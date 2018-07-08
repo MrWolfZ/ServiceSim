@@ -3,12 +3,20 @@ import { toBatch, toEvents } from '../../infrastructure/event-source-repository'
 import * as es from '../../infrastructure/event-stream';
 import { apply, createFromEvents, DomainEvents, RequestMatcher } from './request-matcher';
 
-const journal = ej.open('repo-request-matcher');
+let journal: ej.EventJournal | undefined;
 
-export function requestMatcherOfId(
+async function ensureJournalAsync(): Promise<ej.EventJournal> {
+  if (!journal) {
+    journal = await ej.openAsync('repo-request-matcher');
+  }
+
+  return journal;
+}
+
+export async function requestMatcherOfIdAsync(
   id: string,
-): RequestMatcher {
-  const stream = ej.readStream(journal, id);
+): Promise<RequestMatcher> {
+  const stream = await ej.readStreamAsync(await ensureJournalAsync(), id);
   const events = toEvents<DomainEvents>(stream.stream);
 
   if (es.hasSnapshot(stream)) {
@@ -22,7 +30,7 @@ export function requestMatcherOfId(
   }
 }
 
-export function save(
+export async function saveAsync(
   requestMatcher: RequestMatcher,
   shouldCreateSnapshot = false,
 ) {
@@ -33,8 +41,8 @@ export function save(
     mutatedVersion: requestMatcher.mutatedVersion + 1,
   } : undefined;
 
-  ej.write(
-    journal,
+  await ej.writeAsync(
+    await ensureJournalAsync(),
     requestMatcher.id,
     requestMatcher.mutatedVersion,
     toBatch(requestMatcher.mutatingEvents, snapshotValue),

@@ -1,29 +1,26 @@
 import { EventBatch } from './event-batch';
 import * as es from './event-stream';
 import * as ev from './event-value';
+import { loadEventsAsync, persistEventsAsync } from './persistence/persistence';
 
 export interface EventJournal {
   name: string;
   store: ev.EventValue[];
 }
 
-const eventJournals: { [name: string]: EventJournal } = {};
-
-export function open(
+export async function openAsync(
   name: string,
-): EventJournal {
-  eventJournals[name] = eventJournals[name] || {
+): Promise<EventJournal> {
+  return {
     name,
-    store: [],
+    store: await loadEventsAsync(name),
   };
-
-  return eventJournals[name];
 }
 
-export function readStream(
+export async function readStreamAsync(
   journal: EventJournal,
   streamName: string,
-): es.EventStream {
+): Promise<es.EventStream> {
   let values: ev.EventValue[] = [];
   let latestSnapshotValue: ev.EventValue | undefined;
 
@@ -49,16 +46,18 @@ export function readStream(
   };
 }
 
-export function write(
+export async function writeAsync(
   journal: EventJournal,
   streamName: string,
   streamVersion: number,
   eventBatch: EventBatch,
-) {
+): Promise<void> {
   eventBatch.entries.forEach(e => journal.store.push({
     streamName,
     streamVersion,
     body: e.body,
     snapshot: e.snapshot,
   }));
+
+  await persistEventsAsync(journal.name, journal.store);
 }

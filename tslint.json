@@ -160,7 +160,11 @@
     ],
     "space-before-function-paren": [
       true,
-      "never"
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
     ],
     "space-within-parens": false,
     "strict-boolean-expressions": false,

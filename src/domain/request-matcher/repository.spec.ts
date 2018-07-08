@@ -1,8 +1,8 @@
-import { requestMatcherOfId, save } from './repository';
+import { requestMatcherOfIdAsync, saveAsync } from './repository';
 import { create } from './request-matcher';
 
 describe('request matcher repository', () => {
-  it('should save and load', () => {
+  it('should save and load', async () => {
     const matcher = create(
       'matchers/1',
       'path-pattern',
@@ -11,9 +11,9 @@ describe('request matcher repository', () => {
       },
     );
 
-    save(matcher);
+    await saveAsync(matcher);
 
-    const loadedMatcher = requestMatcherOfId(matcher.id);
+    const loadedMatcher = await requestMatcherOfIdAsync(matcher.id);
 
     expect(loadedMatcher.id).toEqual(matcher.id);
     expect(loadedMatcher.matcherKind).toEqual(matcher.matcherKind);
@@ -21,7 +21,7 @@ describe('request matcher repository', () => {
     expect(loadedMatcher.unmutatedVersion).toEqual(matcher.mutatedVersion);
   });
 
-  it('should save snapshot and load', () => {
+  it('should save snapshot and load', async () => {
     const matcher = create(
       'matchers/1',
       'path-pattern',
@@ -30,9 +30,9 @@ describe('request matcher repository', () => {
       },
     );
 
-    save(matcher, true);
+    await saveAsync(matcher, true);
 
-    const loadedMatcher = requestMatcherOfId(matcher.id);
+    const loadedMatcher = await requestMatcherOfIdAsync(matcher.id);
 
     expect(loadedMatcher.id).toEqual(matcher.id);
     expect(loadedMatcher.matcherKind).toEqual(matcher.matcherKind);
