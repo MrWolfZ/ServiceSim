@@ -1,17 +1,14 @@
 import errorHandler from 'errorhandler';
 
-import app from './app';
+import host from './host';
 
-/**
- * Error Handler. Provides full stack - remove for production
- */
-app.use(errorHandler());
+host.use(errorHandler());
 
-const server = app.listen(app.get('port'), () => {
+const server = host.listen(host.get('port'), () => {
   console.log(
     '  App is running at http://localhost:%d in %s mode',
-    app.get('port'),
-    app.get('env')
+    host.get('port'),
+    host.get('env')
   );
   console.log('  Press CTRL-C to stop\n');
 });
