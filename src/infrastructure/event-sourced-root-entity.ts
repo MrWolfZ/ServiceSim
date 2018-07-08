@@ -1,22 +1,22 @@
 import { DomainEvent } from './domain-event';
 
-export interface EventSourcedRootEntity {
-  mutatingEvents: DomainEvent[];
+export interface EventSourcedRootEntity<TEvent extends DomainEvent = DomainEvent> {
+  mutatingEvents: TEvent[];
   mutatedVersion: number;
   unmutatedVersion: number;
 }
 
-export const NULL: EventSourcedRootEntity = {
+export const NULL: EventSourcedRootEntity<any> = {
   mutatingEvents: [],
   mutatedVersion: 1,
   unmutatedVersion: 0,
 };
 
-export type EntityEventHandler<T extends EventSourcedRootEntity, TEvent extends DomainEvent = DomainEvent> =
+export type EntityEventHandler<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent = DomainEvent> =
   (entity: T, event: TEvent) => T;
 
-export function createFactory<T extends EventSourcedRootEntity, TEvent extends DomainEvent = DomainEvent>(
-  factory: (rootEntity: EventSourcedRootEntity) => T,
+export function createFactory<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent = DomainEvent>(
+  factory: (rootEntity: EventSourcedRootEntity<TEvent>) => T,
   eventHandlerMap: EntityEventHandlerMap<T, TEvent>,
 ) {
   return (
@@ -37,11 +37,11 @@ export function createFactory<T extends EventSourcedRootEntity, TEvent extends D
   };
 }
 
-export interface EntityEventHandlerMap<T extends EventSourcedRootEntity, TEvent extends DomainEvent> {
+export interface EntityEventHandlerMap<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent> {
   [eventKind: string]: EntityEventHandler<T, TEvent>;
 }
 
-export function createApply<T extends EventSourcedRootEntity, TEvent extends DomainEvent>(
+export function createApply<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
   eventHandlerMap: EntityEventHandlerMap<T, TEvent>,
 ): EntityEventHandler<T, TEvent> {
   return (entity, event) => {

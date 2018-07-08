@@ -1,7 +1,7 @@
 import * as esre from '../../infrastructure/event-sourced-root-entity';
 import * as rmc from './request-matcher-created';
 
-export interface RequestMatcher extends esre.EventSourcedRootEntity {
+export interface RequestMatcher extends esre.EventSourcedRootEntity<DomainEvents> {
   id: string;
   matcherKind: string;
   properties: { [prop: string]: any };

@@ -1,7 +1,7 @@
 import { EventBatch } from './event-batch';
 import * as es from './event-stream';
 import * as ev from './event-value';
-import { loadEventsAsync, persistEventsAsync } from './persistence/persistence';
+import { loadEventsAsync, persistEventsAsync } from './persistence';
 
 export interface EventJournal {
   name: string;
@@ -52,12 +52,14 @@ export async function writeAsync(
   streamVersion: number,
   eventBatch: EventBatch,
 ): Promise<void> {
-  eventBatch.entries.forEach(e => journal.store.push({
+  const newEvents: ev.EventValue[] = eventBatch.entries.map(e => ({
     streamName,
     streamVersion,
     body: e.body,
     snapshot: e.snapshot,
   }));
 
-  await persistEventsAsync(journal.name, journal.store);
+  newEvents.forEach(e => journal.store.push(e));
+
+  await persistEventsAsync(journal.name, newEvents);
 }

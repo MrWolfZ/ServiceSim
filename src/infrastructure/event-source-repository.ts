@@ -1,6 +1,6 @@
 import { DomainEvent } from './domain-event';
-import * as eb from './event-batch';
-import { EventValue } from './event-value';
+import * as eb from './event-journal/event-batch';
+import { EventValue } from './event-journal/event-value';
 
 export function toBatch(
   domainEvents: DomainEvent[],

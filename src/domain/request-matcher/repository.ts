@@ -1,6 +1,7 @@
-import * as ej from '../../infrastructure/event-journal';
+import * as ej from '../../infrastructure/event-journal/event-journal';
+import * as es from '../../infrastructure/event-journal/event-stream';
+import * as el from '../../infrastructure/event-log/event-log';
 import { toBatch, toEvents } from '../../infrastructure/event-source-repository';
-import * as es from '../../infrastructure/event-stream';
 import { apply, createFromEvents, DomainEvents, RequestMatcher } from './request-matcher';
 
 let journal: ej.EventJournal | undefined;
@@ -47,4 +48,6 @@ export async function saveAsync(
     requestMatcher.mutatedVersion,
     toBatch(requestMatcher.mutatingEvents, snapshotValue),
   );
+
+  await el.publishAsync(...requestMatcher.mutatingEvents);
 }
