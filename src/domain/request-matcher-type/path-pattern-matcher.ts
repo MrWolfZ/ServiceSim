@@ -1,4 +1,4 @@
-import { Request } from '../request/request';
+import { ServiceRequest } from '../service-invocation/service-invocation';
 import { RequestMatcherType } from './request-matcher-type';
 
 export const KIND = 'request-matcher-type/PATH_PATTERN';
@@ -16,6 +16,6 @@ export const PATH_PATTERN_TYPE: RequestMatcherType = {
   ],
 };
 
-export function apply(request: Request, props: any) {
+export function apply(request: ServiceRequest, props: any) {
   return true;
 }

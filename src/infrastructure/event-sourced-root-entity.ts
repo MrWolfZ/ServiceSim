@@ -1,47 +1,48 @@
 import { DomainEvent } from './domain-event';
 
-export interface EventSourcedRootEntity<TEvent extends DomainEvent = DomainEvent> {
+export interface EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> {
+  id: string;
   mutatingEvents: TEvent[];
   mutatedVersion: number;
   unmutatedVersion: number;
 }
 
 export const NULL: EventSourcedRootEntity<any> = {
+  id: '',
   mutatingEvents: [],
   mutatedVersion: 1,
   unmutatedVersion: 0,
 };
 
-export type EntityEventHandler<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent = DomainEvent> =
+export type EntityEventHandler<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> =
   (entity: T, event: TEvent) => T;
 
-export function createFactory<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent = DomainEvent>(
-  factory: (rootEntity: EventSourcedRootEntity<TEvent>) => T,
+export const createFromEvents = <T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
+  nullEntity: T,
   eventHandlerMap: EntityEventHandlerMap<T, TEvent>,
-) {
-  return (
-    stream: TEvent[],
-    streamVersion: number,
+) => (
+  stream: TEvent[],
+  streamVersion: number,
   ): T => {
-    const rootEntity = {
-      ...NULL,
-      unmutatedVersion: streamVersion,
-      mutatedVersion: streamVersion + 1,
-    };
-
-    const entity = factory(rootEntity);
-    return stream.reduce((e, ev) => {
+    const entity = stream.reduce((e, ev) => {
       const handler = eventHandlerMap[ev.kind];
-      return handler(e, ev);
-    }, entity);
+      return handler(e, ev as EventOfKind<TEvent, TEvent['kind']>);
+    }, nullEntity);
+
+    entity.mutatingEvents = [];
+    entity.unmutatedVersion = streamVersion;
+    entity.mutatedVersion = streamVersion + 1;
+
+    return entity;
   };
-}
 
-export interface EntityEventHandlerMap<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent> {
-  [eventKind: string]: EntityEventHandler<T, TEvent>;
-}
+export type EventOfKind<TEvent, TKind extends string> = TEvent extends DomainEvent<TKind> ? TEvent : never;
 
-export function createApply<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
+export type EntityEventHandlerMap<T extends EventSourcedRootEntity<any>, TEvent extends DomainEvent> = {
+  [eventKind in TEvent['kind']]: EntityEventHandler<T, EventOfKind<TEvent, eventKind>>;
+};
+
+export function createApply<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']>>(
   eventHandlerMap: EntityEventHandlerMap<T, TEvent>,
 ): EntityEventHandler<T, TEvent> {
   return (entity, event) => {
@@ -52,6 +53,6 @@ export function createApply<T extends EventSourcedRootEntity<TEvent>, TEvent ext
         ...entity.mutatingEvents,
         event,
       ],
-    }, event);
+    }, event as EventOfKind<TEvent, TEvent['kind']>);
   };
 }

@@ -1,9 +1,9 @@
-import { EventValue } from './event-value';
+import { StoredEvent } from './stored-event';
 
 export interface EventStream {
   streamName: string;
   streamVersion: number;
-  stream: EventValue[];
+  stream: StoredEvent[];
   snapshot: string;
 }
 

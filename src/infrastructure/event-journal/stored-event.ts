@@ -1,16 +1,11 @@
-import { EventValue } from './event-value';
-
 export interface StoredEvent {
   id: number;
-  eventValue: EventValue;
+  body: string;
+  snapshot: string;
+  streamName: string;
+  streamVersion: number;
 }
 
-export function create(
-  id: number,
-  eventValue: EventValue,
-): StoredEvent {
-  return {
-    id,
-    eventValue,
-  };
+export function hasSnapshot(storedEvent: StoredEvent) {
+  return storedEvent.snapshot.length > 0;
 }

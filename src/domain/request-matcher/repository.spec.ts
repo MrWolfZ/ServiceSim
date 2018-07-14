@@ -1,5 +1,4 @@
-import { requestMatcherOfIdAsync, saveAsync } from './repository';
-import { create } from './request-matcher';
+import { create, ofIdAsync, saveAsync, saveSnapshotAsync } from './request-matcher';
 
 describe('request matcher repository', () => {
   it('should save and load', async () => {
@@ -13,7 +12,7 @@ describe('request matcher repository', () => {
 
     await saveAsync(matcher);
 
-    const loadedMatcher = await requestMatcherOfIdAsync(matcher.id);
+    const loadedMatcher = await ofIdAsync(matcher.id);
 
     expect(loadedMatcher.id).toEqual(matcher.id);
     expect(loadedMatcher.matcherKind).toEqual(matcher.matcherKind);
@@ -30,9 +29,9 @@ describe('request matcher repository', () => {
       },
     );
 
-    await saveAsync(matcher, true);
+    await saveSnapshotAsync(matcher);
 
-    const loadedMatcher = await requestMatcherOfIdAsync(matcher.id);
+    const loadedMatcher = await ofIdAsync(matcher.id);
 
     expect(loadedMatcher.id).toEqual(matcher.id);
     expect(loadedMatcher.matcherKind).toEqual(matcher.matcherKind);

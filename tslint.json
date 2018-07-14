@@ -203,7 +203,7 @@
     "unified-signatures": true,
     "use-default-type-parameter": true,
     "use-isnan": true,
-    "variable-name": true,
+    "variable-name": [true, "allow-pascal-case"],
     "whitespace": [
       true,
       "check-branch",

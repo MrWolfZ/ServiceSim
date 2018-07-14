@@ -1,16 +1,16 @@
 import { DomainEvent } from '../domain-event';
 import { loadEventsAsync, persistEventsAsync } from './persistence';
 
-export type AsyncEventCallback<TEvent extends DomainEvent = DomainEvent> = (ev: TEvent) => Promise<void>;
+export type AsyncEventCallback<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> = (ev: TEvent) => Promise<void>;
 
-interface Subscription<TEvent extends DomainEvent = DomainEvent> {
+interface Subscription<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> {
   subscriptionId: number;
   callback: AsyncEventCallback<TEvent>;
 }
 
-interface BufferedSubscription<TEvent extends DomainEvent = DomainEvent> {
+interface BufferedSubscription<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> {
   subscriptionId: number;
-  eventKinds: string[];
+  eventKinds: TEvent['kind'][];
   bufferedEvents: TEvent[];
 }
 
@@ -27,10 +27,26 @@ const bufferedSubscriptions: { [subscriptionId: number]: BufferedSubscription<an
 
 let currentSubscriptionId = 0;
 
-export async function subscribeAsync<TEvent extends DomainEvent = DomainEvent>(
+export async function subscribeOneAsync<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
   callback: AsyncEventCallback<TEvent>,
-  ...eventKinds: string[]
+  eventKind: TEvent['kind'], // extra parameter to ensure this is not accidentally called without any kinds
+  ...eventKinds: TEvent['kind'][]
 ): Promise<() => void> {
+  const unsub = await subscribeAsync(async ev => {
+    await callback(ev);
+    unsub();
+  }, eventKind, eventKinds);
+
+  return unsub;
+}
+
+export async function subscribeAsync<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
+  callback: AsyncEventCallback<TEvent>,
+  eventKind: TEvent['kind'], // extra parameter to ensure this is not accidentally called without any kinds
+  ...eventKinds: TEvent['kind'][]
+): Promise<() => void> {
+  eventKinds = [eventKind, ...eventKinds];
+
   const subscriptionId = currentSubscriptionId += 1;
 
   bufferedSubscriptions[subscriptionId] = {
@@ -53,7 +69,7 @@ export async function subscribeAsync<TEvent extends DomainEvent = DomainEvent>(
 
   eventKinds.forEach(kind => {
     subscriptions[kind] = subscriptions[kind] || [];
-    subscriptions[kind].push({ subscriptionId, callback });
+    subscriptions[kind as string].push({ subscriptionId, callback });
   });
 
   return () => {

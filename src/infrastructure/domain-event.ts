@@ -1,26 +1,20 @@
-export interface DomainEvent<TKind = string> {
+export interface DomainEvent<TKind extends string = string> {
   kind: TKind;
   occurredOnEpoch: number;
   eventVersion: number;
 }
 
-export const NULL: DomainEvent = {
-  kind: '',
-  occurredOnEpoch: 0,
-  eventVersion: 0,
-};
+export type CustomProperties<T extends DomainEvent<T['kind']>> = Pick<T, Exclude<keyof T, keyof DomainEvent<T['kind']>>>;
 
-export function createFactory<T extends DomainEvent, TKind = string>(
-  kind: TKind,
-  factory: (base: DomainEvent<TKind>) => T,
-) {
-  return (
-    eventVersion = 1,
+export const create = <T extends DomainEvent<T['kind']>>(
+  kind: T['kind'],
+  eventVersion = 1,
+) => (
+  customProps: CustomProperties<T>,
   ): T =>
-    factory({
-      ...NULL,
+    ({
       kind,
       eventVersion,
       occurredOnEpoch: Date.now(),
+      ...(customProps as any),
     });
-}

@@ -1,6 +1,6 @@
-import { EventValue } from '../event-journal/event-value';
-import { StoredEvent } from '../event-journal/stored-event';
+import { StoredEvent } from './stored-event';
 
+// TODO: find a proper way to deal with the event IDs
 export interface EventJournalPersistenceAdapter {
   getEventCountAsync(journalName: string): Promise<number>;
   persistEventsAsync(journalName: string, events: StoredEvent[]): Promise<void>;
@@ -15,8 +15,9 @@ export class InMemoryEventJournalPersistenceAdapter implements EventJournalPersi
   }
 
   async persistEventsAsync(journalName: string, events: StoredEvent[]): Promise<void> {
+    const eventCount = await this.getEventCountAsync(journalName);
     this.eventsPerJournal[journalName] = this.eventsPerJournal[journalName] || [];
-    events.forEach(e => this.eventsPerJournal[journalName].push(e));
+    events.map((e, idx) => ({ ...e, id: eventCount + idx })).forEach(e => this.eventsPerJournal[journalName].push(e));
   }
 
   async loadEventsAsync(journalName: string): Promise<StoredEvent[]> {
@@ -30,21 +31,18 @@ export function setAdapter(a: EventJournalPersistenceAdapter) {
   adapter = a;
 }
 
-export async function persistEventsAsync(
+export function persistEventsAsync(
   journalName: string,
-  events: EventValue[],
+  events: StoredEvent[],
 ): Promise<void> {
-  const eventCount = await adapter.getEventCountAsync(journalName);
-
-  await adapter.persistEventsAsync(
+  return adapter.persistEventsAsync(
     journalName,
-    events.map((ev, idx) => ({ id: eventCount + idx, eventValue: ev })),
+    events,
   );
 }
 
-export async function loadEventsAsync(
+export function loadEventsAsync(
   journalName: string,
-): Promise<EventValue[]> {
-  const storedEvents = await adapter.loadEventsAsync(journalName);
-  return storedEvents.map(se => se.eventValue);
+): Promise<StoredEvent[]> {
+  return adapter.loadEventsAsync(journalName);
 }

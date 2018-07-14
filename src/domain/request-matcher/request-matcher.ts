@@ -1,3 +1,4 @@
+import * as eser from '../../infrastructure/event-sourced-entity-repository';
 import * as esre from '../../infrastructure/event-sourced-root-entity';
 import * as rmc from './request-matcher-created';
 
@@ -30,24 +31,16 @@ export const EVENT_HANDLER_MAP: esre.EntityEventHandlerMap<RequestMatcher, Domai
 };
 
 export const apply = esre.createApply(EVENT_HANDLER_MAP);
+export const createFromEvents = esre.createFromEvents(NULL, EVENT_HANDLER_MAP);
 
-export function create(
+export const create = (
   id: string,
   matcherKind: string,
   properties: { [prop: string]: any },
-): RequestMatcher {
-  return apply(NULL, rmc.create(id, matcherKind, properties));
-}
+) => apply(NULL, rmc.create({ id, matcherKind, properties }));
 
-export function createFromEvents(
-  stream: DomainEvents[],
-  streamVersion: number,
-) {
-  return esre.createFactory<RequestMatcher, DomainEvents>(
-    base => ({
-      ...NULL,
-      ...base,
-    }),
-    EVENT_HANDLER_MAP,
-  )(stream, streamVersion);
-}
+const JOURNAL_NAME = 'request-matcher/Journal';
+
+export const ofIdAsync = eser.entityOfIdAsync(JOURNAL_NAME, apply, createFromEvents);
+export const saveAsync = eser.saveAsync<RequestMatcher, DomainEvents>(JOURNAL_NAME);
+export const saveSnapshotAsync = eser.saveSnapshotAsync<RequestMatcher, DomainEvents>(JOURNAL_NAME);

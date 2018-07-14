@@ -1,23 +1,22 @@
 import { Request, Response } from 'express';
-import * as request from '../domain/request/request';
-import { getAllAsync } from './projections/all-matchers';
+import * as irws from '../domain/service-invocation/invocation-response-was-set';
+import * as si from '../domain/service-invocation/service-invocation';
+import { subscribeOneAsync } from '../infrastructure/event-log/event-log';
 
 export let processRequest = async (req: Request, res: Response) => {
-  const allMatchers = await getAllAsync();
-  const r: request.Request = {
-    path: req.path,
-    body: req.body,
-  };
+  let invocation = si.create('', req.path, req.body);
 
-  allMatchers.forEach(m => {
-    if (m.apply(r)) {
-      console.log(`matcher ${m.id} matches`);
-    }
-  });
+  invocation = await si.saveAsync(invocation);
 
-  res.send({
-    content: 'hello world',
-  });
+  await subscribeOneAsync<irws.InvocationResponseWasSet>(async ev => {
+    res.status(ev.statusCode).send({
+      content: ev.responseBody,
+    });
+  }, irws.KIND);
+
+  invocation = si.setResponse(invocation, 200, 'Hello World');
+
+  await si.saveAsync(invocation);
 };
 
 export type RequestMatcherFunction<TProps = { [prop: string]: any }> = (request: Request, props: TProps) => boolean;

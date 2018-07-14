@@ -11,11 +11,11 @@ describe('all request matchers projection', () => {
   it('should track all created request matchers', async () => {
     const unsub = await startAsync();
     const matcherId1 = 'matchers/1';
-    await publishAsync(rmc.create(matcherId1, 'url-pattern', {}));
+    await publishAsync(rmc.create({ id: matcherId1, matcherKind: 'url-pattern', properties: {} }));
     expect((await getAllAsync()).length).toBe(1);
     expect((await getAllAsync()).map(v => v.id)).toContain(matcherId1);
     const matcherId2 = 'matchers/2';
-    await publishAsync(rmc.create(matcherId2, 'url-pattern', {}));
+    await publishAsync(rmc.create({ id: matcherId2, matcherKind: 'url-pattern', properties: {} }));
     expect((await getAllAsync()).map(v => v.id)).toContain(matcherId2);
     unsub();
   });

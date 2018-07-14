@@ -2,7 +2,6 @@ import express from 'express';
 
 import * as apiController from './controllers/api';
 import { startAsync } from './controllers/projections/all-matchers';
-import { saveAsync } from './domain/request-matcher/repository';
 import * as rm from './domain/request-matcher/request-matcher';
 import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
@@ -22,7 +21,7 @@ async function initializeAsync() {
     },
   );
 
-  await saveAsync(matcher);
+  await rm.saveAsync(matcher);
 }
 
 initializeAsync();
