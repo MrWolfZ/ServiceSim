@@ -27,9 +27,7 @@
     "file-header": false,
     "forin": true,
     "import-blacklist": [
-      true,
-      "rxjs",
-      "@angular/material"
+      false
     ],
     "import-spacing": true,
     "indent": [

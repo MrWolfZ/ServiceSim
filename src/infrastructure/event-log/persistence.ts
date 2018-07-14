@@ -29,23 +29,26 @@ export function setAdapter(a: EventLogPersistenceAdapter) {
   adapter = a;
 }
 
+// TODO: fix event index mess
 export async function persistEventsAsync(
   events: DomainEvent[],
-): Promise<void> {
+): Promise<number[]> {
   const eventCount = await adapter.getEventCountAsync();
 
   await adapter.persistEventsAsync(
     events.map((ev, idx) => ({
-      id: eventCount + idx,
+      id: eventCount + idx + 1,
       eventKind: ev.kind,
       body: JSON.stringify(ev),
     })),
   );
+
+  return events.map((_, idx) => eventCount + idx + 1);
 }
 
 export async function loadEventsAsync<TEvent extends DomainEvent = DomainEvent>(
   ...eventKinds: string[]
-): Promise<TEvent[]> {
+): Promise<[TEvent[], number]> {
   const storedEvents = await adapter.loadEventsAsync(...eventKinds);
-  return storedEvents.map(se => JSON.parse(se.body));
+  return [storedEvents.map(se => JSON.parse(se.body)), storedEvents.reduce((l, ev) => Math.max(l, ev.id), 0)];
 }

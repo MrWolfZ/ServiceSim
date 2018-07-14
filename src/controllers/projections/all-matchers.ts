@@ -1,6 +1,6 @@
 import * as rmc from '../../domain/request-matcher/request-matcher-created';
 import { ServiceRequest } from '../../domain/service-invocation/service-invocation';
-import { subscribeAsync } from '../../infrastructure/event-log/event-log';
+import { eventStream } from '../../infrastructure/event-log/event-log';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [rmc.KIND];
 
@@ -17,8 +17,8 @@ export interface RequestMatcherView {
 
 const views: RequestMatcherView[] = [];
 
-export async function startAsync() {
-  return await subscribeAsync<SubscribedEvents>(async ev => {
+export function start() {
+  return eventStream<SubscribedEvents>(...SUBSCRIBED_EVENT_KINDS).subscribe(ev => {
     switch (ev.kind) {
       case rmc.KIND:
         views.push({
@@ -32,7 +32,7 @@ export async function startAsync() {
       default:
         return;
     }
-  }, ...SUBSCRIBED_EVENT_KINDS);
+  });
 }
 
 export async function getAllAsync() {

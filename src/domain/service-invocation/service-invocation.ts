@@ -68,13 +68,21 @@ export const create = (
   invocationId: string,
   path: string,
   body: string,
-) => apply(NULL, srr.create({ invocationId, path, body }));
+) => apply(NULL, srr.create({
+  invocationId,
+  path,
+  body,
+}));
 
 export const setResponse = (
   invocation: ServiceInvocation,
   statusCode: number,
   responseBody: string,
-) => apply(invocation, irws.create({ invocationId: invocation.id, statusCode, responseBody }));
+) => apply(invocation, irws.create({
+  invocationId: invocation.id,
+  statusCode,
+  responseBody,
+}));
 
 const JOURNAL_NAME = 'service-invocation/Journal';
 

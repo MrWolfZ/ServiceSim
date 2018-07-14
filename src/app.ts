@@ -1,7 +1,7 @@
 import express from 'express';
 
 import * as apiController from './controllers/api';
-import { startAsync } from './controllers/projections/all-matchers';
+import { start } from './controllers/projections/all-matchers';
 import * as rm from './domain/request-matcher/request-matcher';
 import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
@@ -11,7 +11,7 @@ ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());
 elp.setAdapter(new elp.InMemoryEventLogPersistenceAdapter());
 
 async function initializeAsync() {
-  await startAsync();
+  const sub1 = start();
 
   const matcher = rm.create(
     'matchers/1',
@@ -22,6 +22,10 @@ async function initializeAsync() {
   );
 
   await rm.saveAsync(matcher);
+
+  return () => {
+    sub1.unsubscribe();
+  };
 }
 
 initializeAsync();
