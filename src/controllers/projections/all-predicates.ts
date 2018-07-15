@@ -1,25 +1,28 @@
-import * as pkc from '../../domain/predicate-kind/predicate-kind-created';
-import * as pc from '../../domain/predicate/predicate-created';
-import * as rgs from '../../domain/predicate/response-generator-set';
-import * as rgkc from '../../domain/response-generator-kind/response-generator-kind-created';
-import * as rgc from '../../domain/response-generator/response-generator-created';
-import { ServiceRequest, ServiceResponse } from '../../domain/service-invocation/service-invocation';
+import {
+  PredicateCreated,
+  PredicateKindCreated,
+  ResponseGeneratorCreated,
+  ResponseGeneratorKindCreated,
+  ResponseGeneratorSet,
+  ServiceRequest,
+  ServiceResponse,
+} from '../../domain';
 import { eventStream } from '../../infrastructure/event-log/event-log';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
-  pkc.KIND,
-  rgkc.KIND,
-  rgc.KIND,
-  pc.KIND,
-  rgs.KIND,
+  PredicateKindCreated.KIND,
+  ResponseGeneratorKindCreated.KIND,
+  ResponseGeneratorCreated.KIND,
+  PredicateCreated.KIND,
+  ResponseGeneratorSet.KIND,
 ];
 
 type SubscribedEvents =
-  | pkc.PredicateKindCreated
-  | rgkc.ResponseGeneratorKindCreated
-  | rgc.ResponseGeneratorCreated
-  | pc.PredicateCreated
-  | rgs.ResponseGeneratorSet
+  | PredicateKindCreated
+  | ResponseGeneratorKindCreated
+  | ResponseGeneratorCreated
+  | PredicateCreated
+  | ResponseGeneratorSet
   ;
 
 export interface ResponseGeneratorView {
@@ -46,15 +49,15 @@ export function start() {
 
   return eventStream<SubscribedEvents>(...SUBSCRIBED_EVENT_KINDS).subscribe(ev => {
     switch (ev.kind) {
-      case pkc.KIND:
+      case PredicateKindCreated.KIND:
         predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
         return;
 
-      case rgkc.KIND:
+      case ResponseGeneratorKindCreated.KIND:
         responseGeneratorKindFunctionBodies.set(ev.responseGeneratorKindId, ev.generatorFunctionBody);
         return;
 
-      case rgc.KIND:
+      case ResponseGeneratorCreated.KIND:
         responseGenerators.set(ev.responseGeneratorId, {
           properties: ev.properties,
           functionBody: responseGeneratorKindFunctionBodies.get(ev.responseGeneratorKindId)!,
@@ -62,7 +65,7 @@ export function start() {
 
         return;
 
-      case pc.KIND:
+      case PredicateCreated.KIND:
         views.push({
           predicateId: ev.predicateId,
           properties: ev.properties,
@@ -72,7 +75,7 @@ export function start() {
 
         return;
 
-      case rgs.KIND:
+      case ResponseGeneratorSet.KIND:
         const view = views.find(v => v.predicateId === ev.predicateId)!;
         const generator = responseGenerators.get(ev.responseGeneratorId)!;
         view.childPredicatesOrResponseGenerator = {

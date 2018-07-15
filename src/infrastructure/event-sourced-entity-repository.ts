@@ -2,7 +2,7 @@ import { DomainEvent } from './domain-event';
 import * as ej from './event-journal/event-journal';
 import * as es from './event-journal/event-stream';
 import * as el from './event-log/event-log';
-import { EntityEventHandler, EventSourcedRootEntity } from './event-sourced-root-entity';
+import { EventSourcedRootEntity } from './event-sourced-root-entity';
 
 const journals = new Map<string, ej.EventJournal>();
 
@@ -14,65 +14,64 @@ async function ensureJournalAsync(journalName: string): Promise<ej.EventJournal>
   return journals.get(journalName)!;
 }
 
-export const entityOfIdAsync = <T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
-  journalName: string,
-  apply: EntityEventHandler<T, TEvent>,
-  createFromEvents: (stream: TEvent[], streamVersion: number) => T,
-) => async (
-  id: string,
-  ): Promise<T> => {
-    const stream = await ej.readStreamAsync(await ensureJournalAsync(journalName), id);
-    const events = stream.stream.map(e => JSON.parse(e.body) as TEvent);
+export class EventSourcedEntityRepository {
+  static entityOfIdAsync<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
+    journalName: string,
+    fromEvents: (events: TEvent[], streamVersion: number, snapshot: any | undefined) => T,
+  ) {
+    return async (
+      id: string,
+    ): Promise<T> => {
+      const stream = await ej.readStreamAsync(await ensureJournalAsync(journalName), id);
+      const events = stream.stream.map(e => JSON.parse(e.body) as TEvent);
 
-    if (es.hasSnapshot(stream)) {
-      const entity = JSON.parse(stream.snapshot) as T;
-      return events.reduce(apply, entity);
-    } else {
-      return createFromEvents(
+      return fromEvents(
         events,
         stream.streamVersion,
+        es.hasSnapshot(stream) ? JSON.parse(stream.snapshot) : undefined,
       );
-    }
-  };
-
-export const saveAsync = <T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
-  journalName: string,
-) => async (
-  entity: T,
-  ): Promise<T> => {
-    await ej.writeAsync(
-      await ensureJournalAsync(journalName),
-      entity.id,
-      entity.mutatedVersion,
-      ...entity.mutatingEvents
-    );
-
-    await el.publishAsync(...entity.mutatingEvents);
-
-    return {
-      ...(entity as any),
-      mutatingEvents: [],
-      unmutatedVersion: entity.mutatedVersion,
-      mutatedVersion: entity.mutatedVersion + 1,
     };
-  };
+  }
 
-export const saveSnapshotAsync = <T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
-  journalName: string,
-) => async (
-  entity: T,
-  ) => {
-    const snapshotValue: T = {
-      ...(entity as any),
-      mutatingEvents: [],
-      unmutatedVersion: entity.mutatedVersion,
-      mutatedVersion: entity.mutatedVersion + 1,
+  static saveAsync<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
+    journalName: string,
+  ) {
+    return async (
+      entity: T,
+    ): Promise<T> => {
+      await ej.writeAsync(
+        await ensureJournalAsync(journalName),
+        entity.id,
+        entity.mutatedVersion,
+        ...entity.mutatingEvents
+      );
+
+      await el.publishAsync(...entity.mutatingEvents);
+
+      entity.mutatingEvents = [];
+      entity.unmutatedVersion = entity.mutatedVersion;
+      entity.mutatedVersion = entity.mutatedVersion + 1;
+
+      return entity;
     };
+  }
 
-    await ej.writeSnapshotAsync(
-      await ensureJournalAsync(journalName),
-      entity.id,
-      entity.mutatedVersion,
-      snapshotValue,
-    );
-  };
+  static saveSnapshotAsync<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent>(
+    journalName: string,
+  ) {
+    return async (
+      entity: T,
+    ) => {
+      const snapshotValue = entity.createSnapshot();
+
+      await ej.writeSnapshotAsync(
+        await ensureJournalAsync(journalName),
+        entity.id,
+        entity.unmutatedVersion,
+        snapshotValue,
+      );
+
+      return entity;
+    };
+  }
+}

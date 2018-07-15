@@ -1,11 +1,10 @@
-import * as de from '../../infrastructure/domain-event';
+import { DomainEvent } from '../../infrastructure';
 
-export const KIND = 'service-invocation/ServiceRequestReceived';
-
-export interface ServiceRequestReceived extends de.DomainEvent<typeof KIND> {
+export class ServiceRequestReceived extends DomainEvent<typeof ServiceRequestReceived.KIND> {
   invocationId: string;
   path: string;
   body: string;
-}
 
-export const create = de.create<ServiceRequestReceived>(KIND);
+  static readonly KIND = 'service-invocation/ServiceRequestReceived';
+  static readonly create = DomainEvent.createBase(ServiceRequestReceived);
+}

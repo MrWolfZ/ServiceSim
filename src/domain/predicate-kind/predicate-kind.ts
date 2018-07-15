@@ -1,92 +1,75 @@
 import uuid from 'uuid';
 
-import * as eser from '../../infrastructure/event-sourced-entity-repository';
-import * as esre from '../../infrastructure/event-sourced-root-entity';
-import * as pkc from './predicate-kind-created';
-import * as pda from './property-descriptor-added';
+import { EntityEventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { PredicateKindCreated } from './predicate-kind-created';
+import { PredicatePropertyDescriptorAdded } from './property-descriptor-added';
 
-export interface PredicateKind extends esre.EventSourcedRootEntity<DomainEvents> {
-  name: string;
-  description: string;
-  propertyDescriptors: PropertyDescriptor[];
-  evalFunctionBody: string;
-}
+const JOURNAL_NAME = 'predicate-kind/Journal';
 
-export interface PropertyDescriptor {
+type DomainEvents =
+  | PredicateKindCreated
+  | PredicatePropertyDescriptorAdded
+  ;
+
+export interface PredicatePropertyDescriptor {
   name: string;
   description: string;
   isRequired: boolean;
   valueType: 'string' | 'boolean' | 'number';
 }
 
-export const NULL: PredicateKind = {
-  ...esre.NULL,
-  name: '',
-  description: '',
-  propertyDescriptors: [],
-  evalFunctionBody: 'return true;',
-};
+export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
+  name = '';
+  description = '';
+  propertyDescriptors: PredicatePropertyDescriptor[] = [];
+  evalFunctionBody = 'return true;';
 
-export type DomainEvents =
-  | pkc.PredicateKindCreated
-  | pda.PropertyDescriptorAdded
-  ;
+  static create(
+    name: string,
+    description: string,
+    evalFunctionBody: string,
+  ) {
+    return new PredicateKind().apply(PredicateKindCreated.create({
+      predicateKindId: `predicate-kind/${uuid()}`,
+      name,
+      description,
+      evalFunctionBody,
+    }));
+  }
 
-export const EVENT_HANDLER_MAP: esre.EntityEventHandlerMap<PredicateKind, DomainEvents> = {
-  [pkc.KIND]: (e, ev): PredicateKind => {
-    return {
-      ...e,
-      id: ev.predicateKindId,
-      name: ev.name,
-      description: ev.description,
-    };
-  },
-  [pda.KIND]: (e, ev): PredicateKind => {
-    return {
-      ...e,
-      propertyDescriptors: [
-        ...e.propertyDescriptors,
-        {
-          name: ev.name,
-          description: ev.description,
-          isRequired: ev.isRequired,
-          valueType: ev.valueType,
-        },
-      ],
-    };
-  },
-};
+  addPropertyDescriptor = (
+    name: string,
+    description: string,
+    isRequired: boolean,
+    valueType: 'string' | 'boolean' | 'number',
+  ) => {
+    return this.apply(PredicatePropertyDescriptorAdded.create({
+      predicateKindId: this.id,
+      name,
+      description,
+      isRequired,
+      valueType,
+    }));
+  }
 
-export const apply = esre.createApply(EVENT_HANDLER_MAP);
-export const createFromEvents = esre.createFromEvents(NULL, EVENT_HANDLER_MAP);
+  EVENT_HANDLERS: EntityEventHandlerMap<DomainEvents> = {
+    [PredicateKindCreated.KIND]: event => {
+      this.id = event.predicateKindId;
+      this.name = event.name;
+      this.description = event.description;
+    },
+    [PredicatePropertyDescriptorAdded.KIND]: event => {
+      this.propertyDescriptors.push({
+        name: event.name,
+        description: event.description,
+        isRequired: event.isRequired,
+        valueType: event.valueType,
+      });
+    },
+  };
 
-export const create = (
-  name: string,
-  description: string,
-  evalFunctionBody: string,
-) => apply(NULL, pkc.create({
-  predicateKindId: `predicate-kind/${uuid()}`,
-  name,
-  description,
-  evalFunctionBody,
-}));
-
-export const addPropertyDescriptor = (
-  predicateKind: PredicateKind,
-  name: string,
-  description: string,
-  isRequired: boolean,
-  valueType: 'string' | 'boolean' | 'number',
-) => apply(predicateKind, pda.create({
-  predicateKindId: predicateKind.id,
-  name,
-  description,
-  isRequired,
-  valueType,
-}));
-
-const JOURNAL_NAME = 'predicate-kind/Journal';
-
-export const ofIdAsync = eser.entityOfIdAsync(JOURNAL_NAME, apply, createFromEvents);
-export const saveAsync = eser.saveAsync<PredicateKind, DomainEvents>(JOURNAL_NAME);
-export const saveSnapshotAsync = eser.saveSnapshotAsync<PredicateKind, DomainEvents>(JOURNAL_NAME);
+  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<PredicateKind, DomainEvents>(PredicateKind);
+  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, PredicateKind.fromEvents);
+  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<PredicateKind, DomainEvents>(JOURNAL_NAME);
+  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<PredicateKind, DomainEvents>(JOURNAL_NAME);
+}

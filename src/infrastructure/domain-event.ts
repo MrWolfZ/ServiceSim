@@ -1,20 +1,24 @@
-export interface DomainEvent<TKind extends string = string> {
+export interface EventConstructor<T extends DomainEvent<T['kind']>> {
+  new(...args: any[]): T;
+  readonly KIND: T['kind'];
+}
+
+export abstract class DomainEvent<TKind extends string = string> {
   kind: TKind;
   occurredOnEpoch: number;
   eventVersion: number;
+
+  static readonly createBase = <T extends DomainEvent<T['kind']>>(
+    cons: EventConstructor<T>,
+    eventVersion = 1,
+  ) => (
+    customProps: Pick<T, Exclude<keyof T, keyof DomainEvent<T['kind']>>>,
+    ): T => {
+      const instance = new cons();
+      instance.kind = cons.KIND;
+      instance.occurredOnEpoch = Date.now();
+      instance.eventVersion = eventVersion;
+      Object.assign(instance, customProps);
+      return instance;
+    }
 }
-
-export type CustomProperties<T extends DomainEvent<T['kind']>> = Pick<T, Exclude<keyof T, keyof DomainEvent<T['kind']>>>;
-
-export const create = <T extends DomainEvent<T['kind']>>(
-  kind: T['kind'],
-  eventVersion = 1,
-) => (
-  customProps: CustomProperties<T>,
-  ): T =>
-    ({
-      kind,
-      eventVersion,
-      occurredOnEpoch: Date.now(),
-      ...(customProps as any),
-    });

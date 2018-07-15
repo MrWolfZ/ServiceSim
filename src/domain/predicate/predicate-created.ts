@@ -1,11 +1,10 @@
-import * as de from '../../infrastructure/domain-event';
+import { DomainEvent } from '../../infrastructure';
 
-export const KIND = 'predicate/PredicateCreated';
-
-export interface PredicateCreated extends de.DomainEvent<typeof KIND> {
+export class PredicateCreated extends DomainEvent<typeof PredicateCreated.KIND> {
   predicateId: string;
   predicateKindId: string;
   properties: { [prop: string]: string | number | boolean };
-}
 
-export const create = de.create<PredicateCreated>(KIND);
+  static readonly KIND = 'predicate/PredicateCreated';
+  static readonly create = DomainEvent.createBase(PredicateCreated);
+}

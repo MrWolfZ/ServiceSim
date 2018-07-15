@@ -2,10 +2,7 @@ import express from 'express';
 
 import * as apiController from './controllers/api';
 import * as ap from './controllers/projections/all-predicates';
-import * as pk from './domain/predicate-kind/predicate-kind';
-import * as p from './domain/predicate/predicate';
-import * as rgk from './domain/response-generator-kind/response-generator-kind';
-import * as rg from './domain/response-generator/response-generator';
+import { Predicate, PredicateKind, ResponseGenerator, ResponseGeneratorKind } from './domain';
 import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
 
@@ -16,48 +13,46 @@ elp.setAdapter(new elp.InMemoryEventLogPersistenceAdapter());
 export async function initializeAsync() {
   const sub1 = ap.start();
 
-  let staticResponseGeneratorKind = rgk.create(
+  const staticResponseGeneratorKind = ResponseGeneratorKind.create(
     'static',
     'returns a static response',
     'return { statusCode: properties.statusCode, body: properties.body };',
   );
 
-  staticResponseGeneratorKind = rgk.addPropertyDescriptor(
-    staticResponseGeneratorKind,
+  staticResponseGeneratorKind.addPropertyDescriptor(
     'statusCode',
     'the status code of the response',
     true,
     'number',
   );
 
-  staticResponseGeneratorKind = rgk.addPropertyDescriptor(
-    staticResponseGeneratorKind,
+  staticResponseGeneratorKind.addPropertyDescriptor(
     'body',
     'the body of the response',
     false,
     'string',
   );
 
-  staticResponseGeneratorKind = await rgk.saveAsync(staticResponseGeneratorKind);
+  await ResponseGeneratorKind.saveAsync(staticResponseGeneratorKind);
 
-  const noContentResponseGenerator = rg.create(staticResponseGeneratorKind.id, {
+  const noContentResponseGenerator = ResponseGenerator.create(staticResponseGeneratorKind.id, {
     statusCode: 204,
   });
 
-  await rg.saveAsync(noContentResponseGenerator);
+  await ResponseGenerator.saveAsync(noContentResponseGenerator);
 
-  let allPredicateKind = pk.create(
+  const allPredicateKind = PredicateKind.create(
     'all',
     'accepts all requests',
     'return true;',
   );
 
-  allPredicateKind = await pk.saveAsync(allPredicateKind);
+  await PredicateKind.saveAsync(allPredicateKind);
 
-  let rootPredicate = p.create(allPredicateKind.id);
-  rootPredicate = p.setResponseGenerator(rootPredicate, noContentResponseGenerator.id);
+  const rootPredicate = Predicate.create(allPredicateKind.id);
+  rootPredicate.setResponseGenerator(noContentResponseGenerator.id);
 
-  await p.saveAsync(rootPredicate);
+  await Predicate.saveAsync(rootPredicate);
 
   return () => {
     sub1.unsubscribe();

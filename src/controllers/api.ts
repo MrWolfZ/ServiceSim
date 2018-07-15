@@ -1,19 +1,18 @@
 import { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
 
-import * as irws from '../domain/service-invocation/invocation-response-was-set';
-import * as si from '../domain/service-invocation/service-invocation';
+import { InvocationResponseWasSet, ServiceInvocation } from '../domain';
 import { eventStream } from '../infrastructure/event-log/event-log';
 import { getAllAsync } from './projections/all-predicates';
 
 export let processRequest = async (req: Request, res: Response) => {
   const allPredicates = await getAllAsync();
 
-  let invocation = si.create(req.path, req.body);
+  const invocation = ServiceInvocation.create(req.path, req.body);
 
-  invocation = await si.saveAsync(invocation);
+  await ServiceInvocation.saveAsync(invocation);
 
-  eventStream<irws.InvocationResponseWasSet>(irws.KIND).pipe(
+  eventStream<InvocationResponseWasSet>(InvocationResponseWasSet.KIND).pipe(
     filter(ev => ev.invocationId === invocation.id),
     take(1),
     timeout(60000),
@@ -31,14 +30,14 @@ export let processRequest = async (req: Request, res: Response) => {
   const pred = allPredicates.find(p => p.evaluate(invocation.request, p.properties));
 
   if (!pred || !pred.childPredicatesOrResponseGenerator || Array.isArray(pred.childPredicatesOrResponseGenerator)) {
-    invocation = si.setResponse(invocation, 404, '');
-    await si.saveAsync(invocation);
+    invocation.setResponse(404, '');
+    await ServiceInvocation.saveAsync(invocation);
     return;
   }
 
   const generator = pred.childPredicatesOrResponseGenerator;
   const response = generator.generate(invocation.request, generator.properties);
-  invocation = si.setResponse(invocation, response.statusCode, response.body);
+  invocation.setResponse(response.statusCode, response.body);
 
-  await si.saveAsync(invocation);
+  await ServiceInvocation.saveAsync(invocation);
 };

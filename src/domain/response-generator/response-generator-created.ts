@@ -1,11 +1,10 @@
-import * as de from '../../infrastructure/domain-event';
+import { DomainEvent } from '../../infrastructure';
 
-export const KIND = 'response-generator/ResponseGeneratorCreated';
-
-export interface ResponseGeneratorCreated extends de.DomainEvent<typeof KIND> {
+export class ResponseGeneratorCreated extends DomainEvent<typeof ResponseGeneratorCreated.KIND> {
   responseGeneratorId: string;
   responseGeneratorKindId: string;
   properties: { [prop: string]: string | number | boolean };
-}
 
-export const create = de.create<ResponseGeneratorCreated>(KIND);
+  static readonly KIND = 'response-generator/ResponseGeneratorCreated';
+  static readonly create = DomainEvent.createBase(ResponseGeneratorCreated);
+}

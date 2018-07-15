@@ -1,92 +1,75 @@
 import uuid from 'uuid';
 
-import * as eser from '../../infrastructure/event-sourced-entity-repository';
-import * as esre from '../../infrastructure/event-sourced-root-entity';
-import * as pda from './property-descriptor-added';
-import * as rgkc from './response-generator-kind-created';
+import { EntityEventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { ResponseGeneratorPropertyDescriptorAdded } from './property-descriptor-added';
+import { ResponseGeneratorKindCreated } from './response-generator-kind-created';
 
-export interface ResponseGeneratorKind extends esre.EventSourcedRootEntity<DomainEvents> {
-  name: string;
-  description: string;
-  propertyDescriptors: PropertyDescriptor[];
-  generatorFunctionBody: string;
-}
+const JOURNAL_NAME = 'response-generator-kind/Journal';
 
-export interface PropertyDescriptor {
+type DomainEvents =
+  | ResponseGeneratorKindCreated
+  | ResponseGeneratorPropertyDescriptorAdded
+  ;
+
+export interface ResponseGeneratorPropertyDescriptor {
   name: string;
   description: string;
   isRequired: boolean;
   valueType: 'string' | 'boolean' | 'number';
 }
 
-export const NULL: ResponseGeneratorKind = {
-  ...esre.NULL,
-  name: '',
-  description: '',
-  propertyDescriptors: [],
-  generatorFunctionBody: 'return { statusCode: 500, body: \'missing generator function body\' }',
-};
+export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> {
+  name = '';
+  description = '';
+  propertyDescriptors: ResponseGeneratorPropertyDescriptor[] = [];
+  generatorFunctionBody = 'return { statusCode: 500, body: \'missing generator function body\' }';
 
-export type DomainEvents =
-  | rgkc.ResponseGeneratorKindCreated
-  | pda.PropertyDescriptorAdded
-  ;
+  static create(
+    name: string,
+    description: string,
+    generatorFunctionBody: string,
+  ) {
+    return new ResponseGeneratorKind().apply(ResponseGeneratorKindCreated.create({
+      responseGeneratorKindId: `response-generator-kind/${uuid()}`,
+      name,
+      description,
+      generatorFunctionBody,
+    }));
+  }
 
-export const EVENT_HANDLER_MAP: esre.EntityEventHandlerMap<ResponseGeneratorKind, DomainEvents> = {
-  [rgkc.KIND]: (e, ev): ResponseGeneratorKind => {
-    return {
-      ...e,
-      id: ev.responseGeneratorKindId,
-      name: ev.name,
-      description: ev.description,
-    };
-  },
-  [pda.KIND]: (e, ev): ResponseGeneratorKind => {
-    return {
-      ...e,
-      propertyDescriptors: [
-        ...e.propertyDescriptors,
-        {
-          name: ev.name,
-          description: ev.description,
-          isRequired: ev.isRequired,
-          valueType: ev.valueType,
-        },
-      ],
-    };
-  },
-};
+  addPropertyDescriptor = (
+    name: string,
+    description: string,
+    isRequired: boolean,
+    valueType: 'string' | 'boolean' | 'number',
+  ) => {
+    return this.apply(ResponseGeneratorPropertyDescriptorAdded.create({
+      responseGeneratorKindId: this.id,
+      name,
+      description,
+      isRequired,
+      valueType,
+    }));
+  }
 
-export const apply = esre.createApply(EVENT_HANDLER_MAP);
-export const createFromEvents = esre.createFromEvents(NULL, EVENT_HANDLER_MAP);
+  EVENT_HANDLERS: EntityEventHandlerMap<DomainEvents> = {
+    [ResponseGeneratorKindCreated.KIND]: event => {
+      this.id = event.responseGeneratorKindId;
+      this.name = event.name;
+      this.description = event.description;
+    },
+    [ResponseGeneratorPropertyDescriptorAdded.KIND]: event => {
+      this.propertyDescriptors.push({
+        name: event.name,
+        description: event.description,
+        isRequired: event.isRequired,
+        valueType: event.valueType,
+      });
+    },
+  };
 
-export const create = (
-  name: string,
-  description: string,
-  generatorFunctionBody: string,
-) => apply(NULL, rgkc.create({
-  responseGeneratorKindId: `response-generator-kind/${uuid()}`,
-  name,
-  description,
-  generatorFunctionBody,
-}));
-
-export const addPropertyDescriptor = (
-  responseGeneratorKind: ResponseGeneratorKind,
-  name: string,
-  description: string,
-  isRequired: boolean,
-  valueType: 'string' | 'boolean' | 'number',
-) => apply(responseGeneratorKind, pda.create({
-  responseGeneratorKindId: responseGeneratorKind.id,
-  name,
-  description,
-  isRequired,
-  valueType,
-}));
-
-const JOURNAL_NAME = 'response-generator-kind/Journal';
-
-export const ofIdAsync = eser.entityOfIdAsync(JOURNAL_NAME, apply, createFromEvents);
-export const saveAsync = eser.saveAsync<ResponseGeneratorKind, DomainEvents>(JOURNAL_NAME);
-export const saveSnapshotAsync = eser.saveSnapshotAsync<ResponseGeneratorKind, DomainEvents>(JOURNAL_NAME);
+  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<ResponseGeneratorKind, DomainEvents>(ResponseGeneratorKind);
+  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, ResponseGeneratorKind.fromEvents);
+  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<ResponseGeneratorKind, DomainEvents>(JOURNAL_NAME);
+  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<ResponseGeneratorKind, DomainEvents>(JOURNAL_NAME);
+}

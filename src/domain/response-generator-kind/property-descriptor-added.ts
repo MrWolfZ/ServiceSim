@@ -1,13 +1,12 @@
-import * as de from '../../infrastructure/domain-event';
+import { DomainEvent } from '../../infrastructure';
 
-export const KIND = 'response-generator-kind/PropertyDescriptorAdded';
-
-export interface PropertyDescriptorAdded extends de.DomainEvent<typeof KIND> {
+export class ResponseGeneratorPropertyDescriptorAdded extends DomainEvent<typeof ResponseGeneratorPropertyDescriptorAdded.KIND> {
   responseGeneratorKindId: string;
   name: string;
   description: string;
   isRequired: boolean;
   valueType: 'string' | 'boolean' | 'number';
-}
 
-export const create = de.create<PropertyDescriptorAdded>(KIND);
+  static readonly KIND = 'response-generator-kind/PropertyDescriptorAdded';
+  static readonly create = DomainEvent.createBase(ResponseGeneratorPropertyDescriptorAdded);
+}

@@ -1,5 +1,4 @@
-import * as pkc from '../../domain/predicate-kind/predicate-kind-created';
-import * as pc from '../../domain/predicate/predicate-created';
+import { PredicateCreated, PredicateKindCreated } from '../../domain';
 import { publishAsync } from '../../infrastructure/event-log/event-log';
 import { getAllAsync, start } from './all-predicates';
 
@@ -11,12 +10,12 @@ describe('all predicates projection', () => {
 
   it('should track all created predicates', async () => {
     const sub = start();
-    await publishAsync(pkc.create({ predicateKindId: 'url-pattern', name: 'url-patter', description: '', evalFunctionBody: 'return true;' }));
+    await publishAsync(PredicateKindCreated.create({ predicateKindId: 'url-pattern', name: 'url-patter', description: '', evalFunctionBody: 'return true;' }));
     const matcherId1 = 'predicate/1';
-    await publishAsync(pc.create({ predicateId: matcherId1, predicateKindId: 'url-pattern', properties: {} }));
+    await publishAsync(PredicateCreated.create({ predicateId: matcherId1, predicateKindId: 'url-pattern', properties: {} }));
     expect((await getAllAsync()).length).toBe(1);
     const matcherId2 = 'predicate/2';
-    await publishAsync(pc.create({ predicateId: matcherId2, predicateKindId: 'url-pattern', properties: {} }));
+    await publishAsync(PredicateCreated.create({ predicateId: matcherId2, predicateKindId: 'url-pattern', properties: {} }));
     expect((await getAllAsync()).length).toBe(2);
     sub.unsubscribe();
   });

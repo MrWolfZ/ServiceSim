@@ -1,29 +1,29 @@
-import { create, ofIdAsync, saveAsync, saveSnapshotAsync } from './predicate';
+import { Predicate } from './predicate';
 
 describe('Predicate', () => {
   it('should save and load', async () => {
-    const predicate = create('predicate-kind/1');
+    const predicate = Predicate.create('predicate-kind/1');
 
-    await saveAsync(predicate);
+    await Predicate.saveAsync(predicate);
 
-    const loadedPredicate = await ofIdAsync(predicate.id);
+    const loadedPredicate = await Predicate.ofIdAsync(predicate.id);
 
     expect(loadedPredicate.id).toEqual(predicate.id);
     expect(loadedPredicate.predicateKindId).toEqual(predicate.predicateKindId);
     expect(loadedPredicate.properties).toEqual(predicate.properties);
-    expect(loadedPredicate.unmutatedVersion).toEqual(predicate.mutatedVersion);
+    expect(loadedPredicate.unmutatedVersion).toEqual(predicate.unmutatedVersion);
   });
 
   it('should save snapshot and load', async () => {
-    const predicate = create('predicate-kind/1');
+    const predicate = Predicate.create('predicate-kind/1');
 
-    await saveSnapshotAsync(predicate);
+    await Predicate.saveSnapshotAsync(predicate);
 
-    const loadedPredicate = await ofIdAsync(predicate.id);
+    const loadedPredicate = await Predicate.ofIdAsync(predicate.id);
 
     expect(loadedPredicate.id).toEqual(predicate.id);
     expect(loadedPredicate.predicateKindId).toEqual(predicate.predicateKindId);
     expect(loadedPredicate.properties).toEqual(predicate.properties);
-    expect(loadedPredicate.unmutatedVersion).toEqual(predicate.mutatedVersion);
+    expect(loadedPredicate.unmutatedVersion).toEqual(predicate.unmutatedVersion);
   });
 });

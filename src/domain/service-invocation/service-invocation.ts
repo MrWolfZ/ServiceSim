@@ -1,15 +1,15 @@
 import uuid from 'uuid';
 
-import * as eser from '../../infrastructure/event-sourced-entity-repository';
-import * as esre from '../../infrastructure/event-sourced-root-entity';
-import * as irws from './invocation-response-was-set';
-import * as srr from './service-request-received';
+import { EntityEventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { InvocationResponseWasSet } from './invocation-response-was-set';
+import { ServiceRequestReceived } from './service-request-received';
 
-export interface ServiceInvocation extends esre.EventSourcedRootEntity<DomainEvents> {
-  state: 'processing pending' | 'response set';
-  request: ServiceRequest;
-  response: ServiceResponse;
-}
+const JOURNAL_NAME = 'service-invocation/Journal';
+
+type DomainEvents =
+  | ServiceRequestReceived
+  | InvocationResponseWasSet
+  ;
 
 export interface ServiceRequest {
   path: string;
@@ -21,72 +21,60 @@ export interface ServiceResponse {
   body: string;
 }
 
-export const NULL: ServiceInvocation = {
-  ...esre.NULL,
-  state: 'processing pending',
-  request: {
+export class ServiceInvocation extends EventSourcedRootEntity<DomainEvents> {
+  state: 'processing pending' | 'response set' = 'processing pending';
+
+  request: ServiceRequest = {
     path: '',
     body: '',
-  },
-  response: {
+  };
+
+  response: ServiceResponse = {
     statusCode: 0,
     body: '',
-  },
-};
+  };
 
-export type DomainEvents =
-  | srr.ServiceRequestReceived
-  | irws.InvocationResponseWasSet
-  ;
+  static create(
+    path: string,
+    body: string,
+  ) {
+    return new ServiceInvocation().apply(ServiceRequestReceived.create({
+      invocationId: `service-invocation/${uuid()}`,
+      path,
+      body,
+    }));
+  }
 
-export const EVENT_HANDLER_MAP: esre.EntityEventHandlerMap<ServiceInvocation, DomainEvents> = {
-  [srr.KIND]: (e, ev): ServiceInvocation => {
-    return {
-      ...e,
-      id: ev.invocationId,
-      request: {
-        path: ev.path,
-        body: ev.body,
-      },
-    };
-  },
-  [irws.KIND]: (e, ev): ServiceInvocation => {
-    return {
-      ...e,
-      id: ev.invocationId,
-      state: 'response set',
-      response: {
-        statusCode: ev.statusCode,
-        body: ev.responseBody,
-      },
-    };
-  },
-};
+  setResponse = (
+    statusCode: number,
+    responseBody: string,
+  ) => {
+    return this.apply(InvocationResponseWasSet.create({
+      invocationId: this.id,
+      statusCode,
+      responseBody,
+    }));
+  }
 
-export const apply = esre.createApply(EVENT_HANDLER_MAP);
-export const createFromEvents = esre.createFromEvents(NULL, EVENT_HANDLER_MAP);
+  EVENT_HANDLERS: EntityEventHandlerMap<DomainEvents> = {
+    [ServiceRequestReceived.KIND]: event => {
+      this.id = event.invocationId;
+      this.request = {
+        path: event.path,
+        body: event.body,
+      };
+    },
+    [InvocationResponseWasSet.KIND]: event => {
+      this.state = 'response set';
+      this.response = {
+        statusCode: event.statusCode,
+        body: event.responseBody,
+      };
+    },
+  };
 
-export const create = (
-  path: string,
-  body: string,
-) => apply(NULL, srr.create({
-  invocationId: `service-invocation/${uuid()}`,
-  path,
-  body,
-}));
-
-export const setResponse = (
-  invocation: ServiceInvocation,
-  statusCode: number,
-  responseBody: string,
-) => apply(invocation, irws.create({
-  invocationId: invocation.id,
-  statusCode,
-  responseBody,
-}));
-
-const JOURNAL_NAME = 'service-invocation/Journal';
-
-export const ofIdAsync = eser.entityOfIdAsync(JOURNAL_NAME, apply, createFromEvents);
-export const saveAsync = eser.saveAsync<ServiceInvocation, DomainEvents>(JOURNAL_NAME);
-export const saveSnapshotAsync = eser.saveSnapshotAsync<ServiceInvocation, DomainEvents>(JOURNAL_NAME);
+  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<ServiceInvocation, DomainEvents>(ServiceInvocation);
+  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, ServiceInvocation.fromEvents);
+  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<ServiceInvocation, DomainEvents>(JOURNAL_NAME);
+  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<ServiceInvocation, DomainEvents>(JOURNAL_NAME);
+}
