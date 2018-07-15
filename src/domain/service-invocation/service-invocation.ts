@@ -1,3 +1,5 @@
+import uuid from 'uuid';
+
 import * as eser from '../../infrastructure/event-sourced-entity-repository';
 import * as esre from '../../infrastructure/event-sourced-root-entity';
 import * as irws from './invocation-response-was-set';
@@ -65,11 +67,10 @@ export const apply = esre.createApply(EVENT_HANDLER_MAP);
 export const createFromEvents = esre.createFromEvents(NULL, EVENT_HANDLER_MAP);
 
 export const create = (
-  invocationId: string,
   path: string,
   body: string,
 ) => apply(NULL, srr.create({
-  invocationId,
+  invocationId: `service-invocation/${uuid()}`,
   path,
   body,
 }));
