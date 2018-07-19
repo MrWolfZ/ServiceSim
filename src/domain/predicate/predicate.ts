@@ -11,32 +11,41 @@ type DomainEvents =
   | ResponseGeneratorSet
   ;
 
+export interface ResponseGenerator {
+  responseGeneratorKindId: string;
+  properties: { [prop: string]: string | number | boolean };
+}
+
 export class Predicate extends EventSourcedRootEntity<DomainEvents> {
   predicateKindId = '';
   properties: { [prop: string]: string | number | boolean } = {};
-  childPredicateIdsOrResponseGeneratorId: string[] | string | undefined;
+  childPredicateIdsOrResponseGenerator: string[] | ResponseGenerator | undefined;
 
   static create(
     predicateKindId: string,
     properties: { [prop: string]: string | number | boolean } = {},
+    parentPredicateId: string | undefined,
   ) {
     return new Predicate().apply(PredicateCreated.create({
       predicateId: `predicate/${uuid()}`,
       predicateKindId,
       properties,
+      parentPredicateId,
     }));
   }
 
   setResponseGenerator = (
-    responseGeneratorId: string,
+    responseGeneratorKindId: string,
+    properties: { [prop: string]: string | number | boolean },
   ) => {
-    if (Array.isArray(this.childPredicateIdsOrResponseGeneratorId) && this.childPredicateIdsOrResponseGeneratorId.length > 0) {
+    if (Array.isArray(this.childPredicateIdsOrResponseGenerator) && this.childPredicateIdsOrResponseGenerator.length > 0) {
       throw new Error(`Cannot set response generator for predicate ${this.id} since it already has child predicates!`);
     }
 
     return this.apply(ResponseGeneratorSet.create({
       predicateId: this.id,
-      responseGeneratorId,
+      responseGeneratorKindId,
+      properties,
     }));
   }
 
@@ -47,7 +56,10 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
       this.properties = event.properties;
     },
     [ResponseGeneratorSet.KIND]: event => {
-      this.childPredicateIdsOrResponseGeneratorId = event.responseGeneratorId;
+      this.childPredicateIdsOrResponseGenerator = {
+        responseGeneratorKindId: event.responseGeneratorKindId,
+        properties: event.properties,
+      };
     },
   };
 
@@ -55,7 +67,7 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
     return {
       predicateKindId: this.predicateKindId,
       properties: this.properties,
-      childPredicateIdsOrResponseGeneratorId: this.childPredicateIdsOrResponseGeneratorId,
+      childPredicateIdsOrResponseGeneratorId: this.childPredicateIdsOrResponseGenerator,
     };
   }
 

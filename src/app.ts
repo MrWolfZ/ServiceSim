@@ -1,10 +1,10 @@
 import express from 'express';
 
-import * as apiController from './controllers/api';
-import * as ap from './controllers/projections/all-predicates';
-import { Predicate, PredicateKind, ResponseGenerator, ResponseGeneratorKind } from './domain';
+import { Predicate, PredicateKind, ResponseGeneratorKind } from './domain';
 import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
+import simulationApi from './simulation/api';
+import * as ap from './simulation/predicate-tree';
 
 // TODO: set adapter based on configuration
 ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());
@@ -35,12 +35,6 @@ export async function initializeAsync() {
 
   await ResponseGeneratorKind.saveAsync(staticResponseGeneratorKind);
 
-  const noContentResponseGenerator = ResponseGenerator.create(staticResponseGeneratorKind.id, {
-    statusCode: 204,
-  });
-
-  await ResponseGenerator.saveAsync(noContentResponseGenerator);
-
   const allPredicateKind = PredicateKind.create(
     'all',
     'accepts all requests',
@@ -49,8 +43,8 @@ export async function initializeAsync() {
 
   await PredicateKind.saveAsync(allPredicateKind);
 
-  const rootPredicate = Predicate.create(allPredicateKind.id);
-  rootPredicate.setResponseGenerator(noContentResponseGenerator.id);
+  const rootPredicate = Predicate.create(allPredicateKind.id, {}, undefined);
+  rootPredicate.setResponseGenerator(staticResponseGeneratorKind.id, { statusCode: 204 });
 
   await Predicate.saveAsync(rootPredicate);
 
@@ -59,10 +53,7 @@ export async function initializeAsync() {
   };
 }
 
-initializeAsync();
-
 const app = express.Router();
-
-app.use(apiController.processRequest);
+app.use('/simulation', simulationApi);
 
 export default app;

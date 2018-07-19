@@ -2,7 +2,7 @@ import { Predicate } from './predicate';
 
 describe('Predicate', () => {
   it('should save and load', async () => {
-    const predicate = Predicate.create('predicate-kind/1');
+    const predicate = Predicate.create('predicate-kind/1', {}, undefined);
 
     await Predicate.saveAsync(predicate);
 
@@ -15,7 +15,7 @@ describe('Predicate', () => {
   });
 
   it('should save snapshot and load', async () => {
-    const predicate = Predicate.create('predicate-kind/1');
+    const predicate = Predicate.create('predicate-kind/1', {}, undefined);
 
     await Predicate.saveSnapshotAsync(predicate);
 
