@@ -1,37 +1,38 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
-*.swp
+# compiled output
+/dist
+/tmp
+/out-tsc
 
-pids
-logs
-results
-tmp
+# dependencies
+/node_modules
 
-# Build
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-# Coverage reports
-coverage
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# API keys and secrets
-.env
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+debug.log
+/typings
 
-# Dependency directory
-node_modules
-
-# Editors
-
-# OS metadata
+# System Files
 .DS_Store
 Thumbs.db
-
-# Ignore built ts files
-dist/**/*
-
-# Ignore output from coverage report
-coverage

@@ -14,5 +14,8 @@ module.exports = {
   testMatch: [
     '**/src/**/*.spec.(ts|js)',
   ],
+  testPathIgnorePatterns: [
+    "/src/ui/",
+  ],
   testEnvironment: 'node',
 };
