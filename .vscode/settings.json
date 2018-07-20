@@ -8,10 +8,18 @@
   },
   "typescript.referencesCodeLens.enabled": false,
   "tslint.ignoreDefinitionFiles": false,
-  "tslint.autoFixOnSave": true,
   "tslint.exclude": "**/node_modules/**/*",
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.useTabStops": false,
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+  "html.format.wrapAttributes": "force-aligned",
+  "html.format.endWithNewline": true,
+  "beautify.tabSize": 2,
+  "beautify.options": {
+    "end_with_newline": true,
+    "preserve_newlines": true,
+    "max_preserve_newlines": 10
+  },
+  "javascript.implicitProjectConfig.experimentalDecorators": true
 }
