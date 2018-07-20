@@ -23,10 +23,12 @@ type SubscribedEvents =
   | ResponseGeneratorSet
   ;
 
+export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
+
 export interface PredicateNode {
   predicateId: string;
-  evaluate: (request: ServiceRequest) => boolean;
-  childPredicatesOrResponseGenerator: PredicateNode[] | ((request: ServiceRequest) => ServiceResponse) | undefined;
+  evaluate: (request: ServiceRequest) => boolean | Promise<boolean>;
+  childPredicatesOrResponseGenerator: PredicateNode[] | ResponseGeneratorFunction | undefined;
 }
 
 export type PredicateEvaluationFunction = (request: ServiceRequest, properties: { [prop: string]: any }) => boolean;

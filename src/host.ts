@@ -11,7 +11,7 @@ import { SESSION_SECRET } from './util/secrets';
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv.config({ path: '.env.example' });
 
-import app from './app';
+import app, { initializeAsync } from './app';
 
 const host = express();
 
@@ -33,5 +33,11 @@ host.use(
 );
 
 host.use(app);
+
+initializeAsync().then(shutdown => {
+  process.on('SIGTERM', () => {
+    shutdown();
+  });
+});
 
 export default host;

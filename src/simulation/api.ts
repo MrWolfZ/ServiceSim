@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
 
-import { InvocationResponseWasSet, ServiceInvocation, ServiceRequest, ServiceResponse } from '../domain';
+import { InvocationResponseWasSet, ServiceInvocation, ServiceResponse } from '../domain';
 import { eventStream } from '../infrastructure/event-log/event-log';
-import { getTopLevelPredicateNodes, PredicateNode } from './predicate-tree';
+import { getTopLevelPredicateNodes, PredicateNode, ResponseGeneratorFunction } from './predicate-tree';
 
 export const processRequest = async (req: Request, res: Response) => {
   const topLevelPredicates = await getTopLevelPredicateNodes();
@@ -30,18 +30,22 @@ export const processRequest = async (req: Request, res: Response) => {
     body: '',
   };
 
-  const node = findNode(topLevelPredicates);
+  const node = await findNode(topLevelPredicates);
   if (node) {
-    const generator = node.childPredicatesOrResponseGenerator as (request: ServiceRequest) => ServiceResponse;
-    response = generator(invocation.request);
+    const generator = node.childPredicatesOrResponseGenerator as ResponseGeneratorFunction;
+    response = await Promise.resolve(generator(invocation.request));
   }
 
   invocation.setResponse(response.statusCode, response.body);
   await ServiceInvocation.saveAsync(invocation);
 
-  function findNode(nodes: PredicateNode[]): PredicateNode | undefined {
+  async function findNode(nodes: PredicateNode[]): Promise<PredicateNode | undefined> {
     for (const node of nodes) {
       if (!node.childPredicatesOrResponseGenerator) {
+        continue;
+      }
+
+      if (!await Promise.resolve(node.evaluate(invocation.request))) {
         continue;
       }
 
