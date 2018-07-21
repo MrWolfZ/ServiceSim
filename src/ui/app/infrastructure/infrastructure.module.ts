@@ -2,6 +2,9 @@ import { CommonModule, HashLocationStrategy, LocationStrategy } from '@angular/c
 import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { EffectsModule } from '@ngrx/effects';
 import { NgrxFormsModule } from 'ngrx-forms';
 import { SchedulerLike } from 'rxjs';
@@ -22,11 +25,15 @@ import {
 
 export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxjs/Scheduler');
 
+library.add(faEdit);
+library.add(faTimes);
+
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
     NgrxFormsModule,
+    FontAwesomeModule,
     RouterModule.forChild(infrastructureRoutes),
     EffectsModule.forFeature([
       InfrastructureEffects,
@@ -46,6 +53,8 @@ export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxj
   exports: [
     CommonModule,
     HttpClientModule,
+    NgrxFormsModule,
+    FontAwesomeModule,
     LoadingBarComponent,
     ExpansionContainerComponent,
     TrackRouteIsActiveDirective,

@@ -9,6 +9,10 @@
     "src/ui/polyfills.ts"
   ],
   "include": [
-    "src/ui/app/*/*.module.ts"
+    "src/ui/app/**/*"
+  ],
+  "exclude": [
+    "src/ui/app/**/*.api.ts",
+    "src/ui/app/**/*.spec.ts"
   ]
 }

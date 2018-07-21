@@ -1,0 +1,50 @@
+<form [class.is-readonly]="isReadonly">
+  <div class="field title">
+    <p class="control">
+      <input class="input"
+             type="text"
+             placeholder="Name"
+             [value]="state.name"
+             [readonly]="isReadonly"
+             [class.is-paddingless]="isReadonly">
+    </p>
+  </div>
+  <div class="buttons is-pulled-right is-marginless">
+    <a class="button is-primary"
+       (click)="isReadonly = !isReadonly"
+       *ngIf="isReadonly">
+      <span>Edit</span>
+      <span class="icon is-small">
+        <fa-icon icon="edit"></fa-icon>
+      </span>
+    </a>
+    <a class="button is-danger"
+       (click)="isReadonly = !isReadonly"
+       *ngIf="!isReadonly">
+      <span>Cancel</span>
+      <span class="icon is-small">
+        <fa-icon icon="times"></fa-icon>
+      </span>
+    </a>
+  </div>
+  <div class="field">
+    <p class="control">
+      <input class="input"
+             placeholder="Description"
+             [value]="state.description"
+             [readonly]="isReadonly"
+             [class.is-paddingless]="isReadonly" />
+    </p>
+  </div>
+  <div class="field">
+    <label class="label">Function Body</label>
+    <p class="control">
+      <textarea class="textarea code"
+                placeholder="Description"
+                rows="3"
+                [value]="state.evalFunctionBody"
+                [readonly]="isReadonly">
+          </textarea>
+    </p>
+  </div>
+</form>

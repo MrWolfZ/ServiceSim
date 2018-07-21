@@ -1,9 +1,56 @@
 @import "~bulmaswatch/darkly/variables";
-
-// variable overrides
-$radius-small: 0;
-$radius: 0;
-$radius-large: 0;
-
+@import "constants";
 @import "~bulma/bulma";
 @import "~bulmaswatch/darkly/overrides";
+
+form.is-readonly .field {
+  &:not(:last-child) {
+    margin-bottom: 0rem;
+  }
+
+  >.control {
+    >.input,
+    >.textarea {
+      box-shadow: none;
+
+      &:not(.code) {
+        background-color: transparent;
+      }
+
+      resize: none;
+    }
+  }
+}
+
+.field {
+  transition: all ease 200ms;
+}
+
+.input,
+.textarea {
+  border: 0;
+}
+
+.textarea.code {
+  font-family: "Inconsolata", "Consolas", "Monaco", monospace;
+}
+
+.input {
+  &::placeholder {
+    color: $input-placeholder-color;
+  }
+}
+
+.field.title .input {
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.is-paddingless-vertical {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.is-borderless {
+  border: 0 !important;
+}

@@ -4,3 +4,4 @@ export * from './predicate-kinds.guard';
 export * from './predicate-kinds.page';
 export * from './predicate-kinds.reducer';
 export * from './predicate-kinds.state';
+export * from './predicate-kind-list';

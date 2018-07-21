@@ -9,6 +9,8 @@ import { configurationRoutes } from './configuration.routing';
 
 import {
   PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME,
+  PredicateKindListComponent,
+  PredicateKindListItemComponent,
   PredicateKindsPage,
   PredicateKindsPageEffects,
   PredicateKindsPageInitializationGuard,
@@ -27,6 +29,8 @@ import {
   declarations: [
     PredicateKindsPage,
     ResponseGeneratorsPage,
+    PredicateKindListComponent,
+    PredicateKindListItemComponent,
   ],
   imports: [
     InfrastructureModule,

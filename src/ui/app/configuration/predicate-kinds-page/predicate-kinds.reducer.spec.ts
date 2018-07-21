@@ -2,8 +2,10 @@ import { InitializePredicateKindsPageAction } from './predicate-kinds.actions';
 import { predicateKindsPageReducer } from './predicate-kinds.reducer';
 import { INITIAL_PREDICATE_KINDS_PAGE_STATE, PredicateKindsPageDto } from './predicate-kinds.state';
 
-export const MOCK_PREDICATE_KINDS_PAGE_DTO: PredicateKindsPageDto = {
+import { MOCK_PREDICATE_KIND_LIST_DTO } from './predicate-kind-list/predicate-kind-list.reducer.spec';
 
+export const MOCK_PREDICATE_KINDS_PAGE_DTO: PredicateKindsPageDto = {
+  predicateKindList: MOCK_PREDICATE_KIND_LIST_DTO,
 };
 
 describe(predicateKindsPageReducer.name, () => {

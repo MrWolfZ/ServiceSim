@@ -1,0 +1,8 @@
+<div class="tile is-ancestor">
+  <div class="tile is-12 is-vertical is-parent">
+    <div class="tile is-12 is-child box"
+         *ngFor="let item of state.items">
+      <sim-predicate-kind-list-item [state]="item"></sim-predicate-kind-list-item>
+    </div>
+  </div>
+</div>
