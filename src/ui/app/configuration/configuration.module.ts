@@ -15,20 +15,32 @@ import {
   predicateKindsPageReducer,
 } from './predicate-kinds-page';
 
+import {
+  RESPONSE_GENERATORS_PAGE_STATE_FEATURE_NAME,
+  ResponseGeneratorsPage,
+  ResponseGeneratorsPageEffects,
+  ResponseGeneratorsPageInitializationGuard,
+  responseGeneratorsPageReducer,
+} from './response-generators-page';
+
 @NgModule({
   declarations: [
     PredicateKindsPage,
+    ResponseGeneratorsPage,
   ],
   imports: [
     InfrastructureModule,
     RouterModule.forChild(configurationRoutes),
     EffectsModule.forFeature([
       PredicateKindsPageEffects,
+      ResponseGeneratorsPageEffects,
     ]),
     StoreModule.forFeature(PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME, predicateKindsPageReducer),
+    StoreModule.forFeature(RESPONSE_GENERATORS_PAGE_STATE_FEATURE_NAME, responseGeneratorsPageReducer),
   ],
   providers: [
     PredicateKindsPageInitializationGuard,
+    ResponseGeneratorsPageInitializationGuard,
   ],
 })
 export class ConfigurationModule { }
