@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { PredicateKindListItemDto } from './predicate-kind-list-item.state';
+import { PredicateKindListItemDto } from './predicate-kind-list-item.dto';
 
 export class InitializePredicateKindListItemAction implements Action {
   static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/predicate-kind-list-item/INITIALIZE';

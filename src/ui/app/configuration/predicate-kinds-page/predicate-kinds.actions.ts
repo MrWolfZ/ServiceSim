@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { PredicateKindsPageDto } from './predicate-kinds.state';
+import { PredicateKindsPageDto } from './predicate-kinds.dto';
 
 export class LoadPredicateKindsPageDataAction implements Action {
   static readonly TYPE = 'configuration/predicate-kinds-page/LOAD_DATA';

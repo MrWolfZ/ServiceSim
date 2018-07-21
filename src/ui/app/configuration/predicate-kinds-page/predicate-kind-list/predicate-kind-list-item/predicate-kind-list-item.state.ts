@@ -1,8 +1,4 @@
-export interface PredicateKindListItemDto {
-  name: string;
-  description: string;
-  evalFunctionBody: string;
-}
+import { PredicateKindListItemDto } from './predicate-kind-list-item.dto';
 
 export interface PredicateKindListItemState extends PredicateKindListItemDto {
 

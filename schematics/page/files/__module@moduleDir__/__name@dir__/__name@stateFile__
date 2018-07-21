@@ -1,11 +1,9 @@
 import { RootState as AppRootState } from 'app/app.state';
 
+import { <%= dto(name) %> } from './<%= dtoFileNoExt(name) %>';
+
 export interface RootState extends AppRootState {
   <%= featureStateName(name) %>: <%= state(name) %>;
-}
-
-export interface <%= dto(name) %> {
-
 }
 
 export interface <%= state(name) %> extends <%= dto(name) %> {

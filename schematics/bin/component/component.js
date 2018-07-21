@@ -24,14 +24,26 @@ function getParentNameFromPath(parentDirPath) {
     const parentDirPathParts = parentDirPath.split('/');
     return util_1.getPageOrComponentName(parentDirPathParts[parentDirPathParts.length - 1]);
 }
-function insertInParentState(parentDirPath, name, isArray) {
+function insertInParentDto(parentDirPath, name, isArray) {
     const isPage = util_1.isPagePath(parentDirPath);
     const parentName = getParentNameFromPath(parentDirPath);
-    const stateFilePath = `${parentDirPath}/${isPage ? util_1.pageNames.stateFile(parentName) : util_1.componentNames.stateFile(parentName)}`;
+    const dtoFilePath = `${parentDirPath}/${isPage ? util_1.pageNames.dtoFile(parentName) : util_1.componentNames.dtoFile(parentName)}`;
     const parentDtoInterfaceNames = [
         util_1.pageNames.dto(parentName),
         util_1.componentNames.dto(parentName),
     ];
+    const dto = util_1.componentNames.dto(name);
+    return schematics_1.chain([
+        util_1.addPropertyToInterface(dtoFilePath, n => parentDtoInterfaceNames.includes(n), util_1.componentNames.stateName(name), `${dto}${isArray ? '[]' : ''}`),
+        util_1.addImports(dtoFilePath, getImportPath(name), [
+            dto,
+        ], true, true),
+    ]);
+}
+function insertInParentState(parentDirPath, name, isArray) {
+    const isPage = util_1.isPagePath(parentDirPath);
+    const parentName = getParentNameFromPath(parentDirPath);
+    const stateFilePath = `${parentDirPath}/${isPage ? util_1.pageNames.stateFile(parentName) : util_1.componentNames.stateFile(parentName)}`;
     const parentStateInterfaceNames = [
         util_1.pageNames.state(parentName),
         util_1.componentNames.state(parentName),
@@ -40,14 +52,11 @@ function insertInParentState(parentDirPath, name, isArray) {
         util_1.pageNames.initialStateConstant(parentName),
         util_1.componentNames.initialStateConstant(parentName),
     ];
-    const dto = util_1.componentNames.dto(name);
     const state = util_1.componentNames.state(name);
     return schematics_1.chain([
-        util_1.addPropertyToInterface(stateFilePath, n => parentDtoInterfaceNames.includes(n), util_1.componentNames.stateName(name), `${dto}${isArray ? '[]' : ''}`),
         util_1.addPropertyToInterface(stateFilePath, n => parentStateInterfaceNames.includes(n), util_1.componentNames.stateName(name), `${state}${isArray ? '[]' : ''}`),
         util_1.addPropertyToExportObjectLiteral(stateFilePath, n => parentInitialStateConstantNames.includes(n), util_1.componentNames.stateName(name), isArray ? '[]' : 'undefined!'),
         util_1.addImports(stateFilePath, getImportPath(name), [
-            dto,
             state,
         ], true, true),
     ]);
@@ -151,6 +160,7 @@ function component(options) {
             options.skipModuleImport ? schematics_1.noop() : util_1.addDeclarationsToModule(modulePath, [component]),
             options.skipModuleImport ? schematics_1.noop() : util_1.addImports(modulePath, `./${util_1.pageNames.dir(pageName)}`, [component], false, true),
             options.skipParentImport ? schematics_1.noop() : insertParentExport(parentDirPath, options.name),
+            options.skipParentImport ? schematics_1.noop() : insertInParentDto(parentDirPath, options.name, options.array),
             options.skipParentImport ? schematics_1.noop() : insertInParentState(parentDirPath, options.name, options.array),
             options.skipParentImport ? schematics_1.noop() : insertInParentMockDto(parentDirPath, options.name, options.array),
             options.skipParentImport ? schematics_1.noop() : insertInParentReducer(parentDirPath, options.name, options.array),

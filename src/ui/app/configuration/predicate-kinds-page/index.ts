@@ -1,4 +1,5 @@
 export * from './predicate-kinds.actions';
+export * from './predicate-kinds.dto';
 export * from './predicate-kinds.effects';
 export * from './predicate-kinds.guard';
 export * from './predicate-kinds.page';

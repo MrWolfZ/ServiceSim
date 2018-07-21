@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { <%= dto(name) %> } from './<%= stateFileNoExt(name) %>';
+import { <%= dto(name) %> } from './<%= dtoFileNoExt(name) %>';
 
 export class <%= initializationAction(name) %> implements Action {
   static readonly TYPE = '<%= dir(path) %>/<%= dir(name) %>/INITIALIZE';

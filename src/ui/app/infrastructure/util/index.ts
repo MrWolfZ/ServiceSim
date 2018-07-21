@@ -1,3 +1,4 @@
+export * from './api';
 export * from './deep-equals';
 export * from './guard';
 export * from './guid';

@@ -1,11 +1,18 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
-import { delay, flatMap, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
+
+import { addAskMockResponse, ask } from 'app/infrastructure';
 
 import { <%= initializationAction(name) %>, <%= loadAction(name) %> } from './<%= actionsFileNoExt(name) %>';
-import { <%= dto(name) %> } from './<%= stateFileNoExt(name) %>';
+import { ASK_FOR_PAGE_DTO } from './<%= dtoFileNoExt(name) %>';
+
+addAskMockResponse(ASK_FOR_PAGE_DTO, {
+
+});
 
 @Injectable()
 export class <%= effects(name) %> {
@@ -13,13 +20,16 @@ export class <%= effects(name) %> {
   @Effect()
   loadPageData$: Observable<Action> = this.actions$.pipe(
     ofType(<%= loadAction(name) %>.TYPE),
-    map<Action, <%= dto(name) %>>(() => ({
-
-    })),
-    flatMap(dto =>
-      of(new <%= initializationAction(name) %>(dto)).pipe(delay(100))
+    flatMap(() =>
+      ask(
+        this.http,
+        ASK_FOR_PAGE_DTO,
+        dto => [
+          new <%= initializationAction(name) %>(dto),
+        ],
+      )
     ),
   );
 
-  constructor(private actions$: Actions) { }
+  constructor(private actions$: Actions, private http: HttpClient) { }
 }

@@ -1,8 +1,5 @@
-import { PredicateKindListItemDto, PredicateKindListItemState } from './predicate-kind-list-item';
-
-export interface PredicateKindListDto {
-  items: PredicateKindListItemDto[];
-}
+import { PredicateKindListItemState } from './predicate-kind-list-item';
+import { PredicateKindListDto } from './predicate-kind-list.dto';
 
 export interface PredicateKindListState extends PredicateKindListDto {
   items: PredicateKindListItemState[];

@@ -1,6 +1,7 @@
 import { InitializePredicateKindListAction } from './predicate-kind-list.actions';
+import { PredicateKindListDto } from './predicate-kind-list.dto';
 import { predicateKindListReducer } from './predicate-kind-list.reducer';
-import { INITIAL_PREDICATE_KIND_LIST_STATE, PredicateKindListDto } from './predicate-kind-list.state';
+import { INITIAL_PREDICATE_KIND_LIST_STATE } from './predicate-kind-list.state';
 
 import { MOCK_PREDICATE_KIND_LIST_ITEM_DTO } from './predicate-kind-list-item/predicate-kind-list-item.reducer.spec';
 

@@ -74,14 +74,29 @@ function getParentNameFromPath(parentDirPath: string) {
   return getPageOrComponentName(parentDirPathParts[parentDirPathParts.length - 1]);
 }
 
-function insertInParentState(parentDirPath: string, name: string, isArray: boolean): Rule {
+function insertInParentDto(parentDirPath: string, name: string, isArray: boolean): Rule {
   const isPage = isPagePath(parentDirPath);
   const parentName = getParentNameFromPath(parentDirPath);
-  const stateFilePath = `${parentDirPath}/${isPage ? pageNames.stateFile(parentName) : names.stateFile(parentName)}`;
+  const dtoFilePath = `${parentDirPath}/${isPage ? pageNames.dtoFile(parentName) : names.dtoFile(parentName)}`;
   const parentDtoInterfaceNames = [
     pageNames.dto(parentName),
     names.dto(parentName),
   ];
+
+  const dto = names.dto(name);
+
+  return chain([
+    addPropertyToInterface(dtoFilePath, n => parentDtoInterfaceNames.includes(n), names.stateName(name), `${dto}${isArray ? '[]' : ''}`),
+    addImports(dtoFilePath, getImportPath(name), [
+      dto,
+    ], true, true),
+  ]);
+}
+
+function insertInParentState(parentDirPath: string, name: string, isArray: boolean): Rule {
+  const isPage = isPagePath(parentDirPath);
+  const parentName = getParentNameFromPath(parentDirPath);
+  const stateFilePath = `${parentDirPath}/${isPage ? pageNames.stateFile(parentName) : names.stateFile(parentName)}`;
 
   const parentStateInterfaceNames = [
     pageNames.state(parentName),
@@ -93,15 +108,12 @@ function insertInParentState(parentDirPath: string, name: string, isArray: boole
     names.initialStateConstant(parentName),
   ];
 
-  const dto = names.dto(name);
   const state = names.state(name);
 
   return chain([
-    addPropertyToInterface(stateFilePath, n => parentDtoInterfaceNames.includes(n), names.stateName(name), `${dto}${isArray ? '[]' : ''}`),
     addPropertyToInterface(stateFilePath, n => parentStateInterfaceNames.includes(n), names.stateName(name), `${state}${isArray ? '[]' : ''}`),
     addPropertyToExportObjectLiteral(stateFilePath, n => parentInitialStateConstantNames.includes(n), names.stateName(name), isArray ? '[]' : 'undefined!'),
     addImports(stateFilePath, getImportPath(name), [
-      dto,
       state,
     ], true, true),
   ]);
@@ -243,6 +255,7 @@ export function component(options: Options): Rule {
       options.skipModuleImport ? noop() : addDeclarationsToModule(modulePath, [component]),
       options.skipModuleImport ? noop() : addImports(modulePath, `./${pageNames.dir(pageName)}`, [component], false, true),
       options.skipParentImport ? noop() : insertParentExport(parentDirPath, options.name),
+      options.skipParentImport ? noop() : insertInParentDto(parentDirPath, options.name, options.array),
       options.skipParentImport ? noop() : insertInParentState(parentDirPath, options.name, options.array),
       options.skipParentImport ? noop() : insertInParentMockDto(parentDirPath, options.name, options.array),
       options.skipParentImport ? noop() : insertInParentReducer(parentDirPath, options.name, options.array),

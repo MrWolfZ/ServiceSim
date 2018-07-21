@@ -1,13 +1,10 @@
 import { RootState as AppRootState } from 'app/app.state';
 
-import { PredicateKindListDto, PredicateKindListState } from './predicate-kind-list';
+import { PredicateKindListState } from './predicate-kind-list';
+import { PredicateKindsPageDto } from './predicate-kinds.dto';
 
 export interface RootState extends AppRootState {
   predicateKinds: PredicateKindsPageState;
-}
-
-export interface PredicateKindsPageDto {
-  predicateKindList: PredicateKindListDto;
 }
 
 export interface PredicateKindsPageState extends PredicateKindsPageDto {

@@ -1,6 +1,4 @@
-export interface <%= dto(name) %> {
-
-}
+import { <%= dto(name) %> } from './<%= dtoFileNoExt(name) %>';
 
 export interface <%= state(name) %> extends <%= dto(name) %> {
 
