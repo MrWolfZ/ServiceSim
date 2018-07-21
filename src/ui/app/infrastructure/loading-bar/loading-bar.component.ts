@@ -3,7 +3,7 @@ import { select, Store } from '@ngrx/store';
 import { concat, interval, of, Subscription } from 'rxjs';
 import { delay, filter, first, map, pairwise, publish, scan, startWith, switchMap, takeUntil } from 'rxjs/operators';
 
-import { RootState } from '../platform.state';
+import { RootState } from '../infrastructure.state';
 
 // Note that this component is an exception to the rule that non-page components
 // must be dumb since it implements the loading bar outside of the angular realm
@@ -26,7 +26,7 @@ export class LoadingBarComponent implements OnDestroy {
     this.storeSubscription =
       store
         .pipe(
-          select(s => s.platform.loadingBar.activationSemaphore),
+          select(s => s.infrastructure.loadingBar.activationSemaphore),
           publish(obs =>
             obs.pipe(
               pairwise(),

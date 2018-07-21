@@ -61,7 +61,7 @@ export class ErrorEffects {
       };
 
       return [
-        new NavigateAction(['platform', 'error'], { apiError: JSON.stringify(apiError) }),
+        new NavigateAction(['infrastructure', 'error'], { apiError: JSON.stringify(apiError) }),
       ];
     }),
   );

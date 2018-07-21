@@ -7,8 +7,8 @@ import { filter, map } from 'rxjs/operators';
 import { ClearApiErrorAction, SetApiErrorAction } from './error.actions';
 import { ApiError } from './error.state';
 
-import { SetPageTitleAction } from '../platform.actions';
-import { RootState } from '../platform.state';
+import { SetPageTitleAction } from '../infrastructure.actions';
+import { RootState } from '../infrastructure.state';
 
 export const ERROR_PAGE_NAME = 'Error';
 
@@ -25,7 +25,7 @@ export class ErrorPage implements OnInit, OnDestroy {
   timeOfError$: Observable<Date>;
 
   constructor(private store: Store<RootState>, private route: ActivatedRoute) {
-    this.apiError$ = store.pipe(select(s => s.platform.errorPage.apiError));
+    this.apiError$ = store.pipe(select(s => s.infrastructure.errorPage.apiError));
     this.timeOfError$ = this.apiError$.pipe(filter(e => !!e), map(e => new Date(e!.timeOfErrorEpoch)));
   }
 

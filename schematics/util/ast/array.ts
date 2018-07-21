@@ -1,4 +1,4 @@
-import * as ts from '@schematics/angular/node_modules/typescript';
+import * as ts from '../typescript';
 import { insertAt, insertInEmptyArrayOrObject, makeWhitespace } from './util';
 
 export function insertLastInArray(arrayNode: ts.ArrayLiteralExpression, content: string, arrayIndentation: number) {

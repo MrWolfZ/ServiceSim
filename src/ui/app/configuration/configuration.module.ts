@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
-import { PlatformModule } from 'app/platform';
+import { InfrastructureModule } from 'app/infrastructure';
 import { SharedModule } from 'app/shared';
 
 import { configurationRoutes } from './configuration.routing';
@@ -21,7 +21,7 @@ import {
     PredicateKindsPage,
   ],
   imports: [
-    PlatformModule,
+    InfrastructureModule,
     SharedModule,
     RouterModule.forChild(configurationRoutes),
     EffectsModule.forFeature([

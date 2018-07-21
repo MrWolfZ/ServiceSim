@@ -1,5 +1,5 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import * as ts from '@schematics/angular/node_modules/typescript';
+import * as ts from '../typescript';
 
 export interface InsertChange {
   position: number;

@@ -5,7 +5,7 @@ import {
   Tree,
 } from '@angular-devkit/schematics';
 import { getDecoratorMetadata } from '@schematics/angular/utility/ast-utils';
-import * as ts from '@schematics/angular/node_modules/typescript';
+import * as ts from '../typescript';
 
 import { insertLastInArray } from './array';
 import { getPropertyAssignment } from './object';

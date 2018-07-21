@@ -5,7 +5,7 @@ import { select, Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { filter, flatMap, map, tap, withLatestFrom } from 'rxjs/operators';
 
-import { RootState } from '../platform.state';
+import { RootState } from '../infrastructure.state';
 import { deepEquals } from '../util';
 import {
   MergeQueryParamsAction,

@@ -12,7 +12,7 @@ import { AppEffects } from './app.effects';
 import { metaReducers, reducers } from './app.reducer';
 import { routes } from './app.routing';
 
-import { PlatformModule } from './platform';
+import { InfrastructureModule } from './infrastructure';
 import { SharedModule } from './shared';
 
 import { environment } from '../environments/environment';
@@ -31,7 +31,7 @@ import { AppGuard } from './app.guard';
     ...environment.enableDevTools ? [StoreDevtoolsModule.instrument({ maxAge: 25 })] : [],
     RouterModule.forRoot(routes, { useHash: true }),
     EffectsModule.forRoot([AppEffects]),
-    PlatformModule,
+    InfrastructureModule,
     SharedModule,
   ],
   bootstrap: [AppComponent],

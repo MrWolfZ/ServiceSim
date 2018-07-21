@@ -1,6 +1,6 @@
 import { LocationStrategy } from '@angular/common';
 import { Router } from '@angular/router';
-import { NavigateAction, Navigation, RouterState } from '../../platform';
+import { NavigateAction, Navigation, RouterState } from 'app/infrastructure';
 
 import {
   CONFIGURATION_MODULE_PATH,

@@ -4,8 +4,8 @@ import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { SchedulerLike } from 'rxjs';
 
-import { PlatformEffects } from './platform.effects';
-import { platformRoutes } from './platform.routing';
+import { InfrastructureEffects } from 'app/infrastructure/infrastructure.effects';
+import { infrastructureRoutes } from 'app/infrastructure/infrastructure.routing';
 
 import { ExpansionContainerComponent } from './components';
 import { ErrorEffects, ErrorPage } from './error-page';
@@ -17,8 +17,8 @@ export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxj
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild(platformRoutes),
-    EffectsModule.forFeature([PlatformEffects, RouterEffects, ErrorEffects]),
+    RouterModule.forChild(infrastructureRoutes),
+    EffectsModule.forFeature([InfrastructureEffects, RouterEffects, ErrorEffects]),
   ],
   declarations: [
     ErrorPage,
@@ -34,4 +34,4 @@ export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxj
     { provide: RXJS_SCHEDULER, useValue: undefined },
   ],
 })
-export class PlatformModule { }
+export class InfrastructureModule { }

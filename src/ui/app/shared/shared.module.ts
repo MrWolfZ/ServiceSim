@@ -10,7 +10,7 @@ import {
   ResponseGeneratorKindsLinkDirective,
 } from './routing';
 
-import { PlatformModule } from '../platform';
+import { InfrastructureModule } from '../infrastructure';
 
 const exportsAndDeclarations = [
   PredicateKindsLinkDirective,
@@ -22,7 +22,7 @@ const exportsAndDeclarations = [
     CommonModule,
     HttpClientModule,
     NgrxFormsModule,
-    PlatformModule,
+    InfrastructureModule,
     EffectsModule.forFeature([
       AppRoutingEffects,
     ]),

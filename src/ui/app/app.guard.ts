@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate } from '@angular/router';
 import { ActionsSubject, select, Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 
-import { NavigateAction } from './platform';
+import { NavigateAction } from './infrastructure';
 
 import { AppInitializedAction, LoadAppDataAction } from './app.actions';
 import { RootState } from './app.state';
@@ -20,7 +20,7 @@ export class AppGuard implements CanActivate {
     this.store.pipe(
       select(s => s.router.pendingNavigation!.path),
       take(1),
-    ).subscribe(p => isErrorNavigation = p === '/platform/error');
+    ).subscribe(p => isErrorNavigation = p === '/infrastructure/error');
 
     if (isErrorNavigation) {
       return true;
@@ -48,7 +48,7 @@ export class AppGuard implements CanActivate {
     let isInitialized = false;
 
     this.store.pipe(
-      select(s => s.platform.isInitialized),
+      select(s => s.infrastructure.isInitialized),
       take(1),
     ).subscribe(b => isInitialized = b);
 

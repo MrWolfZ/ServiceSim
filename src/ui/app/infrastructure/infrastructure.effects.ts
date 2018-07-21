@@ -5,14 +5,14 @@ import { Action, select, Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { concatMap, delay, flatMap, map, skip } from 'rxjs/operators';
 
-import { BlockUiAction, OpenUrlInNewTabAction, ReloadPageAction, ShowInformationMessageAction, UnblockUiAction } from './platform.actions';
-import { RootState } from './platform.state';
+import { BlockUiAction, OpenUrlInNewTabAction, ReloadPageAction, ShowInformationMessageAction, UnblockUiAction } from './infrastructure.actions';
+import { RootState } from './infrastructure.state';
 
 @Injectable()
-export class PlatformEffects {
+export class InfrastructureEffects {
   @Effect()
   setDocumentTitle$: Observable<Action> = this.store.pipe(
-    select(s => s.platform.pageTitle),
+    select(s => s.infrastructure.pageTitle),
     flatMap(title => {
       this.titleService.setTitle(title);
       return [];
@@ -21,7 +21,7 @@ export class PlatformEffects {
 
   @Effect()
   handleUiBlocking$: Observable<Action> = this.store.pipe(
-    select(s => s.platform.uiIsBlocked),
+    select(s => s.infrastructure.uiIsBlocked),
     skip(1),
     map(isUiBlocked => isUiBlocked ? new BlockUiAction() : new UnblockUiAction()),
   );

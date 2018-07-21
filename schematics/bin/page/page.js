@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ast_utils_1 = require("@schematics/angular/utility/ast-utils");
-const ts = require("@schematics/angular/node_modules/typescript");
+const ts = require("../util/typescript");
 const util_1 = require("../util");
 function insertEffect(modulePath, effectsName) {
     return (host, context) => {

@@ -1,6 +1,6 @@
-import { PlatformState, RouterState } from './platform';
+import { InfrastructureState, RouterState } from './infrastructure';
 
 export interface RootState {
-  platform: PlatformState;
+  infrastructure: InfrastructureState;
   router: RouterState;
 }

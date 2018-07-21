@@ -1,5 +1,5 @@
 import { ActionReducerMap } from '@ngrx/store';
-import { environment } from '../environments/environment';
+import { environment } from 'environments/environment';
 
 /**
  * storeFreeze prevents state from being mutated. When mutation occurs, an
@@ -9,10 +9,10 @@ import { environment } from '../environments/environment';
 import { storeFreeze } from 'ngrx-store-freeze';
 
 import { RootState } from './app.state';
-import { platformReducer, routerReducer } from './platform';
+import { infrastructureReducer, routerReducer } from './infrastructure';
 
 export const reducers: ActionReducerMap<RootState, any> = {
-  platform: platformReducer,
+  infrastructure: infrastructureReducer,
   router: routerReducer,
 };
 

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ast_utils_1 = require("@schematics/angular/utility/ast-utils");
-const ts = require("@schematics/angular/node_modules/typescript");
+const ts = require("../util/typescript");
 const util_1 = require("../util");
 function insertParentExport(parentDirPath, name) {
     return (host) => {
@@ -123,7 +123,7 @@ function insertInParentReducer(parentDirPath, name, isArray) {
     ];
     return schematics_1.chain([
         util_1.modifyFunction(reducerFilePath, n => parentReducerNames.includes(n), n => addNestedReducerCalls(n, parentName, name, isArray)),
-        util_1.addImports(reducerFilePath, 'app/platform', [
+        util_1.addImports(reducerFilePath, 'app/infrastructure', [
             CALL_NESTED_REDUCERS_FUNCTION_NAME,
             ...(isArray ? [CREATE_ARRAY_REDUCER_FUNCTION_NAME] : []),
         ], true, true),

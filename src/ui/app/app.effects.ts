@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { AppInitializedAction, LoadAppDataAction } from './app.actions';
-import { HandleApiErrorAction, InitializePlatformAction } from './platform';
+import { HandleApiErrorAction, InitializeInfrastructureAction } from './infrastructure';
 import {
   uiApiGet,
 } from './shared';
@@ -26,7 +26,7 @@ export class AppEffects {
         'appdata',
         appData => {
           return [
-            new InitializePlatformAction(appData.version),
+            new InitializeInfrastructureAction(appData.version),
             // this must be the last action dispatched here for the app initialization logic to work properly
             new AppInitializedAction(),
           ];
@@ -39,7 +39,7 @@ export class AppEffects {
     ),
     // TODO: remove once API works
     flatMap(a => a.type === HandleApiErrorAction.TYPE ? [
-      new InitializePlatformAction('0.1.0'),
+      new InitializeInfrastructureAction('0.1.0'),
       // this must be the last action dispatched here for the app initialization logic to work properly
       new AppInitializedAction(),
     ] : [a]),

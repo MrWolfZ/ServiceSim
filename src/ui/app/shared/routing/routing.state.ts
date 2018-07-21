@@ -9,7 +9,7 @@ export interface AppRouteParams {
 export interface AppRouteQueryParams {
 }
 
-export const PLATFORM_MODULE_PATH = 'platform';
+export const INFRASTRUCTURE_MODULE_PATH = 'infrastructure';
 
 export const CONFIGURATION_MODULE_PATH = 'configuration';
 

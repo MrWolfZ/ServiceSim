@@ -2,7 +2,7 @@ import { ActionsSubject } from '@ngrx/store';
 import { merge } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { HandleApiErrorAction } from '../../platform';
+import { HandleApiErrorAction } from 'app/infrastructure';
 
 export function handleInitializationAndApiError(actionsSubject: ActionsSubject, actionType: string) {
   return merge(

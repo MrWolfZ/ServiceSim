@@ -4,7 +4,7 @@ import {
   Tree,
 } from '@angular-devkit/schematics';
 import { findNodes } from '@schematics/angular/utility/ast-utils';
-import * as ts from '@schematics/angular/node_modules/typescript';
+import * as ts from '../typescript';
 
 import {
   applyInsertChanges,

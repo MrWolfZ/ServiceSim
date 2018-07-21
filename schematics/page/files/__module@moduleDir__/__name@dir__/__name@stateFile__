@@ -1,4 +1,4 @@
-import { RootState as AppRootState } from '../../app.state';
+import { RootState as AppRootState } from 'app/app.state';
 
 export interface RootState extends AppRootState {
   <%= featureStateName(name) %>: <%= state(name) %>;

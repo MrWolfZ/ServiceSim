@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { AppGuard } from './app.guard';
 import {
   CONFIGURATION_MODULE_PATH,
-  PLATFORM_MODULE_PATH,
+  INFRASTRUCTURE_MODULE_PATH,
 } from './shared';
 
 export const routes: Routes = [
@@ -13,8 +13,8 @@ export const routes: Routes = [
     runGuardsAndResolvers: 'always',
     children: [
       {
-        path: PLATFORM_MODULE_PATH,
-        loadChildren: './platform/platform.module#PlatformModule',
+        path: INFRASTRUCTURE_MODULE_PATH,
+        loadChildren: './infrastructure/infrastructure.module#InfrastructureModule',
       },
       {
         path: CONFIGURATION_MODULE_PATH,

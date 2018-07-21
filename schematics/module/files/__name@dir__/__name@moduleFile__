@@ -3,15 +3,15 @@ import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
-import { PlatformModule } from '../platform';
-import { SharedModule } from '../shared';
+import { InfrastructureModule } from 'app/infrastructure';
+import { SharedModule } from 'app/shared';
 
 import { <%= routes(name) %> } from './<%= routingFileNoExt(name) %>';
 
 @NgModule({
   declarations: [],
   imports: [
-    PlatformModule,
+    InfrastructureModule,
     SharedModule,
     RouterModule.forChild(<%= routes(name) %>),
     EffectsModule.forFeature([]),

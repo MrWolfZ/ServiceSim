@@ -3,8 +3,8 @@ import { Directive, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Action, Store } from '@ngrx/store';
 
-import { RootState } from '../../app.state';
-import { RouterState } from '../../platform';
+import { RootState } from 'app/app.state';
+import { RouterState } from 'app/infrastructure';
 
 import { AbstractLinkDirective } from './link.directive';
 import { NavigateToResponseGeneratorKindsAction } from './routing.actions';

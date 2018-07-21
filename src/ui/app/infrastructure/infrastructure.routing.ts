@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { ErrorPage } from './error-page';
 
-export const platformRoutes: Routes = [
+export const infrastructureRoutes: Routes = [
   {
     path: 'error',
     component: ErrorPage,

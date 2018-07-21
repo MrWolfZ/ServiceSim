@@ -1,8 +1,8 @@
 import { Action } from '@ngrx/store';
 
-export class InitializePlatformAction implements Action {
-  static readonly TYPE = 'platform/INITIALIZE_PLATFORM';
-  readonly type = InitializePlatformAction.TYPE;
+export class InitializeInfrastructureAction implements Action {
+  static readonly TYPE = 'infrastructure/INITIALIZE_INFRASTRUCTURE';
+  readonly type = InitializeInfrastructureAction.TYPE;
 
   constructor(
     public appVersion: string,
@@ -10,7 +10,7 @@ export class InitializePlatformAction implements Action {
 }
 
 export class SetPageTitleAction implements Action {
-  static readonly TYPE = 'platform/SET_PAGE_TITLE';
+  static readonly TYPE = 'infrastructure/SET_PAGE_TITLE';
   readonly type = SetPageTitleAction.TYPE;
 
   titleParts: string[];
@@ -21,27 +21,27 @@ export class SetPageTitleAction implements Action {
 }
 
 export class IncrementUiBlockingApiCallSemaphoreAction implements Action {
-  static readonly TYPE = 'platform/INCREMENT_UI_BLOCKING_API_SEMAPHORE';
+  static readonly TYPE = 'infrastructure/INCREMENT_UI_BLOCKING_API_SEMAPHORE';
   readonly type = IncrementUiBlockingApiCallSemaphoreAction.TYPE;
 }
 
 export class DecrementUiBlockingApiCallSemaphoreAction implements Action {
-  static readonly TYPE = 'platform/DECREMENT_UI_BLOCKING_API_SEMAPHORE';
+  static readonly TYPE = 'infrastructure/DECREMENT_UI_BLOCKING_API_SEMAPHORE';
   readonly type = DecrementUiBlockingApiCallSemaphoreAction.TYPE;
 }
 
 export class BlockUiAction implements Action {
-  static readonly TYPE = 'platform/BLOCK_UI';
+  static readonly TYPE = 'infrastructure/BLOCK_UI';
   readonly type = BlockUiAction.TYPE;
 }
 
 export class UnblockUiAction implements Action {
-  static readonly TYPE = 'platform/UNBLOCK_UI';
+  static readonly TYPE = 'infrastructure/UNBLOCK_UI';
   readonly type = UnblockUiAction.TYPE;
 }
 
 export class ShowInformationMessageAction {
-  static readonly TYPE = 'platform/SHOW_INFORMATION_MESSAGE';
+  static readonly TYPE = 'infrastructure/SHOW_INFORMATION_MESSAGE';
   readonly type = ShowInformationMessageAction.TYPE;
 
   constructor(
@@ -52,7 +52,7 @@ export class ShowInformationMessageAction {
 }
 
 export class OpenUrlInNewTabAction implements Action {
-  static readonly TYPE = 'platform/OPEN_URL_IN_NEW_TAB';
+  static readonly TYPE = 'infrastructure/OPEN_URL_IN_NEW_TAB';
   readonly type = OpenUrlInNewTabAction.TYPE;
 
   constructor(
@@ -61,12 +61,12 @@ export class OpenUrlInNewTabAction implements Action {
 }
 
 export class ReloadPageAction implements Action {
-  static readonly TYPE = 'platform/RELOAD_PAGE';
+  static readonly TYPE = 'infrastructure/RELOAD_PAGE';
   readonly type = ReloadPageAction.TYPE;
 }
 
-export type PlatformActions =
-  | InitializePlatformAction
+export type InfrastructureActions =
+  | InitializeInfrastructureAction
   | SetPageTitleAction
   | IncrementUiBlockingApiCallSemaphoreAction
   | DecrementUiBlockingApiCallSemaphoreAction

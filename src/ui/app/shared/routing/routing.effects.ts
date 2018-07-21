@@ -4,7 +4,7 @@ import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 
-import { RootState } from '../../app.state';
+import { RootState } from 'app/app.state';
 
 import {
   NavigateToPredicateKindsAction,

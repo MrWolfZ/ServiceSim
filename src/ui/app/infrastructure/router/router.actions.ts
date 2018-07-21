@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { SerializedRouterStateSnapshot } from './router.state';
 
 export class NavigateAction implements Action {
-  static readonly TYPE = 'platform/router/NAVIGATE';
+  static readonly TYPE = 'infrastructure/router/NAVIGATE';
   readonly type = NavigateAction.TYPE;
 
   constructor(
@@ -15,7 +15,7 @@ export class NavigateAction implements Action {
 }
 
 export class MergeQueryParamsAction implements Action {
-  static readonly TYPE = 'platform/router/MERGE_QUERY_PARAMS';
+  static readonly TYPE = 'infrastructure/router/MERGE_QUERY_PARAMS';
   readonly type = MergeQueryParamsAction.TYPE;
 
   constructor(
@@ -26,7 +26,7 @@ export class MergeQueryParamsAction implements Action {
 }
 
 export class RoutesRecognizedAction implements Action {
-  static readonly TYPE = 'platform/router/ROUTES_RECOGNIZED';
+  static readonly TYPE = 'infrastructure/router/ROUTES_RECOGNIZED';
   readonly type = RoutesRecognizedAction.TYPE;
 
   constructor(
@@ -35,7 +35,7 @@ export class RoutesRecognizedAction implements Action {
 }
 
 export class NavigationStartedAction implements Action {
-  static readonly TYPE = 'platform/router/NAVIGATION_STARTED';
+  static readonly TYPE = 'infrastructure/router/NAVIGATION_STARTED';
   readonly type = NavigationStartedAction.TYPE;
 
   constructor(
@@ -44,7 +44,7 @@ export class NavigationStartedAction implements Action {
 }
 
 export class NavigationEndedAction implements Action {
-  static readonly TYPE = 'platform/router/NAVIGATION_ENDED';
+  static readonly TYPE = 'infrastructure/router/NAVIGATION_ENDED';
   readonly type = NavigationEndedAction.TYPE;
 
   constructor(
@@ -53,7 +53,7 @@ export class NavigationEndedAction implements Action {
 }
 
 export class NavigationCanceledAction implements Action {
-  static readonly TYPE = 'platform/router/NAVIGATION_CANCELED';
+  static readonly TYPE = 'infrastructure/router/NAVIGATION_CANCELED';
   readonly type = NavigationCanceledAction.TYPE;
 
   constructor(
@@ -63,7 +63,7 @@ export class NavigationCanceledAction implements Action {
 }
 
 export class NavigationFailedAction implements Action {
-  static readonly TYPE = 'platform/router/NAVIGATION_FAILED';
+  static readonly TYPE = 'infrastructure/router/NAVIGATION_FAILED';
   readonly type = NavigationFailedAction.TYPE;
 
   constructor(

@@ -4,8 +4,8 @@ import { concat, Observable, ObservableInput } from 'rxjs';
 import { catchError, mergeMap, startWith } from 'rxjs/operators';
 
 import { HandleApiErrorAction } from '../error-page/error.actions';
+import { DecrementUiBlockingApiCallSemaphoreAction, IncrementUiBlockingApiCallSemaphoreAction } from '../infrastructure.actions';
 import { DecrementLoadingBarSemaphoreAction, IncrementLoadingBarSemaphoreAction } from '../loading-bar/loading-bar.actions';
-import { DecrementUiBlockingApiCallSemaphoreAction, IncrementUiBlockingApiCallSemaphoreAction } from '../platform.actions';
 
 export function surroundWithLoadingBar(obs: Observable<Action>): Observable<Action> {
   return concat(obs.pipe(startWith(new IncrementLoadingBarSemaphoreAction())), [new DecrementLoadingBarSemaphoreAction()]);

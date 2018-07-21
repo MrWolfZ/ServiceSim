@@ -1,23 +1,23 @@
 import { errorPageReducer } from './error-page';
-import { loadingBarReducer } from './loading-bar';
 import {
   DecrementUiBlockingApiCallSemaphoreAction,
   IncrementUiBlockingApiCallSemaphoreAction,
-  InitializePlatformAction,
-  PlatformActions,
+  InfrastructureActions,
+  InitializeInfrastructureAction,
   SetPageTitleAction,
-} from './platform.actions';
-import { INITIAL_PLATFORM_STATE, PlatformState } from './platform.state';
+} from './infrastructure.actions';
+import { InfrastructureState, INITIAL_INFRASTRUCTURE_STATE } from './infrastructure.state';
+import { loadingBarReducer } from './loading-bar';
 import { callNestedReducers } from './util';
 
-export function platformReducer(state = INITIAL_PLATFORM_STATE, action: PlatformActions): PlatformState {
+export function infrastructureReducer(state = INITIAL_INFRASTRUCTURE_STATE, action: InfrastructureActions): InfrastructureState {
   state = callNestedReducers(state, action, {
     errorPage: errorPageReducer,
     loadingBar: loadingBarReducer,
   });
 
   switch (action.type) {
-    case InitializePlatformAction.TYPE:
+    case InitializeInfrastructureAction.TYPE:
       return {
         ...state,
         isInitialized: true,

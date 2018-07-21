@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { ApiError } from './error.state';
 
 export class HandleApiErrorAction implements Action {
-  static readonly TYPE = 'platform/error-page/HANDLE_API_ERROR';
+  static readonly TYPE = 'infrastructure/error-page/HANDLE_API_ERROR';
   readonly type = HandleApiErrorAction.TYPE;
 
   constructor(
@@ -13,12 +13,12 @@ export class HandleApiErrorAction implements Action {
 }
 
 export class ClearApiErrorAction implements Action {
-  static readonly TYPE = 'platform/error-page/CLEAR_API_ERROR';
+  static readonly TYPE = 'infrastructure/error-page/CLEAR_API_ERROR';
   readonly type = ClearApiErrorAction.TYPE;
 }
 
 export class SetApiErrorAction implements Action {
-  static readonly TYPE = 'platform/error-page/SET_API_ERROR';
+  static readonly TYPE = 'infrastructure/error-page/SET_API_ERROR';
   readonly type = SetApiErrorAction.TYPE;
 
   constructor(

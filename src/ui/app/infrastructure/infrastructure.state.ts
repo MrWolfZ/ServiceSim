@@ -3,11 +3,11 @@ import { LoadingBarState } from './loading-bar';
 import { RouterState } from './router';
 
 export interface RootState {
-  platform: PlatformState;
+  infrastructure: InfrastructureState;
   router: RouterState;
 }
 
-export interface PlatformState {
+export interface InfrastructureState {
   errorPage: ErrorPageState;
   loadingBar: LoadingBarState;
   // this property is used to track whether the application has been initialized already (e.g. through)
@@ -20,7 +20,7 @@ export interface PlatformState {
   uiIsBlocked: boolean;
 }
 
-export const INITIAL_PLATFORM_STATE: PlatformState = {
+export const INITIAL_INFRASTRUCTURE_STATE: InfrastructureState = {
   errorPage: undefined!,
   loadingBar: undefined!,
   isInitialized: false,

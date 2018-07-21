@@ -14,7 +14,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { findNodes } from '@schematics/angular/utility/ast-utils';
-import * as ts from '@schematics/angular/node_modules/typescript';
+import * as ts from '../util/typescript';
 
 import {
   addDeclarationsToModule,
@@ -205,7 +205,7 @@ function insertInParentReducer(parentDirPath: string, name: string, isArray: boo
 
   return chain([
     modifyFunction(reducerFilePath, n => parentReducerNames.includes(n), n => addNestedReducerCalls(n, parentName, name, isArray)),
-    addImports(reducerFilePath, 'app/platform', [
+    addImports(reducerFilePath, 'app/infrastructure', [
       CALL_NESTED_REDUCERS_FUNCTION_NAME,
       ...(isArray ? [CREATE_ARRAY_REDUCER_FUNCTION_NAME] : []),
     ], true, true),

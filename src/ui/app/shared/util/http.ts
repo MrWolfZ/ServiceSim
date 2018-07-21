@@ -2,8 +2,8 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import { Observable, ObservableInput } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
-import { httpGet, HttpOptions, httpPost, ObserveBodyHttpOptions, ObserveResponseHttpOptions } from '../../platform';
+import { httpGet, HttpOptions, httpPost, ObserveBodyHttpOptions, ObserveResponseHttpOptions } from 'app/infrastructure';
+import { environment } from 'environments/environment';
 
 export function makeUiApiUrl(relativeUrl: string) {
   return `${environment.apiBaseUrl}uiapi/${relativeUrl.replace(/^\/*/, '')}`;
