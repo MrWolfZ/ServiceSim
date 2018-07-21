@@ -1,0 +1,20 @@
+import { ChangeDetectionStrategy, Component, HostBinding } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+
+import { <%= sortLexicographically(state(name), 'RootState').join(', ') %> } from './<%= stateFileNoExt(name) %>';
+
+@Component({
+  templateUrl: './<%= componentTemplateFile(name) %>',
+  styleUrls: ['./<%= componentFileNoExt(name) %>.<%= styleext %>'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class <%= component(name) %> {
+  @HostBinding('class.page') page = true;
+
+  state$: Observable<<%= state(name) %>>;
+
+  constructor(store: Store<RootState>) {
+    this.state$ = store.select(s => s.<%= featureStateName(name) %>);
+  }
+}

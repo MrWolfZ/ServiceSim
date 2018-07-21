@@ -1,7 +1,6 @@
 {
-  "extends": "../../tsconfig.ui.json",
+  "extends": "./tsconfig.ui.json",
   "compilerOptions": {
-    "outDir": "../../out-tsc/spec",
     "module": "commonjs",
     "types": [
       "jasmine",
@@ -9,11 +8,10 @@
     ]
   },
   "files": [
-    "test.ts",
-    "polyfills.ts"
+    "src/ui/test.ts",
+    "src/ui/polyfills.ts"
   ],
   "include": [
-    "**/*.spec.ts",
-    "**/*.d.ts"
+    "src/ui/**/*.spec.ts"
   ]
 }

@@ -1,0 +1,21 @@
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+
+import { PlatformModule } from '../platform';
+import { SharedModule } from '../shared';
+
+import { <%= routes(name) %> } from './<%= routingFileNoExt(name) %>';
+
+@NgModule({
+  declarations: [],
+  imports: [
+    PlatformModule,
+    SharedModule,
+    RouterModule.forChild(<%= routes(name) %>),
+    EffectsModule.forFeature([]),
+  ],
+  providers: [],
+})
+export class <%= moduleClass(name) %> { }

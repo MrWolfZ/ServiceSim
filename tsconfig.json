@@ -1,23 +1,26 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
+    "moduleResolution": "node",
+    "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
     "noImplicitAny": true,
-    "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "./dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": true,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "paths": {
+      "app/*": [
+        "./src/ui/app/*"
+      ]
+    }
   },
   "include": [
     "./src/**/*"
-  ],
-  "exclude": [
-    "./src/ui/**/*"
   ]
 }

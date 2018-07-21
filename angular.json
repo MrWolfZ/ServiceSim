@@ -17,7 +17,7 @@
             "index": "src/ui/index.html",
             "main": "src/ui/main.ts",
             "polyfills": "src/ui/polyfills.ts",
-            "tsConfig": "src/ui/tsconfig.app.json",
+            "tsConfig": "tsconfig.ui.app.json",
             "assets": [
               "src/ui/favicon.ico",
               "src/ui/assets"
@@ -25,6 +25,11 @@
             "styles": [
               "src/ui/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/ui/styles"
+              ]
+            },
             "scripts": []
           },
           "configurations": {
@@ -69,11 +74,16 @@
           "options": {
             "main": "src/ui/test.ts",
             "polyfills": "src/ui/polyfills.ts",
-            "tsConfig": "src/ui/tsconfig.spec.json",
-            "karmaConfig": "src/ui/karma.conf.js",
+            "tsConfig": "tsconfig.ui.spec.json",
+            "karmaConfig": "karma.conf.js",
             "styles": [
               "src/ui/styles.css"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/ui/styles"
+              ]
+            },
             "scripts": [],
             "assets": [
               "src/ui/favicon.ico",
@@ -85,11 +95,12 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/ui/tsconfig.app.json",
-              "src/ui/tsconfig.spec.json"
+              "tsconfig.ui.app.json",
+              "tsconfig.ui.spec.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/schematics/**"
             ]
           }
         }

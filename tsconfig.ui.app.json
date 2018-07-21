@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.ui.json",
+  "compilerOptions": {
+    "module": "es2015",
+    "types": []
+  },
+  "files": [
+    "src/ui/main.ts",
+    "src/ui/polyfills.ts"
+  ],
+  "include": [
+    "src/ui/app/*/*.module.ts"
+  ]
+}

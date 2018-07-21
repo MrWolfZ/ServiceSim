@@ -1,16 +1,16 @@
 {
-  "extends": "../../tslint.json",
+  "extends": "./tslint.json",
   "rules": {
     "directive-selector": [
       true,
       "attribute",
-      "app",
+      "sim",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "app",
+      "sim",
       "kebab-case"
     ],
     "no-output-on-prefix": true,
@@ -21,10 +21,14 @@
     "no-output-rename": true,
     "use-life-cycle-interface": true,
     "use-pipe-transform-interface": true,
-    "component-class-suffix": true,
+    "component-class-suffix": [
+      true,
+      "Component",
+      "Page"
+    ],
     "directive-class-suffix": true
   },
   "rulesDirectory": [
-    "../../node_modules/codelyzer"
+    "./node_modules/codelyzer"
   ]
 }
