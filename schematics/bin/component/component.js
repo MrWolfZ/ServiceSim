@@ -35,7 +35,7 @@ function insertInParentDto(parentDirPath, name, isArray) {
     const dto = util_1.componentNames.dto(name);
     return schematics_1.chain([
         util_1.addPropertyToInterface(dtoFilePath, n => parentDtoInterfaceNames.includes(n), util_1.componentNames.stateName(name), `${dto}${isArray ? '[]' : ''}`),
-        util_1.addImports(dtoFilePath, getImportPath(name), [
+        util_1.addImports(dtoFilePath, getImportPath(`${util_1.componentNames.dir(name)}/${util_1.componentNames.dtoFileNoExt(name)}`), [
             dto,
         ], true, true),
     ]);

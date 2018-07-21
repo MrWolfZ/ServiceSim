@@ -1,13 +1,13 @@
-import { Ask } from 'app/infrastructure';
+import { Ask } from '../../infrastructure/infrastructure.dto';
 
 export interface <%= dto(name) %> {
 
 }
 
-export const ASK_FOR_PAGE_DTO_KIND = '<%= dir(path) %>/<%= dir(name) %>/ASK_FOR_PAGE_DTO';
+export const <%= askKindConstant(name) %> = '<%= dir(path) %>/<%= dir(name) %>/ASK_FOR_PAGE_DTO';
 
-export interface AskForPageDto extends Ask<typeof ASK_FOR_PAGE_DTO_KIND, <%= dto(name) %>> { }
+export interface <%= askInterface(name) %> extends Ask<typeof <%= askKindConstant(name) %>, <%= dto(name) %>> { }
 
-export const ASK_FOR_PAGE_DTO: AskForPageDto = {
-  kind: ASK_FOR_PAGE_DTO_KIND,
+export const <%= askConstant(name) %>: <%= askInterface(name) %> = {
+  kind: <%= askKindConstant(name) %>,
 };

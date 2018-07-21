@@ -87,7 +87,7 @@ function insertInParentDto(parentDirPath: string, name: string, isArray: boolean
 
   return chain([
     addPropertyToInterface(dtoFilePath, n => parentDtoInterfaceNames.includes(n), names.stateName(name), `${dto}${isArray ? '[]' : ''}`),
-    addImports(dtoFilePath, getImportPath(name), [
+    addImports(dtoFilePath, getImportPath(`${names.dir(name)}/${names.dtoFileNoExt(name)}`), [
       dto,
     ], true, true),
   ]);

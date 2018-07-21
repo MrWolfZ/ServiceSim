@@ -5,6 +5,7 @@ import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
 import simulationApi from './simulation/api';
 import * as ap from './simulation/predicate-tree';
+import uiApi from './ui/app/app.api';
 
 // TODO: set adapter based on configuration
 ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());
@@ -55,5 +56,6 @@ export async function initializeAsync() {
 
 const app = express.Router();
 app.use('/simulation', simulationApi);
+app.use('/uiApi', uiApi);
 
 export default app;

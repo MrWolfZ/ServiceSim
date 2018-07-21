@@ -5,28 +5,10 @@ import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
-import { addAskMockResponse, ask } from 'app/infrastructure';
+import { ask } from 'app/infrastructure';
 
 import { InitializePredicateKindsPageAction, LoadPredicateKindsPageDataAction } from './predicate-kinds.actions';
-import { ASK_FOR_PAGE_DTO } from './predicate-kinds.dto';
-
-addAskMockResponse(ASK_FOR_PAGE_DTO, {
-  predicateKindList: {
-    items: [
-      {
-        name: 'All',
-        // tslint:disable-next-line
-        description: 'Predicates of this kind match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
-        evalFunctionBody: 'return true;',
-      },
-      {
-        name: 'test 2',
-        description: 'description 2',
-        evalFunctionBody: 'function body 2',
-      },
-    ],
-  },
-});
+import { ASK_FOR_PREDICATE_KINDS_PAGE_DTO } from './predicate-kinds.dto';
 
 @Injectable()
 export class PredicateKindsPageEffects {
@@ -37,7 +19,7 @@ export class PredicateKindsPageEffects {
     flatMap(() =>
       ask(
         this.http,
-        ASK_FOR_PAGE_DTO,
+        ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
         dto => [
           new InitializePredicateKindsPageAction(dto),
         ],

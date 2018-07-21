@@ -89,7 +89,6 @@ export function httpGet<TResponse = null>(
       case 'response':
         return http.get<TResponse>(url, {
           observe: 'response',
-          withCredentials: true,
           headers: options.headers,
           params: options.params,
         });
@@ -97,7 +96,6 @@ export function httpGet<TResponse = null>(
       default:
         return http.get<TResponse>(url, {
           observe: 'body',
-          withCredentials: true,
           headers: options.headers,
           params: options.params,
         });
@@ -143,11 +141,13 @@ export function httpPost<TResponse = null>(
   options: HttpOptions = {},
 ): Observable<Action> {
   const obs = (() => {
+    options.headers = options.headers instanceof HttpHeaders ? options.headers : new HttpHeaders(options.headers);
+    options.headers = options.headers.set('content-type', 'application/json');
+
     switch (options.observe) {
       case 'response':
         return http.post<TResponse>(url, body, {
           observe: 'response',
-          withCredentials: true,
           headers: options.headers,
           params: options.params,
         });
@@ -155,7 +155,6 @@ export function httpPost<TResponse = null>(
       default:
         return http.post<TResponse>(url, body, {
           observe: 'body',
-          withCredentials: true,
           headers: options.headers,
           params: options.params,
         });

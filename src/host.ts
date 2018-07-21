@@ -1,5 +1,6 @@
 import bodyParser from 'body-parser';
 import compression from 'compression';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
@@ -17,6 +18,7 @@ const host = express();
 
 host.set('port', process.env.PORT || 3000);
 host.use(compression());
+host.use(cors());
 host.use(bodyParser.json());
 host.use(bodyParser.urlencoded({ extended: true }));
 host.use(expressValidator());
