@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { RootState } from 'app/app.state';
-import { RouterState } from 'app/infrastructure';
+import { RouterState } from '../router';
 
 import { Route } from './routing.state';
 import { createExternalUrl } from './routing.util';

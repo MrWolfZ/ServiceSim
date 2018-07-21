@@ -3,6 +3,8 @@ import { Action } from '@ngrx/store';
 import { concat, Observable, ObservableInput } from 'rxjs';
 import { catchError, mergeMap, startWith } from 'rxjs/operators';
 
+import { environment } from 'environments/environment';
+
 import { HandleApiErrorAction } from '../error-page/error.actions';
 import { DecrementUiBlockingApiCallSemaphoreAction, IncrementUiBlockingApiCallSemaphoreAction } from '../infrastructure.actions';
 import { DecrementLoadingBarSemaphoreAction, IncrementLoadingBarSemaphoreAction } from '../loading-bar/loading-bar.actions';
@@ -167,4 +169,57 @@ export function httpPost<TResponse = null>(
     project,
     options,
   );
+}
+
+export function makeUiApiUrl(relativeUrl: string) {
+  return `${environment.apiBaseUrl}uiapi/${relativeUrl.replace(/^\/*/, '')}`;
+}
+
+export function uiApiGet<TResponse = null>(
+  http: HttpClient,
+  relativeUrl: string,
+  project: (resp: TResponse) => ObservableInput<Action>,
+  options?: ObserveBodyHttpOptions,
+): Observable<Action>;
+
+export function uiApiGet<TResponse = null>(
+  http: HttpClient,
+  relativeUrl: string,
+  project: (resp: HttpResponse<TResponse>) => ObservableInput<Action>,
+  options: ObserveResponseHttpOptions,
+): Observable<Action>;
+
+export function uiApiGet<TResponse = null>(
+  http: HttpClient,
+  relativeUrl: string,
+  project: (resp: HttpResponse<TResponse> | TResponse) => ObservableInput<Action>,
+  options?: HttpOptions,
+): Observable<Action> {
+  return httpGet(http, makeUiApiUrl(relativeUrl), project, options);
+}
+
+export function uiApiPost<TResponse = null>(
+  http: HttpClient,
+  relativeUrl: string,
+  body: any,
+  project: (resp: TResponse) => ObservableInput<Action>,
+  options?: ObserveBodyHttpOptions,
+): Observable<Action>;
+
+export function uiApiPost<TResponse = null>(
+  http: HttpClient,
+  relativeUrl: string,
+  body: any,
+  project: (resp: HttpResponse<TResponse>) => ObservableInput<Action>,
+  options: ObserveResponseHttpOptions,
+): Observable<Action>;
+
+export function uiApiPost<TResponse = null>(
+  http: HttpClient,
+  relativeUrl: string,
+  body: any,
+  project: (resp: HttpResponse<TResponse> | TResponse) => ObservableInput<Action>,
+  options?: HttpOptions,
+): Observable<Action> {
+  return httpPost(http, makeUiApiUrl(relativeUrl), body, project, options);
 }

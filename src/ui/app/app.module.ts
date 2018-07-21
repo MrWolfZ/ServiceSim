@@ -7,16 +7,15 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { AppComponent } from './app.component';
-import { AppEffects } from './app.effects';
-import { metaReducers, reducers } from './app.reducer';
-import { routes } from './app.routing';
+import { AppComponent } from 'app/app.component';
+import { AppEffects } from 'app/app.effects';
+import { metaReducers, reducers } from 'app/app.reducer';
+import { routes } from 'app/app.routing';
 
-import { InfrastructureModule } from './infrastructure';
-import { SharedModule } from './shared';
+import { InfrastructureModule } from 'app/infrastructure';
 
-import { environment } from '../environments/environment';
-import { AppGuard } from './app.guard';
+import { AppGuard } from 'app/app.guard';
+import { environment } from 'environments/environment';
 
 @NgModule({
   declarations: [
@@ -32,7 +31,6 @@ import { AppGuard } from './app.guard';
     RouterModule.forRoot(routes, { useHash: true }),
     EffectsModule.forRoot([AppEffects]),
     InfrastructureModule,
-    SharedModule,
   ],
   bootstrap: [AppComponent],
   providers: [

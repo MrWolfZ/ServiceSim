@@ -1,37 +1,62 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
+import { NgrxFormsModule } from 'ngrx-forms';
 import { SchedulerLike } from 'rxjs';
 
-import { InfrastructureEffects } from 'app/infrastructure/infrastructure.effects';
-import { infrastructureRoutes } from 'app/infrastructure/infrastructure.routing';
+import { InfrastructureEffects } from './infrastructure.effects';
+import { infrastructureRoutes } from './infrastructure.routing';
 
 import { ExpansionContainerComponent } from './components';
 import { ErrorEffects, ErrorPage } from './error-page';
 import { LoadingBarComponent } from './loading-bar';
 import { RouterEffects, TrackRouteIsActiveDirective } from './router';
 
+import {
+  PredicateKindsLinkDirective,
+  ResponseGeneratorKindsLinkDirective,
+  RoutingEffects,
+} from './routing';
+
 export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxjs/Scheduler');
 
 @NgModule({
   imports: [
     CommonModule,
+    HttpClientModule,
+    NgrxFormsModule,
     RouterModule.forChild(infrastructureRoutes),
-    EffectsModule.forFeature([InfrastructureEffects, RouterEffects, ErrorEffects]),
+    EffectsModule.forFeature([
+      InfrastructureEffects,
+      RouterEffects,
+      ErrorEffects,
+      RoutingEffects,
+    ]),
   ],
   declarations: [
     ErrorPage,
     LoadingBarComponent,
     ExpansionContainerComponent,
     TrackRouteIsActiveDirective,
+    PredicateKindsLinkDirective,
+    ResponseGeneratorKindsLinkDirective,
   ],
   exports: [
+    CommonModule,
+    HttpClientModule,
+    LoadingBarComponent,
     ExpansionContainerComponent,
     TrackRouteIsActiveDirective,
+    PredicateKindsLinkDirective,
+    ResponseGeneratorKindsLinkDirective,
   ],
   providers: [
     { provide: RXJS_SCHEDULER, useValue: undefined },
+    // for some reason the location strategy defined by the router is not visible
+    // inside this module, so we have to provide it ourselves
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
   ],
 })
 export class InfrastructureModule { }

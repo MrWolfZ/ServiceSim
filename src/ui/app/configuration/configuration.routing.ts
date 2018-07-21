@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 
-import { PREDICATE_KINDS_PAGE_PATH } from 'app/shared';
+import { PREDICATE_KINDS_PAGE_PATH } from 'app/infrastructure';
 import { PredicateKindsPage, PredicateKindsPageInitializationGuard } from './predicate-kinds-page';
 
 export const configurationRoutes: Route[] = [

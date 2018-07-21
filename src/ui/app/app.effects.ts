@@ -6,10 +6,7 @@ import { Observable } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { AppInitializedAction, LoadAppDataAction } from './app.actions';
-import { HandleApiErrorAction, InitializeInfrastructureAction } from './infrastructure';
-import {
-  uiApiGet,
-} from './shared';
+import { HandleApiErrorAction, InitializeInfrastructureAction, uiApiGet } from './infrastructure';
 
 export interface ApplicationDataDto {
   version: string;

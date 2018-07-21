@@ -17,7 +17,7 @@ import {
 } from './routing.util';
 
 @Injectable()
-export class AppRoutingEffects {
+export class RoutingEffects {
 
   @Effect()
   navigateToPredicateKinds$: Observable<Action> = this.actions$.pipe(

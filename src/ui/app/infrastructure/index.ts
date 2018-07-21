@@ -8,4 +8,5 @@ export * from './components';
 export * from './error-page';
 export * from './loading-bar';
 export * from './router';
+export * from './routing';
 export * from './util';

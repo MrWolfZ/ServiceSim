@@ -4,7 +4,7 @@ import { AppGuard } from './app.guard';
 import {
   CONFIGURATION_MODULE_PATH,
   INFRASTRUCTURE_MODULE_PATH,
-} from './shared';
+} from './infrastructure';
 
 export const routes: Routes = [
   {

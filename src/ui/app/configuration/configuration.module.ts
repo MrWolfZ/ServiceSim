@@ -4,7 +4,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
 import { InfrastructureModule } from 'app/infrastructure';
-import { SharedModule } from 'app/shared';
 
 import { configurationRoutes } from './configuration.routing';
 
@@ -22,7 +21,6 @@ import {
   ],
   imports: [
     InfrastructureModule,
-    SharedModule,
     RouterModule.forChild(configurationRoutes),
     EffectsModule.forFeature([
       PredicateKindsPageEffects,

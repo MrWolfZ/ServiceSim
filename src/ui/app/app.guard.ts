@@ -3,11 +3,10 @@ import { ActivatedRouteSnapshot, CanActivate } from '@angular/router';
 import { ActionsSubject, select, Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 
-import { NavigateAction } from './infrastructure';
+import { handleInitializationAndApiError, NavigateAction } from './infrastructure';
 
 import { AppInitializedAction, LoadAppDataAction } from './app.actions';
 import { RootState } from './app.state';
-import { handleInitializationAndApiError } from './shared';
 
 @Injectable()
 export class AppGuard implements CanActivate {

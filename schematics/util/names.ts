@@ -13,7 +13,7 @@ export const moduleNames = {
 };
 
 export const pageNames = {
-  dir: (name: string) => name.toUpperCase() === 'SHARED' ? 'shared' : `${strings.dasherize(name)}-page`,
+  dir: (name: string) => `${strings.dasherize(name)}-page`,
   dirToName: (name: string) => name.replace(/-page$/, ''),
   route: (name: string) => `${strings.dasherize(name)}`,
   component: (name: string) => `${strings.classify(name)}Page`,

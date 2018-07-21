@@ -13,7 +13,7 @@ exports.moduleNames = {
     routingFileNoExt: (name) => `${core_1.strings.dasherize(name)}.routing`,
 };
 exports.pageNames = {
-    dir: (name) => name.toUpperCase() === 'SHARED' ? 'shared' : `${core_1.strings.dasherize(name)}-page`,
+    dir: (name) => `${core_1.strings.dasherize(name)}-page`,
     dirToName: (name) => name.replace(/-page$/, ''),
     route: (name) => `${core_1.strings.dasherize(name)}`,
     component: (name) => `${core_1.strings.classify(name)}Page`,
