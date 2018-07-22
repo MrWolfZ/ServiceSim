@@ -2,16 +2,16 @@ import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
 
 import { InvocationResponseWasSet, ServiceInvocation, ServiceResponse } from '../domain';
-import { eventStream } from '../infrastructure/event-log/event-log';
-import { getTopLevelPredicateNodes, PredicateNode, ResponseGeneratorFunction } from './predicate-tree';
+import { EventLog } from '../infrastructure';
+import { PredicateNode, PredicateTree, ResponseGeneratorFunction } from './predicate-tree';
 
 export const processRequest = async (req: Request, res: Response) => {
-  const topLevelPredicates = await getTopLevelPredicateNodes();
+  const topLevelPredicates = await PredicateTree.getTopLevelNodes();
 
   const invocation = ServiceInvocation.create(req.path, req.body);
   await ServiceInvocation.saveAsync(invocation);
 
-  eventStream<InvocationResponseWasSet>(InvocationResponseWasSet.KIND).pipe(
+  EventLog.getStream<InvocationResponseWasSet>(InvocationResponseWasSet.KIND).pipe(
     filter(ev => ev.invocationId === invocation.id),
     take(1),
     timeout(60000),

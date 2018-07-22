@@ -22,8 +22,28 @@ form.is-readonly .field {
   }
 }
 
+.modal {
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: all ease 200ms;
+
+  &.is-active {
+    opacity: 1;
+    pointer-events: inherit;
+  }
+
+  .input, .textarea {
+    background-color: $body-background-color;
+  }
+}
+
 .field {
   transition: all ease 200ms;
+
+  &:not(:last-child) {
+    margin-bottom: 0.7rem;
+  }
 }
 
 .input,
@@ -35,15 +55,14 @@ form.is-readonly .field {
   font-family: "Inconsolata", "Consolas", "Monaco", monospace;
 }
 
-.input {
-  &::placeholder {
-    color: $input-placeholder-color;
-  }
-}
-
 .field.title .input {
   font-size: 120%;
   font-weight: bold;
+}
+
+.errors .error {
+  color: $danger;
+  font-size: 0.75rem;
 }
 
 .is-paddingless-vertical {
@@ -53,4 +72,10 @@ form.is-readonly .field {
 
 .is-borderless {
   border: 0 !important;
+}
+
+.justify-content {
+  &.flex-end {
+    justify-content: flex-end;
+  }
 }

@@ -1,7 +1,7 @@
 import { DomainEvent } from './domain-event';
 import * as ej from './event-journal/event-journal';
 import * as es from './event-journal/event-stream';
-import * as el from './event-log/event-log';
+import { EventLog } from './event-log';
 import { EventSourcedRootEntity } from './event-sourced-root-entity';
 
 const journals = new Map<string, ej.EventJournal>();
@@ -46,7 +46,7 @@ export class EventSourcedEntityRepository {
         ...entity.mutatingEvents
       );
 
-      await el.publishAsync(...entity.mutatingEvents);
+      await EventLog.publishAsync(...entity.mutatingEvents);
 
       entity.mutatingEvents = [];
       entity.unmutatedVersion = entity.mutatedVersion;

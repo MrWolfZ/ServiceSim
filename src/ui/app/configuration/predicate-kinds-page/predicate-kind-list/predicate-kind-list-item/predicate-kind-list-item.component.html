@@ -1,26 +1,35 @@
-<form [class.is-readonly]="isReadonly">
+<form [class.is-readonly]="!state.isEditing"
+      [ngrxFormState]="state.formState">
   <div class="field title">
     <p class="control">
       <input class="input"
              type="text"
              placeholder="Name"
-             [value]="state.name"
-             [readonly]="isReadonly"
-             [class.is-paddingless]="isReadonly">
+             [ngrxFormControlState]="state.formState.controls.name"
+             [readonly]="!state.isEditing"
+             [class.is-paddingless]="!state.isEditing">
+      <sim-expansion-container class="errors"
+                               [isCollapsed]="state.formState.controls.name.isValid || (state.formState.controls.name.isUnsubmitted && state.formState.controls.name.isUntouched)">
+        <span class="error"
+              *ngIf="state.formState.controls.name.errors.required">
+          Please enter a name
+        </span>
+      </sim-expansion-container>
     </p>
   </div>
-  <div class="buttons is-pulled-right is-marginless">
+  <div class="buttons is-pulled-right is-marginless"
+       *ngIf="!state.isNewItem">
     <a class="button is-primary"
-       (click)="isReadonly = !isReadonly"
-       *ngIf="isReadonly">
+       (click)="startEdit()"
+       *ngIf="!state.isEditing">
       <span>Edit</span>
       <span class="icon is-small">
         <fa-icon icon="edit"></fa-icon>
       </span>
     </a>
     <a class="button is-danger"
-       (click)="isReadonly = !isReadonly"
-       *ngIf="!isReadonly">
+       (click)="cancelEdit()"
+       *ngIf="state.isEditing">
       <span>Cancel</span>
       <span class="icon is-small">
         <fa-icon icon="times"></fa-icon>
@@ -31,20 +40,19 @@
     <p class="control">
       <input class="input"
              placeholder="Description"
-             [value]="state.description"
-             [readonly]="isReadonly"
-             [class.is-paddingless]="isReadonly" />
+             [ngrxFormControlState]="state.formState.controls.description"
+             [readonly]="!state.isEditing"
+             [class.is-paddingless]="!state.isEditing">
     </p>
   </div>
   <div class="field">
     <label class="label">Function Body</label>
     <p class="control">
       <textarea class="textarea code"
-                placeholder="Description"
                 rows="3"
-                [value]="state.evalFunctionBody"
-                [readonly]="isReadonly">
-          </textarea>
+                [ngrxFormControlState]="state.formState.controls.evalFunctionBody"
+                [readonly]="!state.isEditing">
+      </textarea>
     </p>
   </div>
 </form>

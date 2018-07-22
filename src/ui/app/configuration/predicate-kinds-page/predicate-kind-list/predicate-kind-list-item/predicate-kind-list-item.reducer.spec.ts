@@ -4,6 +4,7 @@ import { predicateKindListItemReducer } from './predicate-kind-list-item.reducer
 import { INITIAL_PREDICATE_KIND_LIST_ITEM_STATE } from './predicate-kind-list-item.state';
 
 export const MOCK_PREDICATE_KIND_LIST_ITEM_DTO: PredicateKindListItemDto = {
+  predicateKindId: '',
   name: '',
   description: '',
   evalFunctionBody: '',

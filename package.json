@@ -118,7 +118,7 @@
     "karma-jasmine": "^1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
     "moment": "^2.22.2",
-    "ngrx-forms": "^2.3.6",
+    "ngrx-forms": "3.0.0",
     "ngrx-store-freeze": "^0.2.4",
     "nodemon": "^1.18.2",
     "protractor": "^5.3.0",

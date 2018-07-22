@@ -8,7 +8,7 @@ export interface Ask<TKind extends string, TResponse> {
 }
 
 // @ts-ignore
-export interface Tell<TKind extends string, TResponse> {
+export interface Tell<TKind extends string, TResponse = never> {
   kind: TKind;
 
   // this field will never be set; it just exists to allow the

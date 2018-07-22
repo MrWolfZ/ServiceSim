@@ -1,8 +1,62 @@
-<div class="tile is-ancestor">
-  <div class="tile is-12 is-vertical is-parent">
-    <div class="tile is-12 is-child box"
-         *ngFor="let item of state.items">
-      <sim-predicate-kind-list-item [state]="item"></sim-predicate-kind-list-item>
+<div class="modal"
+     [class.is-active]="state.newItemDialogIsOpen">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <form [ngrxFormState]="state.newItem.formState">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Create new predicate kind</p>
+      </header>
+      <section class="modal-card-body">
+        <sim-predicate-kind-list-item [state]="state.newItem"></sim-predicate-kind-list-item>
+      </section>
+      <footer class="modal-card-foot justify-content flex-end">
+        <button class="button is-danger is-outlined"
+                type="button"
+                (click)="cancelNewItemDialog()"
+                [disabled]="state.newItemIsSubmitting">
+          Cancel
+        </button>
+        <button class="button is-success"
+                [class.is-loading]="state.newItemIsSubmitting"
+                (click)="submitNewItemDialog()"
+                [disabled]="state.newItem.formState.isInvalid && state.newItem.formState.isSubmitted">
+          Save changes
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="state.items.length > 0">
+  <div class="level">
+    <div class="level-left">
+      <div class="field">
+        <p class="control">
+          <input class="input filter"
+                 placeholder="Filter..."
+                 [ngrxFormControlState]="state.filterControl" />
+        </p>
+      </div>
+    </div>
+    <div class="level-right">
+      <a class="button is-primary"
+         (click)="openNewItemDialog()">
+        <span>Create new kind</span>
+        <span class="icon is-small">
+          <fa-icon icon="plus"></fa-icon>
+        </span>
+      </a>
     </div>
   </div>
+  <div class="tile is-ancestor">
+    <div class="tile is-12 is-vertical is-parent">
+      <div class="tile is-12 is-child box"
+           *ngFor="let item of state.items; trackBy: trackById">
+        <sim-predicate-kind-list-item [state]="item"></sim-predicate-kind-list-item>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="state.items.length === 0">
+  <p>There are no predicate kinds yet.</p>
 </div>
