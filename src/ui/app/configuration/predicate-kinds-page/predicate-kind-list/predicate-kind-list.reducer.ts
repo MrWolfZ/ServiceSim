@@ -72,6 +72,7 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
       return {
         ...state,
         newItemDialogIsOpen: false,
+        newItem: predicateKindListItemReducer(undefined, new InitializeNewPredicateKindListItemAction()),
       };
 
     default:

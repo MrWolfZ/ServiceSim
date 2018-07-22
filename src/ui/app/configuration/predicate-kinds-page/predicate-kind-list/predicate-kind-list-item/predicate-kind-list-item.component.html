@@ -8,13 +8,12 @@
              [ngrxFormControlState]="state.formState.controls.name"
              [readonly]="!state.isEditing"
              [class.is-paddingless]="!state.isEditing">
-      <sim-expansion-container class="errors"
-                               [isCollapsed]="state.formState.controls.name.isValid || (state.formState.controls.name.isUnsubmitted && state.formState.controls.name.isUntouched)">
+      <sim-form-control-errors [formState]="state.formState.controls.name">
         <span class="error"
-              *ngIf="state.formState.controls.name.errors.required">
+              *ngIf="state.formState.errors['_name']?.required">
           Please enter a name
         </span>
-      </sim-expansion-container>
+      </sim-form-control-errors>
     </p>
   </div>
   <div class="buttons is-pulled-right is-marginless"
@@ -43,6 +42,12 @@
              [ngrxFormControlState]="state.formState.controls.description"
              [readonly]="!state.isEditing"
              [class.is-paddingless]="!state.isEditing">
+      <sim-form-control-errors [formState]="state.formState.controls.description">
+        <span class="error"
+              *ngIf="state.formState.errors['_description']?.required">
+          Please enter a description
+        </span>
+      </sim-form-control-errors>
     </p>
   </div>
   <div class="field">
@@ -53,6 +58,12 @@
                 [ngrxFormControlState]="state.formState.controls.evalFunctionBody"
                 [readonly]="!state.isEditing">
       </textarea>
+      <sim-form-control-errors [formState]="state.formState.controls.evalFunctionBody">
+        <span class="error"
+              *ngIf="state.formState.errors['_evalFunctionBody']?.required">
+          Please enter a function body
+        </span>
+      </sim-form-control-errors>
     </p>
   </div>
 </form>

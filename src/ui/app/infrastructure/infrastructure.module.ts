@@ -12,7 +12,7 @@ import { SchedulerLike } from 'rxjs';
 import { InfrastructureEffects } from './infrastructure.effects';
 import { infrastructureRoutes } from './infrastructure.routing';
 
-import { ExpansionContainerComponent } from './components';
+import { ExpansionContainerComponent, FormControlErrorsComponent } from './components';
 import { ErrorEffects, ErrorPage } from './error-page';
 import { LoadingBarComponent } from './loading-bar';
 import { RouterEffects, TrackRouteIsActiveDirective } from './router';
@@ -47,6 +47,7 @@ library.add(faTimes);
     ErrorPage,
     LoadingBarComponent,
     ExpansionContainerComponent,
+    FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
     PredicateKindsLinkDirective,
     ResponseGeneratorKindsLinkDirective,
@@ -58,6 +59,7 @@ library.add(faTimes);
     FontAwesomeModule,
     LoadingBarComponent,
     ExpansionContainerComponent,
+    FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
     PredicateKindsLinkDirective,
     ResponseGeneratorKindsLinkDirective,
