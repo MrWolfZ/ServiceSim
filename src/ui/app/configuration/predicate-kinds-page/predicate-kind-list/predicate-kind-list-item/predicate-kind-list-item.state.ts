@@ -4,7 +4,11 @@ import { PredicateKindListItemDto, PredicateKindListItemFormValue } from './pred
 
 export interface PredicateKindListItemState extends PredicateKindListItemDto {
   isEditing: boolean;
+  isChanged: boolean;
+  isSaving: boolean;
   isNewItem: boolean;
+  isDeleting: boolean;
+  isReadOnly: boolean;
   formState: FormGroupState<PredicateKindListItemFormValue>;
 }
 
@@ -25,6 +29,10 @@ export const INITIAL_PREDICATE_KIND_LIST_ITEM_STATE: PredicateKindListItemState 
   description: '',
   evalFunctionBody: '',
   isEditing: false,
+  isChanged: false,
+  isSaving: false,
   isNewItem: false,
+  isDeleting: false,
+  isReadOnly: true,
   formState: INITIAL_PREDICATE_KIND_LIST_ITEM_FORM_STATE,
 };

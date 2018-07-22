@@ -31,9 +31,20 @@ export class SubmitNewPredicateKindDialogAction implements Action {
   ) {}
 }
 
+// TODO: handle failure as well
 export class SubmitNewPredicateKindDialogSuccessfulAction implements Action {
   static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/SUBMIT_NEW_PREDICATE_KIND_DIALOG_SUCCESSFUL';
   readonly type = SubmitNewPredicateKindDialogSuccessfulAction.TYPE;
+
+  constructor(
+    public predicateKindId: string,
+  ) {}
+}
+
+// TODO: handle failure as well
+export class DeletePredicateKindSuccessfulAction implements Action {
+  static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/DELETE_PREDICATE_KIND_SUCCESSFUL';
+  readonly type = DeletePredicateKindSuccessfulAction.TYPE;
 
   constructor(
     public predicateKindId: string,
@@ -46,4 +57,5 @@ export type PredicateKindListActions =
   | CancelNewPredicateKindDialogAction
   | SubmitNewPredicateKindDialogAction
   | SubmitNewPredicateKindDialogSuccessfulAction
+  | DeletePredicateKindSuccessfulAction
   ;

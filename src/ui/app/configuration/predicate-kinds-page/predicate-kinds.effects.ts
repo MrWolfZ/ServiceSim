@@ -7,9 +7,21 @@ import { flatMap, map } from 'rxjs/operators';
 
 import { ask, tell } from 'app/infrastructure';
 
-import { SubmitNewPredicateKindDialogAction, SubmitNewPredicateKindDialogSuccessfulAction } from './predicate-kind-list';
+import {
+  DeletePredicateKindAction,
+  DeletePredicateKindSuccessfulAction,
+  SaveEditedPredicateKindListItemAction,
+  SavingEditedPredicateKindListItemSuccessfulAction,
+  SubmitNewPredicateKindDialogAction,
+  SubmitNewPredicateKindDialogSuccessfulAction,
+} from './predicate-kind-list';
 import { InitializePredicateKindsPageAction, LoadPredicateKindsPageDataAction } from './predicate-kinds.actions';
-import { ASK_FOR_PREDICATE_KINDS_PAGE_DTO, createCreateNewPredicateKindCommand } from './predicate-kinds.dto';
+import {
+  ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
+  createCreateNewPredicateKindCommand,
+  createDeletePredicateKindCommand,
+  createUpdatePredicateKindCommand,
+} from './predicate-kinds.dto';
 
 @Injectable()
 export class PredicateKindsPageEffects {
@@ -38,6 +50,36 @@ export class PredicateKindsPageEffects {
         createCreateNewPredicateKindCommand(a.formValue),
         dto => [
           new SubmitNewPredicateKindDialogSuccessfulAction(dto.predicateKindId),
+        ],
+      )
+    ),
+  );
+
+  @Effect()
+  updatePredicateKind$: Observable<Action> = this.actions$.pipe(
+    ofType(SaveEditedPredicateKindListItemAction.TYPE),
+    map(a => a as SaveEditedPredicateKindListItemAction),
+    flatMap(a =>
+      tell(
+        this.http,
+        createUpdatePredicateKindCommand(a.predicateKindId, a.formValue),
+        () => [
+          new SavingEditedPredicateKindListItemSuccessfulAction(a.predicateKindId),
+        ],
+      )
+    ),
+  );
+
+  @Effect()
+  deletePredicateKind$: Observable<Action> = this.actions$.pipe(
+    ofType(DeletePredicateKindAction.TYPE),
+    map(a => a as DeletePredicateKindAction),
+    flatMap(a =>
+      tell(
+        this.http,
+        createDeletePredicateKindCommand(a.predicateKindId),
+        () => [
+          new DeletePredicateKindSuccessfulAction(a.predicateKindId),
         ],
       )
     ),

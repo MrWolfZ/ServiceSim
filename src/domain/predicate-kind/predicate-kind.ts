@@ -2,12 +2,16 @@ import uuid from 'uuid';
 
 import { EntityEventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { PredicateKindCreated } from './predicate-kind-created';
+import { PredicateKindDeleted } from './predicate-kind-deleted';
+import { PredicateKindUpdated } from './predicate-kind-updated';
 import { PredicatePropertyDescriptorAdded } from './property-descriptor-added';
 
 const JOURNAL_NAME = 'predicate-kind/Journal';
 
 type DomainEvents =
   | PredicateKindCreated
+  | PredicateKindDeleted
+  | PredicateKindUpdated
   | PredicatePropertyDescriptorAdded
   ;
 
@@ -37,6 +41,25 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     }));
   }
 
+  update(
+    name: string,
+    description: string,
+    evalFunctionBody: string,
+  ) {
+    return this.apply(PredicateKindUpdated.create({
+      predicateKindId: this.id,
+      name,
+      description,
+      evalFunctionBody,
+    }));
+  }
+
+  delete() {
+    return this.apply(PredicateKindDeleted.create({
+      predicateKindId: this.id,
+    }));
+  }
+
   addPropertyDescriptor = (
     name: string,
     description: string,
@@ -57,6 +80,14 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
       this.id = event.predicateKindId;
       this.name = event.name;
       this.description = event.description;
+    },
+    [PredicateKindUpdated.KIND]: event => {
+      this.id = event.predicateKindId;
+      this.name = event.name;
+      this.description = event.description;
+    },
+    [PredicateKindDeleted.KIND]: () => {
+      // nothing to do
     },
     [PredicatePropertyDescriptorAdded.KIND]: event => {
       this.propertyDescriptors.push({

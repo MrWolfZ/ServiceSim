@@ -59,8 +59,8 @@ export function tell<TTellKind extends string, TResponse>(
   tell: Tell<TTellKind, TResponse>,
   project: (resp: TResponse) => ObservableInput<Action>,
   options: CommonHttpOptions = {
-    blocksUi: true,
-    showsLoadingBar: true,
+    blocksUi: false,
+    showsLoadingBar: false,
   },
 ): Observable<Action> {
   return httpPost(

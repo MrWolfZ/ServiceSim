@@ -4,7 +4,7 @@ import { InjectionToken, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEdit, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faEdit, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { EffectsModule } from '@ngrx/effects';
 import { NgrxFormsModule } from 'ngrx-forms';
 import { SchedulerLike } from 'rxjs';
@@ -25,6 +25,7 @@ import {
 
 export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxjs/Scheduler');
 
+library.add(faCheck);
 library.add(faEdit);
 library.add(faPlus);
 library.add(faTimes);

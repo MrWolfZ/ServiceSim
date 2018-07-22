@@ -1,4 +1,4 @@
-<form [class.is-readonly]="!state.isEditing"
+<form [class.is-readonly]="state.isReadOnly"
       [ngrxFormState]="state.formState">
   <div class="field title">
     <p class="control">
@@ -6,8 +6,8 @@
              type="text"
              placeholder="Name"
              [ngrxFormControlState]="state.formState.controls.name"
-             [readonly]="!state.isEditing"
-             [class.is-paddingless]="!state.isEditing">
+             [readonly]="state.isReadOnly"
+             [class.is-paddingless]="state.isReadOnly">
       <sim-form-control-errors [formState]="state.formState.controls.name">
         <span class="error"
               *ngIf="state.formState.errors['_name']?.required">
@@ -18,30 +18,55 @@
   </div>
   <div class="buttons is-pulled-right is-marginless"
        *ngIf="!state.isNewItem">
-    <a class="button is-primary"
-       (click)="startEdit()"
-       *ngIf="!state.isEditing">
-      <span>Edit</span>
-      <span class="icon is-small">
-        <fa-icon icon="edit"></fa-icon>
-      </span>
-    </a>
-    <a class="button is-danger"
-       (click)="cancelEdit()"
-       *ngIf="state.isEditing">
-      <span>Cancel</span>
-      <span class="icon is-small">
-        <fa-icon icon="times"></fa-icon>
-      </span>
-    </a>
+    <div *ngIf="!state.isEditing">
+      <button class="button is-danger"
+              type="button"
+              [class.is-loading]="state.isDeleting"
+              (click)="delete()"
+              [disabled]="state.isDeleting">
+        <span>Delete</span>
+        <span class="icon is-small">
+          <fa-icon icon="times"></fa-icon>
+        </span>
+      </button>
+      <button class="button is-primary"
+              type="button"
+              (click)="startEdit()"
+              [disabled]="state.isDeleting">
+        <span>Edit</span>
+        <span class="icon is-small">
+          <fa-icon icon="edit"></fa-icon>
+        </span>
+      </button>
+    </div>
+    <div *ngIf="state.isEditing">
+      <button class="button is-danger"
+              type="button"
+              (click)="cancelEdit()"
+              [disabled]="state.isSaving">
+        <span>Cancel</span>
+        <span class="icon is-small">
+          <fa-icon icon="times"></fa-icon>
+        </span>
+      </button>
+      <button class="button is-success"
+              (click)="submitEdit()"
+              [disabled]="!state.isChanged || (state.formState.isInvalid && state.formState.isSubmitted)"
+              [class.is-loading]="state.isSaving">
+        <span>Save</span>
+        <span class="icon is-small">
+          <fa-icon icon="check"></fa-icon>
+        </span>
+      </button>
+    </div>
   </div>
   <div class="field">
     <p class="control">
       <input class="input"
              placeholder="Description"
              [ngrxFormControlState]="state.formState.controls.description"
-             [readonly]="!state.isEditing"
-             [class.is-paddingless]="!state.isEditing">
+             [readonly]="state.isReadOnly"
+             [class.is-paddingless]="state.isReadOnly">
       <sim-form-control-errors [formState]="state.formState.controls.description">
         <span class="error"
               *ngIf="state.formState.errors['_description']?.required">
@@ -56,7 +81,7 @@
       <textarea class="textarea code"
                 rows="3"
                 [ngrxFormControlState]="state.formState.controls.evalFunctionBody"
-                [readonly]="!state.isEditing">
+                [readonly]="state.isReadOnly">
       </textarea>
       <sim-form-control-errors [formState]="state.formState.controls.evalFunctionBody">
         <span class="error"

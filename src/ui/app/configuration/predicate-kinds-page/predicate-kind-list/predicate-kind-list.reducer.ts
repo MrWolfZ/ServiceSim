@@ -5,6 +5,7 @@ import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
 import { InitializeNewPredicateKindListItemAction, InitializePredicateKindListItemAction, predicateKindListItemReducer } from './predicate-kind-list-item';
 import {
   CancelNewPredicateKindDialogAction,
+  DeletePredicateKindSuccessfulAction,
   InitializePredicateKindListAction,
   OpenNewPredicateKindDialogAction,
   PredicateKindListActions,
@@ -34,6 +35,7 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
       return {
         ...state,
         newItemDialogIsOpen: true,
+        newItemIsSubmitting: false,
         newItem: predicateKindListItemReducer(undefined, new InitializeNewPredicateKindListItemAction()),
       };
 
@@ -62,7 +64,6 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
 
       return {
         ...state,
-        newItemIsSubmitting: false,
         newItemDialogIsOpen: false,
         items,
       };
@@ -74,6 +75,15 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
         newItemDialogIsOpen: false,
         newItem: predicateKindListItemReducer(undefined, new InitializeNewPredicateKindListItemAction()),
       };
+
+    case DeletePredicateKindSuccessfulAction.TYPE: {
+      const items = state.items.filter(i => i.predicateKindId !== action.predicateKindId);
+
+      return {
+        ...state,
+        items,
+      };
+    }
 
     default:
       return state;

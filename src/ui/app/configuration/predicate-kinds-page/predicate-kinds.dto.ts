@@ -27,3 +27,31 @@ export function createCreateNewPredicateKindCommand(formValue: PredicateKindList
     formValue,
   };
 }
+
+export const UPDATE_PREDICATE_KIND_COMMAND_KIND = 'configuration/predicate-kinds-page/UPDATE_PREDICATE_KIND';
+
+export interface UpdatePredicateKindCommand extends Tell<typeof UPDATE_PREDICATE_KIND_COMMAND_KIND> {
+  predicateKindId: string;
+  formValue: PredicateKindListItemFormValue;
+}
+
+export function createUpdatePredicateKindCommand(predicateKindId: string, formValue: PredicateKindListItemFormValue): UpdatePredicateKindCommand {
+  return {
+    kind: UPDATE_PREDICATE_KIND_COMMAND_KIND,
+    predicateKindId,
+    formValue,
+  };
+}
+
+export const DELETE_PREDICATE_KIND_COMMAND_KIND = 'configuration/predicate-kinds-page/DELETE_PREDICATE_KIND';
+
+export interface DeletePredicateKindCommand extends Tell<typeof DELETE_PREDICATE_KIND_COMMAND_KIND> {
+  predicateKindId: string;
+}
+
+export function createDeletePredicateKindCommand(predicateKindId: string): DeletePredicateKindCommand {
+  return {
+    kind: DELETE_PREDICATE_KIND_COMMAND_KIND,
+    predicateKindId,
+  };
+}

@@ -1,6 +1,8 @@
 import {
   PredicateCreated,
   PredicateKindCreated,
+  PredicateKindDeleted,
+  PredicateKindUpdated,
   ResponseGeneratorKindCreated,
   ResponseGeneratorSet,
   ServiceRequest,
@@ -13,6 +15,8 @@ const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
   PredicateKindCreated.KIND,
   ResponseGeneratorKindCreated.KIND,
   PredicateCreated.KIND,
+  PredicateKindUpdated.KIND,
+  PredicateKindDeleted.KIND,
   ResponseGeneratorSet.KIND,
 ];
 
@@ -20,6 +24,8 @@ type SubscribedEvents =
   | PredicateKindCreated
   | ResponseGeneratorKindCreated
   | PredicateCreated
+  | PredicateKindUpdated
+  | PredicateKindDeleted
   | ResponseGeneratorSet
   ;
 
@@ -27,6 +33,8 @@ export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResp
 
 export interface PredicateNode {
   predicateId: string;
+  predicateKindId: string;
+  properties: { [prop: string]: any };
   evaluate: (request: ServiceRequest) => boolean | Promise<boolean>;
   childPredicatesOrResponseGenerator: PredicateNode[] | ResponseGeneratorFunction | undefined;
 }
@@ -49,6 +57,22 @@ export class PredicateTree {
           predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
           return;
 
+        case PredicateKindUpdated.KIND: {
+          predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
+          const evaluationFunction = new Function('request', 'properties', ev.evalFunctionBody) as PredicateEvaluationFunction;
+          for (const node of predicateNodesById.values()) {
+            if (node.predicateKindId === ev.predicateKindId) {
+              node.evaluate = request => evaluationFunction(request, node.properties);
+            }
+          }
+
+          return;
+        }
+
+        case PredicateKindDeleted.KIND:
+          predicateKindEvalFunctionBodies.delete(ev.predicateKindId);
+          return;
+
         case ResponseGeneratorKindCreated.KIND:
           responseGeneratorKindFunctionBodies.set(ev.responseGeneratorKindId, ev.generatorFunctionBody);
           return;
@@ -59,6 +83,8 @@ export class PredicateTree {
 
           const node: PredicateNode = {
             predicateId: ev.predicateId,
+            predicateKindId: ev.predicateKindId,
+            properties: ev.properties,
             evaluate: request => evaluationFunction(request, ev.properties),
             childPredicatesOrResponseGenerator: undefined,
           };
