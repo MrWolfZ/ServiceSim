@@ -21,7 +21,7 @@ export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['
     return this;
   }
 
-  abstract EVENT_HANDLERS: EntityEventHandlerMap<TEvent>;
+  abstract EVENT_HANDLERS: EventHandlerMap<TEvent>;
 
   protected getSnapshotValue(): any {
     throw new Error('snapshots not supported');
@@ -61,6 +61,6 @@ export type EntityEventHandler<TEvent extends DomainEvent<TEvent['kind']> = Doma
 
 export type EventOfKind<TEvent, TKind extends string> = TEvent extends DomainEvent<TKind> ? TEvent : never;
 
-export type EntityEventHandlerMap<TEvent extends DomainEvent> = {
+export type EventHandlerMap<TEvent extends DomainEvent> = {
   [eventKind in TEvent['kind']]: EntityEventHandler<EventOfKind<TEvent, eventKind>>;
 };

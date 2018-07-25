@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 
-import { EntityEventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { PredicateCreated } from './predicate-created';
 import { ResponseGeneratorSet } from './response-generator-set';
 
@@ -49,7 +49,7 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
     }));
   }
 
-  EVENT_HANDLERS: EntityEventHandlerMap<DomainEvents> = {
+  EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
     [PredicateCreated.KIND]: event => {
       this.id = event.predicateId;
       this.predicateKindId = event.predicateKindId;

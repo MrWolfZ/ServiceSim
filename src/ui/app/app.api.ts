@@ -4,21 +4,19 @@ import { Ask, Tell } from './infrastructure/infrastructure.dto';
 
 import { PredicateKindsApi } from './configuration/predicate-kinds-page/predicate-kinds.api';
 import {
-  ASK_FOR_PREDICATE_KINDS_PAGE_DTO_KIND,
+  ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
   AskForPredicateKindsPageDto,
-  CREATE_NEW_PREDICATE_KIND_COMMAND_KIND,
-  CreateNewPredicateKindCommand,
   DELETE_PREDICATE_KIND_COMMAND_KIND,
   DeletePredicateKindCommand,
-  UPDATE_PREDICATE_KIND_COMMAND_KIND,
-  UpdatePredicateKindCommand,
+  TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND,
+  TellToCreateOrUpdatePredicateKind,
 } from './configuration/predicate-kinds-page/predicate-kinds.dto';
 
 export const askAsync = async (req: Request, res: Response) => {
   const ask = req.body as Ask<string, any>;
 
   switch (ask.kind) {
-    case ASK_FOR_PREDICATE_KINDS_PAGE_DTO_KIND:
+    case ASK_FOR_PREDICATE_KINDS_PAGE_DTO:
       const response = await PredicateKindsApi.askForPageDto(ask as AskForPredicateKindsPageDto);
       res.status(200).send(response);
       break;
@@ -33,15 +31,9 @@ export const tellAsync = async (req: Request, res: Response) => {
   const tell = req.body as Tell<string, any>;
 
   switch (tell.kind) {
-    case CREATE_NEW_PREDICATE_KIND_COMMAND_KIND: {
-      const response = await PredicateKindsApi.createNewPredicateKind(tell as CreateNewPredicateKindCommand);
+    case TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND: {
+      const response = await PredicateKindsApi.createOrUpdatePredicateKind(tell as TellToCreateOrUpdatePredicateKind);
       res.status(200).send(response);
-      break;
-    }
-
-    case UPDATE_PREDICATE_KIND_COMMAND_KIND: {
-      await PredicateKindsApi.updatePredicateKind(tell as UpdatePredicateKindCommand);
-      res.status(204).send();
       break;
     }
 

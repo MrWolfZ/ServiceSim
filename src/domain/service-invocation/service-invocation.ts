@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 
-import { EntityEventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { InvocationResponseWasSet } from './invocation-response-was-set';
 import { ServiceRequestReceived } from './service-request-received';
 
@@ -56,7 +56,7 @@ export class ServiceInvocation extends EventSourcedRootEntity<DomainEvents> {
     }));
   }
 
-  EVENT_HANDLERS: EntityEventHandlerMap<DomainEvents> = {
+  EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
     [ServiceRequestReceived.KIND]: event => {
       this.id = event.invocationId;
       this.request = {

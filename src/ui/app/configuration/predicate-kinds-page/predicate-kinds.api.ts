@@ -4,10 +4,9 @@ import { EventLog } from '../../../../infrastructure';
 import { PredicateKindListItemDto } from './predicate-kind-list/predicate-kind-list-item/predicate-kind-list-item.dto';
 import {
   AskForPredicateKindsPageDto,
-  CreateNewPredicateKindCommand,
   DeletePredicateKindCommand,
   PredicateKindsPageDto,
-  UpdatePredicateKindCommand,
+  TellToCreateOrUpdatePredicateKind,
 } from './predicate-kinds.dto';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
@@ -28,73 +27,69 @@ let dto: PredicateKindsPageDto = {
   },
 };
 
+// TODO: export object that checks itself whether it is responsible for given ask and tell kinds
 export class PredicateKindsApi {
   static start() {
-    return EventLog.getStream<SubscribedEvents>(...SUBSCRIBED_EVENT_KINDS).subscribe(ev => {
-      // tslint:disable-next-line:switch-default
-      switch (ev.kind) {
-        case PredicateKindCreated.KIND: {
-          const newItem: PredicateKindListItemDto = {
-            predicateKindId: ev.predicateKindId,
-            name: ev.name,
-            description: ev.description,
-            evalFunctionBody: ev.evalFunctionBody,
-          };
+    return EventLog.subscribeToStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS, {
+      [PredicateKindCreated.KIND]: ev => {
+        const newItem: PredicateKindListItemDto = {
+          predicateKindId: ev.predicateKindId,
+          name: ev.name,
+          description: ev.description,
+          evalFunctionBody: ev.evalFunctionBody,
+        };
 
-          const items = [
-            ...dto.predicateKindList.items,
-            newItem,
-          ].sort((l, r) => l.name.localeCompare(r.name));
+        const items = [
+          ...dto.predicateKindList.items,
+          newItem,
+        ].sort((l, r) => l.name.localeCompare(r.name));
 
-          dto = {
-            ...dto,
-            predicateKindList: {
-              ...dto.predicateKindList,
-              items,
-            },
-          };
+        dto = {
+          ...dto,
+          predicateKindList: {
+            ...dto.predicateKindList,
+            items,
+          },
+        };
 
-          return;
-        }
+        return;
+      },
+      [PredicateKindUpdated.KIND]: ev => {
+        const updatedItem: PredicateKindListItemDto = {
+          predicateKindId: ev.predicateKindId,
+          name: ev.name,
+          description: ev.description,
+          evalFunctionBody: ev.evalFunctionBody,
+        };
 
-        case PredicateKindUpdated.KIND: {
-          const updatedItem: PredicateKindListItemDto = {
-            predicateKindId: ev.predicateKindId,
-            name: ev.name,
-            description: ev.description,
-            evalFunctionBody: ev.evalFunctionBody,
-          };
+        const items = dto.predicateKindList
+          .items
+          .map(i => i.predicateKindId === ev.predicateKindId ? updatedItem : i)
+          .sort((l, r) => l.name.localeCompare(r.name));
 
-          const items = dto.predicateKindList
-            .items
-            .map(i => i.predicateKindId === ev.predicateKindId ? updatedItem : i)
-            .sort((l, r) => l.name.localeCompare(r.name));
+        dto = {
+          ...dto,
+          predicateKindList: {
+            ...dto.predicateKindList,
+            items,
+          },
+        };
 
-          dto = {
-            ...dto,
-            predicateKindList: {
-              ...dto.predicateKindList,
-              items,
-            },
-          };
+        return;
+      },
+      [PredicateKindDeleted.KIND]: ev => {
+        const items = dto.predicateKindList.items.filter(i => i.predicateKindId !== ev.predicateKindId);
 
-          return;
-        }
+        dto = {
+          ...dto,
+          predicateKindList: {
+            ...dto.predicateKindList,
+            items,
+          },
+        };
 
-        case PredicateKindDeleted.KIND: {
-          const items = dto.predicateKindList.items.filter(i => i.predicateKindId !== ev.predicateKindId);
-
-          dto = {
-            ...dto,
-            predicateKindList: {
-              ...dto.predicateKindList,
-              items,
-            },
-          };
-
-          return;
-        }
-      }
+        return;
+      },
     });
   }
 
@@ -104,32 +99,21 @@ export class PredicateKindsApi {
 
   // TODO: validation
   // TODO: property descriptors
-  static async createNewPredicateKind(command: CreateNewPredicateKindCommand) {
-    const newPredicateKind = PredicateKind.create(
-      command.formValue.name,
-      command.formValue.description,
-      command.formValue.evalFunctionBody,
-    );
+  static async createOrUpdatePredicateKind(command: TellToCreateOrUpdatePredicateKind) {
+    const predicateKind =
+      !!command.predicateKindId
+        ? await PredicateKind.ofIdAsync(command.predicateKindId)
+        : PredicateKind.create(
+          command.formValue.name,
+          command.formValue.description,
+          command.formValue.evalFunctionBody,
+        );
 
-    await PredicateKind.saveAsync(newPredicateKind);
+    await PredicateKind.saveAsync(predicateKind);
 
     return {
-      predicateKindId: newPredicateKind.id,
+      predicateKindId: predicateKind.id,
     };
-  }
-
-  // TODO: validation
-  // TODO: property descriptors
-  static async updatePredicateKind(command: UpdatePredicateKindCommand) {
-    const predicateKind = await PredicateKind.ofIdAsync(command.predicateKindId);
-
-    const updatedPredicateKind = predicateKind.update(
-      command.formValue.name,
-      command.formValue.description,
-      command.formValue.evalFunctionBody,
-    );
-
-    await PredicateKind.saveAsync(updatedPredicateKind);
   }
 
   // TODO: validate predicate kind exists

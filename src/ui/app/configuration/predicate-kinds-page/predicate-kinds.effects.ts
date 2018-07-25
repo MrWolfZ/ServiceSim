@@ -17,10 +17,9 @@ import {
 } from './predicate-kind-list';
 import { InitializePredicateKindsPageAction, LoadPredicateKindsPageDataAction } from './predicate-kinds.actions';
 import {
-  ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
-  createCreateNewPredicateKindCommand,
+  askForPredicateKindsPageDto,
   createDeletePredicateKindCommand,
-  createUpdatePredicateKindCommand,
+  tellToCreateOrUpdatePredicateKind,
 } from './predicate-kinds.dto';
 
 @Injectable()
@@ -32,7 +31,7 @@ export class PredicateKindsPageEffects {
     flatMap(() =>
       ask(
         this.http,
-        ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
+        askForPredicateKindsPageDto(),
         dto => [
           new InitializePredicateKindsPageAction(dto),
         ],
@@ -47,7 +46,7 @@ export class PredicateKindsPageEffects {
     flatMap(a =>
       tell(
         this.http,
-        createCreateNewPredicateKindCommand(a.formValue),
+        tellToCreateOrUpdatePredicateKind(a.formValue),
         dto => [
           new SubmitNewPredicateKindDialogSuccessfulAction(dto.predicateKindId),
         ],
@@ -62,7 +61,7 @@ export class PredicateKindsPageEffects {
     flatMap(a =>
       tell(
         this.http,
-        createUpdatePredicateKindCommand(a.predicateKindId, a.formValue),
+        tellToCreateOrUpdatePredicateKind(a.formValue, a.predicateKindId),
         () => [
           new SavingEditedPredicateKindListItemSuccessfulAction(a.predicateKindId),
         ],

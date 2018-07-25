@@ -7,39 +7,26 @@ export interface PredicateKindsPageDto {
   predicateKindList: PredicateKindListDto;
 }
 
-export const ASK_FOR_PREDICATE_KINDS_PAGE_DTO_KIND = 'configuration/predicate-kinds-page/ASK_FOR_PAGE_DTO';
+export const ASK_FOR_PREDICATE_KINDS_PAGE_DTO = 'configuration/predicate-kinds-page/ASK_FOR_PAGE_DTO';
 
-export interface AskForPredicateKindsPageDto extends Ask<typeof ASK_FOR_PREDICATE_KINDS_PAGE_DTO_KIND, PredicateKindsPageDto> { }
+export interface AskForPredicateKindsPageDto extends Ask<typeof ASK_FOR_PREDICATE_KINDS_PAGE_DTO, PredicateKindsPageDto> { }
 
-export const ASK_FOR_PREDICATE_KINDS_PAGE_DTO: AskForPredicateKindsPageDto = {
-  kind: ASK_FOR_PREDICATE_KINDS_PAGE_DTO_KIND,
-};
+export const askForPredicateKindsPageDto = (): AskForPredicateKindsPageDto => ({
+  kind: ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
+});
 
-export const CREATE_NEW_PREDICATE_KIND_COMMAND_KIND = 'configuration/predicate-kinds-page/CREATE_NEW_PREDICATE_KIND';
+export const TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND = 'configuration/predicate-kinds-page/CREATE_OR_UPDATE_PREDICATE_KIND';
 
-export interface CreateNewPredicateKindCommand extends Tell<typeof CREATE_NEW_PREDICATE_KIND_COMMAND_KIND, { predicateKindId: string }> {
+export interface TellToCreateOrUpdatePredicateKind extends Tell<typeof TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND, { predicateKindId: string }> {
+  predicateKindId?: string;
   formValue: PredicateKindListItemFormValue;
 }
 
-export function createCreateNewPredicateKindCommand(formValue: PredicateKindListItemFormValue): CreateNewPredicateKindCommand {
+export function tellToCreateOrUpdatePredicateKind(formValue: PredicateKindListItemFormValue, predicateKindId?: string): TellToCreateOrUpdatePredicateKind {
   return {
-    kind: CREATE_NEW_PREDICATE_KIND_COMMAND_KIND,
+    kind: TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND,
     formValue,
-  };
-}
-
-export const UPDATE_PREDICATE_KIND_COMMAND_KIND = 'configuration/predicate-kinds-page/UPDATE_PREDICATE_KIND';
-
-export interface UpdatePredicateKindCommand extends Tell<typeof UPDATE_PREDICATE_KIND_COMMAND_KIND> {
-  predicateKindId: string;
-  formValue: PredicateKindListItemFormValue;
-}
-
-export function createUpdatePredicateKindCommand(predicateKindId: string, formValue: PredicateKindListItemFormValue): UpdatePredicateKindCommand {
-  return {
-    kind: UPDATE_PREDICATE_KIND_COMMAND_KIND,
     predicateKindId,
-    formValue,
   };
 }
 

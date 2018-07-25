@@ -1,14 +1,15 @@
-import { ConnectableObservable, Observable, Observer, Subject } from 'rxjs';
+import { ConnectableObservable, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
 
 import { DomainEvent } from '../domain-event';
+import { EventHandlerMap, EventOfKind } from '../event-sourced-root-entity';
 import { loadEventsAsync, persistEventsAsync } from './persistence';
 
 const allEventsSubject = new Subject<[DomainEvent, number]>();
 
 export class EventLog {
   static getStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
-    ...eventKinds: TEvent['kind'][]
+    eventKinds: TEvent['kind'][],
   ): Observable<TEvent> {
     return Observable.create((obs: Observer<TEvent>) => {
       const replayObs = allEventsSubject.pipe(
@@ -40,6 +41,16 @@ export class EventLog {
         sub1.unsubscribe();
         sub2.unsubscribe();
       };
+    });
+  }
+
+  static subscribeToStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
+    eventKinds: TEvent['kind'][],
+    eventHandlerMap: EventHandlerMap<TEvent>,
+  ): Subscription {
+    return EventLog.getStream(eventKinds).subscribe(ev => {
+      const handler = eventHandlerMap[ev.kind];
+      handler(ev as EventOfKind<TEvent, TEvent['kind']>);
     });
   }
 
