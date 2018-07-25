@@ -11,7 +11,7 @@ export const processRequest = async (req: Request, res: Response) => {
   const invocation = ServiceInvocation.create(req.path, req.body);
   await ServiceInvocation.saveAsync(invocation);
 
-  EventLog.getStream<InvocationResponseWasSet>(InvocationResponseWasSet.KIND).pipe(
+  EventLog.getStream<InvocationResponseWasSet>([InvocationResponseWasSet.KIND]).pipe(
     filter(ev => ev.invocationId === invocation.id),
     take(1),
     timeout(60000),

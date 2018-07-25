@@ -1,23 +1,28 @@
-import { PredicateKind, PredicateKindCreated, PredicateKindDeleted, PredicateKindUpdated } from '../../../../domain';
-import { EventLog } from '../../../../infrastructure';
+import { createFormGroupState } from 'ngrx-forms';
 
+import { PredicateKind, PredicateKindCreatedOrUpdated, PredicateKindDeleted } from '../../../../domain';
+import { EventLog, failure, success } from '../../../../infrastructure';
+
+import { Ask, Tell } from '../../infrastructure/infrastructure.dto';
 import { PredicateKindListItemDto } from './predicate-kind-list/predicate-kind-list-item/predicate-kind-list-item.dto';
+import { validatePredicateKindListItem } from './predicate-kind-list/predicate-kind-list-item/predicate-kind-list-item.validation';
 import {
+  ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
   AskForPredicateKindsPageDto,
   DeletePredicateKindCommand,
   PredicateKindsPageDto,
+  TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND,
+  TELL_TO_DELETE_PREDICATE_KIND,
   TellToCreateOrUpdatePredicateKind,
 } from './predicate-kinds.dto';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
-  PredicateKindCreated.KIND,
-  PredicateKindUpdated.KIND,
+  PredicateKindCreatedOrUpdated.KIND,
   PredicateKindDeleted.KIND,
 ];
 
 type SubscribedEvents =
-  | PredicateKindCreated
-  | PredicateKindUpdated
+  | PredicateKindCreatedOrUpdated
   | PredicateKindDeleted
   ;
 
@@ -27,45 +32,22 @@ let dto: PredicateKindsPageDto = {
   },
 };
 
-// TODO: export object that checks itself whether it is responsible for given ask and tell kinds
 export class PredicateKindsApi {
   static start() {
     return EventLog.subscribeToStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS, {
-      [PredicateKindCreated.KIND]: ev => {
-        const newItem: PredicateKindListItemDto = {
+      [PredicateKindCreatedOrUpdated.KIND]: ev => {
+        const item: PredicateKindListItemDto = {
           predicateKindId: ev.predicateKindId,
           name: ev.name,
           description: ev.description,
           evalFunctionBody: ev.evalFunctionBody,
+          propertyDescriptors: ev.propertyDescriptors,
         };
 
         const items = [
-          ...dto.predicateKindList.items,
-          newItem,
+          ...dto.predicateKindList.items.filter(i => i.predicateKindId !== item.predicateKindId),
+          item,
         ].sort((l, r) => l.name.localeCompare(r.name));
-
-        dto = {
-          ...dto,
-          predicateKindList: {
-            ...dto.predicateKindList,
-            items,
-          },
-        };
-
-        return;
-      },
-      [PredicateKindUpdated.KIND]: ev => {
-        const updatedItem: PredicateKindListItemDto = {
-          predicateKindId: ev.predicateKindId,
-          name: ev.name,
-          description: ev.description,
-          evalFunctionBody: ev.evalFunctionBody,
-        };
-
-        const items = dto.predicateKindList
-          .items
-          .map(i => i.predicateKindId === ev.predicateKindId ? updatedItem : i)
-          .sort((l, r) => l.name.localeCompare(r.name));
 
         dto = {
           ...dto,
@@ -93,35 +75,73 @@ export class PredicateKindsApi {
     });
   }
 
+  static async matchAsk(ask: Ask<string, any>) {
+    switch (ask.kind) {
+      case ASK_FOR_PREDICATE_KINDS_PAGE_DTO:
+        return success(dto);
+
+      default:
+        return failure();
+    }
+  }
+
   static async askForPageDto(_: AskForPredicateKindsPageDto) {
     return dto;
   }
 
-  // TODO: validation
-  // TODO: property descriptors
-  static async createOrUpdatePredicateKind(command: TellToCreateOrUpdatePredicateKind) {
-    const predicateKind =
-      !!command.predicateKindId
-        ? await PredicateKind.ofIdAsync(command.predicateKindId)
-        : PredicateKind.create(
-          command.formValue.name,
-          command.formValue.description,
-          command.formValue.evalFunctionBody,
+  static async matchTell(tell: Tell<string, any>) {
+    switch (tell.kind) {
+      case TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND:
+        return success(await PredicateKindsApi.createOrUpdatePredicateKind(tell as TellToCreateOrUpdatePredicateKind));
+
+      case TELL_TO_DELETE_PREDICATE_KIND:
+        return success(await PredicateKindsApi.deletePredicateKind(tell as DeletePredicateKindCommand));
+
+      default:
+        return failure();
+    }
+  }
+
+  static async createOrUpdatePredicateKind(tell: TellToCreateOrUpdatePredicateKind) {
+    const isValid = validatePredicateKindListItem(createFormGroupState('', tell.formValue)).isValid;
+
+    if (!isValid) {
+      return failure();
+    }
+
+    const predicateKind = await (async () => {
+      if (!!tell.predicateKindId) {
+        return (await PredicateKind.ofIdAsync(tell.predicateKindId!)).update(
+          tell.formValue.name,
+          tell.formValue.description,
+          tell.formValue.evalFunctionBody,
+          tell.formValue.propertyDescriptors,
         );
+      }
+
+      return PredicateKind.create(
+        tell.formValue.name,
+        tell.formValue.description,
+        tell.formValue.evalFunctionBody,
+        tell.formValue.propertyDescriptors,
+      );
+    })();
 
     await PredicateKind.saveAsync(predicateKind);
 
-    return {
+    return success({
       predicateKindId: predicateKind.id,
-    };
+    });
   }
 
   // TODO: validate predicate kind exists
   // TODO: only allow if predicate kind is unused
-  static async deletePredicateKind(command: DeletePredicateKindCommand) {
-    const predicateKind = await PredicateKind.ofIdAsync(command.predicateKindId);
+  static async deletePredicateKind(tell: DeletePredicateKindCommand) {
+    const predicateKind = await PredicateKind.ofIdAsync(tell.predicateKindId);
     predicateKind.delete();
 
     await PredicateKind.saveAsync(predicateKind);
+
+    return success();
   }
 }

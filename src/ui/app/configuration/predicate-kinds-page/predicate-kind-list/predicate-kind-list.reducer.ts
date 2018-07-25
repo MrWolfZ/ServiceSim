@@ -55,6 +55,7 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
         name: state.newItem.formState.value.name,
         description: state.newItem.formState.value.description,
         evalFunctionBody: state.newItem.formState.value.evalFunctionBody,
+        propertyDescriptors: state.newItem.formState.value.propertyDescriptors,
       }));
 
       const items = [

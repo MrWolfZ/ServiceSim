@@ -1,52 +1,62 @@
 import express, { Request, Response } from 'express';
 
+import { isSuccess } from '../../infrastructure';
 import { Ask, Tell } from './infrastructure/infrastructure.dto';
 
 import { PredicateKindsApi } from './configuration/predicate-kinds-page/predicate-kinds.api';
-import {
-  ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
-  AskForPredicateKindsPageDto,
-  DELETE_PREDICATE_KIND_COMMAND_KIND,
-  DeletePredicateKindCommand,
-  TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND,
-  TellToCreateOrUpdatePredicateKind,
-} from './configuration/predicate-kinds-page/predicate-kinds.dto';
 
 export const askAsync = async (req: Request, res: Response) => {
   const ask = req.body as Ask<string, any>;
 
-  switch (ask.kind) {
-    case ASK_FOR_PREDICATE_KINDS_PAGE_DTO:
-      const response = await PredicateKindsApi.askForPageDto(ask as AskForPredicateKindsPageDto);
-      res.status(200).send(response);
-      break;
+  const apis = [
+    PredicateKindsApi.matchAsk,
+  ];
 
-    default:
-      res.status(404).send();
-      break;
+  for (const api of apis) {
+    const result = await api(ask);
+
+    if (isSuccess(result)) {
+      const response = result.success;
+      if (!!response) {
+        res.status(200).send(response);
+      } else {
+        res.status(204).send();
+      }
+
+      return;
+    }
   }
+
+  res.status(404).send();
 };
 
 export const tellAsync = async (req: Request, res: Response) => {
   const tell = req.body as Tell<string, any>;
 
-  switch (tell.kind) {
-    case TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND: {
-      const response = await PredicateKindsApi.createOrUpdatePredicateKind(tell as TellToCreateOrUpdatePredicateKind);
-      res.status(200).send(response);
-      break;
-    }
+  const apis = [
+    PredicateKindsApi.matchTell,
+  ];
 
-    case DELETE_PREDICATE_KIND_COMMAND_KIND: {
-      await PredicateKindsApi.deletePredicateKind(tell as DeletePredicateKindCommand);
-      res.status(204).send();
-      break;
-    }
+  for (const api of apis) {
+    const result = await api(tell);
 
-    default:
-      res.status(404).send();
-      break;
+    if (isSuccess(result)) {
+      if (isSuccess(result.success)) {
+        const response = result.success.success;
+        if (!!response) {
+          res.status(200).send(response);
+        } else {
+          res.status(204).send();
+        }
+      } else {
+        res.status(400).send();
+      }
+
+      return;
+    }
   }
+
+  res.status(404).send();
 };
 
 const api = express.Router();

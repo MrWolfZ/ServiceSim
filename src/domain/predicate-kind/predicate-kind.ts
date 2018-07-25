@@ -1,26 +1,16 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
-import { PredicateKindCreated } from './predicate-kind-created';
+import { PredicateKindCreatedOrUpdated } from './predicate-kind-created-or-updated';
 import { PredicateKindDeleted } from './predicate-kind-deleted';
-import { PredicateKindUpdated } from './predicate-kind-updated';
-import { PredicatePropertyDescriptorAdded } from './property-descriptor-added';
+import { PredicatePropertyDescriptor } from './property-descriptor';
 
 const JOURNAL_NAME = 'predicate-kind/Journal';
 
 type DomainEvents =
-  | PredicateKindCreated
+  | PredicateKindCreatedOrUpdated
   | PredicateKindDeleted
-  | PredicateKindUpdated
-  | PredicatePropertyDescriptorAdded
   ;
-
-export interface PredicatePropertyDescriptor {
-  name: string;
-  description: string;
-  isRequired: boolean;
-  valueType: 'string' | 'boolean' | 'number';
-}
 
 export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
   name = '';
@@ -32,12 +22,14 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     name: string,
     description: string,
     evalFunctionBody: string,
+    propertyDescriptors: PredicatePropertyDescriptor[],
   ) {
-    return new PredicateKind().apply(PredicateKindCreated.create({
+    return new PredicateKind().apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: `predicate-kind/${uuid()}`,
       name,
       description,
       evalFunctionBody,
+      propertyDescriptors,
     }));
   }
 
@@ -45,12 +37,18 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     name: string,
     description: string,
     evalFunctionBody: string,
+    propertyDescriptors: PredicatePropertyDescriptor[],
   ) {
-    return this.apply(PredicateKindUpdated.create({
+    if (this.name === name && this.description === description && this.evalFunctionBody === evalFunctionBody) {
+      return this;
+    }
+
+    return this.apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: this.id,
       name,
       description,
       evalFunctionBody,
+      propertyDescriptors,
     }));
   }
 
@@ -60,42 +58,16 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     }));
   }
 
-  addPropertyDescriptor = (
-    name: string,
-    description: string,
-    isRequired: boolean,
-    valueType: 'string' | 'boolean' | 'number',
-  ) => {
-    return this.apply(PredicatePropertyDescriptorAdded.create({
-      predicateKindId: this.id,
-      name,
-      description,
-      isRequired,
-      valueType,
-    }));
-  }
-
   EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
-    [PredicateKindCreated.KIND]: event => {
+    [PredicateKindCreatedOrUpdated.KIND]: event => {
       this.id = event.predicateKindId;
       this.name = event.name;
       this.description = event.description;
-    },
-    [PredicateKindUpdated.KIND]: event => {
-      this.id = event.predicateKindId;
-      this.name = event.name;
-      this.description = event.description;
+      this.evalFunctionBody = event.evalFunctionBody;
+      this.propertyDescriptors = event.propertyDescriptors;
     },
     [PredicateKindDeleted.KIND]: () => {
       // nothing to do
-    },
-    [PredicatePropertyDescriptorAdded.KIND]: event => {
-      this.propertyDescriptors.push({
-        name: event.name,
-        description: event.description,
-        isRequired: event.isRequired,
-        valueType: event.valueType,
-      });
     },
   };
 

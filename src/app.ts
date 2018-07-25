@@ -42,6 +42,7 @@ export async function initializeAsync() {
     'All',
     'Predicates of this kind match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
     'return true;',
+    [],
   );
 
   await PredicateKind.saveAsync(allPredicateKind);

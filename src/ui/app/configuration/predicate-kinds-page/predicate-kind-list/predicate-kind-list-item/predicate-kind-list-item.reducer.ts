@@ -34,6 +34,7 @@ export function predicateKindListItemReducer(
     name: state.name,
     description: state.description,
     evalFunctionBody: state.evalFunctionBody,
+    propertyDescriptors: state.propertyDescriptors,
   });
 
   if (isChanged !== state.isChanged) {
@@ -55,6 +56,7 @@ export function predicateKindListItemReducer(
               name: action.dto.name,
               description: action.dto.description,
               evalFunctionBody: action.dto.evalFunctionBody,
+              propertyDescriptors: action.dto.propertyDescriptors,
             },
           )
         ),
@@ -73,6 +75,7 @@ export function predicateKindListItemReducer(
               name: '',
               description: '',
               evalFunctionBody: '',
+              propertyDescriptors: [],
             },
           )
         ),
@@ -128,6 +131,7 @@ export function predicateKindListItemReducer(
               name: state.name,
               description: state.description,
               evalFunctionBody: state.evalFunctionBody,
+              propertyDescriptors: state.propertyDescriptors,
             },
           )
         ),

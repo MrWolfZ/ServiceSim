@@ -106,7 +106,10 @@
     "no-switch-case-fall-through": true,
     "no-this-assignment": true,
     "no-trailing-whitespace": true,
-    "no-unbound-method": true,
+    "no-unbound-method": [
+      true,
+      "ignore-static"
+    ],
     "no-unnecessary-callback-wrapper": true,
     "no-unnecessary-initializer": true,
     "no-unnecessary-qualifier": true,

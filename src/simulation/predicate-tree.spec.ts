@@ -1,4 +1,4 @@
-import { PredicateCreated, PredicateKindCreated } from '../domain';
+import { PredicateCreated, PredicateKindCreatedOrUpdated } from '../domain';
 import { EventLog } from '../infrastructure';
 import { PredicateTree } from './predicate-tree';
 
@@ -10,11 +10,12 @@ describe('all predicates projection', () => {
 
   it('should track all created predicates', async () => {
     const sub = PredicateTree.start();
-    await EventLog.publishAsync(PredicateKindCreated.create({
+    await EventLog.publishAsync(PredicateKindCreatedOrUpdated.create({
       predicateKindId: 'url-pattern',
       name: 'url-patter',
       description: '',
       evalFunctionBody: 'return true;',
+      propertyDescriptors: [],
     }));
     const matcherId1 = 'predicate/1';
     await EventLog.publishAsync(PredicateCreated.create({

@@ -20,6 +20,7 @@ export const INITIAL_PREDICATE_KIND_LIST_ITEM_FORM_STATE = createFormGroupState<
     name: '',
     description: '',
     evalFunctionBody: '',
+    propertyDescriptors: [],
   },
 );
 
@@ -28,6 +29,7 @@ export const INITIAL_PREDICATE_KIND_LIST_ITEM_STATE: PredicateKindListItemState 
   name: '',
   description: '',
   evalFunctionBody: '',
+  propertyDescriptors: [],
   isEditing: false,
   isChanged: false,
   isSaving: false,

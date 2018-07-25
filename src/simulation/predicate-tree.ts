@@ -1,8 +1,7 @@
 import {
   PredicateCreated,
-  PredicateKindCreated,
+  PredicateKindCreatedOrUpdated,
   PredicateKindDeleted,
-  PredicateKindUpdated,
   ResponseGeneratorKindCreated,
   ResponseGeneratorSet,
   ServiceRequest,
@@ -12,20 +11,18 @@ import {
 import { EventLog } from '../infrastructure';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
-  PredicateKindCreated.KIND,
+  PredicateKindCreatedOrUpdated.KIND,
   ResponseGeneratorKindCreated.KIND,
   PredicateCreated.KIND,
-  PredicateKindUpdated.KIND,
   PredicateKindDeleted.KIND,
   ResponseGeneratorSet.KIND,
 ];
 
 type SubscribedEvents =
-  | PredicateKindCreated
+  | PredicateKindCreatedOrUpdated
+  | PredicateKindDeleted
   | ResponseGeneratorKindCreated
   | PredicateCreated
-  | PredicateKindUpdated
-  | PredicateKindDeleted
   | ResponseGeneratorSet
   ;
 
@@ -50,14 +47,10 @@ export class PredicateTree {
     const responseGeneratorKindFunctionBodies = new Map<string, string>();
     const predicateNodesById = new Map<string, PredicateNode>();
 
-    return EventLog.getStream<SubscribedEvents>(...SUBSCRIBED_EVENT_KINDS).subscribe(ev => {
+    return EventLog.getStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS).subscribe(ev => {
       // tslint:disable-next-line:switch-default
       switch (ev.kind) {
-        case PredicateKindCreated.KIND:
-          predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
-          return;
-
-        case PredicateKindUpdated.KIND: {
+        case PredicateKindCreatedOrUpdated.KIND:
           predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
           const evaluationFunction = new Function('request', 'properties', ev.evalFunctionBody) as PredicateEvaluationFunction;
           for (const node of predicateNodesById.values()) {
@@ -67,7 +60,6 @@ export class PredicateTree {
           }
 
           return;
-        }
 
         case PredicateKindDeleted.KIND:
           predicateKindEvalFunctionBodies.delete(ev.predicateKindId);
