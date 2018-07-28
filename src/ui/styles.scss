@@ -2,6 +2,8 @@
 @import "constants";
 @import "~bulma/bulma";
 @import "~bulmaswatch/darkly/overrides";
+@import '~bulma-checkradio/dist/css/bulma-checkradio';
+@import '~bulma-tooltip/dist/css/bulma-tooltip';
 
 form.is-readonly .field {
   &:not(:last-child):not(.preserve-margin) {

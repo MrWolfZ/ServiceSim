@@ -142,17 +142,23 @@
         <div class="field preserve-margin">
           <label class="label">Is Required?</label>
           <div class="control">
-            <label class="radio"
+            <input type="radio"
+                   id="{{ item.controls.isRequired.id }}.yes"
+                   class="is-checkradio is-rtl is-white"
+                   [value]="true"
+                   [ngrxFormControlState]="item.controls.isRequired">
+            <label for="{{ item.controls.isRequired.id }}.yes"
                    *ngIf="!state.isReadOnly">
-              <input type="radio"
-                     [value]="true"
-                     [ngrxFormControlState]="item.controls.isRequired"> Yes
+              Yes
             </label>
-            <label class="radio"
+            <input type="radio"
+                   id="{{ item.controls.isRequired.id }}.no"
+                   class="is-checkradio is-rtl is-white"
+                   [value]="false"
+                   [ngrxFormControlState]="item.controls.isRequired">
+            <label for="{{ item.controls.isRequired.id }}.no"
                    *ngIf="!state.isReadOnly">
-              <input type="radio"
-                     [value]="false"
-                     [ngrxFormControlState]="item.controls.isRequired"> No
+              No
             </label>
             <span *ngIf="state.isReadOnly">{{ item.controls.isRequired.value ? 'Yes' : 'No' }}</span>
           </div>

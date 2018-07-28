@@ -106,6 +106,8 @@
     "@types/uuid": "^3.4.3",
     "@types/winston": "^2.3.7",
     "bulma": "^0.7.1",
+    "bulma-checkradio": "^2.1.0",
+    "bulma-tooltip": "^2.0.1",
     "chai": "^4.1.2",
     "codelyzer": "^4.2.1",
     "concurrently": "^3.5.1",
