@@ -7,6 +7,7 @@ import {
   CancelNewPredicateKindDialogAction,
   DeletePredicateKindSuccessfulAction,
   InitializePredicateKindListAction,
+  NewPredicateKindDialogClosedAction,
   OpenNewPredicateKindDialogAction,
   PredicateKindListActions,
   SubmitNewPredicateKindDialogAction,
@@ -55,7 +56,7 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
         name: state.newItem.formState.value.name,
         description: state.newItem.formState.value.description,
         evalFunctionBody: state.newItem.formState.value.evalFunctionBody,
-        propertyDescriptors: state.newItem.formState.value.propertyDescriptors,
+        parameters: state.newItem.formState.value.parameters,
       }));
 
       const items = [
@@ -65,7 +66,7 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
 
       return {
         ...state,
-        newItemDialogIsOpen: false,
+        newItemDialogIsClosing: true,
         items,
       };
     }
@@ -73,7 +74,14 @@ export function predicateKindListReducer(state = INITIAL_PREDICATE_KIND_LIST_STA
     case CancelNewPredicateKindDialogAction.TYPE:
       return {
         ...state,
+        newItemDialogIsClosing: true,
+      };
+
+    case NewPredicateKindDialogClosedAction.TYPE:
+      return {
+        ...state,
         newItemDialogIsOpen: false,
+        newItemDialogIsClosing: false,
         newItem: predicateKindListItemReducer(undefined, new InitializeNewPredicateKindListItemAction()),
       };
 

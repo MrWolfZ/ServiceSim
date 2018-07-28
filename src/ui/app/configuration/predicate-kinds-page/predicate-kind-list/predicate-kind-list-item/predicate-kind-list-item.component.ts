@@ -8,7 +8,7 @@ import {
   EditPredicateKindListItemAction,
   SaveEditedPredicateKindListItemAction,
 } from './predicate-kind-list-item.actions';
-import { PredicatePropertyDescriptorFormValue } from './predicate-kind-list-item.dto';
+import { PredicateKindParameterFormValue } from './predicate-kind-list-item.dto';
 import { PredicateKindListItemState } from './predicate-kind-list-item.state';
 
 @Component({
@@ -22,8 +22,8 @@ export class PredicateKindListItemComponent {
 
   constructor(private actionsSubject: ActionsSubject) { }
 
-  get propertyDescriptorControls() {
-    return this.state.formState.controls.propertyDescriptors.controls;
+  get parameterControls() {
+    return this.state.formState.controls.parameters.controls;
   }
 
   delete() {
@@ -46,10 +46,10 @@ export class PredicateKindListItemComponent {
     this.actionsSubject.next(new SaveEditedPredicateKindListItemAction(this.state.predicateKindId, this.state.formState.value));
   }
 
-  addPropertyDescriptor() {
+  addParameter() {
     this.actionsSubject.next(
-      new AddArrayControlAction<PredicatePropertyDescriptorFormValue>(
-        this.state.formState.controls.propertyDescriptors.id,
+      new AddArrayControlAction<PredicateKindParameterFormValue>(
+        this.state.formState.controls.parameters.id,
         {
           name: '',
           description: '',
@@ -60,10 +60,10 @@ export class PredicateKindListItemComponent {
     );
   }
 
-  removePropertyDescriptor(index: number) {
+  removeParameter(index: number) {
     this.actionsSubject.next(
       new RemoveArrayControlAction(
-        this.state.formState.controls.propertyDescriptors.id,
+        this.state.formState.controls.parameters.id,
         index,
       )
     );

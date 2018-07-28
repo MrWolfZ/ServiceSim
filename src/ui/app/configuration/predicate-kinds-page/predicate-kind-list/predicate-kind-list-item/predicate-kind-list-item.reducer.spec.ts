@@ -8,7 +8,7 @@ export const MOCK_PREDICATE_KIND_LIST_ITEM_DTO: PredicateKindListItemDto = {
   name: '',
   description: '',
   evalFunctionBody: '',
-  propertyDescriptors: [],
+  parameters: [],
 };
 
 describe(predicateKindListItemReducer.name, () => {

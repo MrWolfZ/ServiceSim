@@ -1,4 +1,4 @@
-export interface PredicatePropertyDescriptorDto {
+export interface PredicateKindParameterDto {
   name: string;
   description: string;
   isRequired: boolean;
@@ -10,10 +10,10 @@ export interface PredicateKindListItemDto {
   name: string;
   description: string;
   evalFunctionBody: string;
-  propertyDescriptors: PredicatePropertyDescriptorDto[];
+  parameters: PredicateKindParameterDto[];
 }
 
-export interface PredicatePropertyDescriptorFormValue {
+export interface PredicateKindParameterFormValue {
   name: string;
   description: string;
   isRequired: boolean;
@@ -24,5 +24,5 @@ export interface PredicateKindListItemFormValue {
   name: string;
   description: string;
   evalFunctionBody: string;
-  propertyDescriptors: PredicatePropertyDescriptorFormValue[];
+  parameters: PredicateKindParameterFormValue[];
 }

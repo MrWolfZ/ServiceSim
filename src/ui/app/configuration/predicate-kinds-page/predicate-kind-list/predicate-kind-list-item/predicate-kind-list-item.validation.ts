@@ -1,9 +1,9 @@
 import { updateArray, updateGroup, validate } from 'ngrx-forms';
 import { required } from 'ngrx-forms/validation';
 
-import { PredicateKindListItemFormValue, PredicatePropertyDescriptorFormValue } from './predicate-kind-list-item.dto';
+import { PredicateKindListItemFormValue, PredicateKindParameterFormValue } from './predicate-kind-list-item.dto';
 
-export const validatePropertyDescriptor = updateGroup<PredicatePropertyDescriptorFormValue>({
+export const validateParameters = updateGroup<PredicateKindParameterFormValue>({
   name: validate(required),
   description: validate(required),
 });
@@ -12,5 +12,5 @@ export const validatePredicateKindListItem = updateGroup<PredicateKindListItemFo
   name: validate(required),
   description: validate(required),
   evalFunctionBody: validate(required),
-  propertyDescriptors: updateArray(validatePropertyDescriptor),
+  parameters: updateArray(validateParameters),
 });

@@ -91,20 +91,20 @@
       </sim-form-control-errors>
     </p>
   </div>
-  <div class="tile is-ancestor property-descriptors">
+  <div class="tile is-ancestor parameters">
     <div class="tile is-12 is-vertical is-parent">
-      <div class="tile is-12 is-child property-descriptors-title">
-        <label class="label">Property Descriptors</label>
-        <p *ngIf="propertyDescriptorControls.length === 0">
-          This predicate kind does not have any property descriptors.
+      <div class="tile is-12 is-child parameters-title">
+        <label class="label">Parameters</label>
+        <p *ngIf="parameterControls.length === 0">
+          This predicate kind does not have any parameters.
         </p>
       </div>
-      <div class="tile is-12 is-child box property-descriptor"
-           *ngFor="let item of propertyDescriptorControls; let i = index; trackBy: trackByIndex">
+      <div class="tile is-12 is-child box parameter"
+           *ngFor="let item of parameterControls; let i = index; trackBy: trackByIndex">
         <div class="field">
           <label class="label"
                  [class.is-marginless]="state.isReadOnly">
-            Name
+            Parameter Name
           </label>
           <div class="control">
             <input class="input"
@@ -176,7 +176,7 @@
           <button class="button is-danger"
                   type="button"
                   [class.is-loading]="state.isDeleting"
-                  (click)="removePropertyDescriptor(i)"
+                  (click)="removeParameter(i)"
                   [disabled]="state.isDeleting">
             <span>Remove</span>
             <span class="icon is-small">
@@ -189,9 +189,9 @@
         <div class="tile is-12 is-child">
           <button class="button is-primary"
                   type="button"
-                  (click)="addPropertyDescriptor()"
+                  (click)="addParameter()"
                   [disabled]="state.isSaving">
-            <span>Add Property Descriptor</span>
+            <span>Add Parameter</span>
             <span class="icon is-small">
               <fa-icon icon="plus"></fa-icon>
             </span>

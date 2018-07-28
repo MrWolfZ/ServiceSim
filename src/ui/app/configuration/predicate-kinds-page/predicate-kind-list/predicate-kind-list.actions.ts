@@ -22,6 +22,11 @@ export class CancelNewPredicateKindDialogAction implements Action {
   readonly type = CancelNewPredicateKindDialogAction.TYPE;
 }
 
+export class NewPredicateKindDialogClosedAction implements Action {
+  static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/NEW_PREDICATE_KIND_DIALOG_CLOSED';
+  readonly type = NewPredicateKindDialogClosedAction.TYPE;
+}
+
 export class SubmitNewPredicateKindDialogAction implements Action {
   static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/SUBMIT_NEW_PREDICATE_KIND_DIALOG';
   readonly type = SubmitNewPredicateKindDialogAction.TYPE;
@@ -55,6 +60,7 @@ export type PredicateKindListActions =
   | InitializePredicateKindListAction
   | OpenNewPredicateKindDialogAction
   | CancelNewPredicateKindDialogAction
+  | NewPredicateKindDialogClosedAction
   | SubmitNewPredicateKindDialogAction
   | SubmitNewPredicateKindDialogSuccessfulAction
   | DeletePredicateKindSuccessfulAction

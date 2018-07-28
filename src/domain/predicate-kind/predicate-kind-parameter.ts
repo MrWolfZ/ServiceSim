@@ -1,4 +1,4 @@
-export interface PredicatePropertyDescriptor {
+export interface PredicateKindParameter {
   name: string;
   description: string;
   isRequired: boolean;

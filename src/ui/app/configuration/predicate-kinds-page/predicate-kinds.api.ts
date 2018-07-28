@@ -41,7 +41,7 @@ export class PredicateKindsApi {
           name: ev.name,
           description: ev.description,
           evalFunctionBody: ev.evalFunctionBody,
-          propertyDescriptors: ev.propertyDescriptors,
+          parameters: ev.parameters,
         };
 
         const items = [
@@ -115,7 +115,7 @@ export class PredicateKindsApi {
           tell.formValue.name,
           tell.formValue.description,
           tell.formValue.evalFunctionBody,
-          tell.formValue.propertyDescriptors,
+          tell.formValue.parameters,
         );
       }
 
@@ -123,7 +123,7 @@ export class PredicateKindsApi {
         tell.formValue.name,
         tell.formValue.description,
         tell.formValue.evalFunctionBody,
-        tell.formValue.propertyDescriptors,
+        tell.formValue.parameters,
       );
     })();
 

@@ -15,7 +15,7 @@ describe('all predicates projection', () => {
       name: 'url-patter',
       description: '',
       evalFunctionBody: 'return true;',
-      propertyDescriptors: [],
+      parameters: [],
     }));
     const matcherId1 = 'predicate/1';
     await EventLog.publishAsync(PredicateCreated.create({

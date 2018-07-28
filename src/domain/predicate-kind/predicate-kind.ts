@@ -3,7 +3,7 @@ import uuid from 'uuid';
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { PredicateKindCreatedOrUpdated } from './predicate-kind-created-or-updated';
 import { PredicateKindDeleted } from './predicate-kind-deleted';
-import { PredicatePropertyDescriptor } from './property-descriptor';
+import { PredicateKindParameter } from './predicate-kind-parameter';
 
 const JOURNAL_NAME = 'predicate-kind/Journal';
 
@@ -15,21 +15,21 @@ type DomainEvents =
 export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
   name = '';
   description = '';
-  propertyDescriptors: PredicatePropertyDescriptor[] = [];
+  parameters: PredicateKindParameter[] = [];
   evalFunctionBody = 'return true;';
 
   static create(
     name: string,
     description: string,
     evalFunctionBody: string,
-    propertyDescriptors: PredicatePropertyDescriptor[],
+    parameters: PredicateKindParameter[],
   ) {
     return new PredicateKind().apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: `predicate-kind/${uuid()}`,
       name,
       description,
       evalFunctionBody,
-      propertyDescriptors,
+      parameters,
     }));
   }
 
@@ -37,14 +37,14 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     name: string,
     description: string,
     evalFunctionBody: string,
-    propertyDescriptors: PredicatePropertyDescriptor[],
+    parameters: PredicateKindParameter[],
   ) {
     return this.apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: this.id,
       name,
       description,
       evalFunctionBody,
-      propertyDescriptors,
+      parameters,
     }));
   }
 
@@ -60,7 +60,7 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
       this.name = event.name;
       this.description = event.description;
       this.evalFunctionBody = event.evalFunctionBody;
-      this.propertyDescriptors = event.propertyDescriptors;
+      this.parameters = event.parameters;
     },
     [PredicateKindDeleted.KIND]: () => {
       // nothing to do

@@ -22,19 +22,19 @@ export async function initializeAsync() {
     'return { statusCode: properties.statusCode, body: properties.body };',
   );
 
-  staticResponseGeneratorKind.addPropertyDescriptor(
-    'statusCode',
-    'the status code of the response',
-    true,
-    'number',
-  );
+  // // staticResponseGeneratorKind.addParameter(
+  // //   'statusCode',
+  // //   'the status code of the response',
+  // //   true,
+  // //   'number',
+  // // );
 
-  staticResponseGeneratorKind.addPropertyDescriptor(
-    'body',
-    'the body of the response',
-    false,
-    'string',
-  );
+  // // staticResponseGeneratorKind.addParameter(
+  // //   'body',
+  // //   'the body of the response',
+  // //   false,
+  // //   'string',
+  // // );
 
   await ResponseGeneratorKind.saveAsync(staticResponseGeneratorKind);
 

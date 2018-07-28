@@ -8,6 +8,7 @@ export interface PredicateKindListState extends PredicateKindListDto {
   filterControl: FormControlState<string>;
   newItem: PredicateKindListItemState;
   newItemDialogIsOpen: boolean;
+  newItemDialogIsClosing: boolean;
   newItemIsSubmitting: boolean;
 }
 
@@ -16,5 +17,6 @@ export const INITIAL_PREDICATE_KIND_LIST_STATE: PredicateKindListState = {
   filterControl: createFormControlState('configuration/predicate-kinds-page/predicate-kind-list/FILTER_CONTROL', ''),
   newItem: undefined!,
   newItemDialogIsOpen: false,
+  newItemDialogIsClosing: false,
   newItemIsSubmitting: false,
 };

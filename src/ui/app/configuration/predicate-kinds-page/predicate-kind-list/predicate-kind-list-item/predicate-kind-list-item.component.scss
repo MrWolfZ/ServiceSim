@@ -5,10 +5,10 @@
   display: inline-block;
 }
 
-.property-descriptors {
+.parameters {
   padding-top: 0.5rem;
 
-  >.tile>div.property-descriptors-title {
+  >.tile>div.parameters-title {
     margin-bottom: 0.5rem !important;
   }
 }
@@ -17,7 +17,7 @@
   border: 1px solid $background;
 }
 
-.property-descriptor {
+.parameter {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
 
