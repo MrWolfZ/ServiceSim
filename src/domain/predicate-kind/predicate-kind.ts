@@ -39,10 +39,6 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     evalFunctionBody: string,
     propertyDescriptors: PredicatePropertyDescriptor[],
   ) {
-    if (this.name === name && this.description === description && this.evalFunctionBody === evalFunctionBody) {
-      return this;
-    }
-
     return this.apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: this.id,
       name,

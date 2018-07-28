@@ -1,8 +1,8 @@
-<div class="modal"
-     [class.is-active]="state.newItemDialogIsOpen">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <form [ngrxFormState]="state.newItem.formState">
+<form [ngrxFormState]="state.newItem.formState">
+  <div class="modal"
+       [class.is-active]="state.newItemDialogIsOpen">
+    <div class="modal-background"></div>
+    <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Create new predicate kind</p>
       </header>
@@ -23,9 +23,9 @@
           Save changes
         </button>
       </footer>
-    </form>
+    </div>
   </div>
-</div>
+</form>
 
 <div *ngIf="state.items.length > 0">
   <div class="level">

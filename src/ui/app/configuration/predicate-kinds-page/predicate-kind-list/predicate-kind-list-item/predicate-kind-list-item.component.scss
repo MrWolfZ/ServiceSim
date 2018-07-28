@@ -4,3 +4,28 @@
   max-width: 500px;
   display: inline-block;
 }
+
+.property-descriptors {
+  padding-top: 0.5rem;
+
+  >.tile>div.property-descriptors-title {
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+.tile.box {
+  border: 1px solid $background;
+}
+
+.property-descriptor {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+
+  label {
+    transition: all ease 200ms;
+  }
+
+  .select:not(.is-multiple) {
+    height: 2.5em;
+  }
+}

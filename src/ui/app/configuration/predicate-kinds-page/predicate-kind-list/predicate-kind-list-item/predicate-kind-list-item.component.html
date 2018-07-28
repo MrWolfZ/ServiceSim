@@ -9,7 +9,7 @@
              [readonly]="state.isReadOnly"
              [class.is-paddingless]="state.isReadOnly">
       <sim-form-control-errors [formState]="state.formState.controls.name">
-        <span class="error"
+        <span class="help is-danger"
               *ngIf="state.formState.errors['_name']?.required">
           Please enter a name
         </span>
@@ -68,7 +68,7 @@
              [readonly]="state.isReadOnly"
              [class.is-paddingless]="state.isReadOnly">
       <sim-form-control-errors [formState]="state.formState.controls.description">
-        <span class="error"
+        <span class="help is-danger"
               *ngIf="state.formState.errors['_description']?.required">
           Please enter a description
         </span>
@@ -84,11 +84,120 @@
                 [readonly]="state.isReadOnly">
       </textarea>
       <sim-form-control-errors [formState]="state.formState.controls.evalFunctionBody">
-        <span class="error"
+        <span class="help is-danger"
               *ngIf="state.formState.errors['_evalFunctionBody']?.required">
           Please enter a function body
         </span>
       </sim-form-control-errors>
     </p>
+  </div>
+  <div class="tile is-ancestor property-descriptors">
+    <div class="tile is-12 is-vertical is-parent">
+      <div class="tile is-12 is-child property-descriptors-title">
+        <label class="label">Property Descriptors</label>
+        <p *ngIf="propertyDescriptorControls.length === 0">
+          This predicate kind does not have any property descriptors.
+        </p>
+      </div>
+      <div class="tile is-12 is-child box property-descriptor"
+           *ngFor="let item of propertyDescriptorControls; let i = index; trackBy: trackByIndex">
+        <div class="field">
+          <label class="label"
+                 [class.is-marginless]="state.isReadOnly">
+            Name
+          </label>
+          <div class="control">
+            <input class="input"
+                   type="text"
+                   [ngrxFormControlState]="item.controls.name"
+                   [readonly]="state.isReadOnly"
+                   [class.is-paddingless]="state.isReadOnly">
+            <sim-form-control-errors [formState]="item.controls.name">
+              <span class="help is-danger"
+                    *ngIf="item.controls.name.errors.required">
+                Please enter a name
+              </span>
+            </sim-form-control-errors>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label"
+                 [class.is-marginless]="state.isReadOnly">
+            Description
+          </label>
+          <div class="control">
+            <input class="input"
+                   type="text"
+                   [ngrxFormControlState]="item.controls.description"
+                   [readonly]="state.isReadOnly"
+                   [class.is-paddingless]="state.isReadOnly">
+            <sim-form-control-errors [formState]="item.controls.description">
+              <span class="help is-danger"
+                    *ngIf="item.controls.description.errors.required">
+                Please enter a description
+              </span>
+            </sim-form-control-errors>
+          </div>
+        </div>
+        <div class="field preserve-margin">
+          <label class="label">Is Required?</label>
+          <div class="control">
+            <label class="radio"
+                   *ngIf="!state.isReadOnly">
+              <input type="radio"
+                     [value]="true"
+                     [ngrxFormControlState]="item.controls.isRequired"> Yes
+            </label>
+            <label class="radio"
+                   *ngIf="!state.isReadOnly">
+              <input type="radio"
+                     [value]="false"
+                     [ngrxFormControlState]="item.controls.isRequired"> No
+            </label>
+            <span *ngIf="state.isReadOnly">{{ item.controls.isRequired.value ? 'Yes' : 'No' }}</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Value Type</label>
+          <div class="control">
+            <div class="select"
+                 *ngIf="!state.isReadOnly">
+              <select class="is-borderless"
+                      [ngrxFormControlState]="item.controls.valueType">
+                <option value="string">string</option>
+                <option value="boolean">boolean</option>
+                <option value="number">number</option>
+              </select>
+            </div>
+            <span *ngIf="state.isReadOnly">{{ item.controls.valueType.value }}</span>
+          </div>
+        </div>
+        <sim-expansion-container [isCollapsed]="state.isReadOnly">
+          <button class="button is-danger"
+                  type="button"
+                  [class.is-loading]="state.isDeleting"
+                  (click)="removePropertyDescriptor(i)"
+                  [disabled]="state.isDeleting">
+            <span>Remove</span>
+            <span class="icon is-small">
+              <fa-icon icon="times"></fa-icon>
+            </span>
+          </button>
+        </sim-expansion-container>
+      </div>
+      <sim-expansion-container [isCollapsed]="!state.isEditing">
+        <div class="tile is-12 is-child">
+          <button class="button is-primary"
+                  type="button"
+                  (click)="addPropertyDescriptor()"
+                  [disabled]="state.isSaving">
+            <span>Add Property Descriptor</span>
+            <span class="icon is-small">
+              <fa-icon icon="plus"></fa-icon>
+            </span>
+          </button>
+        </div>
+      </sim-expansion-container>
+    </div>
   </div>
 </form>

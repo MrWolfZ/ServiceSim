@@ -31,7 +31,7 @@ const expandedStyle = style({
   marginBottom: '*',
 });
 
-const timings = '300ms ease-out';
+const timings = '200ms ease';
 
 const expandCollapseAnimation = trigger('expandCollapse', [
   transition('collapsed => expanded', [

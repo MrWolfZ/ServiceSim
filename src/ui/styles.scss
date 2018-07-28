@@ -4,7 +4,7 @@
 @import "~bulmaswatch/darkly/overrides";
 
 form.is-readonly .field {
-  &:not(:last-child) {
+  &:not(:last-child):not(.preserve-margin) {
     margin-bottom: 0rem;
   }
 
