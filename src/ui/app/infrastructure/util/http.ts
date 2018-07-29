@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import { concat, Observable, ObservableInput } from 'rxjs';
 import { catchError, mergeMap, startWith } from 'rxjs/operators';
@@ -24,6 +24,7 @@ export interface CommonHttpOptions {
   };
   showsLoadingBar?: boolean;
   blocksUi?: boolean;
+  errorActionFactory?: (response: HttpErrorResponse) => ObservableInput<Action>;
 }
 
 export interface ObserveBodyHttpOptions extends CommonHttpOptions {
@@ -43,7 +44,13 @@ function handleResponse<TResponse = null>(
 ): Observable<Action> {
   let obs = source.pipe(
     mergeMap(project),
-    catchError<Action, Action>(resp => [new HandleApiErrorAction(resp)]),
+    catchError<Action, Action>(resp => {
+      if (options.errorActionFactory) {
+        return options.errorActionFactory(resp);
+      }
+
+      return [new HandleApiErrorAction(resp)];
+    }),
   );
 
   if (options.showsLoadingBar) {

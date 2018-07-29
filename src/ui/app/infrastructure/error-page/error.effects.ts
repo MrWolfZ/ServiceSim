@@ -28,7 +28,7 @@ export class ErrorEffects {
     ofType(HandleApiErrorAction.TYPE),
     map(a => a as HandleApiErrorAction),
     flatMap((a): Action[] => {
-      let apiError = a.response.body as ApiError;
+      let apiError = a.response.error as ApiError;
 
       // if a connection to the server could not be established (e.g. due to invalid certificate
       // on local dev VMs) then the response contains a ProgressEvent instead of an actual response

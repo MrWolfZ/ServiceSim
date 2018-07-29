@@ -1,4 +1,4 @@
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
 import { ApiError } from './error.state';
@@ -8,7 +8,7 @@ export class HandleApiErrorAction implements Action {
   readonly type = HandleApiErrorAction.TYPE;
 
   constructor(
-    public response: HttpResponse<any>,
+    public response: HttpErrorResponse,
   ) { }
 }
 

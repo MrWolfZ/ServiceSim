@@ -3,6 +3,8 @@ import { CanActivate } from '@angular/router';
 import { ActionsSubject } from '@ngrx/store';
 import { first, map } from 'rxjs/operators';
 
+import { HandleApiErrorAction } from 'app/infrastructure';
+
 import { <%= initializationAction(name) %>, <%= loadAction(name) %> } from './<%= actionsFileNoExt(name) %>';
 
 @Injectable()
@@ -12,8 +14,8 @@ export class <%= guard(name) %> implements CanActivate {
   canActivate() {
     this.actionsSubject.next(new <%= loadAction(name) %>());
     return this.actionsSubject.pipe(
-      first(a => a.type === <%= initializationAction(name) %>.TYPE),
-      map(() => true),
+      first(a => a.type === <%= initializationAction(name) %>.TYPE || a.type === HandleApiErrorAction.TYPE),
+      map(a => a.type === <%= initializationAction(name) %>.TYPE),
     );
   }
 }
