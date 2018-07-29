@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, HostBinding } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { PredicateNodeState } from './predicate-node';
 import { PredicateTreePageState, RootState } from './predicate-tree.state';
 
 @Component({
@@ -16,5 +17,9 @@ export class PredicateTreePage {
 
   constructor(store: Store<RootState>) {
     this.state$ = store.select(s => s.predicateTree);
+  }
+
+  trackByNodeId(_: number, node: PredicateNodeState) {
+    return node.nodeId;
   }
 }

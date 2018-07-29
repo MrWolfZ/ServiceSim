@@ -1,0 +1,51 @@
+<div class="box">
+  <div class="predicate">
+    <div class="name-spacer">
+      <div class="expansion-toggle-trigger"
+           (click)="toggleExpansion()"
+           [class.is-disabled]="state.childNodes.length === 0"
+           [class.is-expanded]="state.isExpanded">
+        <div class="icon">
+          <fa-icon icon="chevron-right"
+                   class="expansion-toggle-icon"></fa-icon>
+        </div>
+        <h3 class="is-size-5">
+          {{ state.predicateKindName }}
+        </h3>
+      </div>
+      <div></div>
+    </div>
+    <div class="parameter-preview">
+      <span *ngFor="let parameter of state.parameters; trackBy: trackByParameterName"
+            class="parameter">
+        <label class="label">{{ parameter.name }}:</label>
+        <span class="value">{{ parameter.value }}</span>
+      </span>
+    </div>
+  </div>
+  <div class="response-generator"
+       *ngIf="!!state.responseGenerator">
+    <div class="name-spacer">
+      <div class="icon">
+        <fa-icon icon="arrow-left"></fa-icon>
+      </div>
+      <h3 class="is-size-5">
+        {{ state.responseGenerator!.responseGeneratorKindName }}
+      </h3>
+    </div>
+    <div class="parameter-preview">
+      <span *ngFor="let parameter of state.responseGenerator!.parameters; trackBy: trackByParameterName"
+            class="parameter">
+        <label class="label">{{ parameter.name }}:</label>
+        <span class="value">{{ parameter.value }}</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<sim-expansion-container [isCollapsed]="!state.isExpanded">
+  <div class="child-nodes">
+    <sim-predicate-node *ngFor="let node of state.childNodes; trackBy: trackByNodeId"
+                        [state]="node"></sim-predicate-node>
+  </div>
+</sim-expansion-container>

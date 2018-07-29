@@ -28,6 +28,7 @@ import {
 
 import {
   PREDICATE_TREE_PAGE_STATE_FEATURE_NAME,
+  PredicateNodeComponent,
   PredicateTreePage,
   PredicateTreePageEffects,
   PredicateTreePageInitializationGuard,
@@ -42,6 +43,7 @@ import {
     PredicateKindListItemComponent,
     PredicateKindParameterComponent,
     PredicateTreePage,
+    PredicateNodeComponent,
   ],
   imports: [
     InfrastructureModule,

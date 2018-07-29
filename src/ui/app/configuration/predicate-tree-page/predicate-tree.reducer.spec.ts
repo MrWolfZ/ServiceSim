@@ -3,8 +3,10 @@ import { PredicateTreePageDto } from './predicate-tree.dto';
 import { predicateTreePageReducer } from './predicate-tree.reducer';
 import { INITIAL_PREDICATE_TREE_PAGE_STATE } from './predicate-tree.state';
 
-export const MOCK_PREDICATE_TREE_PAGE_DTO: PredicateTreePageDto = {
+import { MOCK_PREDICATE_NODE_DTO } from './predicate-node/predicate-node.reducer.spec';
 
+export const MOCK_PREDICATE_TREE_PAGE_DTO: PredicateTreePageDto = {
+  topLevelNodes: [MOCK_PREDICATE_NODE_DTO],
 };
 
 describe(predicateTreePageReducer.name, () => {

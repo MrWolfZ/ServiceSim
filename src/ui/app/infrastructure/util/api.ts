@@ -10,9 +10,9 @@ import { CommonHttpOptions, httpPost, surroundWithLoadingBar, surroundWithUiBloc
 
 const mockResponses: { [kind: string]: [any, number] } = {};
 
-export function addAskMockResponse<TAskKind extends string, TResponse>(
-  ask: Ask<TAskKind, TResponse>,
-  response: TResponse,
+export function addAskMockResponse<TAsk extends Ask<TAskKind, TResponse>, TAskKind extends string, TResponse>(
+  ask: TAsk,
+  response: NonNullable<TAsk['dto']>,
   delayInMillis = 300,
 ) {
   mockResponses[ask.kind] = [response, delayInMillis];

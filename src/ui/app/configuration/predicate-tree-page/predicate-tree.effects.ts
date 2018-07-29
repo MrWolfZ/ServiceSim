@@ -8,11 +8,101 @@ import { flatMap } from 'rxjs/operators';
 import { addAskMockResponse, ask } from 'app/infrastructure';
 
 import { InitializePredicateTreePageAction, LoadPredicateTreePageDataAction } from './predicate-tree.actions';
-import { ASK_FOR_PREDICATE_TREE_PAGE_DTO } from './predicate-tree.dto';
+import { ASK_FOR_PREDICATE_TREE_PAGE_DTO, PredicateTreePageDto } from './predicate-tree.dto';
 
-addAskMockResponse(ASK_FOR_PREDICATE_TREE_PAGE_DTO, {
-
-});
+addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePageDto>(
+  ASK_FOR_PREDICATE_TREE_PAGE_DTO,
+  {
+    topLevelNodes: [
+      {
+        nodeId: '1',
+        predicateKindName: 'Path Prefix',
+        parameters: [
+          {
+            name: 'Prefix',
+            value: '/api/books',
+          },
+        ],
+        childNodes: [
+          {
+            nodeId: '1.1',
+            predicateKindName: 'Path Pattern',
+            parameters: [
+              {
+                name: 'Pattern',
+                value: '/api/books/:bookId',
+              },
+              {
+                name: 'Foo',
+                value: 'Bar',
+              },
+              {
+                name: 'Tick',
+                value: 'Tock',
+              },
+            ],
+            childNodes: [
+              {
+                nodeId: '1.1.1',
+                predicateKindName: 'POST',
+                parameters: [],
+                childNodes: [],
+                responseGenerator: {
+                  responseGeneratorKindName: 'Custom Code',
+                  parameters: [
+                    {
+                      name: 'Code',
+                      value: 'return { statusCode: 200, body: \'[{\"name\":\"LOTR\"}]\', contentType: "application/json" };',
+                    },
+                  ],
+                },
+              },
+            ],
+            responseGenerator: undefined,
+          },
+          {
+            nodeId: '1.2',
+            predicateKindName: 'GET',
+            parameters: [],
+            childNodes: [],
+            responseGenerator: undefined,
+          },
+        ],
+        responseGenerator: undefined,
+      },
+      {
+        nodeId: '2',
+        predicateKindName: 'Method',
+        parameters: [
+          {
+            name: 'Allowed Methods',
+            value: 'POST,PUT,DELETE',
+          },
+        ],
+        childNodes: [],
+        responseGenerator: {
+          responseGeneratorKindName: 'No Content',
+          parameters: [],
+        },
+      },
+      {
+        nodeId: '3',
+        predicateKindName: 'GET',
+        parameters: [],
+        childNodes: [],
+        responseGenerator: {
+          responseGeneratorKindName: 'Static File',
+          parameters: [
+            {
+              name: 'File Path',
+              value: '/home/files/path',
+            },
+          ],
+        },
+      },
+    ],
+  },
+);
 
 @Injectable()
 export class PredicateTreePageEffects {

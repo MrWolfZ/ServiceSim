@@ -1,4 +1,6 @@
-<p>predicate-tree works!</p>
-Page State:
-<pre>{{ state$ | async | json }}</pre>
+<h1 class="title">
+  Predicate Tree
+</h1>
 
+<sim-predicate-node *ngFor="let node of (state$ | async).topLevelNodes; trackBy: trackByNodeId"
+                    [state]="node"></sim-predicate-node>

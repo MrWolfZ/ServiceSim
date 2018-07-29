@@ -1,7 +1,9 @@
 import { Ask } from '../../infrastructure/infrastructure.dto';
 
-export interface PredicateTreePageDto {
+import { PredicateNodeDto } from './predicate-node/predicate-node.dto';
 
+export interface PredicateTreePageDto {
+  topLevelNodes: PredicateNodeDto[];
 }
 
 export const ASK_FOR_PREDICATE_TREE_PAGE_DTO_KIND = 'configuration/predicate-tree-page/ASK_FOR_PAGE_DTO';
