@@ -55,6 +55,7 @@ export class PredicateKindListItemComponent {
           description: '',
           isRequired: true,
           valueType: 'string',
+          defaultValue: '',
         },
       )
     );

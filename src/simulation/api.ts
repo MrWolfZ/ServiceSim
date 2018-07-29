@@ -3,6 +3,7 @@ import { filter, take, timeout } from 'rxjs/operators';
 
 import { InvocationResponseWasSet, ServiceInvocation, ServiceResponse } from '../domain';
 import { EventLog } from '../infrastructure';
+import { logger } from '../util';
 import { PredicateNode, PredicateTree, ResponseGeneratorFunction } from './predicate-tree';
 
 export const processRequest = async (req: Request, res: Response) => {
@@ -16,9 +17,7 @@ export const processRequest = async (req: Request, res: Response) => {
     take(1),
     timeout(60000),
   ).subscribe(ev => {
-    res.status(ev.statusCode).send({
-      content: ev.responseBody,
-    });
+    res.status(ev.statusCode).contentType(ev.contentType).send(ev.body);
   }, err => {
     res.status(500).send({
       content: JSON.stringify(err),
@@ -28,6 +27,7 @@ export const processRequest = async (req: Request, res: Response) => {
   let response: ServiceResponse = {
     statusCode: 404,
     body: '',
+    contentType: '',
   };
 
   const node = await findNode(topLevelPredicates);
@@ -36,7 +36,7 @@ export const processRequest = async (req: Request, res: Response) => {
     response = await Promise.resolve(generator(invocation.request));
   }
 
-  invocation.setResponse(response.statusCode, response.body);
+  invocation.setResponse(response.statusCode, response.body, response.contentType);
   await ServiceInvocation.saveAsync(invocation);
 
   async function findNode(nodes: PredicateNode[]): Promise<PredicateNode | undefined> {
@@ -45,7 +45,12 @@ export const processRequest = async (req: Request, res: Response) => {
         continue;
       }
 
-      if (!await Promise.resolve(node.evaluate(invocation.request))) {
+      try {
+        if (!await Promise.resolve(node.evaluate(invocation.request))) {
+          continue;
+        }
+      } catch (e) {
+        logger.error(e);
         continue;
       }
 

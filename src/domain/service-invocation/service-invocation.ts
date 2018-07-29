@@ -19,6 +19,7 @@ export interface ServiceRequest {
 export interface ServiceResponse {
   statusCode: number;
   body: string;
+  contentType: string;
 }
 
 export class ServiceInvocation extends EventSourcedRootEntity<DomainEvents> {
@@ -32,6 +33,7 @@ export class ServiceInvocation extends EventSourcedRootEntity<DomainEvents> {
   response: ServiceResponse = {
     statusCode: 0,
     body: '',
+    contentType: '',
   };
 
   static create(
@@ -47,12 +49,14 @@ export class ServiceInvocation extends EventSourcedRootEntity<DomainEvents> {
 
   setResponse = (
     statusCode: number,
-    responseBody: string,
+    body: string,
+    contentType: string,
   ) => {
     return this.apply(InvocationResponseWasSet.create({
       invocationId: this.id,
       statusCode,
-      responseBody,
+      body,
+      contentType,
     }));
   }
 
@@ -68,7 +72,8 @@ export class ServiceInvocation extends EventSourcedRootEntity<DomainEvents> {
       this.state = 'response set';
       this.response = {
         statusCode: event.statusCode,
-        body: event.responseBody,
+        body: event.body,
+        contentType: event.contentType,
       };
     },
   };

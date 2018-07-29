@@ -3,6 +3,7 @@ export interface PredicateKindParameterDto {
   description: string;
   isRequired: boolean;
   valueType: 'string' | 'boolean' | 'number';
+  defaultValue: string | boolean | number;
 }
 
 export interface PredicateKindListItemDto {
@@ -18,6 +19,7 @@ export interface PredicateKindParameterFormValue {
   description: string;
   isRequired: boolean;
   valueType: 'string' | 'boolean' | 'number';
+  defaultValue: string | boolean | number;
 }
 
 export interface PredicateKindListItemFormValue {

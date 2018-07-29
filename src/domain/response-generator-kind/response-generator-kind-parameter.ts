@@ -1,4 +1,4 @@
-export interface PredicateKindParameter {
+export interface ResponseGeneratorKindParameter {
   name: string;
   description: string;
   isRequired: boolean;

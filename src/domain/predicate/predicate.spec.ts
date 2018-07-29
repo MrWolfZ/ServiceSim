@@ -10,7 +10,7 @@ describe('Predicate', () => {
 
     expect(loadedPredicate.id).toEqual(predicate.id);
     expect(loadedPredicate.predicateKindId).toEqual(predicate.predicateKindId);
-    expect(loadedPredicate.properties).toEqual(predicate.properties);
+    expect(loadedPredicate.parameters).toEqual(predicate.parameters);
     expect(loadedPredicate.unmutatedVersion).toEqual(predicate.unmutatedVersion);
   });
 
@@ -23,7 +23,7 @@ describe('Predicate', () => {
 
     expect(loadedPredicate.id).toEqual(predicate.id);
     expect(loadedPredicate.predicateKindId).toEqual(predicate.predicateKindId);
-    expect(loadedPredicate.properties).toEqual(predicate.properties);
+    expect(loadedPredicate.parameters).toEqual(predicate.parameters);
     expect(loadedPredicate.unmutatedVersion).toEqual(predicate.unmutatedVersion);
   });
 });

@@ -44,13 +44,13 @@
       </div>
     </div>
     <div class="level-right">
-      <a class="button is-primary"
-         (click)="openNewItemDialog()">
+      <button class="button is-primary"
+              (click)="openNewItemDialog()">
         <span>Create new kind</span>
         <span class="icon is-small">
           <fa-icon icon="plus"></fa-icon>
         </span>
-      </a>
+      </button>
     </div>
   </div>
   <div class="tile is-ancestor">
@@ -64,4 +64,13 @@
 </div>
 <div *ngIf="state.items.length === 0">
   <p>There are no predicate kinds yet.</p>
+  <br />
+  <!-- TODO: add button to create default predicate kinds -->
+  <button class="button is-primary"
+          (click)="openNewItemDialog()">
+    <span>Create new kind</span>
+    <span class="icon is-small">
+      <fa-icon icon="plus"></fa-icon>
+    </span>
+  </button>
 </div>

@@ -20,7 +20,6 @@ export class MergeQueryParamsAction implements Action {
 
   constructor(
     public queryParams: { [key: string]: any },
-    // TODO: achieve this with a dedicated action?
     public usePendingNavigation = false,
   ) { }
 }

@@ -19,24 +19,50 @@ export async function initializeAsync() {
   const staticResponseGeneratorKind = ResponseGeneratorKind.create(
     'static',
     'returns a static response',
-    'return { statusCode: properties.statusCode, body: properties.body };',
+    'return { statusCode: parameters["Status Code"], body: parameters["Body"], contentType: parameters["Content Type"] };',
+    [
+      {
+        name: 'Status Code',
+        description: 'The HTTP status code of the response',
+        isRequired: true,
+        valueType: 'number',
+        defaultValue: '204',
+      },
+      {
+        name: 'Body',
+        description: 'The body of the response',
+        isRequired: false,
+        valueType: 'string',
+        defaultValue: '',
+      },
+      {
+        name: 'Content Type',
+        description: 'The content type of the response',
+        isRequired: false,
+        valueType: 'string',
+        defaultValue: 'application/json',
+      },
+    ],
   );
 
-  // // staticResponseGeneratorKind.addParameter(
-  // //   'statusCode',
-  // //   'the status code of the response',
-  // //   true,
-  // //   'number',
-  // // );
-
-  // // staticResponseGeneratorKind.addParameter(
-  // //   'body',
-  // //   'the body of the response',
-  // //   false,
-  // //   'string',
-  // // );
-
   await ResponseGeneratorKind.saveAsync(staticResponseGeneratorKind);
+
+  const pathPrefixPredicateKind = PredicateKind.create(
+    'Path Prefix',
+    'Predicates of this kind match all requests whose path starts with a provided string.',
+    'return request.path.startsWith(parameters.Prefix);',
+    [
+      {
+        name: 'Prefix',
+        description: 'The prefix to check the path for',
+        isRequired: true,
+        valueType: 'string',
+        defaultValue: '/',
+      },
+    ],
+  );
+
+  await PredicateKind.saveAsync(pathPrefixPredicateKind);
 
   const allPredicateKind = PredicateKind.create(
     'All',
@@ -47,10 +73,46 @@ export async function initializeAsync() {
 
   await PredicateKind.saveAsync(allPredicateKind);
 
-  const rootPredicate = Predicate.create(allPredicateKind.id, {}, undefined);
-  rootPredicate.setResponseGenerator(staticResponseGeneratorKind.id, { statusCode: 204 });
+  const topLevelPredicate1 = Predicate.create(pathPrefixPredicateKind.id, {
+    Prefix: '/api',
+  }, undefined);
 
-  await Predicate.saveAsync(rootPredicate);
+  await Predicate.saveAsync(topLevelPredicate1);
+
+  const childPredicate1 = Predicate.create(pathPrefixPredicateKind.id, {
+    Prefix: '/api/books',
+  }, undefined);
+
+  childPredicate1.setResponseGenerator(staticResponseGeneratorKind.id, {
+    'Status Code': 200,
+    'Body': JSON.stringify([{ title: 'LOTR' }]),
+    'Content Type': 'application/json',
+  });
+
+  await Predicate.saveAsync(childPredicate1);
+
+  topLevelPredicate1.addChildPredicate(childPredicate1.id);
+
+  const childPredicate2 = Predicate.create(pathPrefixPredicateKind.id, {
+    Prefix: '/api/authors',
+  }, undefined);
+
+  childPredicate2.setResponseGenerator(staticResponseGeneratorKind.id, {
+    'Status Code': 200,
+    'Body': JSON.stringify([{ name: 'Tolkien' }]),
+    'Content Type': 'application/json',
+  });
+
+  await Predicate.saveAsync(childPredicate2);
+
+  topLevelPredicate1.addChildPredicate(childPredicate2.id);
+
+  await Predicate.saveAsync(topLevelPredicate1);
+
+  const topLevelPredicate2 = Predicate.create(allPredicateKind.id, {}, undefined);
+  topLevelPredicate2.setResponseGenerator(staticResponseGeneratorKind.id, { 'Status Code': 204 });
+
+  await Predicate.saveAsync(topLevelPredicate2);
 
   return () => {
     sub1.unsubscribe();
@@ -61,5 +123,13 @@ export async function initializeAsync() {
 const app = express.Router();
 app.use('/simulation', simulationApi);
 app.use('/uiApi', uiApi);
+
+app.use(function (err: any, _: express.Request, res: express.Response, next: express.NextFunction) {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  return res.status(err.status || 500).render('500');
+});
 
 export default app;

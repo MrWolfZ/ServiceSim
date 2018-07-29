@@ -21,7 +21,7 @@ describe('all predicates projection', () => {
     await EventLog.publishAsync(PredicateCreated.create({
       predicateId: matcherId1,
       predicateKindId: 'url-pattern',
-      properties: {},
+      parameters: {},
       parentPredicateId: undefined,
     }));
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(1);
@@ -29,7 +29,7 @@ describe('all predicates projection', () => {
     await EventLog.publishAsync(PredicateCreated.create({
       predicateId: matcherId2,
       predicateKindId: 'url-pattern',
-      properties: {},
+      parameters: {},
       parentPredicateId: undefined,
     }));
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(2);
