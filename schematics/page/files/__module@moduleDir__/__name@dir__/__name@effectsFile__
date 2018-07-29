@@ -8,9 +8,9 @@ import { flatMap } from 'rxjs/operators';
 import { addAskMockResponse, ask } from 'app/infrastructure';
 
 import { <%= initializationAction(name) %>, <%= loadAction(name) %> } from './<%= actionsFileNoExt(name) %>';
-import { ASK_FOR_PAGE_DTO } from './<%= dtoFileNoExt(name) %>';
+import { <%= askKindConstant(name) %> } from './<%= dtoFileNoExt(name) %>';
 
-addAskMockResponse(ASK_FOR_PAGE_DTO, {
+addAskMockResponse(<%= askKindConstant(name) %>, {
 
 });
 
@@ -23,7 +23,7 @@ export class <%= effects(name) %> {
     flatMap(() =>
       ask(
         this.http,
-        ASK_FOR_PAGE_DTO,
+        <%= askKindConstant(name) %>,
         dto => [
           new <%= initializationAction(name) %>(dto),
         ],
