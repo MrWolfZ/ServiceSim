@@ -30,7 +30,8 @@
     "build-schematics": "tsc -p ./schematics/tsconfig.json",
     "generate-module": "node ./node_modules/@angular-devkit/schematics-cli/bin/schematics.js .:module --dry-run false --name",
     "generate-page": "node ./node_modules/@angular-devkit/schematics-cli/bin/schematics.js .:page --dry-run false --styleext scss --name",
-    "generate-component": "node ./node_modules/@angular-devkit/schematics-cli/bin/schematics.js .:component --dry-run false --styleext scss --prefix sim --name"
+    "generate-component": "node ./node_modules/@angular-devkit/schematics-cli/bin/schematics.js .:component --dry-run false --styleext scss --prefix sim --name",
+    "heroku-postbuild": "npm run build-ui-prod && npm run build-ts"
   },
   "jest": {
     "moduleDirectories": [
