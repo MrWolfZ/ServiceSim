@@ -4,7 +4,7 @@ export interface <%= dto(name) %> {
 
 }
 
-export const <%= askKindConstant(name) %> = '<%= dir(path) %>/<%= dir(name) %>/ASK_FOR_PAGE_DTO';
+export const <%= askKindConstant(name) %> = '<%= moduleDir(module) %>/<%= dir(name) %>/ASK_FOR_PAGE_DTO';
 
 export interface <%= askInterface(name) %> extends Ask<typeof <%= askKindConstant(name) %>, <%= dto(name) %>> { }
 
