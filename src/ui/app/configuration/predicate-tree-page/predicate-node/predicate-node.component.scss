@@ -12,6 +12,24 @@
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  position: relative;
+
+  >.buttons {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    opacity: 0;
+    transition: opacity ease 200ms;
+
+    >.button {
+      margin-bottom: 0;
+    }
+  }
+
+  &:hover>.buttons {
+    opacity: 1;
+  }
 }
 
 .predicate,
