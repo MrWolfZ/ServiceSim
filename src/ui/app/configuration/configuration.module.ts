@@ -11,6 +11,7 @@ import {
   PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME,
   PredicateKindListComponent,
   PredicateKindListItemComponent,
+  PredicateKindParameterComponent,
   PredicateKindsPage,
   PredicateKindsPageEffects,
   PredicateKindsPageInitializationGuard,
@@ -31,6 +32,7 @@ import {
     ResponseGeneratorsPage,
     PredicateKindListComponent,
     PredicateKindListItemComponent,
+    PredicateKindParameterComponent,
   ],
   imports: [
     InfrastructureModule,

@@ -2,9 +2,12 @@ import { createFormGroupState, FormGroupState } from 'ngrx-forms';
 
 import { PredicateKindListItemDto, PredicateKindListItemFormValue } from './predicate-kind-list-item.dto';
 
+import { PredicateKindParameterState } from './predicate-kind-parameter';
+
 export interface PredicateKindListItemState extends PredicateKindListItemDto {
+  parameters: PredicateKindParameterState[];
+  uneditedParameters: PredicateKindParameterState[];
   isEditing: boolean;
-  isChanged: boolean;
   isSaving: boolean;
   isNewItem: boolean;
   isDeleting: boolean;
@@ -30,8 +33,8 @@ export const INITIAL_PREDICATE_KIND_LIST_ITEM_STATE: PredicateKindListItemState 
   description: '',
   evalFunctionBody: '',
   parameters: [],
+  uneditedParameters: [],
   isEditing: false,
-  isChanged: false,
   isSaving: false,
   isNewItem: false,
   isDeleting: false,

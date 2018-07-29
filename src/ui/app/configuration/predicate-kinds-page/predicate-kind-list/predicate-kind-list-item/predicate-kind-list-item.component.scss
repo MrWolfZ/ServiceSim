@@ -20,12 +20,4 @@
 .parameter {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
-
-  label {
-    transition: all ease 200ms;
-  }
-
-  .select:not(.is-multiple) {
-    height: 2.5em;
-  }
 }

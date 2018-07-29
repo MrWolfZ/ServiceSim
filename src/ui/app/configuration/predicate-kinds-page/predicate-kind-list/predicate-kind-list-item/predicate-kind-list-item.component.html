@@ -1,21 +1,5 @@
 <form [class.is-readonly]="state.isReadOnly"
       [ngrxFormState]="state.formState">
-  <div class="field title">
-    <p class="control">
-      <input class="input"
-             type="text"
-             placeholder="Name"
-             [ngrxFormControlState]="state.formState.controls.name"
-             [readonly]="state.isReadOnly"
-             [class.is-paddingless]="state.isReadOnly">
-      <sim-form-control-errors [formState]="state.formState.controls.name">
-        <span class="help is-danger"
-              *ngIf="state.formState.errors['_name']?.required">
-          Please enter a name
-        </span>
-      </sim-form-control-errors>
-    </p>
-  </div>
   <div class="buttons is-pulled-right is-marginless"
        *ngIf="!state.isNewItem">
     <div *ngIf="!state.isEditing">
@@ -51,7 +35,7 @@
       </button>
       <button class="button is-success"
               (click)="submitEdit()"
-              [disabled]="!state.isChanged || (state.formState.isInvalid && state.formState.isSubmitted)"
+              [disabled]="state.formState.isInvalid && state.formState.isSubmitted"
               [class.is-loading]="state.isSaving">
         <span>Save</span>
         <span class="icon is-small">
@@ -59,6 +43,22 @@
         </span>
       </button>
     </div>
+  </div>
+  <div class="field title">
+    <p class="control">
+      <input class="input"
+             type="text"
+             placeholder="Name"
+             [ngrxFormControlState]="state.formState.controls.name"
+             [readonly]="state.isReadOnly"
+             [class.is-paddingless]="state.isReadOnly">
+      <sim-form-control-errors [formState]="state.formState.controls.name">
+        <span class="help is-danger"
+              *ngIf="state.formState.errors['_name']?.required">
+          Please enter a name
+        </span>
+      </sim-form-control-errors>
+    </p>
   </div>
   <div class="field">
     <p class="control">
@@ -101,95 +101,9 @@
       </div>
       <div class="tile is-12 is-child box parameter"
            *ngFor="let item of parameterControls; let i = index; trackBy: trackByIndex">
-        <div class="field">
-          <label class="label"
-                 [class.is-marginless]="state.isReadOnly">
-            Parameter Name
-          </label>
-          <div class="control">
-            <input class="input"
-                   type="text"
-                   [ngrxFormControlState]="item.controls.name"
-                   [readonly]="state.isReadOnly"
-                   [class.is-paddingless]="state.isReadOnly">
-            <sim-form-control-errors [formState]="item.controls.name">
-              <span class="help is-danger"
-                    *ngIf="item.controls.name.errors.required">
-                Please enter a name
-              </span>
-            </sim-form-control-errors>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label"
-                 [class.is-marginless]="state.isReadOnly">
-            Description
-          </label>
-          <div class="control">
-            <input class="input"
-                   type="text"
-                   [ngrxFormControlState]="item.controls.description"
-                   [readonly]="state.isReadOnly"
-                   [class.is-paddingless]="state.isReadOnly">
-            <sim-form-control-errors [formState]="item.controls.description">
-              <span class="help is-danger"
-                    *ngIf="item.controls.description.errors.required">
-                Please enter a description
-              </span>
-            </sim-form-control-errors>
-          </div>
-        </div>
-        <div class="field preserve-margin">
-          <label class="label">Is Required?</label>
-          <div class="control">
-            <input type="radio"
-                   id="{{ item.controls.isRequired.id }}.yes"
-                   class="is-checkradio is-rtl is-white"
-                   [value]="true"
-                   [ngrxFormControlState]="item.controls.isRequired">
-            <label for="{{ item.controls.isRequired.id }}.yes"
-                   *ngIf="!state.isReadOnly">
-              Yes
-            </label>
-            <input type="radio"
-                   id="{{ item.controls.isRequired.id }}.no"
-                   class="is-checkradio is-rtl is-white"
-                   [value]="false"
-                   [ngrxFormControlState]="item.controls.isRequired">
-            <label for="{{ item.controls.isRequired.id }}.no"
-                   *ngIf="!state.isReadOnly">
-              No
-            </label>
-            <span *ngIf="state.isReadOnly">{{ item.controls.isRequired.value ? 'Yes' : 'No' }}</span>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Value Type</label>
-          <div class="control">
-            <div class="select"
-                 *ngIf="!state.isReadOnly">
-              <select class="is-borderless"
-                      [ngrxFormControlState]="item.controls.valueType">
-                <option value="string">string</option>
-                <option value="boolean">boolean</option>
-                <option value="number">number</option>
-              </select>
-            </div>
-            <span *ngIf="state.isReadOnly">{{ item.controls.valueType.value }}</span>
-          </div>
-        </div>
-        <sim-expansion-container [isCollapsed]="state.isReadOnly">
-          <button class="button is-danger"
-                  type="button"
-                  [class.is-loading]="state.isDeleting"
-                  (click)="removeParameter(i)"
-                  [disabled]="state.isDeleting">
-            <span>Remove</span>
-            <span class="icon is-small">
-              <fa-icon icon="times"></fa-icon>
-            </span>
-          </button>
-        </sim-expansion-container>
+        <sim-predicate-kind-parameter [state]="state.parameters[i]"
+                                      [formState]="item"
+                                      (deleteButtonClicked)="removeParameter(i)"></sim-predicate-kind-parameter>
       </div>
       <sim-expansion-container [isCollapsed]="!state.isEditing">
         <div class="tile is-12 is-child">

@@ -3,12 +3,14 @@ import { PredicateKindListItemDto } from './predicate-kind-list-item.dto';
 import { predicateKindListItemReducer } from './predicate-kind-list-item.reducer';
 import { INITIAL_PREDICATE_KIND_LIST_ITEM_STATE } from './predicate-kind-list-item.state';
 
+import { MOCK_PREDICATE_KIND_PARAMETER_DTO } from './predicate-kind-parameter/predicate-kind-parameter.reducer.spec';
+
 export const MOCK_PREDICATE_KIND_LIST_ITEM_DTO: PredicateKindListItemDto = {
   predicateKindId: '',
   name: '',
   description: '',
   evalFunctionBody: '',
-  parameters: [],
+  parameters: [MOCK_PREDICATE_KIND_PARAMETER_DTO],
 };
 
 describe(predicateKindListItemReducer.name, () => {

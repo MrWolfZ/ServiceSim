@@ -50,11 +50,11 @@ export async function initializeAsync() {
   const pathPrefixPredicateKind = PredicateKind.create(
     'Path Prefix',
     'Predicates of this kind match all requests whose path starts with a provided string.',
-    'return request.path.startsWith(parameters.Prefix);',
+    'return request.path.startsWith(parameters["Prefix"]);',
     [
       {
         name: 'Prefix',
-        description: 'The prefix to check the path for',
+        description: 'The prefix to check the path for.',
         isRequired: true,
         valueType: 'string',
         defaultValue: '/',

@@ -25,6 +25,25 @@ export class EditPredicateKindListItemAction implements Action {
   ) {}
 }
 
+export class AddPredicateKindParameterAction implements Action {
+  static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/predicate-kind-list-item/ADD_PARAMETER';
+  readonly type = AddPredicateKindParameterAction.TYPE;
+
+  constructor(
+    public predicateKindId: string,
+  ) {}
+}
+
+export class RemovePredicateKindParameterAction implements Action {
+  static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/predicate-kind-list-item/REMOVE_PARAMETER';
+  readonly type = RemovePredicateKindParameterAction.TYPE;
+
+  constructor(
+    public predicateKindId: string,
+    public index: number,
+  ) {}
+}
+
 export class SaveEditedPredicateKindListItemAction implements Action {
   static readonly TYPE = 'configuration/predicate-kinds-page/predicate-kind-list/predicate-kind-list-item/SAVE_EDITED_PREDICATE_KIND';
   readonly type = SaveEditedPredicateKindListItemAction.TYPE;
@@ -66,6 +85,8 @@ export type PredicateKindListItemActions =
   | InitializePredicateKindListItemAction
   | InitializeNewPredicateKindListItemAction
   | EditPredicateKindListItemAction
+  | AddPredicateKindParameterAction
+  | RemovePredicateKindParameterAction
   | SaveEditedPredicateKindListItemAction
   | SavingEditedPredicateKindListItemSuccessfulAction
   | CancelEditingPredicateKindListItemAction

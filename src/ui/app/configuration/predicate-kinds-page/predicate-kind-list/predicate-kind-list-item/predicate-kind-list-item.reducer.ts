@@ -1,14 +1,16 @@
-import { createFormGroupState, formGroupReducer } from 'ngrx-forms';
+import { addArrayControl, createFormGroupState, formGroupReducer, removeArrayControl, updateGroup } from 'ngrx-forms';
 
-import { callNestedReducers, deepEquals } from 'app/infrastructure';
+import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
 
 import {
+  AddPredicateKindParameterAction,
   CancelEditingPredicateKindListItemAction,
   DeletePredicateKindAction,
   EditPredicateKindListItemAction,
   InitializeNewPredicateKindListItemAction,
   InitializePredicateKindListItemAction,
   PredicateKindListItemActions,
+  RemovePredicateKindParameterAction,
   SaveEditedPredicateKindListItemAction,
   SavingEditedPredicateKindListItemSuccessfulAction,
 } from './predicate-kind-list-item.actions';
@@ -22,30 +24,29 @@ import {
 } from './predicate-kind-list-item.state';
 import { validatePredicateKindListItem } from './predicate-kind-list-item.validation';
 
+import {
+  InitializePredicateKindParameterAction,
+  PredicateKindParameterFormValue,
+  predicateKindParameterReducer,
+  PredicateKindParameterState,
+  SetIsReadOnlyAction,
+} from './predicate-kind-parameter';
+
 export function predicateKindListItemReducer(
   state = INITIAL_PREDICATE_KIND_LIST_ITEM_STATE,
   action: PredicateKindListItemActions,
 ): PredicateKindListItemState {
   state = callNestedReducers<PredicateKindListItemState>(state, action, {
     formState: (s, a) => validatePredicateKindListItem(formGroupReducer(s, a)),
+    parameters: createArrayReducer(predicateKindParameterReducer),
   });
-
-  const isChanged = !deepEquals<PredicateKindListItemFormValue>(state.formState.value, {
-    name: state.name,
-    description: state.description,
-    evalFunctionBody: state.evalFunctionBody,
-    parameters: state.parameters,
-  });
-
-  if (isChanged !== state.isChanged) {
-    state = {
-      ...state,
-      isChanged,
-    };
-  }
 
   switch (action.type) {
-    case InitializePredicateKindListItemAction.TYPE:
+    case InitializePredicateKindListItemAction.TYPE: {
+      const parameters = action.dto.parameters.map((dto, idx) =>
+        predicateKindParameterReducer(state.parameters[idx], new InitializePredicateKindParameterAction(dto))
+      );
+
       return {
         ...INITIAL_PREDICATE_KIND_LIST_ITEM_STATE,
         ...action.dto,
@@ -60,7 +61,10 @@ export function predicateKindListItemReducer(
             },
           )
         ),
+        parameters,
+        uneditedParameters: parameters,
       };
+    }
 
     case InitializeNewPredicateKindListItemAction.TYPE:
       return {
@@ -79,6 +83,7 @@ export function predicateKindListItemReducer(
             },
           )
         ),
+        parameters: state.parameters.map(p => predicateKindParameterReducer(p, new SetIsReadOnlyAction(false))),
       };
 
     case EditPredicateKindListItemAction.TYPE:
@@ -90,6 +95,47 @@ export function predicateKindListItemReducer(
         ...state,
         isEditing: true,
         isReadOnly: false,
+        parameters: state.parameters.map(p => predicateKindParameterReducer(p, new SetIsReadOnlyAction(false))),
+      };
+
+    case AddPredicateKindParameterAction.TYPE:
+      if (action.predicateKindId !== state.predicateKindId) {
+        return state;
+      }
+
+      const newValue: PredicateKindParameterFormValue = {
+        name: '',
+        description: '',
+        isRequired: true,
+        valueType: 'string',
+        defaultValue: '',
+      };
+
+      return {
+        ...state,
+        formState: updateGroup(state.formState, {
+          parameters: addArrayControl<PredicateKindParameterFormValue>(newValue),
+        }),
+        parameters: [
+          ...state.parameters,
+          predicateKindParameterReducer(
+            predicateKindParameterReducer(undefined, new InitializePredicateKindParameterAction(newValue)),
+            new SetIsReadOnlyAction(false),
+          ),
+        ],
+      };
+
+    case RemovePredicateKindParameterAction.TYPE:
+      if (action.predicateKindId !== state.predicateKindId) {
+        return state;
+      }
+
+      return {
+        ...state,
+        formState: updateGroup(state.formState, {
+          parameters: removeArrayControl(action.index),
+        }),
+        parameters: state.parameters.filter((_, idx) => idx !== action.index),
       };
 
     case SaveEditedPredicateKindListItemAction.TYPE:
@@ -101,19 +147,28 @@ export function predicateKindListItemReducer(
         ...state,
         isSaving: true,
         isReadOnly: true,
+        parameters: state.parameters.map(p => predicateKindParameterReducer(p, new SetIsReadOnlyAction(true))),
       };
 
-    case SavingEditedPredicateKindListItemSuccessfulAction.TYPE:
+    case SavingEditedPredicateKindListItemSuccessfulAction.TYPE: {
       if (action.predicateKindId !== state.predicateKindId) {
         return state;
       }
+
+      const parameters: PredicateKindParameterState[] = state.formState.value.parameters.map(p => ({
+        ...p,
+        isReadOnly: true,
+      }));
 
       return {
         ...state,
         isSaving: false,
         isEditing: false,
         ...state.formState.value,
+        parameters,
+        uneditedParameters: parameters,
       };
+    }
 
     case CancelEditingPredicateKindListItemAction.TYPE:
       if (action.predicateKindId !== state.predicateKindId) {
@@ -124,6 +179,7 @@ export function predicateKindListItemReducer(
         ...state,
         isEditing: false,
         isReadOnly: true,
+        parameters: state.uneditedParameters.map(p => predicateKindParameterReducer(p, new SetIsReadOnlyAction(true))),
         formState: validatePredicateKindListItem(
           createFormGroupState<PredicateKindListItemFormValue>(
             `${PREDICATE_KIND_LIST_ITEM_FORM_STATE_ID_PREFIX}${state.predicateKindId}`,
@@ -131,7 +187,13 @@ export function predicateKindListItemReducer(
               name: state.name,
               description: state.description,
               evalFunctionBody: state.evalFunctionBody,
-              parameters: state.parameters,
+              parameters: state.uneditedParameters.map(p => ({
+                name: p.name,
+                description: p.description,
+                isRequired: p.isRequired,
+                valueType: p.valueType,
+                defaultValue: p.defaultValue,
+              })),
             },
           )
         ),
