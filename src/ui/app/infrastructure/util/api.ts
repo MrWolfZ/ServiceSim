@@ -44,7 +44,7 @@ export function ask<TAskKind extends string, TResponse>(
 
   return httpPost(
     http,
-    `${environment.apiBaseUrl}uiApi/ask`,
+    `${environment.apiBaseUrl}ask`,
     JSON.stringify(ask),
     project,
     {
@@ -65,7 +65,7 @@ export function tell<TTellKind extends string, TResponse>(
 ): Observable<Action> {
   return httpPost(
     http,
-    `${environment.apiBaseUrl}uiApi/tell`,
+    `${environment.apiBaseUrl}tell`,
     JSON.stringify(tell),
     project,
     {

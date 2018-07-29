@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 
 import { Predicate, PredicateKind, ResponseGeneratorKind } from './domain';
 import * as ejp from './infrastructure/event-journal/persistence';
@@ -123,6 +124,7 @@ export async function initializeAsync() {
 const app = express.Router();
 app.use('/simulation', simulationApi);
 app.use('/uiApi', uiApi);
+app.use('/ui', express.static(path.join(__dirname, 'ui', 'dist')));
 
 app.use(function (err: any, _: express.Request, res: express.Response, next: express.NextFunction) {
   if (res.headersSent) {

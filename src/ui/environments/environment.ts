@@ -6,7 +6,7 @@ export const environment = {
   enableProdMode: false,
   enableStoreFreeze: true,
   enableDevTools: true,
-  apiBaseUrl: 'http://localhost:3000/',
+  apiBaseUrl: 'http://localhost:3000/uiApi/',
 };
 
 /*

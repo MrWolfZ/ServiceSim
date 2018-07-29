@@ -23,6 +23,7 @@
     "ng": "ng",
     "start-ui": "ng serve",
     "build-ui": "ng build",
+    "build-ui-prod": "ng build --prod --base-href /ui/",
     "test-ui": "ng test",
     "lint-ui": "ng lint",
     "e2e-ui": "ng e2e",
