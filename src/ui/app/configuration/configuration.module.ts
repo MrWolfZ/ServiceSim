@@ -26,6 +26,14 @@ import {
   responseGeneratorsPageReducer,
 } from './response-generators-page';
 
+import {
+  PREDICATE_TREE_PAGE_STATE_FEATURE_NAME,
+  PredicateTreePage,
+  PredicateTreePageEffects,
+  PredicateTreePageInitializationGuard,
+  predicateTreePageReducer,
+} from './predicate-tree-page';
+
 @NgModule({
   declarations: [
     PredicateKindsPage,
@@ -33,6 +41,7 @@ import {
     PredicateKindListComponent,
     PredicateKindListItemComponent,
     PredicateKindParameterComponent,
+    PredicateTreePage,
   ],
   imports: [
     InfrastructureModule,
@@ -40,13 +49,16 @@ import {
     EffectsModule.forFeature([
       PredicateKindsPageEffects,
       ResponseGeneratorsPageEffects,
+      PredicateTreePageEffects,
     ]),
     StoreModule.forFeature(PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME, predicateKindsPageReducer),
     StoreModule.forFeature(RESPONSE_GENERATORS_PAGE_STATE_FEATURE_NAME, responseGeneratorsPageReducer),
+    StoreModule.forFeature(PREDICATE_TREE_PAGE_STATE_FEATURE_NAME, predicateTreePageReducer),
   ],
   providers: [
     PredicateKindsPageInitializationGuard,
     ResponseGeneratorsPageInitializationGuard,
+    PredicateTreePageInitializationGuard,
   ],
 })
 export class ConfigurationModule { }

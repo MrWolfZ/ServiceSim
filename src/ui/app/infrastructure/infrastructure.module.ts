@@ -19,6 +19,7 @@ import { RouterEffects, TrackRouteIsActiveDirective } from './router';
 
 import {
   PredicateKindsLinkDirective,
+  PredicateTreeLinkDirective,
   ResponseGeneratorKindsLinkDirective,
   RoutingEffects,
 } from './routing';
@@ -51,6 +52,7 @@ library.add(faTimes);
     FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
     PredicateKindsLinkDirective,
+    PredicateTreeLinkDirective,
     ResponseGeneratorKindsLinkDirective,
   ],
   exports: [
@@ -63,6 +65,7 @@ library.add(faTimes);
     FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
     PredicateKindsLinkDirective,
+    PredicateTreeLinkDirective,
     ResponseGeneratorKindsLinkDirective,
   ],
   providers: [

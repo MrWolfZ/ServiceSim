@@ -1,3 +1,4 @@
+export * from './predicate-tree-link.directive';
 export * from './predicate-kinds-link.directive';
 export * from './response-generator-kinds-link.directive';
 

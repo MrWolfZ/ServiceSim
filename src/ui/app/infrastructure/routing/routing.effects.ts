@@ -8,16 +8,26 @@ import { RootState } from 'app/app.state';
 
 import {
   NavigateToPredicateKindsAction,
+  NavigateToPredicateTreeAction,
   NavigateToResponseGeneratorKindsAction,
 } from './routing.actions';
 import {
   createNavigateAction,
   creatPredicateKindsRouteRoute,
+  creatPredicateTreeRouteRoute,
   creatResponseGeneratorKindsRouteRoute,
 } from './routing.util';
 
 @Injectable()
 export class RoutingEffects {
+
+  @Effect()
+  navigateToPredicateTree$: Observable<Action> = this.actions$.pipe(
+    ofType(NavigateToPredicateTreeAction.TYPE),
+    map(a => a as NavigateToPredicateTreeAction),
+    withLatestFrom(this.store.select(s => s.router)),
+    map(([_, routerState]) => createNavigateAction(creatPredicateTreeRouteRoute(routerState))),
+  );
 
   @Effect()
   navigateToPredicateKinds$: Observable<Action> = this.actions$.pipe(

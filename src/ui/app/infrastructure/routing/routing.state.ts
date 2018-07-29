@@ -19,5 +19,6 @@ export interface ConfigurationRouteParams {
 export interface ConfigurationRouteQueryParams {
 }
 
+export const PREDICATE_TREE_PAGE_PATH = 'predicate-tree';
 export const PREDICATE_KINDS_PAGE_PATH = 'predicate-kinds';
 export const RESPONSE_GENERATOR_KINDS_PAGE_PATH = 'response-generator-kinds';

@@ -5,6 +5,7 @@ import { NavigateAction, Navigation, RouterState } from '../router';
 import {
   CONFIGURATION_MODULE_PATH,
   PREDICATE_KINDS_PAGE_PATH,
+  PREDICATE_TREE_PAGE_PATH,
   RESPONSE_GENERATOR_KINDS_PAGE_PATH,
   Route,
 } from './routing.state';
@@ -40,6 +41,18 @@ function getPreviousQueryParams(state: RouterState, navFilter: (nav: Navigation)
   }
 
   return {};
+}
+
+export function creatPredicateTreeRouteRoute(state: RouterState): Route {
+  const previousQueryParams = getPreviousQueryParams(
+    state,
+    n => n.path.includes(`/${CONFIGURATION_MODULE_PATH}/${PREDICATE_TREE_PAGE_PATH}`),
+  );
+
+  return {
+    pathParts: [CONFIGURATION_MODULE_PATH, PREDICATE_TREE_PAGE_PATH],
+    queryParams: previousQueryParams,
+  };
 }
 
 export function creatPredicateKindsRouteRoute(state: RouterState): Route {
