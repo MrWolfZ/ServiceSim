@@ -3,7 +3,7 @@ import { Action } from '@ngrx/store';
 import { Observable, ObservableInput, of } from 'rxjs';
 import { delay, flatMap } from 'rxjs/operators';
 
-import { Ask, Tell } from 'app/infrastructure';
+import { Ask, Tell } from 'app/infrastructure/infrastructure.dto';
 import { environment } from 'environments/environment';
 
 import { CommonHttpOptions, httpPost, surroundWithLoadingBar, surroundWithUiBlocking } from './http';

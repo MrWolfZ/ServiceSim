@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { PredicateKindListItemFormValue } from './predicate-kind-list-item';
+import { PredicateKindListItemFormValue } from './predicate-kind-list-item/predicate-kind-list-item.dto';
 import { PredicateKindListDto } from './predicate-kind-list.dto';
 
 export class InitializePredicateKindListAction implements Action {

@@ -1,5 +1,4 @@
 export * from './infrastructure.actions';
-export * from './infrastructure.dto';
 export * from './infrastructure.effects';
 export * from './infrastructure.module';
 export * from './infrastructure.state';

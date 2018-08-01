@@ -1,5 +1,4 @@
 export * from './<%= actionsFileNoExt(name) %>';
-export * from './<%= dtoFileNoExt(name) %>';
 export * from './<%= effectsFileNoExt(name) %>';
 export * from './<%= guardFileNoExt(name) %>';
 export * from './<%= componentFileNoExt(name) %>';

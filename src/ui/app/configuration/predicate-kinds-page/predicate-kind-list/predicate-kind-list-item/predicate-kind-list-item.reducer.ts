@@ -23,14 +23,13 @@ import {
   PredicateKindListItemState,
 } from './predicate-kind-list-item.state';
 import { validatePredicateKindListItem } from './predicate-kind-list-item.validation';
-
 import {
   InitializePredicateKindParameterAction,
-  PredicateKindParameterFormValue,
   predicateKindParameterReducer,
   PredicateKindParameterState,
   SetIsReadOnlyAction,
 } from './predicate-kind-parameter';
+import { PredicateKindParameterFormValue } from './predicate-kind-parameter/predicate-kind-parameter.dto';
 
 export function predicateKindListItemReducer(
   state = INITIAL_PREDICATE_KIND_LIST_ITEM_STATE,
