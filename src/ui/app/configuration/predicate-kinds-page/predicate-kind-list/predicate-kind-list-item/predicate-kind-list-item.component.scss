@@ -1,4 +1,18 @@
 @import 'constants';
+@import "~bulma/sass/utilities/mixins";
+
+@include from($desktop) {
+  :host {
+    .buttons {
+      opacity: 0;
+      transition: opacity ease 200ms;
+    }
+
+    &:hover .buttons {
+      opacity: 1;
+    }
+  }
+}
 
 .field.title {
   max-width: 500px;

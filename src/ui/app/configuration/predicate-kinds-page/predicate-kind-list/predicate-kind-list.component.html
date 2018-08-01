@@ -33,7 +33,7 @@
 </form>
 
 <div *ngIf="state.items.length > 0">
-  <div class="level">
+  <div class="level is-mobile">
     <div class="level-left">
       <div class="field">
         <p class="control">
@@ -53,10 +53,10 @@
       </button>
     </div>
   </div>
-  <div class="tile is-ancestor">
-    <div class="tile is-12 is-vertical is-parent">
-      <div class="tile is-12 is-child box"
-           *ngFor="let item of state.items; trackBy: trackById">
+  <div class="columns is-multiline">
+    <div class="column is-4-fullhd is-6-desktop is-12-tablet"
+         *ngFor="let item of state.items; trackBy: trackById">
+      <div class="box">
         <sim-predicate-kind-list-item [state]="item"></sim-predicate-kind-list-item>
       </div>
     </div>
