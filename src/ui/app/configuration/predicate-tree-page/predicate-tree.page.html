@@ -1,29 +1,16 @@
 <div class="columns">
   <div class="column is-12-tablet is-6-desktop is-8-widescreen">
-    <section class="section">
-      <h1 class="title">
-        Predicate Tree
-      </h1>
+    <h1 class="title">
+      Predicate Tree
+    </h1>
 
-      <sim-predicate-node *ngFor="let node of (state$ | async).topLevelNodes; trackBy: trackByNodeId"
-                          [state]="node"></sim-predicate-node>
-    </section>
+    <sim-predicate-node *ngFor="let node of (state$ | async).topLevelNodes; trackBy: trackByNodeId"
+                        [state]="node"></sim-predicate-node>
   </div>
 
   <!-- TODO build open and close mechanism for small devices -->
   <div class="column is-6-desktop is-4-widescreen">
-    <section class="section">
-      <h1 class="title">
-        Predicate Node
-      </h1>
-
-      <div *ngIf="!(state$ | async).selectedNodeId">
-        Select a predicate node by clicking or tapping it to view its details
-      </div>
-
-      <sim-predicate-node-details [state]="(selectedNode$ | async)"
-                                  *ngIf="(state$ | async).selectedNodeId">
-      </sim-predicate-node-details>
-    </section>
+    <sim-predicate-node-details [state]="(selectedNode$ | async)">
+    </sim-predicate-node-details>
   </div>
 </div>

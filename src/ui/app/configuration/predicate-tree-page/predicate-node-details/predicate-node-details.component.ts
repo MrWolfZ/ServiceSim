@@ -9,5 +9,5 @@ import { PredicateNodeDetailsState } from './predicate-node-details.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PredicateNodeDetailsComponent {
-  @Input() state: PredicateNodeDetailsState;
+  @Input() state: PredicateNodeDetailsState | undefined;
 }

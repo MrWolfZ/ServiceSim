@@ -1,4 +1,17 @@
-<p>predicate-node-details works!</p>
-Component State:
-<pre>{{ state | json }}</pre>
+<h1 class="title">
+  Predicate Node
+</h1>
 
+<div class="box"
+     *ngIf="!state">
+  Select a predicate node by clicking or tapping it to view its details
+</div>
+
+<div class="box"
+     *ngIf="state">
+
+  <p>predicate-node-details works!</p>
+  Component State:
+  <pre>{{ state | json }}</pre>
+
+</div>
