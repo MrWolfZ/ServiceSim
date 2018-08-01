@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostBinding } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { <%= sortLexicographically(state(name), 'RootState').join(', ') %> } from './<%= stateFileNoExt(name) %>';
@@ -15,6 +15,6 @@ export class <%= component(name) %> {
   state$: Observable<<%= state(name) %>>;
 
   constructor(store: Store<RootState>) {
-    this.state$ = store.select(s => s.<%= featureStateName(name) %>);
+    this.state$ = store.pipe(select(s => s.<%= featureStateName(name) %>));
   }
 }
