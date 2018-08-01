@@ -125,6 +125,7 @@ const app = express.Router();
 app.use('/simulation', simulationApi);
 app.use('/uiApi', uiApi);
 app.use('/ui', express.static(path.join(__dirname, 'ui', 'dist')));
+app.use((_, res) => res.sendFile(path.join(__dirname, 'ui', 'dist', 'index.html')));
 
 app.use(function (err: any, _: express.Request, res: express.Response, next: express.NextFunction) {
   if (res.headersSent) {
