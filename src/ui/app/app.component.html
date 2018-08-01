@@ -1,34 +1,8 @@
 <sim-loading-bar></sim-loading-bar>
-
-<section class="hero is-primary">
-  <div class="hero-head">
-    <nav class="navbar"
-         role="navigation"
-         aria-label="main navigation">
-      <div class="container">
-        <div class="navbar-menu">
-          <div class="navbar-start">
-            <a class="navbar-item"
-               predicateTreeLink>
-              Predicate Tree
-            </a>
-            <a class="navbar-item"
-               predicateKindsLink>
-              Predicate Kinds
-            </a>
-            <a class="navbar-item"
-               responseGeneratorKindsLink>
-              Response Generator Kinds
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </div>
-</section>
+<sim-navbar [state]="navbar$ | async"></sim-navbar>
 
 <section class="section">
-  <div class="container">
+  <div class="container is-fluid">
     <router-outlet></router-outlet>
   </div>
 </section>

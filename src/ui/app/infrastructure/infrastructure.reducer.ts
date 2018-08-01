@@ -8,11 +8,13 @@ import {
 } from './infrastructure.actions';
 import { InfrastructureState, INITIAL_INFRASTRUCTURE_STATE } from './infrastructure.state';
 import { loadingBarReducer } from './loading-bar';
+import { navbarReducer } from './navbar';
 import { callNestedReducers } from './util';
 
 export function infrastructureReducer(state = INITIAL_INFRASTRUCTURE_STATE, action: InfrastructureActions): InfrastructureState {
   state = callNestedReducers(state, action, {
     errorPage: errorPageReducer,
+    navbar: navbarReducer,
     loadingBar: loadingBarReducer,
   });
 

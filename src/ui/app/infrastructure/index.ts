@@ -7,6 +7,7 @@ export * from './infrastructure.reducer';
 export * from './components';
 export * from './error-page';
 export * from './loading-bar';
+export * from './navbar';
 export * from './router';
 export * from './routing';
 export * from './util';

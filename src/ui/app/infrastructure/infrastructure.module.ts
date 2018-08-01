@@ -15,6 +15,7 @@ import { infrastructureRoutes } from './infrastructure.routing';
 import { ExpansionContainerComponent, FormControlErrorsComponent } from './components';
 import { ErrorEffects, ErrorPage } from './error-page';
 import { LoadingBarComponent } from './loading-bar';
+import { NavbarComponent } from './navbar';
 import { RouterEffects, TrackRouteIsActiveDirective } from './router';
 
 import {
@@ -50,6 +51,7 @@ library.add(faTimes);
   declarations: [
     ErrorPage,
     LoadingBarComponent,
+    NavbarComponent,
     ExpansionContainerComponent,
     FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
@@ -63,6 +65,7 @@ library.add(faTimes);
     NgrxFormsModule,
     FontAwesomeModule,
     LoadingBarComponent,
+    NavbarComponent,
     ExpansionContainerComponent,
     FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
