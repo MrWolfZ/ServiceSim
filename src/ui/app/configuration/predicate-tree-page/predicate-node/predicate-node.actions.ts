@@ -20,7 +20,17 @@ export class TogglePredicateNodeExpansionAction implements Action {
   ) { }
 }
 
+export class SelectPredicateNodeAction implements Action {
+  static readonly TYPE = 'configuration/predicate-tree-page/predicate-node/SELECT';
+  readonly type = SelectPredicateNodeAction.TYPE;
+
+  constructor(
+    public nodeId: string,
+  ) { }
+}
+
 export type PredicateNodeActions =
   | InitializePredicateNodeAction
   | TogglePredicateNodeExpansionAction
+  | SelectPredicateNodeAction
   ;

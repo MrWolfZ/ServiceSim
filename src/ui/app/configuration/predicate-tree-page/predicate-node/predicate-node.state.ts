@@ -6,6 +6,7 @@ export interface PredicateParameterState extends ParameterDto {
 export interface PredicateNodeState extends PredicateNodeDto {
   parameters: PredicateParameterState[];
   isExpanded: boolean;
+  isSelected: boolean;
   childNodes: PredicateNodeState[];
 }
 
@@ -14,6 +15,7 @@ export const INITIAL_PREDICATE_NODE_STATE: PredicateNodeState = {
   predicateKindName: '',
   parameters: [],
   isExpanded: false,
+  isSelected: false,
   childNodes: [],
   responseGenerator: undefined,
 };

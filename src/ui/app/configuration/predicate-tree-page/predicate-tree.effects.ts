@@ -101,6 +101,26 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
         },
       },
     ],
+    nodeDetailsByNodeId: {
+      '1': {
+        nodeId: '1',
+      },
+      '1.1': {
+        nodeId: '1.1',
+      },
+      '1.1.1': {
+        nodeId: '1.1.1',
+      },
+      '1.2': {
+        nodeId: '1.2',
+      },
+      '2': {
+        nodeId: '2',
+      },
+      '3': {
+        nodeId: '3',
+      },
+    },
   },
 );
 

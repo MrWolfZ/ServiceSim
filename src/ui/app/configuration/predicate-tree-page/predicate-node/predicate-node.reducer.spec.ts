@@ -4,7 +4,7 @@ import { predicateNodeReducer } from './predicate-node.reducer';
 import { INITIAL_PREDICATE_NODE_STATE } from './predicate-node.state';
 
 export const MOCK_PREDICATE_NODE_DTO: PredicateNodeDto = {
-  nodeId: '',
+  nodeId: 'nodeId',
   predicateKindName: '',
   parameters: [],
   childNodes: [],

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsSubject } from '@ngrx/store';
 
-import { TogglePredicateNodeExpansionAction } from './predicate-node.actions';
+import { SelectPredicateNodeAction, TogglePredicateNodeExpansionAction } from './predicate-node.actions';
 import { PredicateNodeState, PredicateParameterState } from './predicate-node.state';
 
 @Component({
@@ -23,6 +23,14 @@ export class PredicateNodeComponent {
     }
 
     this.actionsSubject.next(new TogglePredicateNodeExpansionAction(this.state.nodeId));
+  }
+
+  selectNode() {
+    if (this.state.isSelected) {
+      return;
+    }
+
+    this.actionsSubject.next(new SelectPredicateNodeAction(this.state.nodeId));
   }
 
   trackByNodeId(_: number, node: PredicateNodeState) {

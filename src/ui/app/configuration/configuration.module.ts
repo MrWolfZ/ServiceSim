@@ -29,6 +29,7 @@ import {
 import {
   PREDICATE_TREE_PAGE_STATE_FEATURE_NAME,
   PredicateNodeComponent,
+  PredicateNodeDetailsComponent,
   PredicateTreePage,
   PredicateTreePageEffects,
   PredicateTreePageInitializationGuard,
@@ -44,6 +45,7 @@ import {
     PredicateKindTileComponent,
     PredicateKindDialogComponent,
     PredicateKindFormComponent,
+    PredicateNodeDetailsComponent,
   ],
   imports: [
     InfrastructureModule,

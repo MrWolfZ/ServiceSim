@@ -1,4 +1,4 @@
-import { InitializePredicateNodeAction, PredicateNodeActions, TogglePredicateNodeExpansionAction } from './predicate-node.actions';
+import { InitializePredicateNodeAction, PredicateNodeActions, SelectPredicateNodeAction, TogglePredicateNodeExpansionAction } from './predicate-node.actions';
 import { INITIAL_PREDICATE_NODE_STATE, PredicateNodeState } from './predicate-node.state';
 
 import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
@@ -30,6 +30,18 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
       return {
         ...state,
         isExpanded: !state.isExpanded,
+      };
+
+    case SelectPredicateNodeAction.TYPE:
+      const isSelected = action.nodeId === state.nodeId;
+
+      if (isSelected === state.isSelected) {
+        return state;
+      }
+
+      return {
+        ...state,
+        isSelected,
       };
 
     default:

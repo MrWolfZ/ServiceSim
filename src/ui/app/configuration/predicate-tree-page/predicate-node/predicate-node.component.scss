@@ -14,20 +14,11 @@
   flex-direction: column;
   justify-content: center;
   position: relative;
+  border: 0.125rem solid transparent;
+  transition: border-color ease 200ms;
 
-  >.buttons {
-    position: absolute;
-    right: 0.75rem;
-    opacity: 0;
-    transition: opacity ease 200ms;
-
-    >.button {
-      margin-bottom: 0;
-    }
-  }
-
-  &:hover>.buttons {
-    opacity: 1;
+  &.is-selected {
+    border-color: rgba($link, 0.5);
   }
 }
 
@@ -46,6 +37,7 @@
 
 h3 {
   white-space: nowrap;
+  margin-left: 0.2em;
 }
 
 .parameter-preview {
@@ -71,18 +63,16 @@ h3 {
 }
 
 .expansion-toggle-trigger {
-  display: flex;
-  align-items: center;
   cursor: pointer;
 
-  &.is-expanded>.icon>.expansion-toggle-icon {
+  &.is-expanded>.expansion-toggle-icon {
     transform: rotate(90deg);
   }
 
   &.is-disabled {
     cursor: inherit;
 
-    >.icon>.expansion-toggle-icon {
+    >.expansion-toggle-icon {
       opacity: 0;
     }
   }

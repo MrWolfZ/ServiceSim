@@ -1,20 +1,23 @@
-<div class="box">
+<div class="box"
+     [class.is-selected]="state.isSelected"
+     (click)="selectNode()">
+
   <div class="predicate">
+
     <div class="name-spacer">
-      <div class="expansion-toggle-trigger"
-           (click)="toggleExpansion()"
+      <div class="icon expansion-toggle-trigger"
+           (click)="toggleExpansion(); $event.stopPropagation()"
            [class.is-disabled]="state.childNodes.length === 0"
            [class.is-expanded]="state.isExpanded">
-        <div class="icon">
-          <fa-icon icon="chevron-right"
-                   class="expansion-toggle-icon"></fa-icon>
-        </div>
-        <h3 class="is-size-5">
-          {{ state.predicateKindName }}
-        </h3>
+        <fa-icon icon="chevron-right"
+                 class="expansion-toggle-icon"></fa-icon>
       </div>
+      <h3 class="is-size-5">
+        {{ state.predicateKindName }}
+      </h3>
       <div></div>
     </div>
+
     <div class="parameter-preview">
       <span *ngFor="let parameter of state.parameters; trackBy: trackByParameterName"
             class="parameter">
@@ -22,9 +25,12 @@
         <span class="value">{{ parameter.value }}</span>
       </span>
     </div>
+
   </div>
+
   <div class="response-generator"
        *ngIf="!!state.responseGenerator">
+
     <div class="name-spacer">
       <div class="icon">
         <fa-icon icon="arrow-left"></fa-icon>
@@ -33,6 +39,7 @@
         {{ state.responseGenerator!.responseGeneratorKindName }}
       </h3>
     </div>
+
     <div class="parameter-preview">
       <span *ngFor="let parameter of state.responseGenerator!.parameters; trackBy: trackByParameterName"
             class="parameter">
@@ -40,16 +47,9 @@
         <span class="value">{{ parameter.value }}</span>
       </span>
     </div>
+
   </div>
-  <div class="buttons">
-    <button class="button is-primary"
-            type="button">
-      <span>Edit</span>
-      <span class="icon is-small">
-        <fa-icon icon="edit"></fa-icon>
-      </span>
-    </button>
-  </div>
+
 </div>
 
 <sim-expansion-container [isCollapsed]="!state.isExpanded">
