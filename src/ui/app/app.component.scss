@@ -1,4 +1,14 @@
+@import 'constants';
+@import "~bulma/sass/utilities/mixins";
+
 :host {
   display: block;
   padding-top: 2rem;
+}
+
+@include until($desktop) {
+  :host {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
