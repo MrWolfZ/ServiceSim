@@ -1,15 +1,17 @@
-<div class="columns is-multiline">
-  <div class="column is-12-tablet is-6-desktop is-8-widescreen">
+<div class="columns">
+  <div class="column is-12-tablet is-6-desktop is-8-widescreen tree-column">
     <h1 class="title">
       Predicate Tree
     </h1>
 
-    <sim-predicate-node *ngFor="let node of (state$ | async).topLevelNodes; trackBy: trackByNodeId"
-                        [state]="node"></sim-predicate-node>
+    <div class="nodes">
+      <sim-predicate-node *ngFor="let node of (state$ | async).topLevelNodes; trackBy: trackByNodeId"
+                          [state]="node"></sim-predicate-node>
+    </div>
   </div>
 
   <!-- TODO build open and close mechanism for small devices -->
-  <div class="column is-12-tablet is-6-desktop is-4-widescreen">
+  <div class="column is-12-tablet is-6-desktop is-4-widescreen details-column">
     <sim-predicate-node-details [state]="(selectedNode$ | async)">
     </sim-predicate-node-details>
   </div>

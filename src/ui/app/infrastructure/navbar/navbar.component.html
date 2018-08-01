@@ -2,6 +2,7 @@
      role="navigation"
      aria-label="main navigation">
   <div class="container is-fluid">
+
     <div class="navbar-brand">
       <a role="button"
          class="navbar-burger has-text-white"
@@ -12,25 +13,31 @@
         <span></span>
       </a>
     </div>
+
     <div class="navbar-menu"
          [class.is-active]="state.menuIsOpen">
       <div class="navbar-start">
+
         <a class="navbar-item has-text-white"
            (click)="closeMenu()"
            predicateTreeLink>
           Predicate Tree
         </a>
+
         <a class="navbar-item has-text-white"
            (click)="closeMenu()"
            predicateKindsLink>
           Predicate Kinds
         </a>
+
         <a class="navbar-item has-text-white"
            (click)="closeMenu()"
            responseGeneratorKindsLink>
           Response Generator Kinds
         </a>
+
       </div>
+
     </div>
   </div>
 </nav>

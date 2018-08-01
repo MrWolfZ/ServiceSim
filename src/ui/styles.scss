@@ -5,6 +5,19 @@
 @import '~bulma-checkradio/dist/css/bulma-checkradio';
 @import '~bulma-tooltip/dist/css/bulma-tooltip';
 
+html, body {
+  height: 100%;
+  overflow: auto;
+}
+
+.page {
+  height: 100%;
+  display: block;
+  padding: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .modal {
   display: flex;
   opacity: 0;

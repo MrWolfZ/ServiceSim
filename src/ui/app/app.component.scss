@@ -1,14 +1,6 @@
 @import 'constants';
-@import "~bulma/sass/utilities/mixins";
 
-:host {
-  display: block;
-  padding-top: 2rem;
-}
-
-@include until($desktop) {
-  :host {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+.main-content {
+  margin-top: 4rem;
+  height: calc(100% - 4rem);
 }
