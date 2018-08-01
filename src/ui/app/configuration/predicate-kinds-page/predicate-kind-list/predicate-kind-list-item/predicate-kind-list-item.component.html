@@ -1,123 +1,125 @@
-<form [class.is-readonly]="state.isReadOnly"
-      [ngrxFormState]="state.formState">
-  <div class="buttons is-pulled-right is-marginless"
-       *ngIf="!state.isNewItem">
-    <div *ngIf="!state.isEditing">
-      <button class="button is-danger"
-              type="button"
-              [class.is-loading]="state.isDeleting"
-              (click)="delete()"
-              [disabled]="state.isDeleting">
-        <span>Delete</span>
-        <span class="icon is-small">
-          <fa-icon icon="times"></fa-icon>
-        </span>
-      </button>
-      <button class="button is-primary"
-              type="button"
-              (click)="startEdit()"
-              [disabled]="state.isDeleting">
-        <span>Edit</span>
-        <span class="icon is-small">
-          <fa-icon icon="edit"></fa-icon>
-        </span>
-      </button>
+<div class="box">
+  <form [class.is-readonly]="state.isReadOnly"
+        [ngrxFormState]="state.formState">
+    <div class="buttons is-pulled-right is-marginless"
+         *ngIf="!state.isNewItem">
+      <div *ngIf="!state.isEditing">
+        <button class="button is-danger"
+                type="button"
+                [class.is-loading]="state.isDeleting"
+                (click)="delete()"
+                [disabled]="state.isDeleting">
+          <span>Delete</span>
+          <span class="icon is-small">
+            <fa-icon icon="times"></fa-icon>
+          </span>
+        </button>
+        <button class="button is-primary"
+                type="button"
+                (click)="startEdit()"
+                [disabled]="state.isDeleting">
+          <span>Edit</span>
+          <span class="icon is-small">
+            <fa-icon icon="edit"></fa-icon>
+          </span>
+        </button>
+      </div>
+      <div *ngIf="state.isEditing">
+        <button class="button is-danger"
+                type="button"
+                (click)="cancelEdit()"
+                [disabled]="state.isSaving">
+          <span>Cancel</span>
+          <span class="icon is-small">
+            <fa-icon icon="times"></fa-icon>
+          </span>
+        </button>
+        <button class="button is-success"
+                (click)="submitEdit()"
+                [disabled]="state.formState.isInvalid && state.formState.isSubmitted"
+                [class.is-loading]="state.isSaving">
+          <span>Save</span>
+          <span class="icon is-small">
+            <fa-icon icon="check"></fa-icon>
+          </span>
+        </button>
+      </div>
     </div>
-    <div *ngIf="state.isEditing">
-      <button class="button is-danger"
-              type="button"
-              (click)="cancelEdit()"
-              [disabled]="state.isSaving">
-        <span>Cancel</span>
-        <span class="icon is-small">
-          <fa-icon icon="times"></fa-icon>
-        </span>
-      </button>
-      <button class="button is-success"
-              (click)="submitEdit()"
-              [disabled]="state.formState.isInvalid && state.formState.isSubmitted"
-              [class.is-loading]="state.isSaving">
-        <span>Save</span>
-        <span class="icon is-small">
-          <fa-icon icon="check"></fa-icon>
-        </span>
-      </button>
+    <div class="field title">
+      <p class="control">
+        <input class="input"
+               type="text"
+               placeholder="Name"
+               [ngrxFormControlState]="state.formState.controls.name"
+               [readonly]="state.isReadOnly"
+               [class.is-paddingless]="state.isReadOnly">
+        <sim-form-control-errors [formState]="state.formState.controls.name">
+          <span class="help is-danger"
+                *ngIf="state.formState.errors['_name']?.required">
+            Please enter a name
+          </span>
+        </sim-form-control-errors>
+      </p>
     </div>
-  </div>
-  <div class="field title">
-    <p class="control">
-      <input class="input"
-             type="text"
-             placeholder="Name"
-             [ngrxFormControlState]="state.formState.controls.name"
-             [readonly]="state.isReadOnly"
-             [class.is-paddingless]="state.isReadOnly">
-      <sim-form-control-errors [formState]="state.formState.controls.name">
-        <span class="help is-danger"
-              *ngIf="state.formState.errors['_name']?.required">
-          Please enter a name
-        </span>
-      </sim-form-control-errors>
-    </p>
-  </div>
-  <div class="field">
-    <p class="control">
-      <input class="input"
-             placeholder="Description"
-             [ngrxFormControlState]="state.formState.controls.description"
-             [readonly]="state.isReadOnly"
-             [class.is-paddingless]="state.isReadOnly">
-      <sim-form-control-errors [formState]="state.formState.controls.description">
-        <span class="help is-danger"
-              *ngIf="state.formState.errors['_description']?.required">
-          Please enter a description
-        </span>
-      </sim-form-control-errors>
-    </p>
-  </div>
-  <div class="field">
-    <label class="label">Function Body</label>
-    <p class="control">
-      <textarea class="textarea code"
-                rows="3"
-                [ngrxFormControlState]="state.formState.controls.evalFunctionBody"
-                [readonly]="state.isReadOnly">
+    <div class="field">
+      <p class="control">
+        <input class="input"
+               placeholder="Description"
+               [ngrxFormControlState]="state.formState.controls.description"
+               [readonly]="state.isReadOnly"
+               [class.is-paddingless]="state.isReadOnly">
+        <sim-form-control-errors [formState]="state.formState.controls.description">
+          <span class="help is-danger"
+                *ngIf="state.formState.errors['_description']?.required">
+            Please enter a description
+          </span>
+        </sim-form-control-errors>
+      </p>
+    </div>
+    <div class="field">
+      <label class="label">Function Body</label>
+      <p class="control">
+        <textarea class="textarea code"
+                  rows="3"
+                  [ngrxFormControlState]="state.formState.controls.evalFunctionBody"
+                  [readonly]="state.isReadOnly">
       </textarea>
-      <sim-form-control-errors [formState]="state.formState.controls.evalFunctionBody">
-        <span class="help is-danger"
-              *ngIf="state.formState.errors['_evalFunctionBody']?.required">
-          Please enter a function body
-        </span>
-      </sim-form-control-errors>
-    </p>
-  </div>
-  <div class="tile is-ancestor parameters">
-    <div class="tile is-12 is-vertical is-parent">
-      <div class="tile is-12 is-child parameters-title">
-        <label class="label">Parameters</label>
-        <p *ngIf="parameterControls.length === 0">
-          This predicate kind does not have any parameters.
-        </p>
-      </div>
-      <div class="tile is-12 is-child box parameter"
-           *ngFor="let item of parameterControls; let i = index; trackBy: trackByIndex">
-        <sim-predicate-kind-parameter [state]="state.parameters[i]"
-                                      [formState]="item"
-                                      (deleteButtonClicked)="removeParameter(i)"></sim-predicate-kind-parameter>
-      </div>
-      <sim-expansion-container [isCollapsed]="!state.isEditing">
-        <div class="tile is-12 is-child">
-          <button class="button is-primary"
-                  type="button"
-                  (click)="addParameter()"
-                  [disabled]="state.isSaving">
-            <span>Add Parameter</span>
-            <span class="icon is-small">
-              <fa-icon icon="plus"></fa-icon>
-            </span>
-          </button>
-        </div>
-      </sim-expansion-container>
+        <sim-form-control-errors [formState]="state.formState.controls.evalFunctionBody">
+          <span class="help is-danger"
+                *ngIf="state.formState.errors['_evalFunctionBody']?.required">
+            Please enter a function body
+          </span>
+        </sim-form-control-errors>
+      </p>
     </div>
-  </div>
-</form>
+    <div class="tile is-ancestor parameters">
+      <div class="tile is-12 is-vertical is-parent">
+        <div class="tile is-12 is-child parameters-title">
+          <label class="label">Parameters</label>
+          <p *ngIf="parameterControls.length === 0">
+            This predicate kind does not have any parameters.
+          </p>
+        </div>
+        <div class="tile is-12 is-child box parameter"
+             *ngFor="let item of parameterControls; let i = index; trackBy: trackByIndex">
+          <sim-predicate-kind-parameter [state]="state.parameters[i]"
+                                        [formState]="item"
+                                        (deleteButtonClicked)="removeParameter(i)"></sim-predicate-kind-parameter>
+        </div>
+        <sim-expansion-container [isCollapsed]="!state.isEditing">
+          <div class="tile is-12 is-child">
+            <button class="button is-primary"
+                    type="button"
+                    (click)="addParameter()"
+                    [disabled]="state.isSaving">
+              <span>Add Parameter</span>
+              <span class="icon is-small">
+                <fa-icon icon="plus"></fa-icon>
+              </span>
+            </button>
+          </div>
+        </sim-expansion-container>
+      </div>
+    </div>
+  </form>
+</div>

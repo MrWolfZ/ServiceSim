@@ -56,9 +56,7 @@
   <div class="columns is-multiline">
     <div class="column is-4-fullhd is-6-desktop is-12-tablet"
          *ngFor="let item of state.items; trackBy: trackById">
-      <div class="box">
-        <sim-predicate-kind-list-item [state]="item"></sim-predicate-kind-list-item>
-      </div>
+      <sim-predicate-kind-list-item [state]="item"></sim-predicate-kind-list-item>
     </div>
   </div>
 </div>

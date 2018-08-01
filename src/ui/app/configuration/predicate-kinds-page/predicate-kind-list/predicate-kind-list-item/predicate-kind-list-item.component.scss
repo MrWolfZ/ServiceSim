@@ -1,6 +1,10 @@
 @import 'constants';
 @import "~bulma/sass/utilities/mixins";
 
+:host>.box {
+  height: 100%;
+}
+
 @include from($desktop) {
   :host {
     .buttons {
