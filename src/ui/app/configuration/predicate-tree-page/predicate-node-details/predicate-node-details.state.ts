@@ -6,4 +6,8 @@ export interface PredicateNodeDetailsState extends PredicateNodeDetailsDto {
 
 export const INITIAL_PREDICATE_NODE_DETAILS_STATE: PredicateNodeDetailsState = {
   nodeId: '',
+  predicateKindName: '',
+  childNodes: [],
+  parameters: [],
+  responseGenerator: undefined,
 };

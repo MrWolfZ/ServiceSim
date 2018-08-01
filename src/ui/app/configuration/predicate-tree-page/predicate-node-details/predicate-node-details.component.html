@@ -10,8 +10,164 @@
 <div class="box"
      *ngIf="state">
 
-  <p>predicate-node-details works!</p>
-  Component State:
-  <pre>{{ state | json }}</pre>
+  <div class="level is-marginless is-mobile">
+
+    <div class="level-left">
+      <h2 class="name is-size-5">
+        {{ state!.predicateKindName }}
+      </h2>
+    </div>
+
+    <div class="level-right">
+
+      <div class="buttons is-marginless">
+
+        <button class="button is-danger"
+                type="button">
+          <span>Delete</span>
+          <span class="icon is-small">
+            <fa-icon icon="times"></fa-icon>
+          </span>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="group">
+
+    <label class="label">
+      Parameters
+    </label>
+
+    <p *ngIf="state!.parameters.length === 0">
+      This predicate node does not have any parameters.
+    </p>
+
+    <div class="parameter"
+         *ngFor="let parameter of state!.parameters; trackBy: trackByIndex">
+
+      <label class="label">
+        {{ parameter.name }}:
+      </label>
+
+      <span class="value">
+        {{ parameter.value }}
+      </span>
+
+    </div>
+
+    <button class="button is-primary"
+            type="button"
+            *ngIf="state!.parameters.length > 0">
+      <span>Edit Parameters</span>
+      <span class="icon is-small">
+        <fa-icon icon="edit"></fa-icon>
+      </span>
+    </button>
+
+  </div>
+
+  <div class="group"
+       *ngIf="!state!.responseGenerator">
+
+    <label class="label">
+      Child Nodes
+    </label>
+
+    <p *ngIf="state!.childNodes.length === 0">
+      This predicate node does not have any child nodes.
+    </p>
+
+    <button class="button is-primary"
+            type="button">
+      <span>Add Child Node</span>
+      <span class="icon is-small">
+        <fa-icon icon="plus"></fa-icon>
+      </span>
+    </button>
+
+  </div>
+
+  <div class="group"
+       *ngIf="state!.childNodes.length === 0 && !state!.responseGenerator">
+
+    <label class="label">
+      Response Generator
+    </label>
+
+    <p>
+      This predicate node does not have a response generator.
+    </p>
+
+    <button class="button is-primary"
+            type="button">
+      <span>Set Response Generator</span>
+      <span class="icon is-small">
+        <fa-icon icon="plus"></fa-icon>
+      </span>
+    </button>
+
+  </div>
+
+</div>
+
+<h1 class="title"
+    *ngIf="state && state!.responseGenerator">
+  Response Generator
+</h1>
+
+
+<div class="box"
+     *ngIf="state && state!.responseGenerator">
+
+  <div class="level is-marginless is-mobile">
+
+    <div class="level-left">
+      <h2 class="name is-size-5">
+        {{ state!.responseGenerator!.responseGeneratorKindName }}
+      </h2>
+    </div>
+
+    <div class="level-right">
+
+      <div class="buttons is-marginless">
+
+        <button class="button is-danger"
+                type="button">
+          <span>Remove</span>
+          <span class="icon is-small">
+            <fa-icon icon="times"></fa-icon>
+          </span>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="group">
+
+    <label class="label">
+      Parameters
+    </label>
+
+    <p *ngIf="state!.responseGenerator!.parameters.length === 0">
+      This response generator does not have any parameters.
+    </p>
+
+    <button class="button is-primary"
+            type="button"
+            *ngIf="state!.responseGenerator!.parameters.length > 0">
+      <span>Edit Parameters</span>
+      <span class="icon is-small">
+        <fa-icon icon="edit"></fa-icon>
+      </span>
+    </button>
+
+  </div>
 
 </div>

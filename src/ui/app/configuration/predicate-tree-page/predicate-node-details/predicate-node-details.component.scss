@@ -5,9 +5,20 @@
   flex-direction: column;
   height: 100%;
 
-  >.box {
-    overflow-y: auto;
-    overflow-x: hidden;
+  // TODO: fix scrolling
+  // >.box {
+  //   overflow-y: auto;
+  //   overflow-x: hidden;
+  // }
+}
+
+.group {
+  &:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
+  >.button {
+    margin-top: 1rem;
   }
 }
 

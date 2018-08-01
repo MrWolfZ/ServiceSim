@@ -10,4 +10,8 @@ import { PredicateNodeDetailsState } from './predicate-node-details.state';
 })
 export class PredicateNodeDetailsComponent {
   @Input() state: PredicateNodeDetailsState | undefined;
+
+  trackByIndex(idx: number) {
+    return idx;
+  }
 }

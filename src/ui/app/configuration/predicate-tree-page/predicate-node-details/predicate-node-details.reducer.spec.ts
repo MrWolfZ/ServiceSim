@@ -5,6 +5,10 @@ import { INITIAL_PREDICATE_NODE_DETAILS_STATE } from './predicate-node-details.s
 
 export const MOCK_PREDICATE_NODE_DETAILS_DTO: PredicateNodeDetailsDto = {
   nodeId: 'nodeId',
+  predicateKindName: '',
+  childNodes: [],
+  parameters: [],
+  responseGenerator: undefined,
 };
 
 describe(predicateNodeDetailsReducer.name, () => {

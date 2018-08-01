@@ -104,21 +104,101 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
     nodeDetailsByNodeId: {
       '1': {
         nodeId: '1',
+        predicateKindName: 'Path Prefix',
+        childNodes: [
+          {
+            nodeId: '1.1',
+            predicateKindName: 'Path Pattern',
+          },
+          {
+            nodeId: '1.2',
+            predicateKindName: 'GET',
+          },
+        ],
+        parameters: [
+          {
+            name: 'Prefix',
+            value: '/api/books',
+          },
+        ],
+        responseGenerator: undefined,
       },
       '1.1': {
         nodeId: '1.1',
+        predicateKindName: 'Path Pattern',
+        childNodes: [
+          {
+            nodeId: '1.1.1',
+            predicateKindName: 'POST',
+          },
+        ],
+        parameters: [
+          {
+            name: 'Pattern',
+            value: '/api/books/:bookId',
+          },
+          {
+            name: 'Foo',
+            value: 'Bar',
+          },
+          {
+            name: 'Tick',
+            value: 'Tock',
+          },
+        ],
+        responseGenerator: undefined,
       },
       '1.1.1': {
         nodeId: '1.1.1',
+        predicateKindName: 'POST',
+        childNodes: [],
+        parameters: [],
+        responseGenerator: {
+          responseGeneratorKindName: 'Custom Code',
+          parameters: [
+            {
+              name: 'Code',
+              value: 'return { statusCode: 200, body: \'[{\"name\":\"LOTR\"}]\', contentType: "application/json" };',
+            },
+          ],
+        },
       },
       '1.2': {
         nodeId: '1.2',
+        predicateKindName: 'GET',
+        childNodes: [],
+        parameters: [],
+        responseGenerator: undefined,
       },
       '2': {
         nodeId: '2',
+        predicateKindName: 'Method',
+        childNodes: [],
+        parameters: [
+          {
+            name: 'Allowed Methods',
+            value: 'POST,PUT,DELETE',
+          },
+        ],
+        responseGenerator: {
+          responseGeneratorKindName: 'No Content',
+          parameters: [],
+        },
       },
       '3': {
         nodeId: '3',
+        predicateKindName: 'GET',
+        childNodes: [],
+        parameters: [],
+        responseGenerator: {
+          responseGeneratorKindName: 'Static File',
+          parameters: [
+            {
+              name: 'File Path',
+              value: '/home/files/path',
+            },
+          ],
+        },
       },
     },
   },
