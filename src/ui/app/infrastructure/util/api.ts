@@ -50,6 +50,10 @@ export function ask<TAskKind extends string, TResponse>(
     {
       blocksUi: options.blocksUi,
       showsLoadingBar: options.showsLoadingBar,
+      params: {
+        ...(options.params || {}),
+        kind: ask.kind,
+      },
     },
   );
 }
@@ -71,6 +75,10 @@ export function tell<TTellKind extends string, TResponse>(
     {
       blocksUi: options.blocksUi,
       showsLoadingBar: options.showsLoadingBar,
+      params: {
+        ...(options.params || {}),
+        kind: tell.kind,
+      },
     },
   );
 }

@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import { concat, Observable, ObservableInput } from 'rxjs';
 import { catchError, mergeMap, startWith } from 'rxjs/operators';
@@ -19,7 +19,7 @@ export interface CommonHttpOptions {
   headers?: HttpHeaders | {
     [header: string]: string | string[];
   };
-  params?: HttpParams | {
+  params?: {
     [param: string]: string | string[];
   };
   showsLoadingBar?: boolean;
