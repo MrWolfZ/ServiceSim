@@ -65,6 +65,32 @@ export async function initializeAsync() {
 
   await PredicateKind.saveAsync(pathPrefixPredicateKind);
 
+  const methodPredicateKind = PredicateKind.create(
+    'Method',
+    'Predicates of this kind match all requests that have one of a specified list of methods.',
+    'return parameters["Allowed Methods"].split(",").map(m => m.trim().toUpperCase()).includes(request.method.toUpperCase());',
+    [
+      {
+        name: 'Allowed Methods',
+        description: 'A comma separated list of methods to match.',
+        isRequired: true,
+        valueType: 'string',
+        defaultValue: 'GET,POST,PUT,DELETE',
+      },
+    ],
+  );
+
+  await PredicateKind.saveAsync(methodPredicateKind);
+
+  const getPredicateKind = PredicateKind.create(
+    'GET',
+    'Predicates of this kind match all GET requests',
+    'return request.method.toUpperCase() === "GET"',
+    [],
+  );
+
+  await PredicateKind.saveAsync(getPredicateKind);
+
   const allPredicateKind = PredicateKind.create(
     'All',
     'Predicates of this kind match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
