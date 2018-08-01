@@ -9,13 +9,13 @@ import { configurationRoutes } from './configuration.routing';
 
 import {
   PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME,
-  PredicateKindListComponent,
-  PredicateKindListItemComponent,
-  PredicateKindParameterComponent,
+  PredicateKindDialogComponent,
+  PredicateKindFormComponent,
   PredicateKindsPage,
   PredicateKindsPageEffects,
   PredicateKindsPageInitializationGuard,
   predicateKindsPageReducer,
+  PredicateKindTileComponent,
 } from './predicate-kinds-page';
 
 import {
@@ -39,11 +39,11 @@ import {
   declarations: [
     PredicateKindsPage,
     ResponseGeneratorsPage,
-    PredicateKindListComponent,
-    PredicateKindListItemComponent,
-    PredicateKindParameterComponent,
     PredicateTreePage,
     PredicateNodeComponent,
+    PredicateKindTileComponent,
+    PredicateKindDialogComponent,
+    PredicateKindFormComponent,
   ],
   imports: [
     InfrastructureModule,

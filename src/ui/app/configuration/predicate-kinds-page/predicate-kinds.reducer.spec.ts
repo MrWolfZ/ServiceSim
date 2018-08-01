@@ -3,10 +3,10 @@ import { PredicateKindsPageDto } from './predicate-kinds.dto';
 import { predicateKindsPageReducer } from './predicate-kinds.reducer';
 import { INITIAL_PREDICATE_KINDS_PAGE_STATE } from './predicate-kinds.state';
 
-import { MOCK_PREDICATE_KIND_LIST_DTO } from './predicate-kind-list/predicate-kind-list.reducer.spec';
+import { MOCK_PREDICATE_KIND_TILE_DTO } from './predicate-kind-tile/predicate-kind-tile.reducer.spec';
 
 export const MOCK_PREDICATE_KINDS_PAGE_DTO: PredicateKindsPageDto = {
-  predicateKindList: MOCK_PREDICATE_KIND_LIST_DTO,
+  tiles: [MOCK_PREDICATE_KIND_TILE_DTO],
 };
 
 describe(predicateKindsPageReducer.name, () => {

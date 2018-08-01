@@ -7,14 +7,8 @@ import { flatMap, map } from 'rxjs/operators';
 
 import { ask, tell } from 'app/infrastructure';
 
-import {
-  DeletePredicateKindAction,
-  DeletePredicateKindSuccessfulAction,
-  SaveEditedPredicateKindListItemAction,
-  SavingEditedPredicateKindListItemSuccessfulAction,
-  SubmitNewPredicateKindDialogAction,
-  SubmitNewPredicateKindDialogSuccessfulAction,
-} from './predicate-kind-list';
+import { PredicateKindDialogSubmitSuccessfulAction, SubmitPredicateKindDialogAction } from './predicate-kind-dialog';
+import { DeletePredicateKindAction } from './predicate-kind-tile';
 import { InitializePredicateKindsPageAction, LoadPredicateKindsPageDataAction } from './predicate-kinds.actions';
 import {
   askForPredicateKindsPageDto,
@@ -40,35 +34,21 @@ export class PredicateKindsPageEffects {
   );
 
   @Effect()
-  createNewPredicateKind$: Observable<Action> = this.actions$.pipe(
-    ofType(SubmitNewPredicateKindDialogAction.TYPE),
-    map(a => a as SubmitNewPredicateKindDialogAction),
-    flatMap(a =>
-      tell(
-        this.http,
-        tellToCreateOrUpdatePredicateKind(a.formValue),
-        dto => [
-          new SubmitNewPredicateKindDialogSuccessfulAction(dto.predicateKindId),
-        ],
-      )
-    ),
-  );
-
-  @Effect()
-  updatePredicateKind$: Observable<Action> = this.actions$.pipe(
-    ofType(SaveEditedPredicateKindListItemAction.TYPE),
-    map(a => a as SaveEditedPredicateKindListItemAction),
+  createOrUpdatePredicateKind$: Observable<Action> = this.actions$.pipe(
+    ofType(SubmitPredicateKindDialogAction.TYPE),
+    map(a => a as SubmitPredicateKindDialogAction),
     flatMap(a =>
       tell(
         this.http,
         tellToCreateOrUpdatePredicateKind(a.formValue, a.predicateKindId),
-        () => [
-          new SavingEditedPredicateKindListItemSuccessfulAction(a.predicateKindId),
+        dto => [
+          new PredicateKindDialogSubmitSuccessfulAction(dto.predicateKindId, a.formValue),
         ],
       )
     ),
   );
 
+  // TODO: deal with failure
   @Effect()
   deletePredicateKind$: Observable<Action> = this.actions$.pipe(
     ofType(DeletePredicateKindAction.TYPE),
@@ -77,9 +57,7 @@ export class PredicateKindsPageEffects {
       tell(
         this.http,
         createDeletePredicateKindCommand(a.predicateKindId),
-        () => [
-          new DeletePredicateKindSuccessfulAction(a.predicateKindId),
-        ],
+        () => [],
       )
     ),
   );

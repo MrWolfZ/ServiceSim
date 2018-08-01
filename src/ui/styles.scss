@@ -5,25 +5,6 @@
 @import '~bulma-checkradio/dist/css/bulma-checkradio';
 @import '~bulma-tooltip/dist/css/bulma-tooltip';
 
-form.is-readonly .field {
-  &:not(:last-child):not(.preserve-margin) {
-    margin-bottom: 0rem;
-  }
-
-  >.control {
-    >.input,
-    >.textarea {
-      box-shadow: none;
-
-      &:not(.code) {
-        background-color: transparent;
-      }
-
-      resize: none;
-    }
-  }
-}
-
 .modal {
   display: flex;
   opacity: 0;
@@ -39,14 +20,6 @@ form.is-readonly .field {
   .textarea,
   .select>select {
     background-color: $body-background-color;
-  }
-}
-
-.field {
-  transition: all ease 200ms;
-
-  &:not(:last-child) {
-    margin-bottom: 0.7rem;
   }
 }
 

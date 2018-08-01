@@ -4,8 +4,8 @@ import { PredicateKind, PredicateKindCreatedOrUpdated, PredicateKindDeleted } fr
 import { EventLog, failure, success } from '../../../../infrastructure';
 
 import { Ask, Tell } from '../../infrastructure/infrastructure.dto';
-import { PredicateKindListItemDto } from './predicate-kind-list/predicate-kind-list-item/predicate-kind-list-item.dto';
-import { validatePredicateKindListItem } from './predicate-kind-list/predicate-kind-list-item/predicate-kind-list-item.validation';
+import { validatePredicateKindDialog } from './predicate-kind-dialog/predicate-kind-dialog.validation';
+import { PredicateKindTileDto } from './predicate-kind-tile/predicate-kind-tile.dto';
 import {
   ASK_FOR_PREDICATE_KINDS_PAGE_DTO,
   AskForPredicateKindsPageDto,
@@ -27,16 +27,14 @@ type SubscribedEvents =
   ;
 
 let dto: PredicateKindsPageDto = {
-  predicateKindList: {
-    items: [],
-  },
+  tiles: [],
 };
 
 export class PredicateKindsApi {
   static start() {
     return EventLog.subscribeToStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS, {
       [PredicateKindCreatedOrUpdated.KIND]: ev => {
-        const item: PredicateKindListItemDto = {
+        const item: PredicateKindTileDto = {
           predicateKindId: ev.predicateKindId,
           name: ev.name,
           description: ev.description,
@@ -44,30 +42,24 @@ export class PredicateKindsApi {
           parameters: ev.parameters,
         };
 
-        const items = [
-          ...dto.predicateKindList.items.filter(i => i.predicateKindId !== item.predicateKindId),
+        const tiles = [
+          ...dto.tiles.filter(i => i.predicateKindId !== item.predicateKindId),
           item,
         ].sort((l, r) => l.name.localeCompare(r.name));
 
         dto = {
           ...dto,
-          predicateKindList: {
-            ...dto.predicateKindList,
-            items,
-          },
+          tiles,
         };
 
         return;
       },
       [PredicateKindDeleted.KIND]: ev => {
-        const items = dto.predicateKindList.items.filter(i => i.predicateKindId !== ev.predicateKindId);
+        const tiles = dto.tiles.filter(i => i.predicateKindId !== ev.predicateKindId);
 
         dto = {
           ...dto,
-          predicateKindList: {
-            ...dto.predicateKindList,
-            items,
-          },
+          tiles,
         };
 
         return;
@@ -103,7 +95,7 @@ export class PredicateKindsApi {
   }
 
   static async createOrUpdatePredicateKind(tell: TellToCreateOrUpdatePredicateKind) {
-    const isValid = validatePredicateKindListItem(createFormGroupState('', tell.formValue)).isValid;
+    const isValid = validatePredicateKindDialog(createFormGroupState('', tell.formValue)).isValid;
 
     if (!isValid) {
       return failure();

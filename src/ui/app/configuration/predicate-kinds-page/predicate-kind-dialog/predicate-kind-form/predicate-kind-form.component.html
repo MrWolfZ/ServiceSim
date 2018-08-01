@@ -1,0 +1,203 @@
+<div class="field title">
+  <p class="control">
+    <input class="input"
+           type="text"
+           placeholder="Name"
+           [ngrxFormControlState]="formState.controls.name">
+    <sim-form-control-errors [formState]="formState.controls.name">
+      <span class="help is-danger"
+            *ngIf="formState.errors['_name']?.required">
+        Please enter a name
+      </span>
+    </sim-form-control-errors>
+  </p>
+</div>
+
+<div class="field">
+  <p class="control">
+    <textarea class="textarea"
+              rows="3"
+              placeholder="Description"
+              [ngrxFormControlState]="formState.controls.description">
+    </textarea>
+    <sim-form-control-errors [formState]="formState.controls.description">
+      <span class="help is-danger"
+            *ngIf="formState.errors['_description']?.required">
+        Please enter a description
+      </span>
+    </sim-form-control-errors>
+  </p>
+</div>
+
+<div class="field">
+  <label class="label">Function Body</label>
+  <p class="control">
+    <textarea class="textarea code"
+              rows="5"
+              [ngrxFormControlState]="formState.controls.evalFunctionBody">
+    </textarea>
+    <sim-form-control-errors [formState]="formState.controls.evalFunctionBody">
+      <span class="help is-danger"
+            *ngIf="formState.errors['_evalFunctionBody']?.required">
+        Please enter a function body
+      </span>
+    </sim-form-control-errors>
+  </p>
+</div>
+
+<div class="tile is-ancestor parameters">
+  <div class="tile is-12 is-vertical is-parent">
+    <div class="tile is-12 is-child parameters-title">
+      <label class="label">Parameters</label>
+    </div>
+
+    <div class="tile is-12 is-child box parameter"
+         *ngFor="let parameter of parameterControls; let i = index; trackBy: trackByIndex">
+
+      <div class="field">
+        <label class="label">
+          Parameter Name
+        </label>
+        <div class="control">
+          <input class="input"
+                 type="text"
+                 [ngrxFormControlState]="parameter.controls.name">
+          <sim-form-control-errors [formState]="parameter.controls.name">
+            <span class="help is-danger"
+                  *ngIf="parameter.controls.name.errors.required">
+              Please enter a name
+            </span>
+          </sim-form-control-errors>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">
+          Description
+        </label>
+        <div class="control">
+          <input class="input"
+                 type="text"
+                 [ngrxFormControlState]="parameter.controls.description">
+          <sim-form-control-errors [formState]="parameter.controls.description">
+            <span class="help is-danger"
+                  *ngIf="parameter.controls.description.errors.required">
+              Please enter a description
+            </span>
+          </sim-form-control-errors>
+        </div>
+      </div>
+
+      <div class="columns is-mobile">
+
+        <div class="column is-narrow">
+          <div class="field">
+            <label class="label">Is Required?</label>
+            <div class="control radio-control">
+              <input type="radio"
+                     id="{{ parameter.controls.isRequired.id }}.yes"
+                     class="is-checkradio is-rtl is-white"
+                     [value]="true"
+                     [ngrxFormControlState]="parameter.controls.isRequired">
+              <label for="{{ parameter.controls.isRequired.id }}.yes">
+                Yes
+              </label>
+              <input type="radio"
+                     id="{{ parameter.controls.isRequired.id }}.no"
+                     class="is-checkradio is-rtl is-white"
+                     [value]="false"
+                     [ngrxFormControlState]="parameter.controls.isRequired">
+              <label for="{{ parameter.controls.isRequired.id }}.no">
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-narrow">
+          <div class="field">
+            <label class="label">Value Type</label>
+            <div class="control">
+              <div class="select">
+                <select class="is-borderless"
+                        [ngrxFormControlState]="parameter.controls.valueType">
+                  <option value="string">string</option>
+                  <option value="boolean">boolean</option>
+                  <option value="number">number</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field">
+            <label class="label">
+              Default Value
+            </label>
+
+            <div class="control"
+                 *ngIf="parameter.value.valueType === 'string'">
+              <input class="input"
+                     type="text"
+                     [ngrxFormControlState]="parameter.controls.defaultValue">
+            </div>
+
+            <div class="control"
+                 *ngIf="parameter.value.valueType === 'number'">
+              <input class="input"
+                     type="number"
+                     [ngrxFormControlState]="parameter.controls.defaultValue">
+            </div>
+
+            <div class="control radio-control"
+                 *ngIf="parameter.value.valueType === 'boolean'">
+
+              <input type="radio"
+                     id="{{ parameter.controls.defaultValue.id }}.true"
+                     class="is-checkradio is-rtl is-white"
+                     [value]="true"
+                     [ngrxFormControlState]="parameter.controls.defaultValue">
+              <label for="{{ parameter.controls.defaultValue.id }}.true">
+                True
+              </label>
+
+              <input type="radio"
+                     id="{{ parameter.controls.defaultValue.id }}.false"
+                     class="is-checkradio is-rtl is-white"
+                     [value]="false"
+                     [ngrxFormControlState]="parameter.controls.defaultValue">
+              <label for="{{ parameter.controls.defaultValue.id }}.false">
+                False
+              </label>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="button is-danger"
+              type="button"
+              (click)="removeParameter(i)">
+        <span>Remove</span>
+        <span class="icon is-small">
+          <fa-icon icon="times"></fa-icon>
+        </span>
+      </button>
+
+    </div>
+
+    <div class="tile is-12 is-child">
+      <button class="button is-primary"
+              type="button"
+              (click)="addParameter()"
+              [disabled]="formState.userDefinedProperties['isSaving']">
+        <span>Add Parameter</span>
+        <span class="icon is-small">
+          <fa-icon icon="plus"></fa-icon>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

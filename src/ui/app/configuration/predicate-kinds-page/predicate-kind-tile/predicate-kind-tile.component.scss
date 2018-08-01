@@ -18,24 +18,37 @@
   }
 }
 
-.field.title {
-  max-width: 500px;
-  display: inline-block;
+.name {  
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.description {
+  margin-bottom: 1rem;
 }
 
 .parameters {
-  padding-top: 0.5rem;
-
-  >.tile>div.parameters-title {
-    margin-bottom: 0.5rem !important;
-  }
+  padding-top: 1rem;
 }
 
-.tile.box {
+.parameters-title {
+  margin-bottom: 0.5rem;
+}
+
+.parameter.box {
   border: 1px solid $background;
 }
 
 .parameter {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.parameter-name {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.parameter-description {
+  margin-bottom: 0.5rem;
 }

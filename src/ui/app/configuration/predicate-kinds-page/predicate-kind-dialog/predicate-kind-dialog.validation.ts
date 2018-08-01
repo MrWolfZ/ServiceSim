@@ -1,7 +1,7 @@
-import { setValue, updateGroup, validate } from 'ngrx-forms';
+import { setValue, updateArray, updateGroup, validate } from 'ngrx-forms';
 import { required } from 'ngrx-forms/validation';
 
-import { PredicateKindParameterFormValue } from './predicate-kind-parameter.dto';
+import { PredicateKindDialogFormValue, PredicateKindParameterFormValue } from './predicate-kind-dialog.dto';
 
 export const validatePredicateKindParameter = updateGroup<PredicateKindParameterFormValue>({
   name: validate(required),
@@ -21,4 +21,12 @@ export const validatePredicateKindParameter = updateGroup<PredicateKindParameter
 
     return defaultValue;
   },
+});
+
+// TODO: validate distinct names of parameters
+export const validatePredicateKindDialog = updateGroup<PredicateKindDialogFormValue>({
+  name: validate(required),
+  description: validate(required),
+  evalFunctionBody: validate(required),
+  parameters: updateArray(validatePredicateKindParameter),
 });

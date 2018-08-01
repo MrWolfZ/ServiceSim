@@ -16,7 +16,13 @@ export class InitializePredicateKindsPageAction implements Action {
   ) {}
 }
 
+export class OpenNewPredicateKindDialogAction implements Action {
+  static readonly TYPE = 'configuration/predicate-kinds-page/OPEN_NEW_PREDICATE_KIND_DIALOG';
+  readonly type = OpenNewPredicateKindDialogAction.TYPE;
+}
+
 export type PredicateKindsPageActions =
   | LoadPredicateKindsPageDataAction
   | InitializePredicateKindsPageAction
+  | OpenNewPredicateKindDialogAction
   ;

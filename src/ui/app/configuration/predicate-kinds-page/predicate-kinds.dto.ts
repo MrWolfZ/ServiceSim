@@ -1,10 +1,10 @@
 import { Ask, Tell } from '../../infrastructure/infrastructure.dto';
 
-import { PredicateKindListItemFormValue } from './predicate-kind-list/predicate-kind-list-item/predicate-kind-list-item.dto';
-import { PredicateKindListDto } from './predicate-kind-list/predicate-kind-list.dto';
+import { PredicateKindDialogFormValue } from './predicate-kind-dialog/predicate-kind-dialog.dto';
+import { PredicateKindTileDto } from './predicate-kind-tile/predicate-kind-tile.dto';
 
 export interface PredicateKindsPageDto {
-  predicateKindList: PredicateKindListDto;
+  tiles: PredicateKindTileDto[];
 }
 
 export const ASK_FOR_PREDICATE_KINDS_PAGE_DTO = 'configuration/predicate-kinds-page/ASK_FOR_PAGE_DTO';
@@ -19,10 +19,10 @@ export const TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND = 'configuration/predicate-
 
 export interface TellToCreateOrUpdatePredicateKind extends Tell<typeof TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND, { predicateKindId: string }> {
   predicateKindId?: string;
-  formValue: PredicateKindListItemFormValue;
+  formValue: PredicateKindDialogFormValue;
 }
 
-export function tellToCreateOrUpdatePredicateKind(formValue: PredicateKindListItemFormValue, predicateKindId?: string): TellToCreateOrUpdatePredicateKind {
+export function tellToCreateOrUpdatePredicateKind(formValue: PredicateKindDialogFormValue, predicateKindId?: string): TellToCreateOrUpdatePredicateKind {
   return {
     kind: TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND,
     formValue,

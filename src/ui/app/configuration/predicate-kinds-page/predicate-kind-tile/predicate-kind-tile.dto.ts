@@ -6,10 +6,10 @@ export interface PredicateKindParameterDto {
   defaultValue: string | boolean | number;
 }
 
-export interface PredicateKindParameterFormValue {
+export interface PredicateKindTileDto {
+  predicateKindId: string;
   name: string;
   description: string;
-  isRequired: boolean;
-  valueType: 'string' | 'boolean' | 'number';
-  defaultValue: string | boolean | number;
+  evalFunctionBody: string;
+  parameters: PredicateKindParameterDto[];
 }
