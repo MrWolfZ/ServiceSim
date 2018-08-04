@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-
+  
   // TODO: fix scrolling
   // >.box {
   //   overflow-y: auto;
@@ -16,12 +16,21 @@
   &:not(:last-child) {
     margin-bottom: 1rem;
   }
+}
 
-  >.button {
-    margin-top: 1rem;
+.parameter {
+  display: flex;
+
+  +button {
+    margin-top: 1em;
   }
 }
 
-.name {
-  margin-bottom: 1rem;
+.child-node+button {
+  margin-top: 1em;
+}
+
+.label {
+  margin-bottom: 0;
+  margin-right: 0.25rem;
 }
