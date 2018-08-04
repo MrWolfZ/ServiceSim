@@ -4,7 +4,7 @@ import { PredicateNode } from './predicate-node';
 describe('Predicate', () => {
   it('should save and load', async () => {
     const predicateTemplate = PredicateTemplate.create('Test', 'Description', 'return true;', []);
-    const predicateNode = PredicateNode.create(predicateTemplate, {}, undefined);
+    const predicateNode = PredicateNode.create(predicateTemplate, 'Test', {}, undefined);
 
     await PredicateNode.saveAsync(predicateNode);
 
@@ -18,7 +18,7 @@ describe('Predicate', () => {
 
   it('should save snapshot and load', async () => {
     const predicateTemplate = PredicateTemplate.create('Test', 'Description', 'return true;', []);
-    const predicateNode = PredicateNode.create(predicateTemplate, {}, undefined);
+    const predicateNode = PredicateNode.create(predicateTemplate, 'Test', {}, undefined);
 
     await PredicateNode.saveSnapshotAsync(predicateNode);
 

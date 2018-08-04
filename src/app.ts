@@ -100,29 +100,47 @@ export async function initializeAsync() {
 
   await PredicateTemplate.saveAsync(allPredicateTemplate);
 
-  const topLevelPredicateNode1 = PredicateNode.create(pathPrefixPredicateTemplate, {
-    Prefix: '/api',
-  }, undefined);
+  const topLevelPredicateNode1 = PredicateNode.create(
+    pathPrefixPredicateTemplate,
+    pathPrefixPredicateTemplate.name,
+    {
+      Prefix: '/api',
+    },
+    undefined,
+  );
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const childPredicateNode1 = PredicateNode.create(pathPrefixPredicateTemplate, {
-    Prefix: '/api/books',
-  }, undefined);
+  const childPredicateNode1 = PredicateNode.create(
+    pathPrefixPredicateTemplate,
+    pathPrefixPredicateTemplate.name,
+    {
+      Prefix: '/api/books',
+    },
+    undefined,
+  );
 
-  childPredicateNode1.setResponseGenerator(staticResponseGeneratorTemplate, {
-    'Status Code': 200,
-    'Body': JSON.stringify([{ title: 'LOTR' }]),
-    'Content Type': 'application/json',
-  });
+  childPredicateNode1.setResponseGenerator(
+    staticResponseGeneratorTemplate,
+    {
+      'Status Code': 200,
+      'Body': JSON.stringify([{ title: 'LOTR' }]),
+      'Content Type': 'application/json',
+    },
+  );
 
   await PredicateNode.saveAsync(childPredicateNode1);
 
   topLevelPredicateNode1.addChildPredicate(childPredicateNode1.id);
 
-  const childPredicateNode2 = PredicateNode.create(pathPrefixPredicateTemplate, {
-    Prefix: '/api/authors',
-  }, undefined);
+  const childPredicateNode2 = PredicateNode.create(
+    pathPrefixPredicateTemplate,
+    pathPrefixPredicateTemplate.name,
+    {
+      Prefix: '/api/authors',
+    },
+    undefined,
+  );
 
   childPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, {
     'Status Code': 200,
@@ -136,7 +154,7 @@ export async function initializeAsync() {
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate, {}, undefined);
+  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate, allPredicateTemplate.name, {}, undefined);
   topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, { 'Status Code': 204 });
 
   await PredicateNode.saveAsync(topLevelPredicateNode2);

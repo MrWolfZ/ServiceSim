@@ -1,6 +1,7 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { NonFunctionProperties, Omit } from '../../util';
 import { PredicateTemplate } from '../predicate-template';
 import { ResponseGeneratorTemplate } from '../response-generator-template';
 import { ChildPredicateNodeAdded } from './child-predicate-node-added';
@@ -24,11 +25,13 @@ export interface ResponseGenerator {
 
 export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
   predicateTemplateVersionSnapshot: PredicateTemplateVersionSnapshot;
+  name: string;
   parameterValues: { [prop: string]: string | number | boolean } = {};
   childNodeIdsOrResponseGenerator: string[] | ResponseGenerator | undefined;
 
   static create(
     predicateTemplate: PredicateTemplate,
+    name: string,
     parameterValues: { [prop: string]: string | number | boolean } = {},
     parentNodeId: string | undefined,
   ) {
@@ -42,6 +45,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
         evalFunctionBody: predicateTemplate.evalFunctionBody,
         parameters: predicateTemplate.parameters,
       },
+      name,
       parameterValues,
       parentNodeId,
     }));
@@ -86,6 +90,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
     [PredicateNodeCreated.KIND]: event => {
       this.id = event.nodeId;
       this.predicateTemplateVersionSnapshot = event.predicateTemplateVersionSnapshot;
+      this.name = event.name;
       this.parameterValues = event.parameterValues;
     },
     [ResponseGeneratorSet.KIND]: event => {
@@ -106,6 +111,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
   getSnapshotValue(): NonFunctionProperties<Omit<PredicateNode, keyof EventSourcedRootEntity<DomainEvents> | 'getSnapshotValue'>> {
     return {
       predicateTemplateVersionSnapshot: this.predicateTemplateVersionSnapshot,
+      name: this.name,
       parameterValues: this.parameterValues,
       childNodeIdsOrResponseGenerator: this.childNodeIdsOrResponseGenerator,
     };

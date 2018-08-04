@@ -4,9 +4,10 @@ import { PredicateTemplateVersionSnapshot } from './predicate-template-version-s
 export class PredicateNodeCreated extends DomainEvent<typeof PredicateNodeCreated.KIND> {
   nodeId: string;
   predicateTemplateVersionSnapshot: PredicateTemplateVersionSnapshot;
+  name: string;
   parameterValues: { [prop: string]: string | number | boolean };
   parentNodeId: string | undefined;
 
-  static readonly KIND = 'predicate/PredicateCreated';
+  static readonly KIND = 'predicate/PredicateNodeCreated';
   static readonly create = DomainEvent.createBase(PredicateNodeCreated);
 }

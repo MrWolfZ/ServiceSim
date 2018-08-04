@@ -28,6 +28,7 @@ describe('all predicates projection', () => {
         evalFunctionBody: 'return true;',
         parameters: [],
       },
+      name: 'Test',
       parameterValues: {},
       parentNodeId: undefined,
     }));
@@ -43,6 +44,7 @@ describe('all predicates projection', () => {
         evalFunctionBody: 'return true;',
         parameters: [],
       },
+      name: 'Test',
       parameterValues: {},
       parentNodeId: undefined,
     }));
