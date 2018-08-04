@@ -20,7 +20,14 @@ describe('all predicates projection', () => {
     const matcherId1 = 'predicate/1';
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId1,
-      predicateKindId: 'url-pattern',
+      predicateKindVersionSnapshot: {
+        predicateKindId: 'url-pattern',
+        version: 1,
+        name: 'Test',
+        description: 'Description',
+        evalFunctionBody: 'return true;',
+        parameters: [],
+      },
       parameterValues: {},
       parentPredicateNodeId: undefined,
     }));
@@ -28,7 +35,14 @@ describe('all predicates projection', () => {
     const matcherId2 = 'predicate/2';
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId2,
-      predicateKindId: 'url-pattern',
+      predicateKindVersionSnapshot: {
+        predicateKindId: 'url-pattern',
+        version: 1,
+        name: 'Test',
+        description: 'Description',
+        evalFunctionBody: 'return true;',
+        parameters: [],
+      },
       parameterValues: {},
       parentPredicateNodeId: undefined,
     }));

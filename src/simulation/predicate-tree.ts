@@ -30,7 +30,6 @@ export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResp
 
 export interface PredicateNode {
   nodeId: string;
-  predicateKindId: string;
   parameterValues: { [prop: string]: any };
   evaluate: (request: ServiceRequest) => boolean | Promise<boolean>;
   childNodesOrResponseGenerator: PredicateNode[] | ResponseGeneratorFunction | undefined;
@@ -52,12 +51,6 @@ export class PredicateTree {
       switch (ev.kind) {
         case PredicateKindCreatedOrUpdated.KIND:
           predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
-          const evaluationFunction = new Function('request', 'parameters', ev.evalFunctionBody) as PredicateEvaluationFunction;
-          for (const node of predicateNodesById.values()) {
-            if (node.predicateKindId === ev.predicateKindId) {
-              node.evaluate = request => evaluationFunction(request, node.parameterValues);
-            }
-          }
 
           return;
 
@@ -70,12 +63,11 @@ export class PredicateTree {
           return;
 
         case PredicateNodeCreated.KIND: {
-          const functionBody = predicateKindEvalFunctionBodies.get(ev.predicateKindId)!;
+          const functionBody = ev.predicateKindVersionSnapshot.evalFunctionBody;
           const evaluationFunction = new Function('request', 'parameters', functionBody) as PredicateEvaluationFunction;
 
           const node: PredicateNode = {
             nodeId: ev.nodeId,
-            predicateKindId: ev.predicateKindId,
             parameterValues: ev.parameterValues,
             evaluate: request => evaluationFunction(request, ev.parameterValues),
             childNodesOrResponseGenerator: undefined,
@@ -87,8 +79,8 @@ export class PredicateTree {
         }
 
         case ResponseGeneratorSet.KIND:
-          const predicateNode = predicateNodesById.get(ev.predicateId)!;
-          const generatorFunctionBody = responseGeneratorKindFunctionBodies.get(ev.responseGeneratorKindId)!;
+          const predicateNode = predicateNodesById.get(ev.predicateNodeId)!;
+          const generatorFunctionBody = ev.responseGeneratorKindVersionSnapshot.generatorFunctionBody;
           const generatorFunction = new Function('request', 'parameters', generatorFunctionBody) as ResponseGeneratorGenerateFunction;
           predicateNode.childNodesOrResponseGenerator = request => generatorFunction(request, ev.parameterValues);
           return;
