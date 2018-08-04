@@ -1,5 +1,5 @@
 import { DomainEvent } from '../../infrastructure';
-import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-kind-version-snapshot';
+import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-template-version-snapshot';
 
 export class ResponseGeneratorSet extends DomainEvent<typeof ResponseGeneratorSet.KIND> {
   predicateNodeId: string;

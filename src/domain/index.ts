@@ -1,5 +1,5 @@
 export * from './parameter';
 export * from './predicate-node';
-export * from './predicate-kind';
-export * from './response-generator-kind';
+export * from './predicate-template';
+export * from './response-generator-template';
 export * from './service-invocation';

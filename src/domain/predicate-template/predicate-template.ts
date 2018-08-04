@@ -2,8 +2,8 @@ import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { Parameter } from '../parameter';
-import { PredicateTemplateCreatedOrUpdated } from './predicate-kind-created-or-updated';
-import { PredicateTemplateDeleted } from './predicate-kind-deleted';
+import { PredicateTemplateCreatedOrUpdated } from './predicate-template-created-or-updated';
+import { PredicateTemplateDeleted } from './predicate-template-deleted';
 
 const JOURNAL_NAME = 'predicate-template/Journal';
 

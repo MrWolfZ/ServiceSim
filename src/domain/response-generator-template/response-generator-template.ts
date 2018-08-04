@@ -2,7 +2,7 @@ import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { Parameter } from '../parameter';
-import { ResponseGeneratorTemplateCreatedOrUpdated } from './response-generator-kind-created-or-updated';
+import { ResponseGeneratorTemplateCreatedOrUpdated } from './response-generator-template-created-or-updated';
 
 const JOURNAL_NAME = 'response-generator-template/Journal';
 

@@ -1,5 +1,5 @@
 import { DomainEvent } from '../../infrastructure';
-import { PredicateTemplateVersionSnapshot } from './predicate-kind-version-snapshot';
+import { PredicateTemplateVersionSnapshot } from './predicate-template-version-snapshot';
 
 export class PredicateNodeCreated extends DomainEvent<typeof PredicateNodeCreated.KIND> {
   nodeId: string;

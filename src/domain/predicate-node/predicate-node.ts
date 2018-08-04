@@ -1,13 +1,13 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
-import { PredicateTemplate } from '../predicate-kind';
-import { ResponseGeneratorTemplate } from '../response-generator-kind';
+import { PredicateTemplate } from '../predicate-template';
+import { ResponseGeneratorTemplate } from '../response-generator-template';
 import { ChildPredicateNodeAdded } from './child-predicate-node-added';
-import { PredicateTemplateVersionSnapshot } from './predicate-kind-version-snapshot';
 import { PredicateNodeCreated } from './predicate-node-created';
-import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-kind-version-snapshot';
+import { PredicateTemplateVersionSnapshot } from './predicate-template-version-snapshot';
 import { ResponseGeneratorSet } from './response-generator-set';
+import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-template-version-snapshot';
 
 const JOURNAL_NAME = 'predicate/Journal';
 
