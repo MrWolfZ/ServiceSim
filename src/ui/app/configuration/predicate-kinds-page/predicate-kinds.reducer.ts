@@ -3,16 +3,16 @@ import { INITIAL_PREDICATE_KINDS_PAGE_STATE, PredicateKindsPageState } from './p
 
 import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
 
-import { predicateKindDialogReducer, PredicateKindDialogSubmitSuccessfulAction } from './predicate-kind-dialog';
+import { predicateTemplateDialogReducer, PredicateTemplateDialogSubmitSuccessfulAction } from './predicate-kind-dialog';
 import { DeletePredicateKindAction, InitializePredicateKindTileAction, predicateKindTileReducer } from './predicate-kind-tile';
 
 export function predicateKindsPageReducer(
   state = INITIAL_PREDICATE_KINDS_PAGE_STATE,
-  action: PredicateKindsPageActions | PredicateKindDialogSubmitSuccessfulAction | DeletePredicateKindAction,
+  action: PredicateKindsPageActions | PredicateTemplateDialogSubmitSuccessfulAction | DeletePredicateKindAction,
 ): PredicateKindsPageState {
   state = callNestedReducers(state, action, {
     tiles: createArrayReducer(predicateKindTileReducer),
-    dialog: predicateKindDialogReducer,
+    dialog: predicateTemplateDialogReducer,
   });
 
   switch (action.type) {
@@ -27,9 +27,9 @@ export function predicateKindsPageReducer(
         ),
       };
 
-    case PredicateKindDialogSubmitSuccessfulAction.TYPE: {
+    case PredicateTemplateDialogSubmitSuccessfulAction.TYPE: {
       const newTile = predicateKindTileReducer(undefined, new InitializePredicateKindTileAction({
-        predicateKindId: action.predicateKindId,
+        predicateKindId: action.templateId,
         name: action.formValue.name,
         description: action.formValue.description,
         evalFunctionBody: action.formValue.evalFunctionBody,
@@ -37,7 +37,7 @@ export function predicateKindsPageReducer(
       }));
 
       const tiles = [
-        ...state.tiles.filter(t => t.predicateKindId !== action.predicateKindId),
+        ...state.tiles.filter(t => t.predicateKindId !== action.templateId),
         newTile,
       ].sort((l, r) => l.name.localeCompare(r.name));
 

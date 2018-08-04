@@ -1,6 +1,6 @@
 import { Ask, Tell } from '../../infrastructure/infrastructure.dto';
 
-import { PredicateKindDialogFormValue } from './predicate-kind-dialog/predicate-kind-dialog.dto';
+import { PredicateTemplateDialogFormValue } from './predicate-kind-dialog/predicate-template-dialog.dto';
 import { PredicateKindTileDto } from './predicate-kind-tile/predicate-kind-tile.dto';
 
 export interface PredicateKindsPageDto {
@@ -19,10 +19,10 @@ export const TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND = 'configuration/predicate-
 
 export interface TellToCreateOrUpdatePredicateKind extends Tell<typeof TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND, { predicateKindId: string }> {
   predicateKindId?: string;
-  formValue: PredicateKindDialogFormValue;
+  formValue: PredicateTemplateDialogFormValue;
 }
 
-export function tellToCreateOrUpdatePredicateKind(formValue: PredicateKindDialogFormValue, predicateKindId?: string): TellToCreateOrUpdatePredicateKind {
+export function tellToCreateOrUpdatePredicateKind(formValue: PredicateTemplateDialogFormValue, predicateKindId?: string): TellToCreateOrUpdatePredicateKind {
   return {
     kind: TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND,
     formValue,

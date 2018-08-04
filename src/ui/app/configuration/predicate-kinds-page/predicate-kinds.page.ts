@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, HostBinding } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { OpenPredicateKindDialogAction } from './predicate-kind-dialog';
+import { OpenPredicateTemplateDialogAction } from './predicate-kind-dialog';
 import { PredicateKindTileState } from './predicate-kind-tile';
 import { PredicateKindsPageState, RootState } from './predicate-kinds.state';
 
@@ -21,7 +21,7 @@ export class PredicateKindsPage {
   }
 
   openNewItemDialog() {
-    this.actionsSubject.next(new OpenPredicateKindDialogAction());
+    this.actionsSubject.next(new OpenPredicateTemplateDialogAction());
   }
 
   trackById(_: number, item: PredicateKindTileState) {

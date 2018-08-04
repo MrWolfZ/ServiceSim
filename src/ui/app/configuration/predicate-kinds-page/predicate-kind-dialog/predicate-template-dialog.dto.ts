@@ -1,4 +1,4 @@
-export interface PredicateKindParameterFormValue {
+export interface PredicateTemplateParameterFormValue {
   name: string;
   description: string;
   isRequired: boolean;
@@ -6,9 +6,9 @@ export interface PredicateKindParameterFormValue {
   defaultValue: string | boolean | number;
 }
 
-export interface PredicateKindDialogFormValue {
+export interface PredicateTemplateDialogFormValue {
   name: string;
   description: string;
   evalFunctionBody: string;
-  parameters: PredicateKindParameterFormValue[];
+  parameters: PredicateTemplateParameterFormValue[];
 }

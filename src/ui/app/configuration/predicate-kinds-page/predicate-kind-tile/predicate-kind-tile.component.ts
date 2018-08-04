@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsSubject } from '@ngrx/store';
 
-import { OpenPredicateKindDialogAction } from '../predicate-kind-dialog';
+import { OpenPredicateTemplateDialogAction } from '../predicate-kind-dialog';
 import { DeletePredicateKindAction } from './predicate-kind-tile.actions';
 import { PredicateKindTileState } from './predicate-kind-tile.state';
 
@@ -21,7 +21,7 @@ export class PredicateKindTileComponent {
   }
 
   startEdit() {
-    this.actionsSubject.next(new OpenPredicateKindDialogAction(this.state, this.state.predicateKindId));
+    this.actionsSubject.next(new OpenPredicateTemplateDialogAction(this.state, this.state.predicateKindId));
   }
 
   trackByIndex(idx: number) {

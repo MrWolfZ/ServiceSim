@@ -7,7 +7,7 @@ import { flatMap, map } from 'rxjs/operators';
 
 import { ask, tell } from 'app/infrastructure';
 
-import { PredicateKindDialogSubmitSuccessfulAction, SubmitPredicateKindDialogAction } from './predicate-kind-dialog';
+import { PredicateTemplateDialogSubmitSuccessfulAction, SubmitPredicateTemplateDialogAction } from './predicate-kind-dialog';
 import { DeletePredicateKindAction } from './predicate-kind-tile';
 import { InitializePredicateKindsPageAction, LoadPredicateKindsPageDataAction } from './predicate-kinds.actions';
 import {
@@ -35,14 +35,14 @@ export class PredicateKindsPageEffects {
 
   @Effect()
   createOrUpdatePredicateKind$: Observable<Action> = this.actions$.pipe(
-    ofType(SubmitPredicateKindDialogAction.TYPE),
-    map(a => a as SubmitPredicateKindDialogAction),
+    ofType(SubmitPredicateTemplateDialogAction.TYPE),
+    map(a => a as SubmitPredicateTemplateDialogAction),
     flatMap(a =>
       tell(
         this.http,
-        tellToCreateOrUpdatePredicateKind(a.formValue, a.predicateKindId),
+        tellToCreateOrUpdatePredicateKind(a.formValue, a.templateId),
         dto => [
-          new PredicateKindDialogSubmitSuccessfulAction(dto.predicateKindId, a.formValue),
+          new PredicateTemplateDialogSubmitSuccessfulAction(dto.predicateKindId, a.formValue),
         ],
       )
     ),

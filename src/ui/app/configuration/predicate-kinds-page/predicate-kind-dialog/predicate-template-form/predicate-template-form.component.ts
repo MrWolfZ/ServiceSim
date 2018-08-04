@@ -2,16 +2,16 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsSubject } from '@ngrx/store';
 import { AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'ngrx-forms';
 
-import { PredicateKindDialogFormValue, PredicateKindParameterFormValue } from '../predicate-kind-dialog.dto';
+import { PredicateTemplateDialogFormValue, PredicateTemplateParameterFormValue } from '../predicate-template-dialog.dto';
 
 @Component({
-  selector: 'sim-predicate-kind-form',
-  templateUrl: './predicate-kind-form.component.html',
-  styleUrls: ['./predicate-kind-form.component.scss'],
+  selector: 'sim-predicate-template-form',
+  templateUrl: './predicate-template-form.component.html',
+  styleUrls: ['./predicate-template-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PredicateKindFormComponent {
-  @Input() formState: FormGroupState<PredicateKindDialogFormValue>;
+  @Input() formState: FormGroupState<PredicateTemplateDialogFormValue>;
 
   constructor(private actionsSubject: ActionsSubject) { }
 
@@ -21,7 +21,7 @@ export class PredicateKindFormComponent {
 
   addParameter() {
     this.actionsSubject.next(
-      new AddArrayControlAction<PredicateKindParameterFormValue>(
+      new AddArrayControlAction<PredicateTemplateParameterFormValue>(
         this.formState.controls.parameters.id,
         {
           name: '',

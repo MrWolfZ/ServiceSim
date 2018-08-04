@@ -2,11 +2,9 @@ import { createFormControlState, FormControlState } from 'ngrx-forms';
 
 import { RootState as AppRootState } from 'app/app.state';
 
-import { PredicateKindsPageDto } from './predicate-kinds.dto';
-
+import { PredicateTemplateDialogState } from './predicate-kind-dialog';
 import { PredicateKindTileState } from './predicate-kind-tile';
-
-import { PredicateKindDialogState } from './predicate-kind-dialog';
+import { PredicateKindsPageDto } from './predicate-kinds.dto';
 
 export interface RootState extends AppRootState {
   predicateKinds: PredicateKindsPageState;
@@ -14,7 +12,7 @@ export interface RootState extends AppRootState {
 
 export interface PredicateKindsPageState extends PredicateKindsPageDto {
   tiles: PredicateKindTileState[];
-  dialog: PredicateKindDialogState;
+  dialog: PredicateTemplateDialogState;
   filterControl: FormControlState<string>;
 }
 

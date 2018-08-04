@@ -7,11 +7,11 @@
       <header class="modal-card-head">
         <p class="modal-card-title"
            *ngIf="state.isNewItem">
-          Create new predicate kind
+          Create new predicate template
         </p>
         <p class="modal-card-title"
            *ngIf="!state.isNewItem">
-          Edit predicate kind
+          Edit predicate template
         </p>
       </header>
 
@@ -21,7 +21,7 @@
       -->
       <section class="modal-card-body"
                *ngIf="state.dialogIsOpen">
-        <sim-predicate-kind-form [formState]="state.formState"></sim-predicate-kind-form>
+        <sim-predicate-template-form [formState]="state.formState"></sim-predicate-template-form>
       </section>
 
       <footer class="modal-card-foot justify-content flex-end">
