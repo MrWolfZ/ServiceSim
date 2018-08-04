@@ -1,8 +1,8 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { Parameter } from '../parameter';
 import { ResponseGeneratorKindCreatedOrUpdated } from './response-generator-kind-created-or-updated';
-import { ResponseGeneratorKindParameter } from './response-generator-kind-parameter';
 
 const JOURNAL_NAME = 'response-generator-kind/Journal';
 
@@ -13,14 +13,14 @@ type DomainEvents =
 export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> {
   name = '';
   description = '';
-  parameters: ResponseGeneratorKindParameter[] = [];
+  parameters: Parameter[] = [];
   generatorFunctionBody = 'return { statusCode: 500, body: \'missing generator function body\' }';
 
   static create(
     name: string,
     description: string,
     generatorFunctionBody: string,
-    parameters: ResponseGeneratorKindParameter[],
+    parameters: Parameter[],
   ) {
     return new ResponseGeneratorKind().apply(ResponseGeneratorKindCreatedOrUpdated.create({
       responseGeneratorKindId: `response-generator-kind/${uuid()}`,
@@ -35,7 +35,7 @@ export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> 
     name: string,
     description: string,
     generatorFunctionBody: string,
-    parameters: ResponseGeneratorKindParameter[],
+    parameters: Parameter[],
   ) {
     return this.apply(ResponseGeneratorKindCreatedOrUpdated.create({
       responseGeneratorKindId: this.id,

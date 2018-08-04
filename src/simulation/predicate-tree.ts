@@ -31,7 +31,7 @@ export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResp
 export interface PredicateNode {
   predicateId: string;
   predicateKindId: string;
-  parameters: { [prop: string]: any };
+  parameterValues: { [prop: string]: any };
   evaluate: (request: ServiceRequest) => boolean | Promise<boolean>;
   childPredicatesOrResponseGenerator: PredicateNode[] | ResponseGeneratorFunction | undefined;
 }
@@ -55,7 +55,7 @@ export class PredicateTree {
           const evaluationFunction = new Function('request', 'parameters', ev.evalFunctionBody) as PredicateEvaluationFunction;
           for (const node of predicateNodesById.values()) {
             if (node.predicateKindId === ev.predicateKindId) {
-              node.evaluate = request => evaluationFunction(request, node.parameters);
+              node.evaluate = request => evaluationFunction(request, node.parameterValues);
             }
           }
 
@@ -76,8 +76,8 @@ export class PredicateTree {
           const node: PredicateNode = {
             predicateId: ev.predicateId,
             predicateKindId: ev.predicateKindId,
-            parameters: ev.parameters,
-            evaluate: request => evaluationFunction(request, ev.parameters),
+            parameterValues: ev.parameterValues,
+            evaluate: request => evaluationFunction(request, ev.parameterValues),
             childPredicatesOrResponseGenerator: undefined,
           };
 
@@ -90,7 +90,7 @@ export class PredicateTree {
           const predicateNode = predicateNodesById.get(ev.predicateId)!;
           const generatorFunctionBody = responseGeneratorKindFunctionBodies.get(ev.responseGeneratorKindId)!;
           const generatorFunction = new Function('request', 'parameters', generatorFunctionBody) as ResponseGeneratorGenerateFunction;
-          predicateNode.childPredicatesOrResponseGenerator = request => generatorFunction(request, ev.parameters);
+          predicateNode.childPredicatesOrResponseGenerator = request => generatorFunction(request, ev.parameterValues);
           return;
       }
     });

@@ -1,9 +1,9 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
+import { Parameter } from '../parameter';
 import { PredicateKindCreatedOrUpdated } from './predicate-kind-created-or-updated';
 import { PredicateKindDeleted } from './predicate-kind-deleted';
-import { PredicateKindParameter } from './predicate-kind-parameter';
 
 const JOURNAL_NAME = 'predicate-kind/Journal';
 
@@ -15,14 +15,14 @@ type DomainEvents =
 export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
   name = '';
   description = '';
-  parameters: PredicateKindParameter[] = [];
+  parameters: Parameter[] = [];
   evalFunctionBody = 'return true;';
 
   static create(
     name: string,
     description: string,
     evalFunctionBody: string,
-    parameters: PredicateKindParameter[],
+    parameters: Parameter[],
   ) {
     return new PredicateKind().apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: `predicate-kind/${uuid()}`,
@@ -37,7 +37,7 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     name: string,
     description: string,
     evalFunctionBody: string,
-    parameters: PredicateKindParameter[],
+    parameters: Parameter[],
   ) {
     return this.apply(PredicateKindCreatedOrUpdated.create({
       predicateKindId: this.id,
