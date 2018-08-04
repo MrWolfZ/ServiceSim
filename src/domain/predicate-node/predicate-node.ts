@@ -103,11 +103,11 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
     },
   };
 
-  getSnapshotValue() {
+  getSnapshotValue(): NonFunctionProperties<Omit<PredicateNode, keyof EventSourcedRootEntity<DomainEvents> | 'getSnapshotValue'>> {
     return {
       predicateTemplateVersionSnapshot: this.predicateTemplateVersionSnapshot,
-      parameters: this.parameterValues,
-      childPredicateIdsOrResponseGeneratorId: this.childNodeIdsOrResponseGenerator,
+      parameterValues: this.parameterValues,
+      childNodeIdsOrResponseGenerator: this.childNodeIdsOrResponseGenerator,
     };
   }
 
