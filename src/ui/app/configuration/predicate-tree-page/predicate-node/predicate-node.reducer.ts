@@ -20,6 +20,7 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
         childNodes: action.dto.childNodes.map(dto =>
           predicateNodeReducer(state.childNodes.find(n => n.nodeId === dto.nodeId), new InitializePredicateNodeAction(dto))
         ),
+        isExpanded: action.dto.childNodes.length > 0, // TODO: remove once devlopment finishes
       };
 
     case TogglePredicateNodeExpansionAction.TYPE:

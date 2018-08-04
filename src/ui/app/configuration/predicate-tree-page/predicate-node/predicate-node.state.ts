@@ -14,7 +14,7 @@ export const INITIAL_PREDICATE_NODE_STATE: PredicateNodeState = {
   nodeId: '',
   predicateKindName: '',
   parameters: [],
-  isExpanded: true, // TODO: set to false once devlopment finishes
+  isExpanded: false,
   isSelected: false,
   childNodes: [],
   responseGenerator: undefined,
