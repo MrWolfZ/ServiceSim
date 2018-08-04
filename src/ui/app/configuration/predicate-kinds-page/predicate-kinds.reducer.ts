@@ -37,7 +37,7 @@ export function predicateKindsPageReducer(
       }));
 
       const tiles = [
-        ...state.tiles,
+        ...state.tiles.filter(t => t.predicateKindId !== action.predicateKindId),
         newTile,
       ].sort((l, r) => l.name.localeCompare(r.name));
 
