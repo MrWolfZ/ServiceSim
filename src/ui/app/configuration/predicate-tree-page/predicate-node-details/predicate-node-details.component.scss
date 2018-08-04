@@ -21,16 +21,20 @@
 .parameter {
   display: flex;
 
-  +button {
+  +.button {
     margin-top: 1em;
   }
 }
 
-.child-node+button {
+.child-node+.button {
   margin-top: 1em;
 }
 
 .label {
   margin-bottom: 0;
   margin-right: 0.25rem;
+}
+
+.button {
+  transition: none;
 }

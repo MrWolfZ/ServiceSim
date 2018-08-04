@@ -19,7 +19,7 @@ export async function initializeAsync() {
 
   const staticResponseGeneratorTemplate = ResponseGeneratorTemplate.create(
     'static',
-    'returns a static response',
+    'Response generators based on this template return a static configured response.',
     'return { statusCode: parameters["Status Code"], body: parameters["Body"], contentType: parameters["Content Type"] };',
     [
       {
@@ -84,7 +84,7 @@ export async function initializeAsync() {
 
   const getPredicateTemplate = PredicateTemplate.create(
     'GET',
-    'Predicates based on this template match all GET requests',
+    'Predicates based on this template match all GET requests.',
     'return request.method.toUpperCase() === "GET"',
     [],
   );
