@@ -32,7 +32,7 @@ export const processRequest = async (req: Request, res: Response) => {
 
   const node = await findNode(topLevelPredicates);
   if (node) {
-    const generator = node.childPredicatesOrResponseGenerator as ResponseGeneratorFunction;
+    const generator = node.childNodesOrResponseGenerator as ResponseGeneratorFunction;
     response = await Promise.resolve(generator(invocation.request));
   }
 
@@ -41,7 +41,7 @@ export const processRequest = async (req: Request, res: Response) => {
 
   async function findNode(nodes: PredicateNode[]): Promise<PredicateNode | undefined> {
     for (const node of nodes) {
-      if (!node.childPredicatesOrResponseGenerator) {
+      if (!node.childNodesOrResponseGenerator) {
         continue;
       }
 
@@ -54,11 +54,11 @@ export const processRequest = async (req: Request, res: Response) => {
         continue;
       }
 
-      if (!Array.isArray(node.childPredicatesOrResponseGenerator)) {
+      if (!Array.isArray(node.childNodesOrResponseGenerator)) {
         return node;
       }
 
-      const childNode = findNode(node.childPredicatesOrResponseGenerator);
+      const childNode = findNode(node.childNodesOrResponseGenerator);
       if (childNode) {
         return childNode;
       }

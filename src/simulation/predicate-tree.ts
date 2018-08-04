@@ -1,7 +1,7 @@
 import {
-  PredicateCreated,
   PredicateKindCreatedOrUpdated,
   PredicateKindDeleted,
+  PredicateNodeCreated,
   ResponseGeneratorKindCreatedOrUpdated,
   ResponseGeneratorSet,
   ServiceRequest,
@@ -13,7 +13,7 @@ import { EventLog } from '../infrastructure';
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
   PredicateKindCreatedOrUpdated.KIND,
   ResponseGeneratorKindCreatedOrUpdated.KIND,
-  PredicateCreated.KIND,
+  PredicateNodeCreated.KIND,
   PredicateKindDeleted.KIND,
   ResponseGeneratorSet.KIND,
 ];
@@ -22,18 +22,18 @@ type SubscribedEvents =
   | PredicateKindCreatedOrUpdated
   | PredicateKindDeleted
   | ResponseGeneratorKindCreatedOrUpdated
-  | PredicateCreated
+  | PredicateNodeCreated
   | ResponseGeneratorSet
   ;
 
 export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
 
 export interface PredicateNode {
-  predicateId: string;
+  nodeId: string;
   predicateKindId: string;
   parameterValues: { [prop: string]: any };
   evaluate: (request: ServiceRequest) => boolean | Promise<boolean>;
-  childPredicatesOrResponseGenerator: PredicateNode[] | ResponseGeneratorFunction | undefined;
+  childNodesOrResponseGenerator: PredicateNode[] | ResponseGeneratorFunction | undefined;
 }
 
 export type PredicateEvaluationFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => boolean;
@@ -69,20 +69,20 @@ export class PredicateTree {
           responseGeneratorKindFunctionBodies.set(ev.responseGeneratorKindId, ev.generatorFunctionBody);
           return;
 
-        case PredicateCreated.KIND: {
+        case PredicateNodeCreated.KIND: {
           const functionBody = predicateKindEvalFunctionBodies.get(ev.predicateKindId)!;
           const evaluationFunction = new Function('request', 'parameters', functionBody) as PredicateEvaluationFunction;
 
           const node: PredicateNode = {
-            predicateId: ev.predicateId,
+            nodeId: ev.nodeId,
             predicateKindId: ev.predicateKindId,
             parameterValues: ev.parameterValues,
             evaluate: request => evaluationFunction(request, ev.parameterValues),
-            childPredicatesOrResponseGenerator: undefined,
+            childNodesOrResponseGenerator: undefined,
           };
 
           topLevelPredicateNodes.push(node);
-          predicateNodesById.set(ev.predicateId, node);
+          predicateNodesById.set(ev.nodeId, node);
           return;
         }
 
@@ -90,7 +90,7 @@ export class PredicateTree {
           const predicateNode = predicateNodesById.get(ev.predicateId)!;
           const generatorFunctionBody = responseGeneratorKindFunctionBodies.get(ev.responseGeneratorKindId)!;
           const generatorFunction = new Function('request', 'parameters', generatorFunctionBody) as ResponseGeneratorGenerateFunction;
-          predicateNode.childPredicatesOrResponseGenerator = request => generatorFunction(request, ev.parameterValues);
+          predicateNode.childNodesOrResponseGenerator = request => generatorFunction(request, ev.parameterValues);
           return;
       }
     });

@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 
-import { Predicate, PredicateKind, ResponseGeneratorKind } from './domain';
+import { PredicateKind, PredicateNode, ResponseGeneratorKind } from './domain';
 import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
 import { PredicateTree } from './simulation';
@@ -100,46 +100,46 @@ export async function initializeAsync() {
 
   await PredicateKind.saveAsync(allPredicateKind);
 
-  const topLevelPredicate1 = Predicate.create(pathPrefixPredicateKind.id, {
+  const topLevelPredicateNode1 = PredicateNode.create(pathPrefixPredicateKind.id, {
     Prefix: '/api',
   }, undefined);
 
-  await Predicate.saveAsync(topLevelPredicate1);
+  await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const childPredicate1 = Predicate.create(pathPrefixPredicateKind.id, {
+  const childPredicateNode1 = PredicateNode.create(pathPrefixPredicateKind.id, {
     Prefix: '/api/books',
   }, undefined);
 
-  childPredicate1.setResponseGenerator(staticResponseGeneratorKind.id, {
+  childPredicateNode1.setResponseGenerator(staticResponseGeneratorKind.id, {
     'Status Code': 200,
     'Body': JSON.stringify([{ title: 'LOTR' }]),
     'Content Type': 'application/json',
   });
 
-  await Predicate.saveAsync(childPredicate1);
+  await PredicateNode.saveAsync(childPredicateNode1);
 
-  topLevelPredicate1.addChildPredicate(childPredicate1.id);
+  topLevelPredicateNode1.addChildPredicate(childPredicateNode1.id);
 
-  const childPredicate2 = Predicate.create(pathPrefixPredicateKind.id, {
+  const childPredicateNode2 = PredicateNode.create(pathPrefixPredicateKind.id, {
     Prefix: '/api/authors',
   }, undefined);
 
-  childPredicate2.setResponseGenerator(staticResponseGeneratorKind.id, {
+  childPredicateNode2.setResponseGenerator(staticResponseGeneratorKind.id, {
     'Status Code': 200,
     'Body': JSON.stringify([{ name: 'Tolkien' }]),
     'Content Type': 'application/json',
   });
 
-  await Predicate.saveAsync(childPredicate2);
+  await PredicateNode.saveAsync(childPredicateNode2);
 
-  topLevelPredicate1.addChildPredicate(childPredicate2.id);
+  topLevelPredicateNode1.addChildPredicate(childPredicateNode2.id);
 
-  await Predicate.saveAsync(topLevelPredicate1);
+  await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const topLevelPredicate2 = Predicate.create(allPredicateKind.id, {}, undefined);
-  topLevelPredicate2.setResponseGenerator(staticResponseGeneratorKind.id, { 'Status Code': 204 });
+  const topLevelPredicateNode2 = PredicateNode.create(allPredicateKind.id, {}, undefined);
+  topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorKind.id, { 'Status Code': 204 });
 
-  await Predicate.saveAsync(topLevelPredicate2);
+  await PredicateNode.saveAsync(topLevelPredicateNode2);
 
   return () => {
     sub1.unsubscribe();

@@ -1,16 +1,16 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
-import { ChildPredicateAdded } from './child-predicate-added';
-import { PredicateCreated } from './predicate-created';
+import { ChildPredicateNodeAdded } from './child-predicate-node-added';
+import { PredicateNodeCreated } from './predicate-node-created';
 import { ResponseGeneratorSet } from './response-generator-set';
 
 const JOURNAL_NAME = 'predicate/Journal';
 
 type DomainEvents =
-  | PredicateCreated
+  | PredicateNodeCreated
   | ResponseGeneratorSet
-  | ChildPredicateAdded
+  | ChildPredicateNodeAdded
   ;
 
 export interface ResponseGenerator {
@@ -18,7 +18,7 @@ export interface ResponseGenerator {
   parameterValues: { [prop: string]: string | number | boolean };
 }
 
-export class Predicate extends EventSourcedRootEntity<DomainEvents> {
+export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
   predicateKindId = '';
   parameterValues: { [prop: string]: string | number | boolean } = {};
   childPredicateIdsOrResponseGenerator: string[] | ResponseGenerator | undefined;
@@ -26,13 +26,13 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
   static create(
     predicateKindId: string,
     parameterValues: { [prop: string]: string | number | boolean } = {},
-    parentPredicateId: string | undefined,
+    parentPredicateNodeId: string | undefined,
   ) {
-    return new Predicate().apply(PredicateCreated.create({
-      predicateId: `predicate/${uuid()}`,
+    return new PredicateNode().apply(PredicateNodeCreated.create({
+      nodeId: `predicate/${uuid()}`,
       predicateKindId,
       parameterValues,
-      parentPredicateId,
+      parentPredicateNodeId,
     }));
   }
 
@@ -41,7 +41,7 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
     parameterValues: { [prop: string]: string | number | boolean },
   ) {
     if (Array.isArray(this.childPredicateIdsOrResponseGenerator) && this.childPredicateIdsOrResponseGenerator.length > 0) {
-      throw new Error(`Cannot set response generator for predicate ${this.id} since it already has child predicates!`);
+      throw new Error(`Cannot set response generator for predicate node ${this.id} since it already has child predicates!`);
     }
 
     return this.apply(ResponseGeneratorSet.create({
@@ -55,18 +55,18 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
     predicateId: string,
   ) {
     if (!!this.childPredicateIdsOrResponseGenerator && !!(this.childPredicateIdsOrResponseGenerator as ResponseGenerator).responseGeneratorKindId) {
-      throw new Error(`Cannot add child predicate for predicate ${this.id} since it already has a response generator set!`);
+      throw new Error(`Cannot add child predicate node for predicate node ${this.id} since it already has a response generator set!`);
     }
 
-    return this.apply(ChildPredicateAdded.create({
+    return this.apply(ChildPredicateNodeAdded.create({
       parentPredicateId: this.id,
       childPredicateId: predicateId,
     }));
   }
 
   EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
-    [PredicateCreated.KIND]: event => {
-      this.id = event.predicateId;
+    [PredicateNodeCreated.KIND]: event => {
+      this.id = event.nodeId;
       this.predicateKindId = event.predicateKindId;
       this.parameterValues = event.parameterValues;
     },
@@ -76,7 +76,7 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
         parameterValues: event.parameterValues,
       };
     },
-    [ChildPredicateAdded.KIND]: event => {
+    [ChildPredicateNodeAdded.KIND]: event => {
       if (!Array.isArray(this.childPredicateIdsOrResponseGenerator)) {
         this.childPredicateIdsOrResponseGenerator = [];
       }
@@ -93,8 +93,8 @@ export class Predicate extends EventSourcedRootEntity<DomainEvents> {
     };
   }
 
-  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<Predicate, DomainEvents>(Predicate);
-  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, Predicate.fromEvents);
-  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<Predicate, DomainEvents>(JOURNAL_NAME);
-  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<Predicate, DomainEvents>(JOURNAL_NAME);
+  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<PredicateNode, DomainEvents>(PredicateNode);
+  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, PredicateNode.fromEvents);
+  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<PredicateNode, DomainEvents>(JOURNAL_NAME);
+  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<PredicateNode, DomainEvents>(JOURNAL_NAME);
 }

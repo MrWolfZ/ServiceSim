@@ -1,4 +1,4 @@
-import { PredicateCreated, PredicateKindCreatedOrUpdated } from '../domain';
+import { PredicateKindCreatedOrUpdated, PredicateNodeCreated } from '../domain';
 import { EventLog } from '../infrastructure';
 import { PredicateTree } from './predicate-tree';
 
@@ -18,19 +18,19 @@ describe('all predicates projection', () => {
       parameters: [],
     }));
     const matcherId1 = 'predicate/1';
-    await EventLog.publishAsync(PredicateCreated.create({
-      predicateId: matcherId1,
+    await EventLog.publishAsync(PredicateNodeCreated.create({
+      nodeId: matcherId1,
       predicateKindId: 'url-pattern',
-      parameters: {},
-      parentPredicateId: undefined,
+      parameterValues: {},
+      parentPredicateNodeId: undefined,
     }));
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(1);
     const matcherId2 = 'predicate/2';
-    await EventLog.publishAsync(PredicateCreated.create({
-      predicateId: matcherId2,
+    await EventLog.publishAsync(PredicateNodeCreated.create({
+      nodeId: matcherId2,
       predicateKindId: 'url-pattern',
-      parameters: {},
-      parentPredicateId: undefined,
+      parameterValues: {},
+      parentPredicateNodeId: undefined,
     }));
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(2);
     sub.unsubscribe();
