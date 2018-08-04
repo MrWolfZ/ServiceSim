@@ -19,9 +19,9 @@ import { NavbarComponent } from './navbar';
 import { RouterEffects, TrackRouteIsActiveDirective } from './router';
 
 import {
-  PredicateKindsLinkDirective,
+  PredicateTemplatesLinkDirective,
   PredicateTreeLinkDirective,
-  ResponseGeneratorKindsLinkDirective,
+  ResponseGeneratorTemplatesLinkDirective,
   RoutingEffects,
 } from './routing';
 
@@ -55,9 +55,9 @@ library.add(faTimes);
     ExpansionContainerComponent,
     FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
-    PredicateKindsLinkDirective,
+    PredicateTemplatesLinkDirective,
     PredicateTreeLinkDirective,
-    ResponseGeneratorKindsLinkDirective,
+    ResponseGeneratorTemplatesLinkDirective,
   ],
   exports: [
     CommonModule,
@@ -69,9 +69,9 @@ library.add(faTimes);
     ExpansionContainerComponent,
     FormControlErrorsComponent,
     TrackRouteIsActiveDirective,
-    PredicateKindsLinkDirective,
+    PredicateTemplatesLinkDirective,
     PredicateTreeLinkDirective,
-    ResponseGeneratorKindsLinkDirective,
+    ResponseGeneratorTemplatesLinkDirective,
   ],
   providers: [
     { provide: RXJS_SCHEDULER, useValue: undefined },

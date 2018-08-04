@@ -1,4 +1,4 @@
-import { PredicateTemplate } from '../predicate-kind';
+import { PredicateTemplate } from '../predicate-template';
 import { PredicateNode } from './predicate-node';
 
 describe('Predicate', () => {

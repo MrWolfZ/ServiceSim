@@ -5,18 +5,18 @@ export class NavigateToPredicateTreeAction implements Action {
   readonly type = NavigateToPredicateTreeAction.TYPE;
 }
 
-export class NavigateToPredicateKindsAction implements Action {
-  static readonly TYPE = 'app/routing/NAVIGATE_TO_PREDICATE_KINDS';
-  readonly type = NavigateToPredicateKindsAction.TYPE;
+export class NavigateToPredicateTemplatesAction implements Action {
+  static readonly TYPE = 'app/routing/NAVIGATE_TO_PREDICATE_TEMPLATES';
+  readonly type = NavigateToPredicateTemplatesAction.TYPE;
 }
 
-export class NavigateToResponseGeneratorKindsAction implements Action {
-  static readonly TYPE = 'app/routing/NAVIGATE_TO_RESPONSE_GENERATOR_KINDS';
-  readonly type = NavigateToResponseGeneratorKindsAction.TYPE;
+export class NavigateToResponseGeneratorTemplatesAction implements Action {
+  static readonly TYPE = 'app/routing/NAVIGATE_TO_RESPONSE_GENERATOR_TEMPLATES';
+  readonly type = NavigateToResponseGeneratorTemplatesAction.TYPE;
 }
 
 export type AppRoutingActions =
   | NavigateToPredicateTreeAction
-  | NavigateToPredicateKindsAction
-  | NavigateToResponseGeneratorKindsAction
+  | NavigateToPredicateTemplatesAction
+  | NavigateToResponseGeneratorTemplatesAction
   ;

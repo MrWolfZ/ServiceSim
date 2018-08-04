@@ -4,9 +4,9 @@ import { NavigateAction, Navigation, RouterState } from '../router';
 
 import {
   CONFIGURATION_MODULE_PATH,
-  PREDICATE_KINDS_PAGE_PATH,
+  PREDICATE_TEMPLATES_PAGE_PATH,
   PREDICATE_TREE_PAGE_PATH,
-  RESPONSE_GENERATOR_KINDS_PAGE_PATH,
+  RESPONSE_GENERATOR_TEMPLATES_PAGE_PATH,
   Route,
 } from './routing.state';
 
@@ -55,26 +55,26 @@ export function creatPredicateTreeRouteRoute(state: RouterState): Route {
   };
 }
 
-export function creatPredicateKindsRouteRoute(state: RouterState): Route {
+export function creatPredicateTemplatesRouteRoute(state: RouterState): Route {
   const previousQueryParams = getPreviousQueryParams(
     state,
-    n => n.path.includes(`/${CONFIGURATION_MODULE_PATH}/${PREDICATE_KINDS_PAGE_PATH}`),
+    n => n.path.includes(`/${CONFIGURATION_MODULE_PATH}/${PREDICATE_TEMPLATES_PAGE_PATH}`),
   );
 
   return {
-    pathParts: [CONFIGURATION_MODULE_PATH, PREDICATE_KINDS_PAGE_PATH],
+    pathParts: [CONFIGURATION_MODULE_PATH, PREDICATE_TEMPLATES_PAGE_PATH],
     queryParams: previousQueryParams,
   };
 }
 
-export function creatResponseGeneratorKindsRouteRoute(state: RouterState): Route {
+export function creatResponseGeneratorTemplatesRouteRoute(state: RouterState): Route {
   const previousQueryParams = getPreviousQueryParams(
     state,
-    n => n.path.includes(`/${CONFIGURATION_MODULE_PATH}/${RESPONSE_GENERATOR_KINDS_PAGE_PATH}`),
+    n => n.path.includes(`/${CONFIGURATION_MODULE_PATH}/${RESPONSE_GENERATOR_TEMPLATES_PAGE_PATH}`),
   );
 
   return {
-    pathParts: [CONFIGURATION_MODULE_PATH, RESPONSE_GENERATOR_KINDS_PAGE_PATH],
+    pathParts: [CONFIGURATION_MODULE_PATH, RESPONSE_GENERATOR_TEMPLATES_PAGE_PATH],
     queryParams: previousQueryParams,
   };
 }

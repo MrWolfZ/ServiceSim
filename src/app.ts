@@ -7,7 +7,7 @@ import * as elp from './infrastructure/event-log/persistence';
 import { PredicateTree } from './simulation';
 import simulationApi from './simulation/api';
 import uiApi from './ui/app/app.api';
-import { PredicateTemplatesApi } from './ui/app/configuration/predicate-kinds-page/predicate-kinds.api';
+import { PredicateTemplatesApi } from './ui/app/configuration/predicate-templates-page/predicate-templates.api';
 
 // TODO: set adapter based on configuration
 ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());

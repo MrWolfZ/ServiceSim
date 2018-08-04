@@ -3,7 +3,7 @@ import express, { Request, Response } from 'express';
 import { isSuccess } from '../../infrastructure';
 import { Ask, Tell } from './infrastructure/infrastructure.dto';
 
-import { PredicateTemplatesApi } from './configuration/predicate-kinds-page/predicate-kinds.api';
+import { PredicateTemplatesApi } from './configuration/predicate-templates-page/predicate-templates.api';
 
 export const askAsync = async (req: Request, res: Response) => {
   const ask = req.body as Ask<string, any>;

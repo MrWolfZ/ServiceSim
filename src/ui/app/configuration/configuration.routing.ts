@@ -1,11 +1,9 @@
 import { Route } from '@angular/router';
 
-import { PREDICATE_KINDS_PAGE_PATH, PREDICATE_TREE_PAGE_PATH, RESPONSE_GENERATOR_KINDS_PAGE_PATH } from 'app/infrastructure';
-import { PredicateKindsPage, PredicateKindsPageInitializationGuard } from './predicate-kinds-page';
-
-import { ResponseGeneratorsPage, ResponseGeneratorsPageInitializationGuard } from './response-generators-page';
-
+import { PREDICATE_TEMPLATES_PAGE_PATH, PREDICATE_TREE_PAGE_PATH, RESPONSE_GENERATOR_TEMPLATES_PAGE_PATH } from 'app/infrastructure';
+import { PredicateTemplatesPage, PredicateTemplatesPageInitializationGuard } from './predicate-templates-page';
 import { PredicateTreePage, PredicateTreePageInitializationGuard } from './predicate-tree-page';
+import { ResponseGeneratorTemplatesPage, ResponseGeneratorTemplatesPageInitializationGuard } from './response-generator-templates-page';
 
 export const configurationRoutes: Route[] = [
   {
@@ -19,13 +17,13 @@ export const configurationRoutes: Route[] = [
     canActivate: [PredicateTreePageInitializationGuard],
   },
   {
-    path: PREDICATE_KINDS_PAGE_PATH,
-    component: PredicateKindsPage,
-    canActivate: [PredicateKindsPageInitializationGuard],
+    path: PREDICATE_TEMPLATES_PAGE_PATH,
+    component: PredicateTemplatesPage,
+    canActivate: [PredicateTemplatesPageInitializationGuard],
   },
   {
-    path: RESPONSE_GENERATOR_KINDS_PAGE_PATH,
-    component: ResponseGeneratorsPage,
-    canActivate: [ResponseGeneratorsPageInitializationGuard],
+    path: RESPONSE_GENERATOR_TEMPLATES_PAGE_PATH,
+    component: ResponseGeneratorTemplatesPage,
+    canActivate: [ResponseGeneratorTemplatesPageInitializationGuard],
   },
 ];

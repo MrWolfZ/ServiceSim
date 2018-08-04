@@ -8,23 +8,23 @@ import { InfrastructureModule } from 'app/infrastructure';
 import { configurationRoutes } from './configuration.routing';
 
 import {
-  PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME,
-  PredicateKindFormComponent,
-  PredicateKindsPage,
-  PredicateKindsPageEffects,
-  PredicateKindsPageInitializationGuard,
-  predicateKindsPageReducer,
-  PredicateKindTileComponent,
+  PREDICATE_TEMPLATES_PAGE_STATE_FEATURE_NAME,
   PredicateTemplateDialogComponent,
-} from './predicate-kinds-page';
+  PredicateTemplateFormComponent,
+  PredicateTemplatesPage,
+  PredicateTemplatesPageEffects,
+  PredicateTemplatesPageInitializationGuard,
+  predicateTemplatesPageReducer,
+  PredicateTemplateTileComponent,
+} from './predicate-templates-page';
 
 import {
-  RESPONSE_GENERATORS_PAGE_STATE_FEATURE_NAME,
-  ResponseGeneratorsPage,
-  ResponseGeneratorsPageEffects,
-  ResponseGeneratorsPageInitializationGuard,
-  responseGeneratorsPageReducer,
-} from './response-generators-page';
+  RESPONSE_GENERATOR_TEMPLATES_PAGE_STATE_FEATURE_NAME,
+  ResponseGeneratorTemplatesPage,
+  ResponseGeneratorTemplatesPageEffects,
+  ResponseGeneratorTemplatesPageInitializationGuard,
+  responseGeneratorTemplatesPageReducer,
+} from './response-generator-templates-page';
 
 import {
   PREDICATE_TREE_PAGE_STATE_FEATURE_NAME,
@@ -38,30 +38,30 @@ import {
 
 @NgModule({
   declarations: [
-    PredicateKindsPage,
-    ResponseGeneratorsPage,
+    PredicateTemplatesPage,
+    ResponseGeneratorTemplatesPage,
     PredicateTreePage,
     PredicateNodeComponent,
-    PredicateKindTileComponent,
+    PredicateTemplateTileComponent,
     PredicateTemplateDialogComponent,
-    PredicateKindFormComponent,
+    PredicateTemplateFormComponent,
     PredicateNodeDetailsComponent,
   ],
   imports: [
     InfrastructureModule,
     RouterModule.forChild(configurationRoutes),
     EffectsModule.forFeature([
-      PredicateKindsPageEffects,
-      ResponseGeneratorsPageEffects,
+      PredicateTemplatesPageEffects,
+      ResponseGeneratorTemplatesPageEffects,
       PredicateTreePageEffects,
     ]),
-    StoreModule.forFeature(PREDICATE_KINDS_PAGE_STATE_FEATURE_NAME, predicateKindsPageReducer),
-    StoreModule.forFeature(RESPONSE_GENERATORS_PAGE_STATE_FEATURE_NAME, responseGeneratorsPageReducer),
+    StoreModule.forFeature(PREDICATE_TEMPLATES_PAGE_STATE_FEATURE_NAME, predicateTemplatesPageReducer),
+    StoreModule.forFeature(RESPONSE_GENERATOR_TEMPLATES_PAGE_STATE_FEATURE_NAME, responseGeneratorTemplatesPageReducer),
     StoreModule.forFeature(PREDICATE_TREE_PAGE_STATE_FEATURE_NAME, predicateTreePageReducer),
   ],
   providers: [
-    PredicateKindsPageInitializationGuard,
-    ResponseGeneratorsPageInitializationGuard,
+    PredicateTemplatesPageInitializationGuard,
+    ResponseGeneratorTemplatesPageInitializationGuard,
     PredicateTreePageInitializationGuard,
   ],
 })

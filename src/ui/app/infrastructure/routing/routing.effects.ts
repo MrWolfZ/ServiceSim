@@ -7,15 +7,15 @@ import { map, withLatestFrom } from 'rxjs/operators';
 import { RootState } from 'app/app.state';
 
 import {
-  NavigateToPredicateKindsAction,
+  NavigateToPredicateTemplatesAction,
   NavigateToPredicateTreeAction,
-  NavigateToResponseGeneratorKindsAction,
+  NavigateToResponseGeneratorTemplatesAction,
 } from './routing.actions';
 import {
   createNavigateAction,
-  creatPredicateKindsRouteRoute,
+  creatPredicateTemplatesRouteRoute,
   creatPredicateTreeRouteRoute,
-  creatResponseGeneratorKindsRouteRoute,
+  creatResponseGeneratorTemplatesRouteRoute,
 } from './routing.util';
 
 @Injectable()
@@ -30,19 +30,19 @@ export class RoutingEffects {
   );
 
   @Effect()
-  navigateToPredicateKinds$: Observable<Action> = this.actions$.pipe(
-    ofType(NavigateToPredicateKindsAction.TYPE),
-    map(a => a as NavigateToPredicateKindsAction),
+  navigateToPredicateTemplates$: Observable<Action> = this.actions$.pipe(
+    ofType(NavigateToPredicateTemplatesAction.TYPE),
+    map(a => a as NavigateToPredicateTemplatesAction),
     withLatestFrom(this.store.select(s => s.router)),
-    map(([_, routerState]) => createNavigateAction(creatPredicateKindsRouteRoute(routerState))),
+    map(([_, routerState]) => createNavigateAction(creatPredicateTemplatesRouteRoute(routerState))),
   );
 
   @Effect()
-  navigateToResponseGeneratorKinds$: Observable<Action> = this.actions$.pipe(
-    ofType(NavigateToResponseGeneratorKindsAction.TYPE),
-    map(a => a as NavigateToResponseGeneratorKindsAction),
+  navigateToResponseGeneratorTemplates$: Observable<Action> = this.actions$.pipe(
+    ofType(NavigateToResponseGeneratorTemplatesAction.TYPE),
+    map(a => a as NavigateToResponseGeneratorTemplatesAction),
     withLatestFrom(this.store.select(s => s.router)),
-    map(([_, routerState]) => createNavigateAction(creatResponseGeneratorKindsRouteRoute(routerState))),
+    map(([_, routerState]) => createNavigateAction(creatResponseGeneratorTemplatesRouteRoute(routerState))),
   );
 
   constructor(private actions$: Actions, private store: Store<RootState>) { }
