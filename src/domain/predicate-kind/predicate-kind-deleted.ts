@@ -1,8 +1,8 @@
 import { DomainEvent } from '../../infrastructure';
 
-export class PredicateKindDeleted extends DomainEvent<typeof PredicateKindDeleted.KIND> {
-  predicateKindId: string;
+export class PredicateTemplateDeleted extends DomainEvent<typeof PredicateTemplateDeleted.KIND> {
+  templateId: string;
 
-  static readonly KIND = 'predicate-kind/PredicateKindDeleted';
-  static readonly create = DomainEvent.createBase(PredicateKindDeleted);
+  static readonly KIND = 'predicate-template/PredicateTemplateDeleted';
+  static readonly create = DomainEvent.createBase(PredicateTemplateDeleted);
 }

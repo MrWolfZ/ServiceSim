@@ -3,13 +3,13 @@ import express, { Request, Response } from 'express';
 import { isSuccess } from '../../infrastructure';
 import { Ask, Tell } from './infrastructure/infrastructure.dto';
 
-import { PredicateKindsApi } from './configuration/predicate-kinds-page/predicate-kinds.api';
+import { PredicateTemplatesApi } from './configuration/predicate-kinds-page/predicate-kinds.api';
 
 export const askAsync = async (req: Request, res: Response) => {
   const ask = req.body as Ask<string, any>;
 
   const apis = [
-    PredicateKindsApi.matchAsk,
+    PredicateTemplatesApi.matchAsk,
   ];
 
   for (const api of apis) {
@@ -34,7 +34,7 @@ export const tellAsync = async (req: Request, res: Response) => {
   const tell = req.body as Tell<string, any>;
 
   const apis = [
-    PredicateKindsApi.matchTell,
+    PredicateTemplatesApi.matchTell,
   ];
 
   for (const api of apis) {

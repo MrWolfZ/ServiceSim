@@ -2,17 +2,17 @@ import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { Parameter } from '../parameter';
-import { PredicateKindCreatedOrUpdated } from './predicate-kind-created-or-updated';
-import { PredicateKindDeleted } from './predicate-kind-deleted';
+import { PredicateTemplateCreatedOrUpdated } from './predicate-kind-created-or-updated';
+import { PredicateTemplateDeleted } from './predicate-kind-deleted';
 
-const JOURNAL_NAME = 'predicate-kind/Journal';
+const JOURNAL_NAME = 'predicate-template/Journal';
 
 type DomainEvents =
-  | PredicateKindCreatedOrUpdated
-  | PredicateKindDeleted
+  | PredicateTemplateCreatedOrUpdated
+  | PredicateTemplateDeleted
   ;
 
-export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
+export class PredicateTemplate extends EventSourcedRootEntity<DomainEvents> {
   name = '';
   description = '';
   parameters: Parameter[] = [];
@@ -24,8 +24,8 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     evalFunctionBody: string,
     parameters: Parameter[],
   ) {
-    return new PredicateKind().apply(PredicateKindCreatedOrUpdated.create({
-      predicateKindId: `predicate-kind/${uuid()}`,
+    return new PredicateTemplate().apply(PredicateTemplateCreatedOrUpdated.create({
+      templateId: `predicate-template/${uuid()}`,
       name,
       description,
       evalFunctionBody,
@@ -39,8 +39,8 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
     evalFunctionBody: string,
     parameters: Parameter[],
   ) {
-    return this.apply(PredicateKindCreatedOrUpdated.create({
-      predicateKindId: this.id,
+    return this.apply(PredicateTemplateCreatedOrUpdated.create({
+      templateId: this.id,
       name,
       description,
       evalFunctionBody,
@@ -49,26 +49,26 @@ export class PredicateKind extends EventSourcedRootEntity<DomainEvents> {
   }
 
   delete() {
-    return this.apply(PredicateKindDeleted.create({
-      predicateKindId: this.id,
+    return this.apply(PredicateTemplateDeleted.create({
+      templateId: this.id,
     }));
   }
 
   EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
-    [PredicateKindCreatedOrUpdated.KIND]: event => {
-      this.id = event.predicateKindId;
+    [PredicateTemplateCreatedOrUpdated.KIND]: event => {
+      this.id = event.templateId;
       this.name = event.name;
       this.description = event.description;
       this.evalFunctionBody = event.evalFunctionBody;
       this.parameters = event.parameters;
     },
-    [PredicateKindDeleted.KIND]: () => {
+    [PredicateTemplateDeleted.KIND]: () => {
       // nothing to do
     },
   };
 
-  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<PredicateKind, DomainEvents>(PredicateKind);
-  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, PredicateKind.fromEvents);
-  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<PredicateKind, DomainEvents>(JOURNAL_NAME);
-  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<PredicateKind, DomainEvents>(JOURNAL_NAME);
+  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<PredicateTemplate, DomainEvents>(PredicateTemplate);
+  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, PredicateTemplate.fromEvents);
+  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<PredicateTemplate, DomainEvents>(JOURNAL_NAME);
+  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<PredicateTemplate, DomainEvents>(JOURNAL_NAME);
 }

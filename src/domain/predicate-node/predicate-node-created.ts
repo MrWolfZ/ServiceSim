@@ -1,11 +1,11 @@
 import { DomainEvent } from '../../infrastructure';
-import { PredicateKindVersionSnapshot } from './predicate-kind-version-snapshot';
+import { PredicateTemplateVersionSnapshot } from './predicate-kind-version-snapshot';
 
 export class PredicateNodeCreated extends DomainEvent<typeof PredicateNodeCreated.KIND> {
   nodeId: string;
-  predicateKindVersionSnapshot: PredicateKindVersionSnapshot;
+  predicateTemplateVersionSnapshot: PredicateTemplateVersionSnapshot;
   parameterValues: { [prop: string]: string | number | boolean };
-  parentPredicateNodeId: string | undefined;
+  parentNodeId: string | undefined;
 
   static readonly KIND = 'predicate/PredicateCreated';
   static readonly create = DomainEvent.createBase(PredicateNodeCreated);

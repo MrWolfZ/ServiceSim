@@ -1,13 +1,13 @@
 import { DomainEvent } from '../../infrastructure';
 import { Parameter } from '../parameter';
 
-export class ResponseGeneratorKindCreatedOrUpdated extends DomainEvent<typeof ResponseGeneratorKindCreatedOrUpdated.KIND> {
-  responseGeneratorKindId: string;
+export class ResponseGeneratorTemplateCreatedOrUpdated extends DomainEvent<typeof ResponseGeneratorTemplateCreatedOrUpdated.KIND> {
+  templateId: string;
   name: string;
   description: string;
   generatorFunctionBody: string;
   parameters: Parameter[];
 
-  static readonly KIND = 'response-generator-kind/ResponseGeneratorKindCreatedOrUpdated';
-  static readonly create = DomainEvent.createBase(ResponseGeneratorKindCreatedOrUpdated);
+  static readonly KIND = 'response-generator-template/ResponseGeneratorTemplateCreatedOrUpdated';
+  static readonly create = DomainEvent.createBase(ResponseGeneratorTemplateCreatedOrUpdated);
 }

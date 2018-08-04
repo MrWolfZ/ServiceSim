@@ -1,12 +1,12 @@
 import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
-import { PredicateKind } from '../predicate-kind';
-import { ResponseGeneratorKind } from '../response-generator-kind';
+import { PredicateTemplate } from '../predicate-kind';
+import { ResponseGeneratorTemplate } from '../response-generator-kind';
 import { ChildPredicateNodeAdded } from './child-predicate-node-added';
-import { PredicateKindVersionSnapshot } from './predicate-kind-version-snapshot';
+import { PredicateTemplateVersionSnapshot } from './predicate-kind-version-snapshot';
 import { PredicateNodeCreated } from './predicate-node-created';
-import { ResponseGeneratorKindVersionSnapshot } from './response-generator-kind-version-snapshot';
+import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-kind-version-snapshot';
 import { ResponseGeneratorSet } from './response-generator-set';
 
 const JOURNAL_NAME = 'predicate/Journal';
@@ -18,37 +18,37 @@ type DomainEvents =
   ;
 
 export interface ResponseGenerator {
-  versionSnapshot: ResponseGeneratorKindVersionSnapshot;
+  templateVersionSnapshot: ResponseGeneratorTemplateVersionSnapshot;
   parameterValues: { [prop: string]: string | number | boolean };
 }
 
 export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
-  predicateKindVersionSnapshot: PredicateKindVersionSnapshot;
+  predicateTemplateVersionSnapshot: PredicateTemplateVersionSnapshot;
   parameterValues: { [prop: string]: string | number | boolean } = {};
   childNodeIdsOrResponseGenerator: string[] | ResponseGenerator | undefined;
 
   static create(
-    predicateKind: PredicateKind,
+    predicateTemplate: PredicateTemplate,
     parameterValues: { [prop: string]: string | number | boolean } = {},
-    parentPredicateNodeId: string | undefined,
+    parentNodeId: string | undefined,
   ) {
     return new PredicateNode().apply(PredicateNodeCreated.create({
       nodeId: `predicate/${uuid()}`,
-      predicateKindVersionSnapshot: {
-        predicateKindId: predicateKind.id,
-        version: predicateKind.unmutatedVersion,
-        name: predicateKind.name,
-        description: predicateKind.description,
-        evalFunctionBody: predicateKind.evalFunctionBody,
-        parameters: predicateKind.parameters,
+      predicateTemplateVersionSnapshot: {
+        templateId: predicateTemplate.id,
+        version: predicateTemplate.unmutatedVersion,
+        name: predicateTemplate.name,
+        description: predicateTemplate.description,
+        evalFunctionBody: predicateTemplate.evalFunctionBody,
+        parameters: predicateTemplate.parameters,
       },
       parameterValues,
-      parentPredicateNodeId,
+      parentNodeId,
     }));
   }
 
   setResponseGenerator(
-    responseGeneratorKind: ResponseGeneratorKind,
+    responseGeneratorTemplate: ResponseGeneratorTemplate,
     parameterValues: { [prop: string]: string | number | boolean },
   ) {
     if (Array.isArray(this.childNodeIdsOrResponseGenerator) && this.childNodeIdsOrResponseGenerator.length > 0) {
@@ -57,13 +57,13 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
 
     return this.apply(ResponseGeneratorSet.create({
       predicateNodeId: this.id,
-      responseGeneratorKindVersionSnapshot: {
-        responseGeneratorKindId: responseGeneratorKind.id,
-        version: responseGeneratorKind.unmutatedVersion,
-        name: responseGeneratorKind.name,
-        description: responseGeneratorKind.description,
-        generatorFunctionBody: responseGeneratorKind.generatorFunctionBody,
-        parameters: responseGeneratorKind.parameters,
+      responseGeneratorTemplateVersionSnapshot: {
+        templateId: responseGeneratorTemplate.id,
+        version: responseGeneratorTemplate.unmutatedVersion,
+        name: responseGeneratorTemplate.name,
+        description: responseGeneratorTemplate.description,
+        generatorFunctionBody: responseGeneratorTemplate.generatorFunctionBody,
+        parameters: responseGeneratorTemplate.parameters,
       },
       parameterValues,
     }));
@@ -72,7 +72,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
   addChildPredicate(
     childNodeId: string,
   ) {
-    if (!!this.childNodeIdsOrResponseGenerator && !!(this.childNodeIdsOrResponseGenerator as ResponseGenerator).versionSnapshot) {
+    if (!!this.childNodeIdsOrResponseGenerator && !!(this.childNodeIdsOrResponseGenerator as ResponseGenerator).templateVersionSnapshot) {
       throw new Error(`Cannot add child predicate node for predicate node ${this.id} since it already has a response generator set!`);
     }
 
@@ -85,12 +85,12 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
   EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
     [PredicateNodeCreated.KIND]: event => {
       this.id = event.nodeId;
-      this.predicateKindVersionSnapshot = event.predicateKindVersionSnapshot;
+      this.predicateTemplateVersionSnapshot = event.predicateTemplateVersionSnapshot;
       this.parameterValues = event.parameterValues;
     },
     [ResponseGeneratorSet.KIND]: event => {
       this.childNodeIdsOrResponseGenerator = {
-        versionSnapshot: event.responseGeneratorKindVersionSnapshot,
+        templateVersionSnapshot: event.responseGeneratorTemplateVersionSnapshot,
         parameterValues: event.parameterValues,
       };
     },
@@ -105,7 +105,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
 
   getSnapshotValue() {
     return {
-      predicateKindVersionSnapshot: this.predicateKindVersionSnapshot,
+      predicateTemplateVersionSnapshot: this.predicateTemplateVersionSnapshot,
       parameters: this.parameterValues,
       childPredicateIdsOrResponseGeneratorId: this.childNodeIdsOrResponseGenerator,
     };

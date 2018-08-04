@@ -1,4 +1,4 @@
-import { PredicateKindCreatedOrUpdated, PredicateNodeCreated } from '../domain';
+import { PredicateNodeCreated, PredicateTemplateCreatedOrUpdated } from '../domain';
 import { EventLog } from '../infrastructure';
 import { PredicateTree } from './predicate-tree';
 
@@ -10,8 +10,8 @@ describe('all predicates projection', () => {
 
   it('should track all created predicates', async () => {
     const sub = PredicateTree.start();
-    await EventLog.publishAsync(PredicateKindCreatedOrUpdated.create({
-      predicateKindId: 'url-pattern',
+    await EventLog.publishAsync(PredicateTemplateCreatedOrUpdated.create({
+      templateId: 'url-pattern',
       name: 'url-patter',
       description: '',
       evalFunctionBody: 'return true;',
@@ -20,8 +20,8 @@ describe('all predicates projection', () => {
     const matcherId1 = 'predicate/1';
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId1,
-      predicateKindVersionSnapshot: {
-        predicateKindId: 'url-pattern',
+      predicateTemplateVersionSnapshot: {
+        templateId: 'url-pattern',
         version: 1,
         name: 'Test',
         description: 'Description',
@@ -29,14 +29,14 @@ describe('all predicates projection', () => {
         parameters: [],
       },
       parameterValues: {},
-      parentPredicateNodeId: undefined,
+      parentNodeId: undefined,
     }));
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(1);
     const matcherId2 = 'predicate/2';
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId2,
-      predicateKindVersionSnapshot: {
-        predicateKindId: 'url-pattern',
+      predicateTemplateVersionSnapshot: {
+        templateId: 'url-pattern',
         version: 1,
         name: 'Test',
         description: 'Description',
@@ -44,7 +44,7 @@ describe('all predicates projection', () => {
         parameters: [],
       },
       parameterValues: {},
-      parentPredicateNodeId: undefined,
+      parentNodeId: undefined,
     }));
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(2);
     sub.unsubscribe();

@@ -1,6 +1,6 @@
 import { createFormGroupState } from 'ngrx-forms';
 
-import { PredicateKind, PredicateKindCreatedOrUpdated, PredicateKindDeleted } from '../../../../domain';
+import { PredicateTemplate, PredicateTemplateCreatedOrUpdated, PredicateTemplateDeleted } from '../../../../domain';
 import { EventLog, failure, success } from '../../../../infrastructure';
 
 import { Ask, Tell } from '../../infrastructure/infrastructure.dto';
@@ -17,25 +17,25 @@ import {
 } from './predicate-kinds.dto';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
-  PredicateKindCreatedOrUpdated.KIND,
-  PredicateKindDeleted.KIND,
+  PredicateTemplateCreatedOrUpdated.KIND,
+  PredicateTemplateDeleted.KIND,
 ];
 
 type SubscribedEvents =
-  | PredicateKindCreatedOrUpdated
-  | PredicateKindDeleted
+  | PredicateTemplateCreatedOrUpdated
+  | PredicateTemplateDeleted
   ;
 
 let dto: PredicateKindsPageDto = {
   tiles: [],
 };
 
-export class PredicateKindsApi {
+export class PredicateTemplatesApi {
   static start() {
     return EventLog.subscribeToStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS, {
-      [PredicateKindCreatedOrUpdated.KIND]: ev => {
+      [PredicateTemplateCreatedOrUpdated.KIND]: ev => {
         const item: PredicateKindTileDto = {
-          predicateKindId: ev.predicateKindId,
+          predicateKindId: ev.templateId,
           name: ev.name,
           description: ev.description,
           evalFunctionBody: ev.evalFunctionBody,
@@ -54,8 +54,8 @@ export class PredicateKindsApi {
 
         return;
       },
-      [PredicateKindDeleted.KIND]: ev => {
-        const tiles = dto.tiles.filter(i => i.predicateKindId !== ev.predicateKindId);
+      [PredicateTemplateDeleted.KIND]: ev => {
+        const tiles = dto.tiles.filter(i => i.predicateKindId !== ev.templateId);
 
         dto = {
           ...dto,
@@ -84,10 +84,10 @@ export class PredicateKindsApi {
   static async matchTell(tell: Tell<string, any>) {
     switch (tell.kind) {
       case TELL_TO_CREATE_OR_UPDATE_PREDICATE_KIND:
-        return success(await PredicateKindsApi.createOrUpdatePredicateKind(tell as TellToCreateOrUpdatePredicateKind));
+        return success(await PredicateTemplatesApi.createOrUpdatePredicateKind(tell as TellToCreateOrUpdatePredicateKind));
 
       case TELL_TO_DELETE_PREDICATE_KIND:
-        return success(await PredicateKindsApi.deletePredicateKind(tell as DeletePredicateKindCommand));
+        return success(await PredicateTemplatesApi.deletePredicateKind(tell as DeletePredicateKindCommand));
 
       default:
         return failure();
@@ -103,7 +103,7 @@ export class PredicateKindsApi {
 
     const predicateKind = await (async () => {
       if (!!tell.predicateKindId) {
-        return (await PredicateKind.ofIdAsync(tell.predicateKindId!)).update(
+        return (await PredicateTemplate.ofIdAsync(tell.predicateKindId!)).update(
           tell.formValue.name,
           tell.formValue.description,
           tell.formValue.evalFunctionBody,
@@ -111,7 +111,7 @@ export class PredicateKindsApi {
         );
       }
 
-      return PredicateKind.create(
+      return PredicateTemplate.create(
         tell.formValue.name,
         tell.formValue.description,
         tell.formValue.evalFunctionBody,
@@ -119,7 +119,7 @@ export class PredicateKindsApi {
       );
     })();
 
-    await PredicateKind.saveAsync(predicateKind);
+    await PredicateTemplate.saveAsync(predicateKind);
 
     return success({
       predicateKindId: predicateKind.id,
@@ -129,10 +129,10 @@ export class PredicateKindsApi {
   // TODO: validate predicate kind exists
   // TODO: only allow if predicate kind is unused
   static async deletePredicateKind(tell: DeletePredicateKindCommand) {
-    const predicateKind = await PredicateKind.ofIdAsync(tell.predicateKindId);
+    const predicateKind = await PredicateTemplate.ofIdAsync(tell.predicateKindId);
     predicateKind.delete();
 
-    await PredicateKind.saveAsync(predicateKind);
+    await PredicateTemplate.saveAsync(predicateKind);
 
     return success();
   }

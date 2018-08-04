@@ -1,7 +1,7 @@
 import { Parameter } from '../parameter';
 
-export interface ResponseGeneratorKindVersionSnapshot {
-  responseGeneratorKindId: string;
+export interface ResponseGeneratorTemplateVersionSnapshot {
+  templateId: string;
   version: number;
   name: string;
   description: string;

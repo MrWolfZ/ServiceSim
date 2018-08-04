@@ -1,13 +1,13 @@
 import express from 'express';
 import path from 'path';
 
-import { PredicateKind, PredicateNode, ResponseGeneratorKind } from './domain';
+import { PredicateNode, PredicateTemplate, ResponseGeneratorTemplate } from './domain';
 import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
 import { PredicateTree } from './simulation';
 import simulationApi from './simulation/api';
 import uiApi from './ui/app/app.api';
-import { PredicateKindsApi } from './ui/app/configuration/predicate-kinds-page/predicate-kinds.api';
+import { PredicateTemplatesApi } from './ui/app/configuration/predicate-kinds-page/predicate-kinds.api';
 
 // TODO: set adapter based on configuration
 ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());
@@ -15,9 +15,9 @@ elp.setAdapter(new elp.InMemoryEventLogPersistenceAdapter());
 
 export async function initializeAsync() {
   const sub1 = PredicateTree.start();
-  const sub2 = PredicateKindsApi.start();
+  const sub2 = PredicateTemplatesApi.start();
 
-  const staticResponseGeneratorKind = ResponseGeneratorKind.create(
+  const staticResponseGeneratorTemplate = ResponseGeneratorTemplate.create(
     'static',
     'returns a static response',
     'return { statusCode: parameters["Status Code"], body: parameters["Body"], contentType: parameters["Content Type"] };',
@@ -46,11 +46,11 @@ export async function initializeAsync() {
     ],
   );
 
-  await ResponseGeneratorKind.saveAsync(staticResponseGeneratorKind);
+  await ResponseGeneratorTemplate.saveAsync(staticResponseGeneratorTemplate);
 
-  const pathPrefixPredicateKind = PredicateKind.create(
+  const pathPrefixPredicateTemplate = PredicateTemplate.create(
     'Path Prefix',
-    'Predicates of this kind match all requests whose path starts with a provided string.',
+    'Predicates based on this template match all requests whose path starts with a provided string.',
     'return request.path.startsWith(parameters["Prefix"]);',
     [
       {
@@ -63,11 +63,11 @@ export async function initializeAsync() {
     ],
   );
 
-  await PredicateKind.saveAsync(pathPrefixPredicateKind);
+  await PredicateTemplate.saveAsync(pathPrefixPredicateTemplate);
 
-  const methodPredicateKind = PredicateKind.create(
+  const methodPredicateTemplate = PredicateTemplate.create(
     'Method',
-    'Predicates of this kind match all requests that have one of a specified list of methods.',
+    'Predicates based on this template match all requests that have one of a specified list of methods.',
     'return parameters["Allowed Methods"].split(",").map(m => m.trim().toUpperCase()).includes(request.method.toUpperCase());',
     [
       {
@@ -80,37 +80,37 @@ export async function initializeAsync() {
     ],
   );
 
-  await PredicateKind.saveAsync(methodPredicateKind);
+  await PredicateTemplate.saveAsync(methodPredicateTemplate);
 
-  const getPredicateKind = PredicateKind.create(
+  const getPredicateTemplate = PredicateTemplate.create(
     'GET',
-    'Predicates of this kind match all GET requests',
+    'Predicates based on this template match all GET requests',
     'return request.method.toUpperCase() === "GET"',
     [],
   );
 
-  await PredicateKind.saveAsync(getPredicateKind);
+  await PredicateTemplate.saveAsync(getPredicateTemplate);
 
-  const allPredicateKind = PredicateKind.create(
+  const allPredicateTemplate = PredicateTemplate.create(
     'All',
-    'Predicates of this kind match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
+    'Predicates based on this template match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
     'return true;',
     [],
   );
 
-  await PredicateKind.saveAsync(allPredicateKind);
+  await PredicateTemplate.saveAsync(allPredicateTemplate);
 
-  const topLevelPredicateNode1 = PredicateNode.create(pathPrefixPredicateKind.id, {
+  const topLevelPredicateNode1 = PredicateNode.create(pathPrefixPredicateTemplate, {
     Prefix: '/api',
   }, undefined);
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const childPredicateNode1 = PredicateNode.create(pathPrefixPredicateKind.id, {
+  const childPredicateNode1 = PredicateNode.create(pathPrefixPredicateTemplate, {
     Prefix: '/api/books',
   }, undefined);
 
-  childPredicateNode1.setResponseGenerator(staticResponseGeneratorKind.id, {
+  childPredicateNode1.setResponseGenerator(staticResponseGeneratorTemplate, {
     'Status Code': 200,
     'Body': JSON.stringify([{ title: 'LOTR' }]),
     'Content Type': 'application/json',
@@ -120,11 +120,11 @@ export async function initializeAsync() {
 
   topLevelPredicateNode1.addChildPredicate(childPredicateNode1.id);
 
-  const childPredicateNode2 = PredicateNode.create(pathPrefixPredicateKind.id, {
+  const childPredicateNode2 = PredicateNode.create(pathPrefixPredicateTemplate, {
     Prefix: '/api/authors',
   }, undefined);
 
-  childPredicateNode2.setResponseGenerator(staticResponseGeneratorKind.id, {
+  childPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, {
     'Status Code': 200,
     'Body': JSON.stringify([{ name: 'Tolkien' }]),
     'Content Type': 'application/json',
@@ -136,8 +136,8 @@ export async function initializeAsync() {
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const topLevelPredicateNode2 = PredicateNode.create(allPredicateKind.id, {}, undefined);
-  topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorKind.id, { 'Status Code': 204 });
+  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate, {}, undefined);
+  topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, { 'Status Code': 204 });
 
   await PredicateNode.saveAsync(topLevelPredicateNode2);
 

@@ -1,9 +1,9 @@
 import { DomainEvent } from '../../infrastructure';
-import { ResponseGeneratorKindVersionSnapshot } from './response-generator-kind-version-snapshot';
+import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-kind-version-snapshot';
 
 export class ResponseGeneratorSet extends DomainEvent<typeof ResponseGeneratorSet.KIND> {
   predicateNodeId: string;
-  responseGeneratorKindVersionSnapshot: ResponseGeneratorKindVersionSnapshot;
+  responseGeneratorTemplateVersionSnapshot: ResponseGeneratorTemplateVersionSnapshot;
   parameterValues: { [prop: string]: string | number | boolean };
 
   static readonly KIND = 'predicate/ResponseGeneratorSet';

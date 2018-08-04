@@ -2,15 +2,15 @@ import uuid from 'uuid';
 
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../infrastructure';
 import { Parameter } from '../parameter';
-import { ResponseGeneratorKindCreatedOrUpdated } from './response-generator-kind-created-or-updated';
+import { ResponseGeneratorTemplateCreatedOrUpdated } from './response-generator-kind-created-or-updated';
 
-const JOURNAL_NAME = 'response-generator-kind/Journal';
+const JOURNAL_NAME = 'response-generator-template/Journal';
 
 type DomainEvents =
-  | ResponseGeneratorKindCreatedOrUpdated
+  | ResponseGeneratorTemplateCreatedOrUpdated
   ;
 
-export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> {
+export class ResponseGeneratorTemplate extends EventSourcedRootEntity<DomainEvents> {
   name = '';
   description = '';
   parameters: Parameter[] = [];
@@ -22,8 +22,8 @@ export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> 
     generatorFunctionBody: string,
     parameters: Parameter[],
   ) {
-    return new ResponseGeneratorKind().apply(ResponseGeneratorKindCreatedOrUpdated.create({
-      responseGeneratorKindId: `response-generator-kind/${uuid()}`,
+    return new ResponseGeneratorTemplate().apply(ResponseGeneratorTemplateCreatedOrUpdated.create({
+      templateId: `response-generator-template/${uuid()}`,
       name,
       description,
       generatorFunctionBody,
@@ -37,8 +37,8 @@ export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> 
     generatorFunctionBody: string,
     parameters: Parameter[],
   ) {
-    return this.apply(ResponseGeneratorKindCreatedOrUpdated.create({
-      responseGeneratorKindId: this.id,
+    return this.apply(ResponseGeneratorTemplateCreatedOrUpdated.create({
+      templateId: this.id,
       name,
       description,
       generatorFunctionBody,
@@ -47,8 +47,8 @@ export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> 
   }
 
   EVENT_HANDLERS: EventHandlerMap<DomainEvents> = {
-    [ResponseGeneratorKindCreatedOrUpdated.KIND]: event => {
-      this.id = event.responseGeneratorKindId;
+    [ResponseGeneratorTemplateCreatedOrUpdated.KIND]: event => {
+      this.id = event.templateId;
       this.name = event.name;
       this.description = event.description;
       this.generatorFunctionBody = event.generatorFunctionBody,
@@ -56,8 +56,8 @@ export class ResponseGeneratorKind extends EventSourcedRootEntity<DomainEvents> 
     },
   };
 
-  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<ResponseGeneratorKind, DomainEvents>(ResponseGeneratorKind);
-  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, ResponseGeneratorKind.fromEvents);
-  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<ResponseGeneratorKind, DomainEvents>(JOURNAL_NAME);
-  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<ResponseGeneratorKind, DomainEvents>(JOURNAL_NAME);
+  static readonly fromEvents = EventSourcedRootEntity.fromEventsBase<ResponseGeneratorTemplate, DomainEvents>(ResponseGeneratorTemplate);
+  static readonly ofIdAsync = EventSourcedEntityRepository.entityOfIdAsync(JOURNAL_NAME, ResponseGeneratorTemplate.fromEvents);
+  static readonly saveAsync = EventSourcedEntityRepository.saveAsync<ResponseGeneratorTemplate, DomainEvents>(JOURNAL_NAME);
+  static readonly saveSnapshotAsync = EventSourcedEntityRepository.saveSnapshotAsync<ResponseGeneratorTemplate, DomainEvents>(JOURNAL_NAME);
 }

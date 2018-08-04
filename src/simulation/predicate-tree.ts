@@ -1,9 +1,9 @@
 import {
-  PredicateKindCreatedOrUpdated,
-  PredicateKindDeleted,
   PredicateNodeCreated,
-  ResponseGeneratorKindCreatedOrUpdated,
+  PredicateTemplateCreatedOrUpdated,
+  PredicateTemplateDeleted,
   ResponseGeneratorSet,
+  ResponseGeneratorTemplateCreatedOrUpdated,
   ServiceRequest,
   ServiceResponse,
 } from '../domain';
@@ -11,17 +11,17 @@ import {
 import { EventLog } from '../infrastructure';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
-  PredicateKindCreatedOrUpdated.KIND,
-  ResponseGeneratorKindCreatedOrUpdated.KIND,
+  PredicateTemplateCreatedOrUpdated.KIND,
+  ResponseGeneratorTemplateCreatedOrUpdated.KIND,
   PredicateNodeCreated.KIND,
-  PredicateKindDeleted.KIND,
+  PredicateTemplateDeleted.KIND,
   ResponseGeneratorSet.KIND,
 ];
 
 type SubscribedEvents =
-  | PredicateKindCreatedOrUpdated
-  | PredicateKindDeleted
-  | ResponseGeneratorKindCreatedOrUpdated
+  | PredicateTemplateCreatedOrUpdated
+  | PredicateTemplateDeleted
+  | ResponseGeneratorTemplateCreatedOrUpdated
   | PredicateNodeCreated
   | ResponseGeneratorSet
   ;
@@ -42,28 +42,28 @@ const topLevelPredicateNodes: PredicateNode[] = [];
 
 export class PredicateTree {
   static start() {
-    const predicateKindEvalFunctionBodies = new Map<string, string>();
-    const responseGeneratorKindFunctionBodies = new Map<string, string>();
+    const predicateTemplateEvalFunctionBodies = new Map<string, string>();
+    const responseGeneratorTemplateFunctionBodies = new Map<string, string>();
     const predicateNodesById = new Map<string, PredicateNode>();
 
     return EventLog.getStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS).subscribe(ev => {
       // tslint:disable-next-line:switch-default
       switch (ev.kind) {
-        case PredicateKindCreatedOrUpdated.KIND:
-          predicateKindEvalFunctionBodies.set(ev.predicateKindId, ev.evalFunctionBody);
+        case PredicateTemplateCreatedOrUpdated.KIND:
+          predicateTemplateEvalFunctionBodies.set(ev.templateId, ev.evalFunctionBody);
 
           return;
 
-        case PredicateKindDeleted.KIND:
-          predicateKindEvalFunctionBodies.delete(ev.predicateKindId);
+        case PredicateTemplateDeleted.KIND:
+          predicateTemplateEvalFunctionBodies.delete(ev.templateId);
           return;
 
-        case ResponseGeneratorKindCreatedOrUpdated.KIND:
-          responseGeneratorKindFunctionBodies.set(ev.responseGeneratorKindId, ev.generatorFunctionBody);
+        case ResponseGeneratorTemplateCreatedOrUpdated.KIND:
+          responseGeneratorTemplateFunctionBodies.set(ev.templateId, ev.generatorFunctionBody);
           return;
 
         case PredicateNodeCreated.KIND: {
-          const functionBody = ev.predicateKindVersionSnapshot.evalFunctionBody;
+          const functionBody = ev.predicateTemplateVersionSnapshot.evalFunctionBody;
           const evaluationFunction = new Function('request', 'parameters', functionBody) as PredicateEvaluationFunction;
 
           const node: PredicateNode = {
@@ -80,7 +80,7 @@ export class PredicateTree {
 
         case ResponseGeneratorSet.KIND:
           const predicateNode = predicateNodesById.get(ev.predicateNodeId)!;
-          const generatorFunctionBody = ev.responseGeneratorKindVersionSnapshot.generatorFunctionBody;
+          const generatorFunctionBody = ev.responseGeneratorTemplateVersionSnapshot.generatorFunctionBody;
           const generatorFunction = new Function('request', 'parameters', generatorFunctionBody) as ResponseGeneratorGenerateFunction;
           predicateNode.childNodesOrResponseGenerator = request => generatorFunction(request, ev.parameterValues);
           return;

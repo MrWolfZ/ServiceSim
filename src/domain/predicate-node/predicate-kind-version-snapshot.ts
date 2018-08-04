@@ -1,7 +1,7 @@
 import { Parameter } from '../parameter';
 
-export interface PredicateKindVersionSnapshot {
-  predicateKindId: string;
+export interface PredicateTemplateVersionSnapshot {
+  templateId: string;
   version: number;
   name: string;
   description: string;
