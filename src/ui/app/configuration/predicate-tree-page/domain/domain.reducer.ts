@@ -1,7 +1,14 @@
 import { Action } from '@ngrx/store';
 
-import { DomainState, INITIAL_DOMAIN_STATE } from './domain.state';
+import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
 
-export function domainReducer(state = INITIAL_DOMAIN_STATE, _: Action): DomainState {
+import { DomainState, INITIAL_DOMAIN_STATE } from './domain.state';
+import { predicateNodeReducer } from './predicate-node';
+
+export function domainReducer(state = INITIAL_DOMAIN_STATE, action: Action): DomainState {
+  state = callNestedReducers<DomainState>(state, action, {
+    nodes: createArrayReducer(predicateNodeReducer),
+  });
+
   return state;
 }

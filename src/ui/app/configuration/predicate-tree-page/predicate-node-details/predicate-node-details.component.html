@@ -31,7 +31,8 @@
         </button>
 
         <button class="button is-primary"
-                type="button">
+                type="button"
+                (click)="startEdit()">
           <span>Edit</span>
           <span class="icon is-small">
             <fa-icon icon="edit"></fa-icon>
@@ -46,11 +47,11 @@
 
   <p *ngIf="state.hasTemplate">
     Based on template
-    <i>{{ state.templateName }}</i>
+    <a>{{ state.templateName }}</a>
   </p>
 
   <p *ngIf="state.node.description">
-    {{ state.node.description }}
+    <i>{{ state.node.description }}</i>
   </p>
 
   <div class="group"
@@ -187,11 +188,11 @@
 
   <p *ngIf="state.responseGeneratorHasTemplate">
     Based on template
-    <i>{{ state.responseGeneratorTemplateName }}</i>
+    <a>{{ state.responseGeneratorTemplateName }}</a>
   </p>
 
   <p *ngIf="state.responseGenerator!.description">
-    {{ state.responseGenerator!.description }}
+    <i>{{ state.responseGenerator!.description }}</i>
   </p>
 
   <div class="group"

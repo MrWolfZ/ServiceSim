@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store';
 
+import { PredicateNodeEditDialogFormValue } from './predicate-node.dto';
 import {
   PredicateCustomProperties,
   PredicateTemplateInfo,
@@ -22,26 +23,28 @@ export interface PredicateNode {
   isTopLevelNode: boolean;
 }
 
-export interface PredicateNodeEditFormValue {
-  name: string;
-  parameterValues: { [prop: string]: string | number | boolean };
-}
-
-export interface PredicateNodeCreateFormValue extends PredicateNodeEditFormValue {
-  predicateTemplateId: string;
-}
-
 export class UpdatePredicateNodeAction implements Action {
   static readonly TYPE = 'configuration/predicate-tree-page/domain/predicate-node/UPDATE';
   readonly type = UpdatePredicateNodeAction.TYPE;
 
   constructor(
     public nodeId: string,
+    public formValue: PredicateNodeEditDialogFormValue,
+  ) { }
+}
+
+export class PredicateNodeUpdatedAction implements Action {
+  static readonly TYPE = 'configuration/predicate-tree-page/domain/predicate-node/UPDATED';
+  readonly type = PredicateNodeUpdatedAction.TYPE;
+
+  constructor(
+    public node: PredicateNode,
   ) { }
 }
 
 export type PredicateNodeActions =
   | UpdatePredicateNodeAction
+  | PredicateNodeUpdatedAction
   ;
 
 export const NULL_PREDICATE_NODE: PredicateNode = {

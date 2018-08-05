@@ -30,6 +30,7 @@ import {
   PREDICATE_TREE_PAGE_STATE_FEATURE_NAME,
   PredicateNodeComponent,
   PredicateNodeDetailsComponent,
+  PredicateNodeEditDialogComponent,
   PredicateTreePage,
   PredicateTreePageEffects,
   PredicateTreePageInitializationGuard,
@@ -46,6 +47,7 @@ import {
     PredicateTemplateDialogComponent,
     PredicateTemplateFormComponent,
     PredicateNodeDetailsComponent,
+    PredicateNodeEditDialogComponent,
   ],
   imports: [
     InfrastructureModule,

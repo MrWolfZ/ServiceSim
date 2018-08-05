@@ -1,11 +1,14 @@
 import { InitializePredicateNodeDetailsAction, PredicateNodeDetailsActions } from './predicate-node-details.actions';
 import { INITIAL_PREDICATE_NODE_DETAILS_STATE, PredicateNodeDetailsState } from './predicate-node-details.state';
 
-import { isPredicateTemplateInfo, isResponseGeneratorTemplateInfo } from '../domain';
+import { isPredicateTemplateInfo, isResponseGeneratorTemplateInfo, PredicateNodeUpdatedAction } from '../domain';
 
-export function predicateNodeDetailsReducer(state = INITIAL_PREDICATE_NODE_DETAILS_STATE, action: PredicateNodeDetailsActions): PredicateNodeDetailsState {
+export function predicateNodeDetailsReducer(
+  state = INITIAL_PREDICATE_NODE_DETAILS_STATE,
+  action: PredicateNodeDetailsActions | PredicateNodeUpdatedAction,
+): PredicateNodeDetailsState {
   switch (action.type) {
-    case InitializePredicateNodeDetailsAction.TYPE:
+    case InitializePredicateNodeDetailsAction.TYPE: {
       const node = action.domainState.nodes.find(n => n.nodeId === action.nodeId)!;
 
       let childNodeNames: { [nodeId: string]: string } = {};
@@ -64,6 +67,29 @@ export function predicateNodeDetailsReducer(state = INITIAL_PREDICATE_NODE_DETAI
         responseGeneratorParameterValues,
         responseGeneratorCustomGenerateFunctionBody,
       };
+    }
+
+    case PredicateNodeUpdatedAction.TYPE: {
+      if (action.node.nodeId !== state.node.nodeId) {
+        return state;
+      }
+
+      let parameterValues = {};
+      let customEvalFunctionBody = '';
+
+      if (isPredicateTemplateInfo(action.node.templateInfoOrCustomProperties)) {
+        parameterValues = action.node.templateInfoOrCustomProperties.parameterValues;
+      } else {
+        customEvalFunctionBody = action.node.templateInfoOrCustomProperties.evalFunctionBody;
+      }
+
+      return {
+        ...state,
+        node: action.node,
+        parameterValues,
+        customEvalFunctionBody,
+      };
+    }
 
     default:
       return state;

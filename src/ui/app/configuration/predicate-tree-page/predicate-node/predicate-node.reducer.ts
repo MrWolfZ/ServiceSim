@@ -2,15 +2,18 @@ import { InitializePredicateNodeAction, PredicateNodeActions, SelectPredicateNod
 import { INITIAL_PREDICATE_NODE_STATE, PredicateNodeState } from './predicate-node.state';
 
 import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
-import { isPredicateCustomPropertes, isResponseGeneratorCustomPropertes } from '../domain';
+import { isPredicateCustomProperties, isPredicateTemplateInfo, isResponseGeneratorCustomProperties, PredicateNodeUpdatedAction } from '../domain';
 
-export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, action: PredicateNodeActions): PredicateNodeState {
+export function predicateNodeReducer(
+  state = INITIAL_PREDICATE_NODE_STATE,
+  action: PredicateNodeActions | PredicateNodeUpdatedAction,
+): PredicateNodeState {
   state = callNestedReducers<PredicateNodeState>(state, action, {
     childNodes: createArrayReducer(predicateNodeReducer),
   });
 
   switch (action.type) {
-    case InitializePredicateNodeAction.TYPE:
+    case InitializePredicateNodeAction.TYPE: {
       const node = action.domainState.nodes.find(n => n.nodeId === action.nodeId)!;
 
       let childNodes: PredicateNodeState[] = [];
@@ -23,7 +26,7 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
       }
 
       const parameterValues =
-        isPredicateCustomPropertes(node.templateInfoOrCustomProperties)
+        isPredicateCustomProperties(node.templateInfoOrCustomProperties)
           ? {}
           : node.templateInfoOrCustomProperties.parameterValues;
 
@@ -35,7 +38,7 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
       const responseGeneratorParameterValues =
         !responseGenerator
           ? {}
-          : isResponseGeneratorCustomPropertes(responseGenerator.templateInfoOrCustomProperties)
+          : isResponseGeneratorCustomProperties(responseGenerator.templateInfoOrCustomProperties)
             ? {}
             : responseGenerator.templateInfoOrCustomProperties.parameterValues;
 
@@ -48,6 +51,25 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
         isSelected: false,
         isExpanded: childNodes.length > 0, // TODO: remove once devlopment finishes
       };
+    }
+
+    case PredicateNodeUpdatedAction.TYPE: {
+      if (action.node.nodeId !== state.node.nodeId) {
+        return state;
+      }
+
+      let parameterValues = {};
+
+      if (isPredicateTemplateInfo(action.node.templateInfoOrCustomProperties)) {
+        parameterValues = action.node.templateInfoOrCustomProperties.parameterValues;
+      }
+
+      return {
+        ...state,
+        node: action.node,
+        parameterValues,
+      };
+    }
 
     case TogglePredicateNodeExpansionAction.TYPE:
       if (action.nodeId !== state.node.nodeId) {

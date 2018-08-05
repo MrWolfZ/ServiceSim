@@ -24,7 +24,7 @@ export class SubmitPredicateTemplateDialogAction implements Action {
 
 // TODO: handle failure as well
 export class PredicateTemplateDialogSubmitSuccessfulAction implements Action {
-  static readonly TYPE = 'configuration/predicate-templates-page/predicate-template-list/SUBMIT_SUCCESSFUL';
+  static readonly TYPE = 'configuration/predicate-templates-page/predicate-template-dialog/SUBMIT_SUCCESSFUL';
   readonly type = PredicateTemplateDialogSubmitSuccessfulAction.TYPE;
 
   constructor(

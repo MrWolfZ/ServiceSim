@@ -6,3 +6,4 @@ export * from './predicate-tree.reducer';
 export * from './predicate-tree.state';
 export * from './predicate-node';
 export * from './predicate-node-details';
+export * from './predicate-node-edit-dialog';

@@ -2,11 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { delay, flatMap, map } from 'rxjs/operators';
 
 import { addAskMockResponse, ask } from 'app/infrastructure';
 
+import { UpdatePredicateNodeAction } from './domain';
+import { PredicateNodeEditDialogSubmitSuccessfulAction, SubmitPredicateNodeEditDialogAction } from './predicate-node-edit-dialog';
 import { InitializePredicateTreePageAction, LoadPredicateTreePageDataAction } from './predicate-tree.actions';
 import { ASK_FOR_PREDICATE_TREE_PAGE_DTO, PredicateTreePageDto } from './predicate-tree.dto';
 
@@ -269,6 +271,26 @@ export class PredicateTreePageEffects {
           new InitializePredicateTreePageAction(dto),
         ],
       )
+    ),
+  );
+
+  // TODO: check if node didn't change and if so skip api call
+  @Effect()
+  updatePredicateNode$: Observable<Action> = this.actions$.pipe(
+    ofType(SubmitPredicateNodeEditDialogAction.TYPE),
+    map(a => a as SubmitPredicateNodeEditDialogAction),
+    flatMap(a =>
+      // tell(
+      //   this.http,
+      //   tellToCreateOrUpdatePredicateTemplate(a.formValue, a.templateId),
+      //   dto => [
+      //     new PredicateNodeEditDialogSubmitSuccessfulAction(dto.templateId, a.formValue),
+      //   ],
+      // )
+      of(
+        new PredicateNodeEditDialogSubmitSuccessfulAction(a.nodeId, a.formValue),
+        new UpdatePredicateNodeAction(a.nodeId, a.formValue),
+      ).pipe(delay(100)),
     ),
   );
 

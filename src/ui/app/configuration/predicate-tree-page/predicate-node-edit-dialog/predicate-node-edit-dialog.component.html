@@ -1,0 +1,147 @@
+<form [ngrxFormState]="state.formState">
+  <div class="modal"
+       [class.is-active]="state.dialogIsOpen && !state.dialogIsClosing">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+
+      <header class="modal-card-head">
+        <p class="modal-card-title">
+          Edit predicate node
+        </p>
+      </header>
+
+      <!--
+        We remove the body from the DOM while the dialog is not open to
+        prevent any animations from playing when the dialog is opened.
+      -->
+      <section class="modal-card-body"
+               *ngIf="state.dialogIsOpen">
+
+        <div class="field title">
+          <p class="control">
+            <input class="input"
+                   type="text"
+                   placeholder="Name"
+                   [ngrxFormControlState]="state.formState.controls.nodeName">
+            <sim-form-control-errors [formState]="state.formState.controls.nodeName">
+              <span class="help is-danger"
+                    *ngIf="state.formState.errors['_nodeName']?.required">
+                Please enter a name
+              </span>
+            </sim-form-control-errors>
+          </p>
+        </div>
+
+        <div class="field">
+          <p class="control">
+            <textarea class="textarea"
+                      rows="3"
+                      placeholder="Description"
+                      [ngrxFormControlState]="state.formState.controls.nodeDescription">
+                    </textarea>
+          </p>
+        </div>
+
+        <div class="field"
+             *ngIf="state.nodeIsCustom">
+          <label class="label">Function Body</label>
+          <p class="control">
+            <textarea class="textarea code"
+                      rows="5"
+                      [ngrxFormControlState]="state.formState.controls.evalFunctionBody">
+                    </textarea>
+            <sim-form-control-errors [formState]="state.formState.controls.evalFunctionBody">
+              <span class="help is-danger"
+                    *ngIf="state.formState.errors['_evalFunctionBody']?.required">
+                Please enter a function body
+              </span>
+            </sim-form-control-errors>
+          </p>
+        </div>
+
+        <div class="content"
+             *ngIf="!state.nodeIsCustom && state.parameters.length > 0">
+
+          <h5>Parameter Values</h5>
+
+          <div class="field"
+               *ngFor="let parameter of state.parameters; trackBy: trackByIndex">
+
+            <label class="label">
+              {{ parameter.name }}
+
+              <fa-icon icon="info-circle"
+                       class="tooltip is-tooltip-primary is-tooltip-right"
+                       [attr.data-tooltip]="parameter.description"></fa-icon>
+            </label>
+
+            <div class="control">
+
+              <ng-container *ngIf="parameter.valueType === 'string'">
+                <input class="input"
+                       type="text"
+                       [ngrxFormControlState]="parameterValuesControls[parameter.name]">
+              </ng-container>
+
+              <ng-container class="control"
+                            *ngIf="parameter.valueType === 'number'">
+                <input class="input"
+                       type="number"
+                       [ngrxFormControlState]="parameterValuesControls[parameter.name]">
+              </ng-container>
+
+              <ng-container class="control radio-control"
+                            *ngIf="parameter.valueType === 'boolean'">
+
+                <input type="radio"
+                       id="{{ parameterValuesControls[parameter.name].id }}.true"
+                       class="is-checkradio is-rtl is-white"
+                       [value]="true"
+                       [ngrxFormControlState]="parameterValuesControls[parameter.name]">
+                <label for="{{ parameterValuesControls[parameter.name].id }}.true">
+                  True
+                </label>
+
+                <input type="radio"
+                       id="{{ parameterValuesControls[parameter.name].id }}.false"
+                       class="is-checkradio is-rtl is-white"
+                       [value]="false"
+                       [ngrxFormControlState]="parameterValuesControls[parameter.name]">
+                <label for="{{ parameterValuesControls[parameter.name].id }}.false">
+                  False
+                </label>
+
+              </ng-container>
+
+              <sim-form-control-errors [formState]="parameterValuesControls[parameter.name]">
+                <span class="help is-danger"
+                      *ngIf="parameterValuesControls[parameter.name].errors.required">
+                  Please enter a value
+                </span>
+              </sim-form-control-errors>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <footer class="modal-card-foot justify-content flex-end">
+        <button class="button is-danger is-outlined"
+                type="button"
+                (click)="cancelDialog()"
+                [disabled]="state.isSaving">
+          Cancel
+        </button>
+        <button class="button is-success"
+                [class.is-loading]="state.isSaving"
+                (click)="submitDialog()"
+                [disabled]="state.formState.isInvalid && state.formState.isSubmitted">
+          Save
+        </button>
+      </footer>
+    </div>
+  </div>
+</form>

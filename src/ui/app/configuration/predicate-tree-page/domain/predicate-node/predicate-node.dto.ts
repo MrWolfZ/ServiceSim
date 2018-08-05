@@ -33,3 +33,12 @@ export interface PredicateTemplateInfoDto {
 export interface PredicateCustomPropertiesDto {
   evalFunctionBody: string;
 }
+
+export interface PredicateNodeEditDialogFormValue {
+  nodeName: string;
+  nodeDescription: string;
+  evalFunctionBody: string;
+  parameterValues: {
+    [param: string]: string | boolean | number;
+  };
+}

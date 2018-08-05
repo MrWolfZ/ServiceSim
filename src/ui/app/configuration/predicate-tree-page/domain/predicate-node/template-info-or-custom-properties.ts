@@ -19,7 +19,7 @@ export function isResponseGeneratorTemplateInfo(
   return !!(value as ResponseGeneratorTemplateInfo).templateSnapshot;
 }
 
-export function isResponseGeneratorCustomPropertes(
+export function isResponseGeneratorCustomProperties(
   value: any,
 ): value is ResponseGeneratorCustomProperties {
   return !!(value as ResponseGeneratorCustomProperties).generateFunctionBody;
@@ -39,7 +39,7 @@ export function isPredicateTemplateInfo(
   return !!(value as PredicateTemplateInfo).templateSnapshot;
 }
 
-export function isPredicateCustomPropertes(
+export function isPredicateCustomProperties(
   value: any,
 ): value is PredicateCustomProperties {
   return !!(value as PredicateCustomProperties).evalFunctionBody;
