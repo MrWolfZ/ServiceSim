@@ -16,25 +16,27 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
     nodes: [
       {
         nodeId: '1',
-        predicateTemplateVersionSnapshot: {
-          templateId: 'predicate-templates/1',
-          version: 1,
-          name: 'Path Prefix',
-          description: 'Foo',
-          evalFunctionBody: 'return true;',
-          parameters: [
-            {
-              name: 'Prefix',
-              description: 'Prefix',
-              isRequired: true,
-              valueType: 'string',
-              defaultValue: '/',
-            },
-          ],
-        },
         name: 'My Path Prefix',
-        parameterValues: {
-          'Prefix': '/api/books',
+        templateInstanceOrEvalFunctionBody: {
+          templateSnapshot: {
+            templateId: 'predicate-templates/1',
+            version: 1,
+            name: 'Path Prefix',
+            description: 'Foo',
+            evalFunctionBody: 'return true;',
+            parameters: [
+              {
+                name: 'Prefix',
+                description: 'Prefix',
+                isRequired: true,
+                valueType: 'string',
+                defaultValue: '/',
+              },
+            ],
+          },
+          parameterValues: {
+            'Prefix': '/api/books',
+          },
         },
         childNodeIdsOrResponseGenerator: [
           '1.1',
@@ -44,41 +46,43 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       },
       {
         nodeId: '1.1',
-        predicateTemplateVersionSnapshot: {
-          templateId: 'predicate-templates/2',
-          version: 1,
-          name: 'Path Pattern',
-          description: 'Foo',
-          evalFunctionBody: 'return true;',
-          parameters: [
-            {
-              name: 'Pattern',
-              description: 'Pattern',
-              isRequired: true,
-              valueType: 'string',
-              defaultValue: '/',
-            },
-            {
-              name: 'Foo',
-              description: 'Foo',
-              isRequired: true,
-              valueType: 'boolean',
-              defaultValue: true,
-            },
-            {
-              name: 'Bar',
-              description: 'Bar',
-              isRequired: true,
-              valueType: 'number',
-              defaultValue: 1,
-            },
-          ],
-        },
         name: 'My Path Pattern',
-        parameterValues: {
-          'Pattern': '/api/books/:bookId',
-          'Foo': false,
-          'Bar': 100,
+        templateInstanceOrEvalFunctionBody: {
+          templateSnapshot: {
+            templateId: 'predicate-templates/2',
+            version: 1,
+            name: 'Path Pattern',
+            description: 'Foo',
+            evalFunctionBody: 'return true;',
+            parameters: [
+              {
+                name: 'Pattern',
+                description: 'Pattern',
+                isRequired: true,
+                valueType: 'string',
+                defaultValue: '/',
+              },
+              {
+                name: 'Foo',
+                description: 'Foo',
+                isRequired: true,
+                valueType: 'boolean',
+                defaultValue: true,
+              },
+              {
+                name: 'Bar',
+                description: 'Bar',
+                isRequired: true,
+                valueType: 'number',
+                defaultValue: 1,
+              },
+            ],
+          },
+          parameterValues: {
+            'Pattern': '/api/books/:bookId',
+            'Foo': false,
+            'Bar': 100,
+          },
         },
         childNodeIdsOrResponseGenerator: [
           '1.1.1',
@@ -87,123 +91,147 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       },
       {
         nodeId: '1.1.1',
-        predicateTemplateVersionSnapshot: {
-          templateId: 'predicate-templates/3',
-          version: 1,
-          name: 'POST',
-          description: 'POST',
-          evalFunctionBody: 'return true;',
-          parameters: [],
-        },
         name: 'My POST',
-        parameterValues: {},
-        childNodeIdsOrResponseGenerator: {
-          templateVersionSnapshot: {
-            templateId: 'response-generator-templates/1',
+        templateInstanceOrEvalFunctionBody: {
+          templateSnapshot: {
+            templateId: 'predicate-templates/3',
             version: 1,
-            name: 'Custom Code',
-            description: 'Custom Code',
-            generatorFunctionBody: 'return eval(parameters["Code"]);',
-            parameters: [
-              {
-                name: 'Code',
-                description: '',
-                isRequired: true,
-                valueType: 'string',
-                defaultValue: 'return { statusCode: 204, body: "", contentType: "" };',
-              },
-            ],
+            name: 'POST',
+            description: 'POST',
+            evalFunctionBody: 'return true;',
+            parameters: [],
           },
+          parameterValues: {},
+        },
+        childNodeIdsOrResponseGenerator: {
           name: 'My Custom Code',
-          parameterValues: {
-            'Code': 'return { statusCode: 200, body: "[{"Name":"LOTR"}]", contentType: "application/json" };',
-          },
+          templateInstanceOrGeneratorFunctionBody: 'return { statusCode: 200, body: "[{"Name":"LOTR"}]", contentType: "application/json" };',
         },
         isTopLevelNode: false,
       },
       {
         nodeId: '1.2',
-        predicateTemplateVersionSnapshot: {
-          templateId: 'predicate-templates/4',
-          version: 1,
-          name: 'GET',
-          description: 'GET',
-          evalFunctionBody: 'return true;',
-          parameters: [],
-        },
         name: 'My GET',
-        parameterValues: {},
+        templateInstanceOrEvalFunctionBody: {
+          templateSnapshot: {
+            templateId: 'predicate-templates/4',
+            version: 1,
+            name: 'GET',
+            description: 'GET',
+            evalFunctionBody: 'return true;',
+            parameters: [],
+          },
+          parameterValues: {},
+        },
         childNodeIdsOrResponseGenerator: undefined,
         isTopLevelNode: false,
       },
       {
         nodeId: '2',
-        predicateTemplateVersionSnapshot: {
-          templateId: 'predicate-templates/5',
-          version: 1,
-          name: 'Allowed Methods',
-          description: 'Allowed Methods',
-          evalFunctionBody: 'return true;',
-          parameters: [
-            {
-              name: 'Allowed Methods',
-              description: 'Allowed Methods',
-              isRequired: true,
-              valueType: 'string',
-              defaultValue: 'POST,PUT,DELETE',
-            },
-          ],
-        },
         name: 'My Allowed Methods',
-        parameterValues: {
-          'Allowed Methods': 'PUT,DELETE',
+        templateInstanceOrEvalFunctionBody: {
+          templateSnapshot: {
+            templateId: 'predicate-templates/5',
+            version: 1,
+            name: 'Allowed Methods',
+            description: 'Allowed Methods',
+            evalFunctionBody: 'return true;',
+            parameters: [
+              {
+                name: 'Allowed Methods',
+                description: 'Allowed Methods',
+                isRequired: true,
+                valueType: 'string',
+                defaultValue: 'POST,PUT,DELETE',
+              },
+            ],
+          },
+          parameterValues: {
+            'Allowed Methods': 'PUT,DELETE',
+          },
         },
         childNodeIdsOrResponseGenerator: {
-          templateVersionSnapshot: {
-            templateId: 'response-generator-templates/2',
-            version: 1,
-            name: 'No Content',
-            description: 'No Content',
-            generatorFunctionBody: 'return { statusCode: 204, body: "", contentType: "" }',
-            parameters: [],
-          },
           name: 'My No Content',
-          parameterValues: {},
+          templateInstanceOrGeneratorFunctionBody: {
+            templateSnapshot: {
+              templateId: 'response-generator-templates/2',
+              version: 1,
+              name: 'No Content',
+              description: 'No Content',
+              generatorFunctionBody: 'return { statusCode: 204, body: "", contentType: "" }',
+              parameters: [],
+            },
+            parameterValues: {},
+          },
         },
         isTopLevelNode: true,
       },
       {
         nodeId: '3',
-        predicateTemplateVersionSnapshot: {
-          templateId: 'predicate-templates/4',
-          version: 1,
-          name: 'GET',
-          description: 'GET',
-          evalFunctionBody: 'return true;',
-          parameters: [],
-        },
         name: 'My GET 2',
-        parameterValues: {},
-        childNodeIdsOrResponseGenerator: {
-          templateVersionSnapshot: {
-            templateId: 'response-generator-templates/3',
+        templateInstanceOrEvalFunctionBody: {
+          templateSnapshot: {
+            templateId: 'predicate-templates/4',
             version: 1,
-            name: 'Static File',
-            description: 'Static File',
-            generatorFunctionBody: 'return { statusCode: 200, body: "", contentType: "application/blob" };',
-            parameters: [
-              {
-                name: 'File Path',
-                description: 'File Path',
-                isRequired: true,
-                valueType: 'string',
-                defaultValue: '',
-              },
-            ],
+            name: 'GET',
+            description: 'GET',
+            evalFunctionBody: 'return true;',
+            parameters: [],
           },
+          parameterValues: {},
+        },
+        childNodeIdsOrResponseGenerator: {
           name: 'My Static File',
-          parameterValues: {
-            'File Path': '/home/files/path',
+          templateInstanceOrGeneratorFunctionBody: {
+            templateSnapshot: {
+              templateId: 'response-generator-templates/3',
+              version: 1,
+              name: 'Static File',
+              description: 'Static File',
+              generatorFunctionBody: 'return { statusCode: 200, body: "", contentType: "application/blob" };',
+              parameters: [
+                {
+                  name: 'File Path',
+                  description: 'File Path',
+                  isRequired: true,
+                  valueType: 'string',
+                  defaultValue: '',
+                },
+              ],
+            },
+            parameterValues: {
+              'File Path': '/home/files/path',
+            },
+          },
+        },
+        isTopLevelNode: true,
+      },
+      {
+        nodeId: '4',
+        name: 'My Custom Predicate',
+        templateInstanceOrEvalFunctionBody: 'return true;',
+        childNodeIdsOrResponseGenerator: {
+          name: 'My Static File',
+          templateInstanceOrGeneratorFunctionBody: {
+            templateSnapshot: {
+              templateId: 'response-generator-templates/3',
+              version: 1,
+              name: 'Static File',
+              description: 'Static File',
+              generatorFunctionBody: 'return { statusCode: 200, body: "", contentType: "application/blob" };',
+              parameters: [
+                {
+                  name: 'File Path',
+                  description: 'File Path',
+                  isRequired: true,
+                  valueType: 'string',
+                  defaultValue: '',
+                },
+              ],
+            },
+            parameterValues: {
+              'File Path': '/home/files/path',
+            },
           },
         },
         isTopLevelNode: true,

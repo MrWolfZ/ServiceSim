@@ -3,30 +3,33 @@ import { predicateNodeReducer } from './predicate-node.reducer';
 
 export const MOCK_PREDICATE_NODE_DTO: PredicateNodeDto = {
   nodeId: '1',
-  predicateTemplateVersionSnapshot: {
-    templateId: 'predicate-templates/1',
-    version: 1,
-    name: 'Path Prefix',
-    description: 'Foo',
-    evalFunctionBody: 'return true;',
-    parameters: [
-      {
-        name: 'Prefix',
-        description: 'Prefix',
-        isRequired: true,
-        valueType: 'string',
-        defaultValue: '/',
-      },
-    ],
-  },
   name: 'My Path Prefix',
-  parameterValues: {
-    'Prefix': '/api/books',
+  templateInstanceOrEvalFunctionBody: {
+    templateSnapshot: {
+      templateId: 'predicate-templates/1',
+      version: 1,
+      name: 'Path Prefix',
+      description: 'Foo',
+      evalFunctionBody: 'return true;',
+      parameters: [
+        {
+          name: 'Prefix',
+          description: 'Prefix',
+          isRequired: true,
+          valueType: 'string',
+          defaultValue: '/',
+        },
+      ],
+    },
+    parameterValues: {
+      'Prefix': '/api/books',
+    },
   },
   childNodeIdsOrResponseGenerator: [
     '1.1',
     '1.2',
   ],
+  isTopLevelNode: true,
 };
 
 describe(predicateNodeReducer.name, () => {

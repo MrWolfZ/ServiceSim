@@ -1,17 +1,21 @@
 import { PredicateTemplateVersionSnapshotDto } from '../predicate-template/predicate-template.dto';
-import { ResponseGeneratorTemplateVersionSnapshotDto } from '../response-generator-template/response-generator-template.dto';
+import { ResponseGeneratorTemplateSnapshotDto } from '../response-generator-template/response-generator-template.dto';
 
 export interface ResponseGeneratorDto {
-  templateVersionSnapshot: ResponseGeneratorTemplateVersionSnapshotDto;
   name: string;
-  parameterValues: { [prop: string]: string | number | boolean };
+  templateInstanceOrGeneratorFunctionBody: {
+    templateSnapshot: ResponseGeneratorTemplateSnapshotDto;
+    parameterValues: { [prop: string]: string | number | boolean };
+  } | string;
 }
 
 export interface PredicateNodeDto {
   nodeId: string;
-  predicateTemplateVersionSnapshot: PredicateTemplateVersionSnapshotDto;
   name: string;
-  parameterValues: { [prop: string]: string | number | boolean };
+  templateInstanceOrEvalFunctionBody: {
+    templateSnapshot: PredicateTemplateVersionSnapshotDto;
+    parameterValues: { [prop: string]: string | number | boolean };
+  } | string;
   childNodeIdsOrResponseGenerator: string[] | ResponseGeneratorDto | undefined;
   isTopLevelNode: boolean;
 }

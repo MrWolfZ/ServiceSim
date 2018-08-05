@@ -8,6 +8,6 @@ export interface ResponseGeneratorTemplateDto {
   parameters: ParameterDto[];
 }
 
-export interface ResponseGeneratorTemplateVersionSnapshotDto extends ResponseGeneratorTemplateDto {
+export interface ResponseGeneratorTemplateSnapshotDto extends ResponseGeneratorTemplateDto {
   version: number;
 }

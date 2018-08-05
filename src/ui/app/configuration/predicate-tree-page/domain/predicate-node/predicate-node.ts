@@ -1,16 +1,26 @@
 import { Action } from '@ngrx/store';
 
 import { PredicateTemplateVersionSnapshot } from '../predicate-template';
-import { ResponseGeneratorTemplateVersionSnapshot } from '../response-generator-template';
-import { PredicateNodeDto, ResponseGeneratorDto } from './predicate-node.dto';
+import { ResponseGeneratorTemplateSnapshot } from '../response-generator-template';
+import { PredicateNodeDto } from './predicate-node.dto';
 
-export interface ResponseGenerator extends ResponseGeneratorDto {
-  templateVersionSnapshot: ResponseGeneratorTemplateVersionSnapshot;
+export interface ResponseGenerator {
+  name: string;
+  templateInstanceOrGeneratorFunctionBody: {
+    templateSnapshot: ResponseGeneratorTemplateSnapshot;
+    parameterValues: { [prop: string]: string | number | boolean };
+  } | string;
 }
 
 export interface PredicateNode extends PredicateNodeDto {
-  predicateTemplateVersionSnapshot: PredicateTemplateVersionSnapshot;
+  nodeId: string;
+  name: string;
+  templateInstanceOrEvalFunctionBody: {
+    templateSnapshot: PredicateTemplateVersionSnapshot;
+    parameterValues: { [prop: string]: string | number | boolean };
+  } | string;
   childNodeIdsOrResponseGenerator: string[] | ResponseGenerator | undefined;
+  isTopLevelNode: boolean;
 }
 
 export interface PredicateNodeEditFormValue {
@@ -37,16 +47,18 @@ export type PredicateNodeActions =
 
 export const NULL_PREDICATE_NODE: PredicateNode = {
   nodeId: '',
-  predicateTemplateVersionSnapshot: {
-    templateId: '',
-    version: 0,
-    name: '',
-    description: '',
-    evalFunctionBody: '',
-    parameters: [],
-  },
   name: '',
-  parameterValues: {},
+  templateInstanceOrEvalFunctionBody: {
+    templateSnapshot: {
+      templateId: '',
+      version: 0,
+      name: '',
+      description: '',
+      evalFunctionBody: '',
+      parameters: [],
+    },
+    parameterValues: {},
+  },
   childNodeIdsOrResponseGenerator: undefined,
   isTopLevelNode: true,
 };

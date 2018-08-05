@@ -18,7 +18,7 @@
     </div>
 
     <div class="parameter-preview">
-      <span *ngFor="let kv of state.node.parameterValues | keyValue; trackBy: trackByKey"
+      <span *ngFor="let kv of state.parameterValues | keyValue; trackBy: trackByKey"
             class="parameter">
         <label class="label">{{ kv.key }}:</label>
         <span class="value">{{ kv.value }}</span>
@@ -40,7 +40,7 @@
     </div>
 
     <div class="parameter-preview">
-      <span *ngFor="let kv of state.responseGenerator!.parameterValues | keyvalue; trackBy: trackByKey"
+      <span *ngFor="let kv of state.responseGeneratorParameterValues | keyvalue; trackBy: trackByKey"
             class="parameter">
         <label class="label">{{ kv.key }}:</label>
         <span class="value">{{ kv.value }}</span>

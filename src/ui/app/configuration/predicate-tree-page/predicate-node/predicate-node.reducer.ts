@@ -21,16 +21,30 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
         );
       }
 
+      const parameterValues =
+        typeof node.templateInstanceOrEvalFunctionBody === 'string'
+          ? {}
+          : node.templateInstanceOrEvalFunctionBody.parameterValues;
+
       const responseGenerator =
         node.childNodeIdsOrResponseGenerator !== undefined && !Array.isArray(node.childNodeIdsOrResponseGenerator)
           ? node.childNodeIdsOrResponseGenerator
           : undefined;
 
+      const responseGeneratorParameterValues =
+        !responseGenerator
+          ? {}
+          : typeof responseGenerator.templateInstanceOrGeneratorFunctionBody === 'string'
+            ? {}
+            : responseGenerator.templateInstanceOrGeneratorFunctionBody.parameterValues;
+
       return {
-        ...state,
         node,
         childNodes,
+        parameterValues,
         responseGenerator,
+        responseGeneratorParameterValues,
+        isSelected: false,
         isExpanded: childNodes.length > 0, // TODO: remove once devlopment finishes
       };
 

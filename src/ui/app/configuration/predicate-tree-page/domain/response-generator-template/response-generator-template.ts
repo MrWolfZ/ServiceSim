@@ -5,6 +5,6 @@ export interface ResponseGeneratorTemplate extends ResponseGeneratorTemplateDto 
   parameters: Parameter[];
 }
 
-export interface ResponseGeneratorTemplateVersionSnapshot extends ResponseGeneratorTemplate {
+export interface ResponseGeneratorTemplateSnapshot extends ResponseGeneratorTemplate {
   version: number;
 }

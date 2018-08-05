@@ -44,22 +44,24 @@
 
   </div>
 
-  <p *ngIf="state.templateNameIsVisible">
-    Based on template <i>{{ state.node.predicateTemplateVersionSnapshot.name }}</i>
+  <p *ngIf="state.hasTemplate">
+    Based on template
+    <i>{{ state.templateName }}</i>
   </p>
 
-  <div class="group">
+  <div class="group"
+       *ngIf="state.hasTemplate">
 
     <h5>
       Parameter Values
     </h5>
 
-    <p *ngIf="state.node.predicateTemplateVersionSnapshot.parameters.length === 0">
+    <p *ngIf="(state.parameterValues | keyValue).length === 0">
       This node's template does not have any parameters.
     </p>
 
     <div class="parameter"
-         *ngFor="let kv of state.node.parameterValues | keyValue; trackBy: trackByKey">
+         *ngFor="let kv of state.parameterValues | keyValue; trackBy: trackByKey">
 
       <label class="label">
         {{ kv.key }}:
@@ -70,6 +72,17 @@
       </span>
 
     </div>
+
+  </div>
+
+  <div class="group"
+       *ngIf="!state.hasTemplate">
+
+    <h5>
+      Function Body
+    </h5>
+
+    <pre><code>{{ state.node.templateInstanceOrEvalFunctionBody }}</code></pre>
 
   </div>
 
@@ -168,22 +181,24 @@
 
   </div>
 
-  <p *ngIf="state.responseGeneratorTemplateNameIsVisible">
-    Based on template <i>{{ state.responseGenerator!.templateVersionSnapshot.name }}</i>
+  <p *ngIf="state.responseGeneratorHasTemplate">
+    Based on template
+    <i>{{ state.responseGeneratorTemplateName }}</i>
   </p>
 
-  <div class="group">
+  <div class="group"
+       *ngIf="state.responseGeneratorHasTemplate">
 
     <h5>
       Parameter Values
     </h5>
 
-    <p *ngIf="state.responseGenerator!.templateVersionSnapshot.parameters.length === 0">
+    <p *ngIf="(state.responseGeneratorParameterValues | keyValue).length === 0">
       This response generator's template does not have any parameters.
     </p>
 
     <div class="parameter"
-         *ngFor="let kv of state.responseGenerator!.parameterValues | keyValue; trackBy: trackByKey">
+         *ngFor="let kv of state.responseGeneratorParameterValues | keyValue; trackBy: trackByKey">
 
       <label class="label">
         {{ kv.key }}:
@@ -194,6 +209,17 @@
       </span>
 
     </div>
+
+  </div>
+
+  <div class="group"
+       *ngIf="!state.responseGeneratorHasTemplate">
+
+    <h5>
+      Function Body
+    </h5>
+
+    <pre><code>{{ state.responseGenerator!.templateInstanceOrGeneratorFunctionBody }}</code></pre>
 
   </div>
 

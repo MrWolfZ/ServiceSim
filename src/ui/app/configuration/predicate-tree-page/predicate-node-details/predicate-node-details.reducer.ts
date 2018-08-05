@@ -21,13 +21,36 @@ export function predicateNodeDetailsReducer(state = INITIAL_PREDICATE_NODE_DETAI
           ? node.childNodeIdsOrResponseGenerator
           : undefined;
 
+      let hasTemplate = false;
+      let templateName = '';
+      let parameterValues = {};
+
+      if (typeof node.templateInstanceOrEvalFunctionBody !== 'string') {
+        hasTemplate = true;
+        templateName = node.templateInstanceOrEvalFunctionBody.templateSnapshot.name;
+        parameterValues = node.templateInstanceOrEvalFunctionBody.parameterValues;
+      }
+
+      let responseGeneratorHasTemplate = false;
+      let responseGeneratorTemplateName = '';
+      let responseGeneratorParameterValues = {};
+
+      if (responseGenerator && typeof responseGenerator.templateInstanceOrGeneratorFunctionBody !== 'string') {
+        responseGeneratorHasTemplate = true;
+        responseGeneratorTemplateName = responseGenerator.templateInstanceOrGeneratorFunctionBody.templateSnapshot.name;
+        responseGeneratorParameterValues = responseGenerator.templateInstanceOrGeneratorFunctionBody.parameterValues;
+      }
+
       return {
-        ...state,
         node,
         childNodeNames,
+        hasTemplate,
+        templateName,
+        parameterValues,
         responseGenerator,
-        templateNameIsVisible: node.name !== node.predicateTemplateVersionSnapshot.name,
-        responseGeneratorTemplateNameIsVisible: !!responseGenerator && responseGenerator.name !== responseGenerator.templateVersionSnapshot.name,
+        responseGeneratorHasTemplate,
+        responseGeneratorTemplateName,
+        responseGeneratorParameterValues,
       };
 
     default:
