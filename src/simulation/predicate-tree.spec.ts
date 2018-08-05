@@ -23,7 +23,7 @@ describe('all predicates projection', () => {
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId1,
       name: 'Test',
-      templateInstanceOrEvalFunctionBody: {
+      templateInfoOrCustomProperties: {
         templateSnapshot: {
           templateId: 'url-pattern',
           version: 1,
@@ -43,7 +43,7 @@ describe('all predicates projection', () => {
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId2,
       name: 'Test',
-      templateInstanceOrEvalFunctionBody: {
+      templateInfoOrCustomProperties: {
         templateSnapshot: {
           templateId: 'url-pattern',
           version: 1,

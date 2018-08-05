@@ -2,6 +2,7 @@ import { InitializePredicateNodeAction, PredicateNodeActions, SelectPredicateNod
 import { INITIAL_PREDICATE_NODE_STATE, PredicateNodeState } from './predicate-node.state';
 
 import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
+import { isPredicateCustomPropertes, isResponseGeneratorCustomPropertes } from '../domain';
 
 export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, action: PredicateNodeActions): PredicateNodeState {
   state = callNestedReducers<PredicateNodeState>(state, action, {
@@ -22,9 +23,9 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
       }
 
       const parameterValues =
-        typeof node.templateInstanceOrEvalFunctionBody === 'string'
+        isPredicateCustomPropertes(node.templateInfoOrCustomProperties)
           ? {}
-          : node.templateInstanceOrEvalFunctionBody.parameterValues;
+          : node.templateInfoOrCustomProperties.parameterValues;
 
       const responseGenerator =
         node.childNodeIdsOrResponseGenerator !== undefined && !Array.isArray(node.childNodeIdsOrResponseGenerator)
@@ -34,9 +35,9 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
       const responseGeneratorParameterValues =
         !responseGenerator
           ? {}
-          : typeof responseGenerator.templateInstanceOrGeneratorFunctionBody === 'string'
+          : isResponseGeneratorCustomPropertes(responseGenerator.templateInfoOrCustomProperties)
             ? {}
-            : responseGenerator.templateInstanceOrGeneratorFunctionBody.parameterValues;
+            : responseGenerator.templateInfoOrCustomProperties.parameterValues;
 
       return {
         node,

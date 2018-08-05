@@ -102,6 +102,7 @@ export async function initializeAsync() {
 
   const topLevelPredicateNode1 = PredicateNode.create(
     pathPrefixPredicateTemplate.name,
+    '',
     {
       template: pathPrefixPredicateTemplate,
       parameterValues: {
@@ -115,6 +116,7 @@ export async function initializeAsync() {
 
   const childPredicateNode1 = PredicateNode.create(
     pathPrefixPredicateTemplate.name,
+    '',
     {
       template: pathPrefixPredicateTemplate,
       parameterValues: {
@@ -126,6 +128,7 @@ export async function initializeAsync() {
 
   childPredicateNode1.setResponseGenerator(
     'Static',
+    '',
     {
       template: staticResponseGeneratorTemplate,
       parameterValues: {
@@ -142,6 +145,7 @@ export async function initializeAsync() {
 
   const childPredicateNode2 = PredicateNode.create(
     pathPrefixPredicateTemplate.name,
+    '',
     {
       template: pathPrefixPredicateTemplate,
       parameterValues: {
@@ -153,6 +157,7 @@ export async function initializeAsync() {
 
   childPredicateNode2.setResponseGenerator(
     'Static',
+    '',
     {
       template: staticResponseGeneratorTemplate,
       parameterValues: {
@@ -169,8 +174,8 @@ export async function initializeAsync() {
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate.name, { template: allPredicateTemplate, parameterValues: {} }, undefined);
-  topLevelPredicateNode2.setResponseGenerator('Status Code', { template: staticResponseGeneratorTemplate, parameterValues: { 'Status Code': 204 } });
+  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate.name, '', { template: allPredicateTemplate, parameterValues: {} }, undefined);
+  topLevelPredicateNode2.setResponseGenerator('Status Code', '', { template: staticResponseGeneratorTemplate, parameterValues: { 'Status Code': 204 } });
 
   await PredicateNode.saveAsync(topLevelPredicateNode2);
 

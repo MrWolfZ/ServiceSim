@@ -4,7 +4,8 @@ import { predicateNodeReducer } from './predicate-node.reducer';
 export const MOCK_PREDICATE_NODE_DTO: PredicateNodeDto = {
   nodeId: '1',
   name: 'My Path Prefix',
-  templateInstanceOrEvalFunctionBody: {
+  description: '',
+  templateInfoOrCustomProperties: {
     templateSnapshot: {
       templateId: 'predicate-templates/1',
       version: 1,

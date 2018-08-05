@@ -49,6 +49,10 @@
     <i>{{ state.templateName }}</i>
   </p>
 
+  <p *ngIf="state.node.description">
+    {{ state.node.description }}
+  </p>
+
   <div class="group"
        *ngIf="state.hasTemplate">
 
@@ -82,7 +86,7 @@
       Function Body
     </h5>
 
-    <pre><code>{{ state.node.templateInstanceOrEvalFunctionBody }}</code></pre>
+    <pre><code>{{ state.customEvalFunctionBody }}</code></pre>
 
   </div>
 
@@ -186,6 +190,10 @@
     <i>{{ state.responseGeneratorTemplateName }}</i>
   </p>
 
+  <p *ngIf="state.responseGenerator!.description">
+    {{ state.responseGenerator!.description }}
+  </p>
+
   <div class="group"
        *ngIf="state.responseGeneratorHasTemplate">
 
@@ -219,7 +227,7 @@
       Function Body
     </h5>
 
-    <pre><code>{{ state.responseGenerator!.templateInstanceOrGeneratorFunctionBody }}</code></pre>
+    <pre><code>{{ state.responseGeneratorCustomGenerateFunctionBody }}</code></pre>
 
   </div>
 

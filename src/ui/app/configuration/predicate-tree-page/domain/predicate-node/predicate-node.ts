@@ -1,24 +1,23 @@
 import { Action } from '@ngrx/store';
 
-import { PredicateTemplateVersionSnapshot } from '../predicate-template';
-import { ResponseGeneratorTemplateSnapshot } from '../response-generator-template';
-import { PredicateNodeDto } from './predicate-node.dto';
+import {
+  PredicateCustomProperties,
+  PredicateTemplateInfo,
+  ResponseGeneratorCustomProperties,
+  ResponseGeneratorTemplateInfo,
+} from './template-info-or-custom-properties';
 
 export interface ResponseGenerator {
   name: string;
-  templateInstanceOrGeneratorFunctionBody: {
-    templateSnapshot: ResponseGeneratorTemplateSnapshot;
-    parameterValues: { [prop: string]: string | number | boolean };
-  } | string;
+  description: string;
+  templateInfoOrCustomProperties: ResponseGeneratorTemplateInfo | ResponseGeneratorCustomProperties;
 }
 
-export interface PredicateNode extends PredicateNodeDto {
+export interface PredicateNode {
   nodeId: string;
   name: string;
-  templateInstanceOrEvalFunctionBody: {
-    templateSnapshot: PredicateTemplateVersionSnapshot;
-    parameterValues: { [prop: string]: string | number | boolean };
-  } | string;
+  description: string;
+  templateInfoOrCustomProperties: PredicateTemplateInfo | PredicateCustomProperties;
   childNodeIdsOrResponseGenerator: string[] | ResponseGenerator | undefined;
   isTopLevelNode: boolean;
 }
@@ -48,7 +47,8 @@ export type PredicateNodeActions =
 export const NULL_PREDICATE_NODE: PredicateNode = {
   nodeId: '',
   name: '',
-  templateInstanceOrEvalFunctionBody: {
+  description: '',
+  templateInfoOrCustomProperties: {
     templateSnapshot: {
       templateId: '',
       version: 0,

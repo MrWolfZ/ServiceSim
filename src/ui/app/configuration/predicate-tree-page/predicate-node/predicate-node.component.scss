@@ -35,6 +35,13 @@
   margin-right: 2em;
 }
 
+.description {
+  margin-right: 2em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 h3 {
   white-space: nowrap;
   margin-left: 0.2em;

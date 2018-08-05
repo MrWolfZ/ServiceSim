@@ -14,7 +14,8 @@ export const INITIAL_PREDICATE_NODE_STATE: PredicateNodeState = {
   node: {
     nodeId: '',
     name: '',
-    templateInstanceOrEvalFunctionBody: {
+    description: '',
+    templateInfoOrCustomProperties: {
       templateSnapshot: {
         templateId: '',
         version: 0,

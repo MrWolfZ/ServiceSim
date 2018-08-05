@@ -17,7 +17,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       {
         nodeId: '1',
         name: 'My Path Prefix',
-        templateInstanceOrEvalFunctionBody: {
+        description: 'Book API requests',
+        templateInfoOrCustomProperties: {
           templateSnapshot: {
             templateId: 'predicate-templates/1',
             version: 1,
@@ -47,7 +48,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       {
         nodeId: '1.1',
         name: 'My Path Pattern',
-        templateInstanceOrEvalFunctionBody: {
+        description: 'Single book requests',
+        templateInfoOrCustomProperties: {
           templateSnapshot: {
             templateId: 'predicate-templates/2',
             version: 1,
@@ -92,7 +94,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       {
         nodeId: '1.1.1',
         name: 'My POST',
-        templateInstanceOrEvalFunctionBody: {
+        description: '',
+        templateInfoOrCustomProperties: {
           templateSnapshot: {
             templateId: 'predicate-templates/3',
             version: 1,
@@ -105,14 +108,18 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
         },
         childNodeIdsOrResponseGenerator: {
           name: 'My Custom Code',
-          templateInstanceOrGeneratorFunctionBody: 'return { statusCode: 200, body: "[{"Name":"LOTR"}]", contentType: "application/json" };',
+          description: 'Return book',
+          templateInfoOrCustomProperties: {
+            generateFunctionBody: 'return { statusCode: 200, body: "[{"Name":"LOTR"}]", contentType: "application/json" };',
+          },
         },
         isTopLevelNode: false,
       },
       {
         nodeId: '1.2',
         name: 'My GET',
-        templateInstanceOrEvalFunctionBody: {
+        description: '',
+        templateInfoOrCustomProperties: {
           templateSnapshot: {
             templateId: 'predicate-templates/4',
             version: 1,
@@ -129,7 +136,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       {
         nodeId: '2',
         name: 'My Allowed Methods',
-        templateInstanceOrEvalFunctionBody: {
+        description: '',
+        templateInfoOrCustomProperties: {
           templateSnapshot: {
             templateId: 'predicate-templates/5',
             version: 1,
@@ -152,7 +160,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
         },
         childNodeIdsOrResponseGenerator: {
           name: 'My No Content',
-          templateInstanceOrGeneratorFunctionBody: {
+          description: '',
+          templateInfoOrCustomProperties: {
             templateSnapshot: {
               templateId: 'response-generator-templates/2',
               version: 1,
@@ -169,7 +178,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       {
         nodeId: '3',
         name: 'My GET 2',
-        templateInstanceOrEvalFunctionBody: {
+        description: 'File requests',
+        templateInfoOrCustomProperties: {
           templateSnapshot: {
             templateId: 'predicate-templates/4',
             version: 1,
@@ -182,7 +192,8 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
         },
         childNodeIdsOrResponseGenerator: {
           name: 'My Static File',
-          templateInstanceOrGeneratorFunctionBody: {
+          description: 'return specific file',
+          templateInfoOrCustomProperties: {
             templateSnapshot: {
               templateId: 'response-generator-templates/3',
               version: 1,
@@ -209,10 +220,14 @@ addAskMockResponse<typeof ASK_FOR_PREDICATE_TREE_PAGE_DTO, any, PredicateTreePag
       {
         nodeId: '4',
         name: 'My Custom Predicate',
-        templateInstanceOrEvalFunctionBody: 'return true;',
+        description: 'Some custom code',
+        templateInfoOrCustomProperties: {
+          evalFunctionBody: 'return true;',
+        },
         childNodeIdsOrResponseGenerator: {
           name: 'My Static File',
-          templateInstanceOrGeneratorFunctionBody: {
+          description: '',
+          templateInfoOrCustomProperties: {
             templateSnapshot: {
               templateId: 'response-generator-templates/3',
               version: 1,

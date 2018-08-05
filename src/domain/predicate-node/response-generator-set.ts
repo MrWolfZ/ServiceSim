@@ -1,13 +1,11 @@
 import { DomainEvent } from '../../infrastructure';
-import { ResponseGeneratorTemplateSnapshot } from './response-generator-template-snapshot';
+import { ResponseGeneratorCustomProperties, ResponseGeneratorTemplateInfo } from './template-info-or-custom-properties';
 
 export class ResponseGeneratorSet extends DomainEvent<typeof ResponseGeneratorSet.KIND> {
   predicateNodeId: string;
   responseGeneratorName: string;
-  templateInstanceOrGeneratorFunctionBody: {
-    templateSnapshot: ResponseGeneratorTemplateSnapshot;
-    parameterValues: { [prop: string]: string | number | boolean };
-  } | string;
+  responseGeneratorDescription: string;
+  templateInfoOrCustomProperties: ResponseGeneratorTemplateInfo | ResponseGeneratorCustomProperties;
 
   static readonly KIND = 'predicate/ResponseGeneratorSet';
   static readonly create = DomainEvent.createBase(ResponseGeneratorSet);

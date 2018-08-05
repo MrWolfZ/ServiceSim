@@ -1,4 +1,6 @@
 import {
+  isPredicateCustomPropertes,
+  isResponseGeneratorCustomPropertes,
   PredicateNodeCreated,
   ResponseGeneratorSet,
   ServiceRequest,
@@ -40,11 +42,11 @@ export class PredicateTree {
         case PredicateNodeCreated.KIND: {
           let evaluate: PredicateNode['evaluate'];
 
-          if (typeof ev.templateInstanceOrEvalFunctionBody === 'string') {
-            evaluate = new Function('request', ev.templateInstanceOrEvalFunctionBody) as typeof evaluate;
+          if (isPredicateCustomPropertes(ev.templateInfoOrCustomProperties)) {
+            evaluate = new Function('request', ev.templateInfoOrCustomProperties.evalFunctionBody) as typeof evaluate;
           } else {
-            const functionBody = ev.templateInstanceOrEvalFunctionBody.templateSnapshot.evalFunctionBody;
-            const parameterValues = ev.templateInstanceOrEvalFunctionBody.parameterValues;
+            const functionBody = ev.templateInfoOrCustomProperties.templateSnapshot.evalFunctionBody;
+            const parameterValues = ev.templateInfoOrCustomProperties.parameterValues;
             const evaluationFunction = new Function('request', 'parameters', functionBody) as PredicateEvaluationFunction;
             evaluate = (request => evaluationFunction(request, parameterValues)) as typeof evaluate;
           }
@@ -65,11 +67,11 @@ export class PredicateTree {
 
           let generate: ResponseGeneratorFunction;
 
-          if (typeof ev.templateInstanceOrGeneratorFunctionBody === 'string') {
-            generate = new Function('request', ev.templateInstanceOrGeneratorFunctionBody) as typeof generate;
+          if (isResponseGeneratorCustomPropertes(ev.templateInfoOrCustomProperties)) {
+            generate = new Function('request', ev.templateInfoOrCustomProperties.generateFunctionBody) as typeof generate;
           } else {
-            const functionBody = ev.templateInstanceOrGeneratorFunctionBody.templateSnapshot.generatorFunctionBody;
-            const parameterValues = ev.templateInstanceOrGeneratorFunctionBody.parameterValues;
+            const functionBody = ev.templateInfoOrCustomProperties.templateSnapshot.generatorFunctionBody;
+            const parameterValues = ev.templateInfoOrCustomProperties.parameterValues;
             const generatorFunction = new Function('request', 'parameters', functionBody) as ResponseGeneratorGenerateFunction;
             generate = (request => generatorFunction(request, parameterValues)) as typeof generate;
           }

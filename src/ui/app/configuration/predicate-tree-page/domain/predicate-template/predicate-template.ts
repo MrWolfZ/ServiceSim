@@ -5,6 +5,6 @@ export interface PredicateTemplate extends PredicateTemplateDto {
   parameters: Parameter[];
 }
 
-export interface PredicateTemplateVersionSnapshot extends PredicateTemplate {
+export interface PredicateTemplateSnapshot extends PredicateTemplate {
   version: number;
 }

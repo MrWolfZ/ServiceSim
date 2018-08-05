@@ -1,6 +1,8 @@
 import { InitializePredicateNodeDetailsAction, PredicateNodeDetailsActions } from './predicate-node-details.actions';
 import { INITIAL_PREDICATE_NODE_DETAILS_STATE, PredicateNodeDetailsState } from './predicate-node-details.state';
 
+import { isPredicateTemplateInfo, isResponseGeneratorTemplateInfo } from '../domain';
+
 export function predicateNodeDetailsReducer(state = INITIAL_PREDICATE_NODE_DETAILS_STATE, action: PredicateNodeDetailsActions): PredicateNodeDetailsState {
   switch (action.type) {
     case InitializePredicateNodeDetailsAction.TYPE:
@@ -24,21 +26,29 @@ export function predicateNodeDetailsReducer(state = INITIAL_PREDICATE_NODE_DETAI
       let hasTemplate = false;
       let templateName = '';
       let parameterValues = {};
+      let customEvalFunctionBody = '';
 
-      if (typeof node.templateInstanceOrEvalFunctionBody !== 'string') {
+      if (isPredicateTemplateInfo(node.templateInfoOrCustomProperties)) {
         hasTemplate = true;
-        templateName = node.templateInstanceOrEvalFunctionBody.templateSnapshot.name;
-        parameterValues = node.templateInstanceOrEvalFunctionBody.parameterValues;
+        templateName = node.templateInfoOrCustomProperties.templateSnapshot.name;
+        parameterValues = node.templateInfoOrCustomProperties.parameterValues;
+      } else {
+        customEvalFunctionBody = node.templateInfoOrCustomProperties.evalFunctionBody;
       }
 
       let responseGeneratorHasTemplate = false;
       let responseGeneratorTemplateName = '';
       let responseGeneratorParameterValues = {};
+      let responseGeneratorCustomGenerateFunctionBody = '';
 
-      if (responseGenerator && typeof responseGenerator.templateInstanceOrGeneratorFunctionBody !== 'string') {
-        responseGeneratorHasTemplate = true;
-        responseGeneratorTemplateName = responseGenerator.templateInstanceOrGeneratorFunctionBody.templateSnapshot.name;
-        responseGeneratorParameterValues = responseGenerator.templateInstanceOrGeneratorFunctionBody.parameterValues;
+      if (responseGenerator) {
+        if (isResponseGeneratorTemplateInfo(responseGenerator.templateInfoOrCustomProperties)) {
+          responseGeneratorHasTemplate = true;
+          responseGeneratorTemplateName = responseGenerator.templateInfoOrCustomProperties.templateSnapshot.name;
+          responseGeneratorParameterValues = responseGenerator.templateInfoOrCustomProperties.parameterValues;
+        } else {
+          responseGeneratorCustomGenerateFunctionBody = responseGenerator.templateInfoOrCustomProperties.generateFunctionBody;
+        }
       }
 
       return {
@@ -47,10 +57,12 @@ export function predicateNodeDetailsReducer(state = INITIAL_PREDICATE_NODE_DETAI
         hasTemplate,
         templateName,
         parameterValues,
+        customEvalFunctionBody,
         responseGenerator,
         responseGeneratorHasTemplate,
         responseGeneratorTemplateName,
         responseGeneratorParameterValues,
+        responseGeneratorCustomGenerateFunctionBody,
       };
 
     default:

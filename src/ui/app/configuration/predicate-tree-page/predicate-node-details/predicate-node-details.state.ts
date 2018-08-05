@@ -6,17 +6,20 @@ export interface PredicateNodeDetailsState {
   hasTemplate: boolean;
   templateName: string;
   parameterValues: { [prop: string]: string | number | boolean };
+  customEvalFunctionBody: string;
   responseGenerator: ResponseGenerator | undefined;
   responseGeneratorHasTemplate: boolean;
   responseGeneratorTemplateName: string;
   responseGeneratorParameterValues: { [prop: string]: string | number | boolean };
+  responseGeneratorCustomGenerateFunctionBody: string;
 }
 
 export const INITIAL_PREDICATE_NODE_DETAILS_STATE: PredicateNodeDetailsState = {
   node: {
     nodeId: '',
     name: '',
-    templateInstanceOrEvalFunctionBody: {
+    description: '',
+    templateInfoOrCustomProperties: {
       templateSnapshot: {
         templateId: '',
         version: 0,
@@ -34,8 +37,10 @@ export const INITIAL_PREDICATE_NODE_DETAILS_STATE: PredicateNodeDetailsState = {
   hasTemplate: false,
   templateName: '',
   parameterValues: {},
+  customEvalFunctionBody: '',
   responseGenerator: undefined,
   responseGeneratorHasTemplate: false,
   responseGeneratorTemplateName: '',
   responseGeneratorParameterValues: {},
+  responseGeneratorCustomGenerateFunctionBody: '',
 };
