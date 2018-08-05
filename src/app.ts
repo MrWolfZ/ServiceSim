@@ -27,7 +27,7 @@ export async function initializeAsync() {
         description: 'The HTTP status code of the response',
         isRequired: true,
         valueType: 'number',
-        defaultValue: '204',
+        defaultValue: 204,
       },
       {
         name: 'Body',
@@ -122,6 +122,7 @@ export async function initializeAsync() {
 
   childPredicateNode1.setResponseGenerator(
     staticResponseGeneratorTemplate,
+    'Static',
     {
       'Status Code': 200,
       'Body': JSON.stringify([{ title: 'LOTR' }]),
@@ -142,11 +143,15 @@ export async function initializeAsync() {
     undefined,
   );
 
-  childPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, {
-    'Status Code': 200,
-    'Body': JSON.stringify([{ name: 'Tolkien' }]),
-    'Content Type': 'application/json',
-  });
+  childPredicateNode2.setResponseGenerator(
+    staticResponseGeneratorTemplate,
+    'Static',
+    {
+      'Status Code': 200,
+      'Body': JSON.stringify([{ name: 'Tolkien' }]),
+      'Content Type': 'application/json',
+    },
+  );
 
   await PredicateNode.saveAsync(childPredicateNode2);
 
@@ -155,7 +160,7 @@ export async function initializeAsync() {
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
   const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate, allPredicateTemplate.name, {}, undefined);
-  topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, { 'Status Code': 204 });
+  topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, 'Status Code', { 'Status Code': 204 });
 
   await PredicateNode.saveAsync(topLevelPredicateNode2);
 

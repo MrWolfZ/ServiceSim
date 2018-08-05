@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsSubject } from '@ngrx/store';
 import { AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'ngrx-forms';
 
-import { PredicateTemplateDialogFormValue, PredicateTemplateParameterFormValue } from '../predicate-template-dialog.dto';
+import { ParameterFormValue, PredicateTemplateDialogFormValue } from '../predicate-template-dialog.dto';
 
 @Component({
   selector: 'sim-predicate-template-form',
@@ -21,7 +21,7 @@ export class PredicateTemplateFormComponent {
 
   addParameter() {
     this.actionsSubject.next(
-      new AddArrayControlAction<PredicateTemplateParameterFormValue>(
+      new AddArrayControlAction<ParameterFormValue>(
         this.formState.controls.parameters.id,
         {
           name: '',

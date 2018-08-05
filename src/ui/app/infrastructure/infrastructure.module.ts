@@ -25,6 +25,10 @@ import {
   RoutingEffects,
 } from './routing';
 
+import {
+  KeyValuePipe,
+} from './util';
+
 export const RXJS_SCHEDULER = new InjectionToken<SchedulerLike | undefined>('rxjs/Scheduler');
 
 library.add(faArrowLeft);
@@ -58,6 +62,7 @@ library.add(faTimes);
     PredicateTemplatesLinkDirective,
     PredicateTreeLinkDirective,
     ResponseGeneratorTemplatesLinkDirective,
+    KeyValuePipe,
   ],
   exports: [
     CommonModule,
@@ -72,6 +77,7 @@ library.add(faTimes);
     PredicateTemplatesLinkDirective,
     PredicateTreeLinkDirective,
     ResponseGeneratorTemplatesLinkDirective,
+    KeyValuePipe,
   ],
   providers: [
     { provide: RXJS_SCHEDULER, useValue: undefined },

@@ -3,18 +3,18 @@
 </h1>
 
 <div class="box"
-     *ngIf="!state">
+     *ngIf="!state.node.nodeId">
   Select a predicate node by clicking or tapping it to view its details
 </div>
 
 <div class="box content"
-     *ngIf="state">
+     *ngIf="state.node.nodeId">
 
   <div class="level is-marginless is-mobile">
 
     <div class="level-left">
       <h3>
-        {{ state!.predicateKindName }}
+        {{ state.node.name }}
       </h3>
     </div>
 
@@ -30,11 +30,23 @@
           </span>
         </button>
 
+        <button class="button is-primary"
+                type="button">
+          <span>Edit</span>
+          <span class="icon is-small">
+            <fa-icon icon="edit"></fa-icon>
+          </span>
+        </button>
+
       </div>
 
     </div>
 
   </div>
+
+  <p *ngIf="state.templateNameIsVisible">
+    Based on template <i>{{ state.node.predicateTemplateVersionSnapshot.name }}</i>
+  </p>
 
   <div class="group">
 
@@ -42,50 +54,41 @@
       Parameter Values
     </h5>
 
-    <p *ngIf="state!.parameters.length === 0">
+    <p *ngIf="state.node.predicateTemplateVersionSnapshot.parameters.length === 0">
       This node's template does not have any parameters.
     </p>
 
     <div class="parameter"
-         *ngFor="let parameter of state!.parameters; trackBy: trackByIndex">
+         *ngFor="let kv of state.node.parameterValues | keyValue; trackBy: trackByKey">
 
       <label class="label">
-        {{ parameter.name }}:
+        {{ kv.key }}:
       </label>
 
       <span class="value">
-        {{ parameter.value }}
+        {{ kv.value }}
       </span>
 
     </div>
 
-    <button class="button is-primary"
-            type="button"
-            *ngIf="state!.parameters.length > 0">
-      <span>Edit Parameters</span>
-      <span class="icon is-small">
-        <fa-icon icon="edit"></fa-icon>
-      </span>
-    </button>
-
   </div>
 
   <div class="group"
-       *ngIf="!state!.responseGenerator">
+       *ngIf="!state.responseGenerator">
 
     <h5>
       Child Nodes
     </h5>
 
-    <p *ngIf="state!.childNodes.length === 0">
+    <p *ngIf="(state.childNodeNames | keyValue).length === 0">
       This predicate node does not have any child nodes.
     </p>
 
     <div class="child-node"
-         *ngFor="let childNode of state!.childNodes; trackBy: trackByIndex">
+         *ngFor="let kv of state.childNodeNames | keyValue; trackBy: trackByKey">
 
-      <a (click)="selectChildNode(childNode.nodeId)">
-        {{ childNode.predicateKindName }}
+      <a (click)="selectChildNode(kv.key)">
+        {{ kv.value }}
       </a>
 
     </div>
@@ -101,7 +104,7 @@
   </div>
 
   <div class="group"
-       *ngIf="state!.childNodes.length === 0 && !state!.responseGenerator">
+       *ngIf="(state.childNodeNames | keyValue).length === 0 && !state.responseGenerator">
 
     <h5>
       Response Generator
@@ -124,18 +127,18 @@
 </div>
 
 <h1 class="title"
-    *ngIf="state && state!.responseGenerator">
+    *ngIf="state.responseGenerator">
   Response Generator
 </h1>
 
 <div class="box content"
-     *ngIf="state && state!.responseGenerator">
+     *ngIf="state.responseGenerator">
 
   <div class="level is-marginless is-mobile">
 
     <div class="level-left">
       <h3>
-        {{ state!.responseGenerator!.responseGeneratorKindName }}
+        {{ state.responseGenerator!.name }}
       </h3>
     </div>
 
@@ -151,11 +154,23 @@
           </span>
         </button>
 
+        <button class="button is-primary"
+                type="button">
+          <span>Edit</span>
+          <span class="icon is-small">
+            <fa-icon icon="edit"></fa-icon>
+          </span>
+        </button>
+
       </div>
 
     </div>
 
   </div>
+
+  <p *ngIf="state.responseGeneratorTemplateNameIsVisible">
+    Based on template <i>{{ state.responseGenerator!.templateVersionSnapshot.name }}</i>
+  </p>
 
   <div class="group">
 
@@ -163,31 +178,22 @@
       Parameter Values
     </h5>
 
-    <p *ngIf="state!.responseGenerator!.parameters.length === 0">
+    <p *ngIf="state.responseGenerator!.templateVersionSnapshot.parameters.length === 0">
       This response generator's template does not have any parameters.
     </p>
 
     <div class="parameter"
-         *ngFor="let parameter of state!.responseGenerator!.parameters; trackBy: trackByIndex">
+         *ngFor="let kv of state.responseGenerator!.parameterValues | keyValue; trackBy: trackByKey">
 
       <label class="label">
-        {{ parameter.name }}:
+        {{ kv.key }}:
       </label>
 
       <span class="value">
-        {{ parameter.value }}
+        {{ kv.value }}
       </span>
 
     </div>
-
-    <button class="button is-primary"
-            type="button"
-            *ngIf="state!.responseGenerator!.parameters.length > 0">
-      <span>Edit Parameters</span>
-      <span class="icon is-small">
-        <fa-icon icon="edit"></fa-icon>
-      </span>
-    </button>
 
   </div>
 

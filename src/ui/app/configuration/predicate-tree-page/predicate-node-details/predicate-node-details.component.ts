@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsSubject } from '@ngrx/store';
 
 import { SelectPredicateNodeAction } from '../predicate-node';
-import { ChildNodeState, PredicateNodeDetailsState } from './predicate-node-details.state';
+import { PredicateNodeDetailsState } from './predicate-node-details.state';
 
 @Component({
   selector: 'sim-predicate-node-details',
@@ -11,7 +11,7 @@ import { ChildNodeState, PredicateNodeDetailsState } from './predicate-node-deta
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PredicateNodeDetailsComponent {
-  @Input() state: PredicateNodeDetailsState | undefined;
+  @Input() state: PredicateNodeDetailsState;
 
   constructor(private actionsSubject: ActionsSubject) {}
 
@@ -19,11 +19,7 @@ export class PredicateNodeDetailsComponent {
     this.actionsSubject.next(new SelectPredicateNodeAction(childNodeId));
   }
 
-  trackByIndex(idx: number) {
-    return idx;
-  }
-
-  trackByNodeId(_: number, childNode: ChildNodeState) {
-    return childNode.nodeId;
+  trackByKey(_: number, { key }: { key: string }) {
+    return key;
   }
 }

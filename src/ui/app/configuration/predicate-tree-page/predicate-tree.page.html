@@ -12,7 +12,7 @@
 
   <!-- TODO build open and close mechanism for small devices -->
   <div class="column is-12-tablet is-6-desktop is-4-widescreen details-column">
-    <sim-predicate-node-details [state]="(selectedNode$ | async)">
+    <sim-predicate-node-details [state]="(state$ | async).nodeDetails">
     </sim-predicate-node-details>
   </div>
 </div>

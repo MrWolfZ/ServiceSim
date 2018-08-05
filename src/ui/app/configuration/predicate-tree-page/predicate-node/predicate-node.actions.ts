@@ -1,13 +1,14 @@
 import { Action } from '@ngrx/store';
 
-import { PredicateNodeDto } from './predicate-node.dto';
+import { DomainState } from '../domain';
 
 export class InitializePredicateNodeAction implements Action {
   static readonly TYPE = 'configuration/predicate-tree-page/predicate-node/INITIALIZE';
   readonly type = InitializePredicateNodeAction.TYPE;
 
   constructor(
-    public dto: PredicateNodeDto,
+    public domainState: DomainState,
+    public nodeId: string,
   ) { }
 }
 

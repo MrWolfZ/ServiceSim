@@ -1,17 +1,11 @@
+import { MOCK_PREDICATE_NODE_DTO } from './domain/predicate-node/predicate-node.reducer.spec';
 import { InitializePredicateTreePageAction } from './predicate-tree.actions';
 import { PredicateTreePageDto } from './predicate-tree.dto';
 import { predicateTreePageReducer } from './predicate-tree.reducer';
 import { INITIAL_PREDICATE_TREE_PAGE_STATE } from './predicate-tree.state';
 
-import { MOCK_PREDICATE_NODE_DTO } from './predicate-node/predicate-node.reducer.spec';
-
-import { MOCK_PREDICATE_NODE_DETAILS_DTO } from './predicate-node-details/predicate-node-details.reducer.spec';
-
 export const MOCK_PREDICATE_TREE_PAGE_DTO: PredicateTreePageDto = {
-  topLevelNodes: [MOCK_PREDICATE_NODE_DTO],
-  nodeDetailsByNodeId: {
-    [MOCK_PREDICATE_NODE_DTO.nodeId]: MOCK_PREDICATE_NODE_DETAILS_DTO,
-  },
+  nodes: [MOCK_PREDICATE_NODE_DTO],
 };
 
 describe(predicateTreePageReducer.name, () => {

@@ -3,6 +3,7 @@ import { ResponseGeneratorTemplateVersionSnapshot } from './response-generator-t
 
 export class ResponseGeneratorSet extends DomainEvent<typeof ResponseGeneratorSet.KIND> {
   predicateNodeId: string;
+  responseGeneratorName: string;
   responseGeneratorTemplateVersionSnapshot: ResponseGeneratorTemplateVersionSnapshot;
   parameterValues: { [prop: string]: string | number | boolean };
 

@@ -20,6 +20,7 @@ type DomainEvents =
 
 export interface ResponseGenerator {
   templateVersionSnapshot: ResponseGeneratorTemplateVersionSnapshot;
+  name: string;
   parameterValues: { [prop: string]: string | number | boolean };
 }
 
@@ -53,6 +54,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
 
   setResponseGenerator(
     responseGeneratorTemplate: ResponseGeneratorTemplate,
+    responseGeneratorName: string,
     parameterValues: { [prop: string]: string | number | boolean },
   ) {
     if (Array.isArray(this.childNodeIdsOrResponseGenerator) && this.childNodeIdsOrResponseGenerator.length > 0) {
@@ -69,6 +71,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
         generatorFunctionBody: responseGeneratorTemplate.generatorFunctionBody,
         parameters: responseGeneratorTemplate.parameters,
       },
+      responseGeneratorName,
       parameterValues,
     }));
   }
@@ -96,6 +99,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
     [ResponseGeneratorSet.KIND]: event => {
       this.childNodeIdsOrResponseGenerator = {
         templateVersionSnapshot: event.responseGeneratorTemplateVersionSnapshot,
+        name: event.responseGeneratorName,
         parameterValues: event.parameterValues,
       };
     },

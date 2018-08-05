@@ -1,9 +1,8 @@
-import { combineReducers } from '@ngrx/store';
-
 import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
 
+import { domainReducer, DomainState } from './domain';
 import { InitializePredicateNodeAction, predicateNodeReducer, SelectPredicateNodeAction } from './predicate-node';
-import { InitializePredicateNodeDetailsAction, predicateNodeDetailsReducer, PredicateNodeDetailsState } from './predicate-node-details';
+import { InitializePredicateNodeDetailsAction, predicateNodeDetailsReducer } from './predicate-node-details';
 import { InitializePredicateTreePageAction, PredicateTreePageActions } from './predicate-tree.actions';
 import { INITIAL_PREDICATE_TREE_PAGE_STATE, PredicateTreePageState } from './predicate-tree.state';
 
@@ -11,40 +10,31 @@ export function predicateTreePageReducer(
   state = INITIAL_PREDICATE_TREE_PAGE_STATE,
   action: PredicateTreePageActions | SelectPredicateNodeAction,
 ): PredicateTreePageState {
-  const nodeDetailsByIdReducer = combineReducers<{ [nodeId: string]: PredicateNodeDetailsState }>(
-    Object.keys(state.nodeDetailsByNodeId).reduce((agg, nodeId) => ({
-      ...agg,
-      [nodeId]: predicateNodeDetailsReducer,
-    }), {})
-  );
-
   state = callNestedReducers<PredicateTreePageState>(state, action, {
+    domain: domainReducer,
     topLevelNodes: createArrayReducer(predicateNodeReducer),
-    nodeDetailsByNodeId: nodeDetailsByIdReducer,
+    nodeDetails: predicateNodeDetailsReducer,
   });
 
   switch (action.type) {
     case InitializePredicateTreePageAction.TYPE:
+      const domain: DomainState = {
+        nodes: action.dto.nodes,
+      };
+
       return {
-        ...state,
-        ...action.dto,
-        topLevelNodes: action.dto.topLevelNodes.map((dto, idx) =>
-          predicateNodeReducer(state.topLevelNodes[idx], new InitializePredicateNodeAction(dto))
+        ...INITIAL_PREDICATE_TREE_PAGE_STATE,
+        domain,
+        topLevelNodes: action.dto.nodes.filter(n => n.isTopLevelNode).map(dto =>
+          predicateNodeReducer(undefined, new InitializePredicateNodeAction(domain, dto.nodeId))
         ),
-        nodeDetailsByNodeId:
-          Object.keys(action.dto.nodeDetailsByNodeId).reduce((agg, nodeId) => ({
-            ...agg,
-            [nodeId]: predicateNodeDetailsReducer(
-              state.nodeDetailsByNodeId[nodeId],
-              new InitializePredicateNodeDetailsAction(action.dto.nodeDetailsByNodeId[nodeId]),
-            ),
-          }), {}),
       };
 
     case SelectPredicateNodeAction.TYPE:
       return {
         ...state,
         selectedNodeId: action.nodeId,
+        nodeDetails: predicateNodeDetailsReducer(undefined, new InitializePredicateNodeDetailsAction(state.domain, action.nodeId)),
       };
 
     default:

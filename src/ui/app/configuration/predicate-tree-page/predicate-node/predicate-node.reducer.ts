@@ -4,27 +4,38 @@ import { INITIAL_PREDICATE_NODE_STATE, PredicateNodeState } from './predicate-no
 import { callNestedReducers, createArrayReducer } from 'app/infrastructure';
 
 export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, action: PredicateNodeActions): PredicateNodeState {
-  // we do not forward initialization actions to our child nodes since they are explicitly
-  // intialized in the intialization handler below
-  if (action.type !== InitializePredicateNodeAction.TYPE) {
-    state = callNestedReducers<PredicateNodeState>(state, action, {
-      childNodes: createArrayReducer(predicateNodeReducer),
-    });
-  }
+  state = callNestedReducers<PredicateNodeState>(state, action, {
+    childNodes: createArrayReducer(predicateNodeReducer),
+  });
 
   switch (action.type) {
     case InitializePredicateNodeAction.TYPE:
+      const node = action.domainState.nodes.find(n => n.nodeId === action.nodeId)!;
+
+      let childNodes: PredicateNodeState[] = [];
+
+      if (Array.isArray(node.childNodeIdsOrResponseGenerator)) {
+        const childNodeIds = node.childNodeIdsOrResponseGenerator;
+        childNodes = action.domainState.nodes.filter(n => childNodeIds.indexOf(n.nodeId) >= 0).map(n =>
+          predicateNodeReducer(undefined, new InitializePredicateNodeAction(action.domainState, n.nodeId))
+        );
+      }
+
+      const responseGenerator =
+        node.childNodeIdsOrResponseGenerator !== undefined && !Array.isArray(node.childNodeIdsOrResponseGenerator)
+          ? node.childNodeIdsOrResponseGenerator
+          : undefined;
+
       return {
         ...state,
-        ...action.dto,
-        childNodes: action.dto.childNodes.map(dto =>
-          predicateNodeReducer(state.childNodes.find(n => n.nodeId === dto.nodeId), new InitializePredicateNodeAction(dto))
-        ),
-        isExpanded: action.dto.childNodes.length > 0, // TODO: remove once devlopment finishes
+        node,
+        childNodes,
+        responseGenerator,
+        isExpanded: childNodes.length > 0, // TODO: remove once devlopment finishes
       };
 
     case TogglePredicateNodeExpansionAction.TYPE:
-      if (action.nodeId !== state.nodeId) {
+      if (action.nodeId !== state.node.nodeId) {
         return state;
       }
 
@@ -34,7 +45,7 @@ export function predicateNodeReducer(state = INITIAL_PREDICATE_NODE_STATE, actio
       };
 
     case SelectPredicateNodeAction.TYPE:
-      const isSelected = action.nodeId === state.nodeId;
+      const isSelected = action.nodeId === state.node.nodeId;
 
       if (isSelected === state.isSelected) {
         return state;

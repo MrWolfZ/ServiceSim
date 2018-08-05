@@ -1,21 +1,31 @@
-import { ParameterDto, PredicateNodeDto } from './predicate-node.dto';
+import { PredicateNode, ResponseGenerator } from '../domain';
 
-export interface PredicateParameterState extends ParameterDto {
-}
-
-export interface PredicateNodeState extends PredicateNodeDto {
-  parameters: PredicateParameterState[];
+export interface PredicateNodeState {
+  node: PredicateNode;
+  childNodes: PredicateNodeState[];
+  responseGenerator: ResponseGenerator | undefined;
   isExpanded: boolean;
   isSelected: boolean;
-  childNodes: PredicateNodeState[];
 }
 
 export const INITIAL_PREDICATE_NODE_STATE: PredicateNodeState = {
-  nodeId: '',
-  predicateKindName: '',
-  parameters: [],
-  isExpanded: false,
-  isSelected: false,
+  node: {
+    nodeId: '',
+    predicateTemplateVersionSnapshot: {
+      templateId: '',
+      version: 0,
+      name: '',
+      description: '',
+      evalFunctionBody: '',
+      parameters: [],
+    },
+    name: '',
+    parameterValues: {},
+    childNodeIdsOrResponseGenerator: undefined,
+    isTopLevelNode: false,
+  },
   childNodes: [],
   responseGenerator: undefined,
+  isExpanded: false,
+  isSelected: false,
 };
