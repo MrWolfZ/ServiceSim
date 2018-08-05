@@ -8,8 +8,8 @@ import { ChildPredicateNodeAdded } from './child-predicate-node-added';
 import { PredicateNodeCreated } from './predicate-node-created';
 import { ResponseGeneratorSet } from './response-generator-set';
 import {
-  isPredicateCustomPropertes,
-  isResponseGeneratorCustomPropertes,
+  isPredicateCustomProperties,
+  isResponseGeneratorCustomProperties,
   PredicateCustomProperties,
   PredicateTemplateInfo,
   ResponseGeneratorCustomProperties,
@@ -48,7 +48,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
       name,
       description,
       templateInfoOrCustomProperties:
-        isPredicateCustomPropertes(templateInfoOrCustomProperties)
+        isPredicateCustomProperties(templateInfoOrCustomProperties)
           ? templateInfoOrCustomProperties
           : {
             templateSnapshot: {
@@ -82,7 +82,7 @@ export class PredicateNode extends EventSourcedRootEntity<DomainEvents> {
       responseGeneratorName,
       responseGeneratorDescription,
       templateInfoOrCustomProperties:
-        isResponseGeneratorCustomPropertes(templateInfoOrCustomProperties)
+        isResponseGeneratorCustomProperties(templateInfoOrCustomProperties)
           ? templateInfoOrCustomProperties
           : {
             templateSnapshot: {

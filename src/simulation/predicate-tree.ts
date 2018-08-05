@@ -1,6 +1,6 @@
 import {
-  isPredicateCustomPropertes,
-  isResponseGeneratorCustomPropertes,
+  isPredicateCustomProperties,
+  isResponseGeneratorCustomProperties,
   PredicateNodeCreated,
   ResponseGeneratorSet,
   ServiceRequest,
@@ -42,7 +42,7 @@ export class PredicateTree {
         case PredicateNodeCreated.KIND: {
           let evaluate: PredicateNode['evaluate'];
 
-          if (isPredicateCustomPropertes(ev.templateInfoOrCustomProperties)) {
+          if (isPredicateCustomProperties(ev.templateInfoOrCustomProperties)) {
             evaluate = new Function('request', ev.templateInfoOrCustomProperties.evalFunctionBody) as typeof evaluate;
           } else {
             const functionBody = ev.templateInfoOrCustomProperties.templateSnapshot.evalFunctionBody;
@@ -67,7 +67,7 @@ export class PredicateTree {
 
           let generate: ResponseGeneratorFunction;
 
-          if (isResponseGeneratorCustomPropertes(ev.templateInfoOrCustomProperties)) {
+          if (isResponseGeneratorCustomProperties(ev.templateInfoOrCustomProperties)) {
             generate = new Function('request', ev.templateInfoOrCustomProperties.generateFunctionBody) as typeof generate;
           } else {
             const functionBody = ev.templateInfoOrCustomProperties.templateSnapshot.generatorFunctionBody;
