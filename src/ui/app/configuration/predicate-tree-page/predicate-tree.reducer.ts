@@ -31,6 +31,10 @@ export function predicateTreePageReducer(
       };
 
     case SelectPredicateNodeAction.TYPE:
+      if (state.selectedNodeId === action.nodeId) {
+        return state;
+      }
+
       return {
         ...state,
         selectedNodeId: action.nodeId,

@@ -1,6 +1,6 @@
 import { Parameter } from '../parameter';
 
-export interface ResponseGeneratorTemplateVersionSnapshot {
+export interface ResponseGeneratorTemplateSnapshot {
   templateId: string;
   version: number;
   name: string;

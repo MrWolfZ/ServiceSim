@@ -101,10 +101,12 @@ export async function initializeAsync() {
   await PredicateTemplate.saveAsync(allPredicateTemplate);
 
   const topLevelPredicateNode1 = PredicateNode.create(
-    pathPrefixPredicateTemplate,
     pathPrefixPredicateTemplate.name,
     {
-      Prefix: '/api',
+      template: pathPrefixPredicateTemplate,
+      parameterValues: {
+        Prefix: '/api',
+      },
     },
     undefined,
   );
@@ -112,21 +114,25 @@ export async function initializeAsync() {
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
   const childPredicateNode1 = PredicateNode.create(
-    pathPrefixPredicateTemplate,
     pathPrefixPredicateTemplate.name,
     {
-      Prefix: '/api/books',
+      template: pathPrefixPredicateTemplate,
+      parameterValues: {
+        Prefix: '/api/books',
+      },
     },
     undefined,
   );
 
   childPredicateNode1.setResponseGenerator(
-    staticResponseGeneratorTemplate,
     'Static',
     {
-      'Status Code': 200,
-      'Body': JSON.stringify([{ title: 'LOTR' }]),
-      'Content Type': 'application/json',
+      template: staticResponseGeneratorTemplate,
+      parameterValues: {
+        'Status Code': 200,
+        'Body': JSON.stringify([{ title: 'LOTR' }]),
+        'Content Type': 'application/json',
+      },
     },
   );
 
@@ -135,21 +141,25 @@ export async function initializeAsync() {
   topLevelPredicateNode1.addChildPredicate(childPredicateNode1.id);
 
   const childPredicateNode2 = PredicateNode.create(
-    pathPrefixPredicateTemplate,
     pathPrefixPredicateTemplate.name,
     {
-      Prefix: '/api/authors',
+      template: pathPrefixPredicateTemplate,
+      parameterValues: {
+        Prefix: '/api/authors',
+      },
     },
     undefined,
   );
 
   childPredicateNode2.setResponseGenerator(
-    staticResponseGeneratorTemplate,
     'Static',
     {
-      'Status Code': 200,
-      'Body': JSON.stringify([{ name: 'Tolkien' }]),
-      'Content Type': 'application/json',
+      template: staticResponseGeneratorTemplate,
+      parameterValues: {
+        'Status Code': 200,
+        'Body': JSON.stringify([{ name: 'Tolkien' }]),
+        'Content Type': 'application/json',
+      },
     },
   );
 
@@ -159,8 +169,8 @@ export async function initializeAsync() {
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate, allPredicateTemplate.name, {}, undefined);
-  topLevelPredicateNode2.setResponseGenerator(staticResponseGeneratorTemplate, 'Status Code', { 'Status Code': 204 });
+  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate.name, { template: allPredicateTemplate, parameterValues: {} }, undefined);
+  topLevelPredicateNode2.setResponseGenerator('Status Code', { template: staticResponseGeneratorTemplate, parameterValues: { 'Status Code': 204 } });
 
   await PredicateNode.saveAsync(topLevelPredicateNode2);
 
