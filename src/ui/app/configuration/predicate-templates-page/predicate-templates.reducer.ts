@@ -28,13 +28,16 @@ export function predicateTemplatesPageReducer(
       };
 
     case PredicateTemplateDialogSubmitSuccessfulAction.TYPE: {
-      const newTile = predicateTemplateTileReducer(undefined, new InitializePredicateTemplateTileAction({
-        templateId: action.templateId,
-        name: action.formValue.name,
-        description: action.formValue.description,
-        evalFunctionBody: action.formValue.evalFunctionBody,
-        parameters: action.formValue.parameters,
-      }));
+      const newTile = predicateTemplateTileReducer(
+        undefined,
+        new InitializePredicateTemplateTileAction({
+          templateId: action.templateId,
+          name: action.formValue.name,
+          description: action.formValue.description,
+          evalFunctionBody: action.formValue.evalFunctionBody,
+          parameters: action.formValue.parameters,
+        }),
+      );
 
       const tiles = [
         ...state.tiles.filter(t => t.templateId !== action.templateId),

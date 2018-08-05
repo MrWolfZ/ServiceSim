@@ -33,6 +33,7 @@ export class PredicateTemplatesPageEffects {
     ),
   );
 
+  // TODO: check if template exists and didn't change and if so skip api call
   @Effect()
   createOrUpdatePredicateTemplate$: Observable<Action> = this.actions$.pipe(
     ofType(SubmitPredicateTemplateDialogAction.TYPE),

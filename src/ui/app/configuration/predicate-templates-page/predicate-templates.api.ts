@@ -1,7 +1,7 @@
 import { createFormGroupState } from 'ngrx-forms';
 
 import { PredicateTemplate, PredicateTemplateCreatedOrUpdated, PredicateTemplateDeleted } from '../../../../domain';
-import { EventLog, failure, success } from '../../../../infrastructure';
+import { EventLog, failure, Result, success } from '../../../../infrastructure';
 
 import { Ask, Tell } from '../../infrastructure/infrastructure.dto';
 import { validatePredicateTemplateDialog } from './predicate-template-dialog/predicate-template-dialog.validation';
@@ -84,24 +84,24 @@ export class PredicateTemplatesApi {
   static async matchTell(tell: Tell<string, any>) {
     switch (tell.kind) {
       case TELL_TO_CREATE_OR_UPDATE_PREDICATE_TEMPLATE:
-        return success(await PredicateTemplatesApi.createOrUpdatePredicateKind(tell as TellToCreateOrUpdatePredicateTemplate));
+        return success(await PredicateTemplatesApi.createOrUpdatePredicateTemplate(tell as TellToCreateOrUpdatePredicateTemplate));
 
       case TELL_TO_DELETE_PREDICATE_TEMPLATE:
-        return success(await PredicateTemplatesApi.deletePredicateKind(tell as DeletePredicateTemplateCommand));
+        return success(await PredicateTemplatesApi.deletePredicateTemplate(tell as DeletePredicateTemplateCommand));
 
       default:
         return failure();
     }
   }
 
-  static async createOrUpdatePredicateKind(tell: TellToCreateOrUpdatePredicateTemplate) {
+  static async createOrUpdatePredicateTemplate(tell: TellToCreateOrUpdatePredicateTemplate): Promise<Result<TellToCreateOrUpdatePredicateTemplate['dto']>> {
     const isValid = validatePredicateTemplateDialog(createFormGroupState('', tell.formValue)).isValid;
 
     if (!isValid) {
       return failure();
     }
 
-    const predicateKind = await (async () => {
+    const template = await (async () => {
       if (!!tell.templateId) {
         return (await PredicateTemplate.ofIdAsync(tell.templateId!)).update(
           tell.formValue.name,
@@ -119,16 +119,16 @@ export class PredicateTemplatesApi {
       );
     })();
 
-    await PredicateTemplate.saveAsync(predicateKind);
+    await PredicateTemplate.saveAsync(template);
 
     return success({
-      predicateKindId: predicateKind.id,
+      templateId: template.id,
     });
   }
 
   // TODO: validate predicate kind exists
   // TODO: only allow if predicate kind is unused
-  static async deletePredicateKind(tell: DeletePredicateTemplateCommand) {
+  static async deletePredicateTemplate(tell: DeletePredicateTemplateCommand) {
     const predicateKind = await PredicateTemplate.ofIdAsync(tell.templateId);
     predicateKind.delete();
 

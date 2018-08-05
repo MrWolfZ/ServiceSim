@@ -22,18 +22,23 @@ export class PredicateTemplateTileComponent {
   }
 
   startEdit() {
-    this.actionsSubject.next(new OpenPredicateTemplateDialogAction({
-      name: this.state.name,
-      description: this.state.description,
-      evalFunctionBody: this.state.evalFunctionBody,
-      parameters: this.state.parameters.map<ParameterFormValue>(p => ({
-        name: p.name,
-        description: p.description,
-        isRequired: p.isRequired,
-        valueType: p.valueType as any,
-        defaultValue: p.defaultValue as any,
-      })),
-    }, this.state.templateId));
+    this.actionsSubject.next(
+      new OpenPredicateTemplateDialogAction(
+        {
+          name: this.state.name,
+          description: this.state.description,
+          evalFunctionBody: this.state.evalFunctionBody,
+          parameters: this.state.parameters.map<ParameterFormValue>(p => ({
+            name: p.name,
+            description: p.description,
+            isRequired: p.isRequired,
+            valueType: p.valueType as any,
+            defaultValue: p.defaultValue as any,
+          })),
+        },
+        this.state.templateId,
+      )
+    );
   }
 
   trackByIndex(idx: number) {
