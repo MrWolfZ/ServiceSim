@@ -9,6 +9,19 @@
       "protocol": "inspector"
     },
     {
+      "type": "chrome",
+      "request": "launch",
+      "name": "vuejs: chrome",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/src/ui-vue",
+      "breakOnLoad": true,
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///src/ui-vue/*": "${webRoot}/*",
+        "webpack:///./src/ui-vue/*": "${webRoot}/*"
+      }
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Generate Test Page",

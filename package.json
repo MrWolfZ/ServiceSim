@@ -73,11 +73,12 @@
     "vue-property-decorator": "^7.0.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
+    "vuex-class": "^0.3.1",
     "winston": "^3.0.0",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.7.2",
+    "@angular-devkit/build-angular": "^0.11.4",
     "@angular-devkit/schematics-cli": "^0.7.2",
     "@angular/animations": "^6.1.1",
     "@angular/cli": "^6.1.1",
@@ -141,8 +142,8 @@
     "moment": "^2.22.2",
     "ngrx-forms": "^3.0.2",
     "ngrx-store-freeze": "^0.2.4",
-    "nodemon": "^1.18.3",
     "node-sass": "^4.9.0",
+    "nodemon": "^1.18.3",
     "protractor": "^5.4.0",
     "sass-loader": "^7.0.1",
     "shelljs": "^0.8.2",
