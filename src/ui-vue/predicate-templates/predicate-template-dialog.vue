@@ -1,43 +1,55 @@
 <script lang="tsx">
-import { Component, Prop } from 'vue-property-decorator';
-import TsxComponent from '../tsx-component';
-
-interface PredicateTemplateDialogProps {
-  dialogIsOpen: boolean;
-}
+import { Component, Vue } from 'vue-property-decorator';
+import PredicateTemplateForm from './predicate-template-form.vue';
 
 @Component({
-  components: {},
+  components: {
+    PredicateTemplateForm,
+  },
 })
-export default class PredicateTemplateDialog extends TsxComponent<PredicateTemplateDialogProps> implements PredicateTemplateDialogProps {
-  @Prop() dialogIsOpen = false;
-  dialogIsClosing = false;
-  isNewItem = true;
-  isSaving = false;
-  formState: any = {};
+export default class PredicateTemplateDialog extends Vue {
+  private dialogIsOpen = false;
+  private dialogIsClosing = false;
+  private isNewItem = true;
+  private isSaving = false;
 
-  submitDialog() {
-    // g
+  private form = () => this.$refs[this.form.name] as PredicateTemplateForm;
+
+  openDialog(isNewItem = true) {
+    this.isSaving = false;
+    this.isNewItem = isNewItem;
+    this.dialogIsOpen = true;
   }
 
-  cancelDialog() {
-    // g
+  private async submitDialog() {
+    this.isSaving = true;
+    await new Promise<void>(resolve => setTimeout(resolve, 2000));
+    this.closeDialog();
+  }
+
+  private cancelDialog() {
+    this.closeDialog();
+  }
+
+  private closeDialog() {
+    this.dialogIsClosing = true;
+
+    // to prevent jumping of modal while dialog is fading out
+    setTimeout(() => {
+      this.dialogIsOpen = false;
+      this.dialogIsClosing = false;
+    }, 200);
   }
 
   render() {
-    if (!this.dialogIsOpen) {
-      return null;
-    }
-
     return (
-      <form ngrxFormState='state.formState'>
-        <div class={`modal${this.dialogIsOpen && !this.dialogIsClosing ? ` is-active` : ``}`}>
-          <div class='modal-background'></div>
+      <form novalidate onSubmit={(e: Event) => e.preventDefault()}>
+        <div class={`modal ${this.dialogIsOpen && !this.dialogIsClosing ? `is-active` : ``}`}>
+          <div class='modal-background' />
           <div class='modal-card'>
-
             <header class='modal-card-head'>
               <p class='modal-card-title'>
-                { this.isNewItem ? `Create new predicate template` : `Edit predicate template` }
+                {this.isNewItem ? `Create new predicate template` : `Edit predicate template`}
               </p>
             </header>
 
@@ -50,7 +62,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
 
             { this.dialogIsOpen &&
               <section class='modal-card-body'>
-                <sim-predicate-template-form formState='state.formState'></sim-predicate-template-form>
+                <PredicateTemplateForm ref={this.form.name} />
               </section>
             }
 
@@ -61,9 +73,9 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
                       disabled={this.isSaving}>
                 Cancel
               </button>
-              <button class={`button is-success${this.isSaving ? `is-loading` : ``}`}
+              <button class={`button is-success ${this.isSaving ? `is-loading` : ``}`}
                       onClick={() => this.submitDialog()}
-                      disabled={this.formState.isInvalid && this.formState.isSubmitted}>
+                      disabled={this.form() && this.form().isInvalid && this.form().isSubmitted}>
                 Save
               </button>
             </footer>

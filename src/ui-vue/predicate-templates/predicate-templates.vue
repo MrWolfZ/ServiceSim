@@ -9,11 +9,9 @@ import PredicateTemplateDialog from './predicate-template-dialog.vue';
 })
 export default class PredicateTemplatesPage extends Vue {
   tiles: string[] = [];
-  dialogIsOpen = false;
+  private filterValue = '';
 
-  openNewItemDialog() {
-    this.dialogIsOpen = true;
-  }
+  private newItemDialog = () => this.$refs[this.newItemDialog.name] as PredicateTemplateDialog;
 
   render() {
     return (
@@ -30,13 +28,14 @@ export default class PredicateTemplatesPage extends Vue {
                   <p class='control'>
                     <input class='input filter'
                            placeholder='Filter...'
-                           ngrxFormControlState='(state$ | async).filterControl' />
+                           value={this.filterValue}
+                           onInput={ (e: Event) => this.filterValue = (e.target as HTMLInputElement).value } />
                   </p>
                 </div>
               </div>
               <div class='level-right'>
                 <button class='button is-primary'
-                        onClick={() => this.openNewItemDialog()}>
+                        onClick={() => this.newItemDialog().openDialog()}>
                   <span>Create new template</span>
                   <span class='icon is-small'>
                     <fa-icon icon='plus'></fa-icon>
@@ -61,7 +60,7 @@ export default class PredicateTemplatesPage extends Vue {
             <br />
             { /* TODO: add button to create default predicate templates */ }
             <button class='button is-primary'
-                    onClick={() => this.openNewItemDialog()}>
+                    onClick={() => this.newItemDialog().openDialog()}>
               <span>Create new template</span>
               <span class='icon is-small'>
                 <fa-icon icon='plus'></fa-icon>
@@ -70,7 +69,7 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-        <PredicateTemplateDialog dialogIsOpen={this.dialogIsOpen}></PredicateTemplateDialog>
+        <PredicateTemplateDialog ref={this.newItemDialog.name}></PredicateTemplateDialog>
       </div>
     );
   }
