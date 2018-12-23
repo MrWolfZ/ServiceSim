@@ -1,0 +1,17 @@
+@import "~bulmaswatch/darkly/variables";
+@import "~bulma/sass/utilities/initial-variables";
+
+// bulmaswatch overrides
+$radius-small: 0;
+$radius: 0;
+$radius-large: 0;
+
+// bulma theming
+$input-color: $white;
+$input-background-color: $background;
+$input-border-color: $background;
+$input-disabled-background-color: $background;
+$input-disabled-color: $grey;
+
+// custom variables
+$input-placeholder-color: $grey-lighter;

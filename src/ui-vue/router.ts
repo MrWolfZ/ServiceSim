@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import PredicateTreePage from './predicate-tree/predicate-tree.vue';
 
 Vue.use(Router);
 
@@ -9,17 +9,18 @@ export default new Router({
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: Home,
+      path: '/predicate-tree',
+      name: 'predicate-tree',
+      component: PredicateTreePage,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+      path: '/predicate-templates',
+      name: 'predicate-templates',
+      component: () => import(/* webpackChunkName: "predicate-templates" */ './predicate-templates/predicate-templates.vue'),
+    },
+    {
+      path: '/',
+      redirect: 'predicate-tree',
     },
   ],
 });
