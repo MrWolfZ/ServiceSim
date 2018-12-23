@@ -38,5 +38,15 @@ module.exports = {
         options.configFile = 'tsconfig.ui-vue.json';
         return options;
       });
+
+    config.module
+      .rule('scss')
+      .oneOf('vue-modules')
+      .use('sass-loader')
+      .loader('sass-loader')
+      .tap(options => {
+        options.includePaths = ['src/ui-vue/styles'];
+        return options;
+      });
   }
 }
