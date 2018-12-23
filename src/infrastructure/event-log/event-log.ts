@@ -8,12 +8,12 @@ import { loadEventsAsync, persistEventsAsync } from './persistence';
 const allEventsSubject = new Subject<[DomainEvent, number]>();
 
 export class EventLog {
-  static getStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
+  static getStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>>(
     eventKinds: TEvent['kind'][],
   ): Observable<TEvent> {
     return Observable.create((obs: Observer<TEvent>) => {
       const replayObs = allEventsSubject.pipe(
-        filter(([ev]) => eventKinds.indexOf(ev.kind) >= 0),
+        filter(([ev]) => eventKinds.indexOf(ev.kind as TEvent['kind']) >= 0),
         map(t => t as [TEvent, number]),
         publishReplay(),
       ) as ConnectableObservable<[TEvent, number]>;
@@ -44,7 +44,7 @@ export class EventLog {
     });
   }
 
-  static subscribeToStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent>(
+  static subscribeToStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>>(
     eventKinds: TEvent['kind'][],
     eventHandlerMap: EventHandlerMap<TEvent>,
   ): Subscription {

@@ -22,5 +22,6 @@
     "preserve_newlines": true,
     "max_preserve_newlines": 10
   },
-  "javascript.implicitProjectConfig.experimentalDecorators": true
+  "javascript.implicitProjectConfig.experimentalDecorators": true,
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

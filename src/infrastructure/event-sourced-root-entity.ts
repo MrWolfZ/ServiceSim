@@ -1,10 +1,10 @@
 import { DomainEvent } from './domain-event';
 
-export interface EntityConstructor<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> {
+export interface EntityConstructor<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> {
   new(...args: any[]): T;
 }
 
-export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> {
+export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> {
   id = '';
   mutatingEvents: TEvent[] = [];
   mutatedVersion = 1;
@@ -57,7 +57,7 @@ export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['
   }
 }
 
-export type EntityEventHandler<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent> = (event: TEvent) => void;
+export type EntityEventHandler<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> = (event: TEvent) => void;
 
 export type EventOfKind<TEvent, TKind extends string> = TEvent extends DomainEvent<TKind> ? TEvent : never;
 
