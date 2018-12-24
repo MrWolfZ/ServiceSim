@@ -2,9 +2,18 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faArrowLeft, faCheck, faChevronRight, faEdit, faInfoCircle, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Vue from 'vue';
+import Component from 'vue-class-component';
+import Vuex from 'vuex';
+import { getStoreBuilder } from 'vuex-typex';
 import App from './app.vue';
+import './domain';
 import router from './router';
-import store from './store';
+
+Component.registerHooks([
+  'beforeRouteEnter',
+  'beforeRouteLeave',
+  'beforeRouteUpdate',
+]);
 
 library.add(faArrowLeft);
 library.add(faCheck);
@@ -16,10 +25,12 @@ library.add(faTimes);
 
 Vue.component('fa-icon', FontAwesomeIcon as any);
 
+Vue.use(Vuex);
+
 Vue.config.productionTip = false;
 
 new Vue({
   router,
-  store,
+  store: getStoreBuilder<{}>().vuexStore(),
   render: (h) => h(App),
 }).$mount('#app');

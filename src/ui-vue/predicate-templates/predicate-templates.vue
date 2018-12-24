@@ -1,17 +1,29 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
+import { Route } from 'vue-router';
+import predicateTemplates from '../domain/predicate-templates';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
+import PredicateTemplateTile from './predicate-template-tile.vue';
 
 @Component({
   components: {
     PredicateTemplateDialog,
+    PredicateTemplateTile,
   },
 })
 export default class PredicateTemplatesPage extends Vue {
-  tiles: string[] = [];
   private filterValue = '';
 
   private newItemDialog = () => this.$refs[this.newItemDialog.name] as PredicateTemplateDialog;
+
+  async beforeRouteEnter(_: Route, _2: Route, next: () => void) {
+    await predicateTemplates.loadTemplates();
+    next();
+  }
+
+  get templates() {
+    return predicateTemplates.all;
+  }
 
   render() {
     return (
@@ -20,7 +32,7 @@ export default class PredicateTemplatesPage extends Vue {
           Predicate Templates
         </h1>
 
-        { this.tiles.length > 0 &&
+        { this.templates.length > 0 &&
           <div>
             <div class='level is-mobile'>
               <div class='level-left'>
@@ -45,16 +57,16 @@ export default class PredicateTemplatesPage extends Vue {
             </div>
             <div class='columns is-multiline'>
               {
-                this.tiles.map(item =>
+                this.templates.map(template =>
                   <div class='column is-4-fullhd is-6-desktop is-12-tablet'>
-                    <sim-predicate-template-tile state={item}></sim-predicate-template-tile>
+                    <PredicateTemplateTile templateId={template.id}></PredicateTemplateTile>
                   </div>
                 )
               }
             </div>
           </div>
         }
-        { this.tiles.length === 0 &&
+        { this.templates.length === 0 &&
           <div>
             <p>There are no predicate templates yet.</p>
             <br />

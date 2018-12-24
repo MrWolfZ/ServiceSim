@@ -12,6 +12,12 @@ declare global {
   }
 }
 
+declare module 'vue/types/vue' {
+  interface Vue {
+    vueTsxProps: Readonly<{ ref?: string }>;
+  }
+}
+
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue> {
     ref?: string;
