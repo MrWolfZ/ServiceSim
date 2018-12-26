@@ -1,6 +1,5 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
-import { Route } from 'vue-router';
 import predicateTemplates from '../domain/predicate-templates';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
 import PredicateTemplateTile from './predicate-template-tile.vue';
@@ -16,9 +15,8 @@ export default class PredicateTemplatesPage extends Vue {
 
   private newItemDialog = () => this.$refs[this.newItemDialog.name] as PredicateTemplateDialog;
 
-  async beforeRouteEnter(_: Route, _2: Route, next: () => void) {
-    await predicateTemplates.loadTemplates();
-    next();
+  created() {
+    predicateTemplates.loadAllAsync();
   }
 
   get templates() {

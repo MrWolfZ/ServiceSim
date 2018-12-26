@@ -1,4 +1,5 @@
 import { BareActionContext, getStoreBuilder } from 'vuex-typex';
+import errors from './errors';
 import { Parameter } from './parameter';
 
 export interface PredicateTemplate {
@@ -44,7 +45,7 @@ export function createNew(state: PredicateTemplatesState, newTemplate: Predicate
   state.templatesById[newTemplate.id] = newTemplate;
 }
 
-export async function loadTemplates(_: BareActionContext<PredicateTemplatesState, {}>) {
+export async function loadAllAsync(_: BareActionContext<PredicateTemplatesState, {}>) {
   try {
     predicateTemplates.markAsLoading();
 
@@ -64,25 +65,27 @@ export async function loadTemplates(_: BareActionContext<PredicateTemplatesState
           },
         ],
       },
-    ]), 1000));
+    ]), 100));
 
     predicateTemplates.setTemplates(templates);
   } catch (e) {
+    errors.setError({ message: JSON.stringify(e) });
     predicateTemplates.setTemplates([]);
     throw e;
   }
 }
 
+const stateGetter = b.state();
 const allGetter = b.read(all);
 const predicateTemplates = {
-  get state() { return b.state(); },
+  get state() { return stateGetter(); },
   get all() { return allGetter(); },
 
   markAsLoading: b.commit(markAsLoading),
   setTemplates: b.commit(setTemplates),
   createNew: b.commit(createNew),
 
-  loadTemplates: b.dispatch(loadTemplates),
+  loadAllAsync: b.dispatch(loadAllAsync),
 };
 
 export default predicateTemplates;

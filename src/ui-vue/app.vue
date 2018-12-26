@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
+import predicateTemplates from './domain/predicate-templates';
 import Layout from './infrastructure/layout.vue';
 
 @Component({
@@ -8,6 +9,10 @@ import Layout from './infrastructure/layout.vue';
   },
 })
 export default class App extends Vue {
+  created() {
+    predicateTemplates.loadAllAsync();
+  }
+
   render() {
     return <Layout></Layout>;
   }
