@@ -1,33 +1,49 @@
 <script lang="tsx">
-import { Component, Vue } from 'vue-property-decorator';
-import PredicateTemplateForm from './predicate-template-form.vue';
+import { Component, Emit } from 'vue-property-decorator';
+import { PredicateTemplate } from '../domain';
+import TsxComponent from '../infrastructure/tsx-component';
+import guid from '../infrastructure/util/guid';
+import { ParameterFormValue } from './parameter-form.vue';
+import PredicateTemplateForm, { EMPTY_PREDICATE_TEMPLATE_FORM_VALUE, PredicateTemplateFormValue } from './predicate-template-form.vue';
+
+export interface PredicateTemplateDialogProps {
+  onSubmit: (newValue: PredicateTemplate) => any;
+}
 
 @Component({
   components: {
     PredicateTemplateForm,
   },
 })
-export default class PredicateTemplateDialog extends Vue {
+export default class PredicateTemplateDialog extends TsxComponent<PredicateTemplateDialogProps> {
   private dialogIsOpen = false;
-  private isNewItem = true;
-  private form: PredicateTemplateForm | null = null;
-
-  mounted() {
-    this.form = this.$refs.form as PredicateTemplateForm;
-  }
+  private templateId: string | undefined;
+  private formValue: PredicateTemplateFormValue = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE;
 
   openNewItemDialog() {
-    this.isNewItem = true;
+    this.templateId = undefined;
     this.dialogIsOpen = true;
-    this.form!.initialize({
-      name: '',
-      description: '',
-      evalFunctionBody: '',
-      parameters: [],
-    });
+    this.formValue = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE;
+  }
+
+  openEditItemDialog(template: PredicateTemplate) {
+    this.templateId = template.id;
+    this.dialogIsOpen = true;
+    const { id, ...rest } = template;
+    this.formValue = rest;
+  }
+
+  @Emit('submit')
+  private onSubmit(): PredicateTemplate {
+    return {
+      id: this.templateId || guid(),
+      ...this.formValue,
+      parameters: this.formValue.parameters.map(p => ({ ...p })),
+    };
   }
 
   private submitDialog() {
+    this.onSubmit();
     this.closeDialog();
   }
 
@@ -47,12 +63,12 @@ export default class PredicateTemplateDialog extends Vue {
           <div class='modal-card'>
             <header class='modal-card-head'>
               <p class='modal-card-title'>
-                {this.isNewItem ? `Create new predicate template` : `Edit predicate template`}
+                {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
               </p>
             </header>
 
             <section class='modal-card-body'>
-              <PredicateTemplateForm ref='form' />
+              <PredicateTemplateForm formValue={this.formValue} onChange={fv => this.formValue = fv} />
             </section>
 
             <footer class='modal-card-foot justify-content flex-end'>
@@ -63,7 +79,7 @@ export default class PredicateTemplateDialog extends Vue {
               </button>
               <button class='button is-success'
                       onClick={() => this.submitDialog()}
-                      disabled={this.form && this.form.isInvalid}>
+                      disabled={!isTemplateValid(this.formValue)}>
                 Save
               </button>
             </footer>
@@ -72,6 +88,14 @@ export default class PredicateTemplateDialog extends Vue {
       </form>
     );
   }
+}
+
+function isParameterValid(formValue: ParameterFormValue) {
+  return !!formValue.name && !!formValue.description;
+}
+
+function isTemplateValid(formValue: PredicateTemplateFormValue) {
+  return !!formValue.name && !!formValue.description && !!formValue.evalFunctionBody && formValue.parameters.every(isParameterValid);
 }
 </script>
 

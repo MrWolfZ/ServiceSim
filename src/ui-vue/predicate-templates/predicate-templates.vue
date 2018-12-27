@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
+import { PredicateTemplate } from '../domain';
 import predicateTemplates from '../domain/predicate-templates';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
 import PredicateTemplateTile from './predicate-template-tile.vue';
@@ -23,6 +24,10 @@ export default class PredicateTemplatesPage extends Vue {
 
   get templates() {
     return predicateTemplates.all;
+  }
+
+  private createNewTemplate(template: PredicateTemplate) {
+    console.log(template);
   }
 
   render() {
@@ -81,7 +86,7 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-        <PredicateTemplateDialog ref={this.newItemDialog.name}></PredicateTemplateDialog>
+        <PredicateTemplateDialog ref={this.newItemDialog.name} onSubmit={t => this.createNewTemplate(t)}></PredicateTemplateDialog>
       </div>
     );
   }

@@ -6,6 +6,12 @@ import TsxComponent from '../infrastructure/tsx-component';
 
 export type ParameterFormValue = Parameter;
 
+export interface ParameterFormProps {
+  formValue: ParameterFormValue;
+  onChange: (newValue: ParameterFormValue) => any;
+  onRemove: () => any;
+}
+
 let instanceCount = 0;
 
 @Component({
@@ -15,46 +21,37 @@ let instanceCount = 0;
     NumberInput,
   },
 })
-export default class ParameterForm extends TsxComponent<{ formValue: ParameterFormValue; onRemove: () => void }> {
+export default class ParameterForm extends TsxComponent<ParameterFormProps> {
   @Prop() formValue: ParameterFormValue;
 
   private instanceCount = instanceCount++;
-  private name = '';
-  private description = '';
-  private isRequired = false;
-  private valueType: ParameterFormValue['valueType'] = 'string';
-  private defaultValue: ParameterFormValue['defaultValue'] = '';
 
-  created() {
-    this.name = this.formValue.name;
-    this.description = this.formValue.description;
-    this.isRequired = this.formValue.isRequired;
-    this.valueType = this.formValue.valueType;
-    this.defaultValue = this.formValue.defaultValue;
-  }
-
-  private updateValueType(newValueType: ParameterFormValue['valueType']) {
-    this.valueType = newValueType;
-
-    switch (this.valueType) {
-      case 'string':
-      default:
-        this.defaultValue = '';
-        break;
-
-      case 'number':
-        this.defaultValue = 0;
-        break;
-
-      case 'boolean':
-        this.defaultValue = false;
-        break;
-    }
+  @Emit('change')
+  private onChange(change: Partial<ParameterFormValue>) {
+    return { ...this.formValue, ...change };
   }
 
   @Emit('remove')
   private remove() {
     // we just need to emit
+  }
+
+  private updateValueType(newValueType: ParameterFormValue['valueType']) {
+    const newDefaultValue = (() => {
+      switch (newValueType) {
+        case 'string':
+        default:
+          return '';
+
+        case 'number':
+          return 0;
+
+        case 'boolean':
+          return false;
+      }
+    })();
+
+    this.onChange({ valueType: newValueType, defaultValue: newDefaultValue } as Partial<ParameterFormValue>);
   }
 
   render() {
@@ -68,9 +65,9 @@ export default class ParameterForm extends TsxComponent<{ formValue: ParameterFo
           <div class='control'>
             <Input class='input'
                    type='text'
-                   value={this.name}
-                   onInput={value => this.name = value} />
-            { !this.name &&
+                   value={this.formValue.name}
+                   onInput={value => this.onChange({ name: value })} />
+            { !this.formValue.name &&
               <span class='help is-danger'>
                 Please enter a name
               </span>
@@ -85,9 +82,9 @@ export default class ParameterForm extends TsxComponent<{ formValue: ParameterFo
           <div class='control'>
             <Input class='input'
                    type='text'
-                   value={this.description}
-                   onInput={value => this.description = value} />
-            { !this.description &&
+                   value={this.formValue.description}
+                   onInput={value => this.onChange({ description: value })} />
+            { !this.formValue.description &&
               <span class='help is-danger'>
                 Please enter a description
               </span>
@@ -105,8 +102,8 @@ export default class ParameterForm extends TsxComponent<{ formValue: ParameterFo
                               id={`parameterForm.isRequired.${this.instanceCount}.yes`}
                               class='is-checkradio is-rtl is-white'
                               value={true}
-                              checked={this.isRequired}
-                              onInput={value => this.isRequired = value} />
+                              checked={this.formValue.isRequired}
+                              onInput={value => this.onChange({ isRequired: value })} />
                 <label for={`parameterForm.isRequired.${this.instanceCount}.yes`}>
                   Yes
                 </label>
@@ -114,8 +111,8 @@ export default class ParameterForm extends TsxComponent<{ formValue: ParameterFo
                               id={`parameterForm.isRequired.${this.instanceCount}.no`}
                               class='is-checkradio is-rtl is-white'
                               value={false}
-                              checked={!this.isRequired}
-                              onInput={value => this.isRequired = value} />
+                              checked={!this.formValue.isRequired}
+                              onInput={value => this.onChange({ isRequired: value })} />
                 <label for={`parameterForm.isRequired.${this.instanceCount}.no`}>
                   No
                 </label>
@@ -144,33 +141,33 @@ export default class ParameterForm extends TsxComponent<{ formValue: ParameterFo
                 Default Value
               </label>
 
-              { this.valueType === 'string' &&
+              { this.formValue.valueType === 'string' &&
                 <div class='control'>
                   <Input class='input'
                          type='text'
-                         value={this.defaultValue as string}
-                         onInput={value => this.defaultValue = value} />
+                         value={this.formValue.defaultValue as string}
+                         onInput={value => this.onChange({ defaultValue: value })} />
                 </div>
               }
 
-              { this.valueType === 'number' &&
+              { this.formValue.valueType === 'number' &&
                 <div class='control'>
                   <NumberInput class='input'
                                type='number'
-                               value={this.defaultValue as number}
-                               onInput={value => this.defaultValue = value} />
+                               value={this.formValue.defaultValue as number}
+                               onInput={value => this.onChange({ defaultValue: value })} />
                 </div>
               }
 
-              { this.valueType === 'boolean' &&
+              { this.formValue.valueType === 'boolean' &&
                 <div class='control radio-control'>
 
                   <BooleanInput type='radio'
                                 id={`parameterForm.defaultValue.${this.instanceCount}.true`}
                                 class='is-checkradio is-rtl is-white'
                                 value={true}
-                                checked={this.defaultValue as boolean}
-                                onInput={value => this.defaultValue = value} />
+                                checked={this.formValue.defaultValue as boolean}
+                                onInput={value => this.onChange({ defaultValue: value })} />
                   <label for={`parameterForm.defaultValue.${this.instanceCount}.true`}>
                     True
                   </label>
@@ -179,8 +176,8 @@ export default class ParameterForm extends TsxComponent<{ formValue: ParameterFo
                                 id={`parameterForm.defaultValue.${this.instanceCount}.false`}
                                 class='is-checkradio is-rtl is-white'
                                 value={false}
-                                checked={!this.defaultValue}
-                                onInput={value => this.defaultValue = value} />
+                                checked={!this.formValue.defaultValue}
+                                onInput={value => this.onChange({ defaultValue: value })} />
                   <label for={`parameterForm.defaultValue.${this.instanceCount}.false`}>
                     False
                   </label>

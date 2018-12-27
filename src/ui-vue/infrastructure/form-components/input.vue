@@ -24,13 +24,17 @@ export default class Input<T extends string | number | boolean = string> extends
     return value;
   }
 
+  parseValue(el: HTMLInputElement) {
+    return el.value as T;
+  }
+
   render() {
     return (
       <input type={this.type}
              placeholder={this.placeholder}
              value={this.value}
              checked={this.checked}
-             onInput={(e: Event) => this.onInput((e.target as HTMLInputElement).value as T)} />
+             onInput={(e: Event) => this.onInput(this.parseValue(e.target as HTMLInputElement))} />
     );
   }
 }
@@ -38,12 +42,20 @@ export default class Input<T extends string | number | boolean = string> extends
 @Component({
   components: {},
 })
-export class BooleanInput extends Input<boolean> {}
+export class BooleanInput extends Input<boolean> {
+  parseValue(el: HTMLInputElement) {
+    return el.value === 'true';
+  }
+}
 
 @Component({
   components: {},
 })
-export class NumberInput extends Input<number> {}
+export class NumberInput extends Input<number> {
+  parseValue(el: HTMLInputElement) {
+    return parseInt(el.value, 10);
+  }
+}
 </script>
 
 <style scoped lang="scss">

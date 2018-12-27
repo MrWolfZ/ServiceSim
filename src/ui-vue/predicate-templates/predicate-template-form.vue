@@ -1,7 +1,8 @@
 <script lang="tsx">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 import Input from '../infrastructure/form-components/input.vue';
 import TextArea from '../infrastructure/form-components/textarea.vue';
+import TsxComponent from '../infrastructure/tsx-component';
 import ParameterForm, { ParameterFormValue } from './parameter-form.vue';
 
 export interface PredicateTemplateFormValue {
@@ -11,54 +12,63 @@ export interface PredicateTemplateFormValue {
   parameters: ParameterFormValue[];
 }
 
+export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE = {
+  name: '',
+  description: '',
+  evalFunctionBody: '',
+  parameters: [],
+};
+
+export interface PredicateTemplateFormProps {
+  formValue: PredicateTemplateFormValue;
+  onChange: (newValue: PredicateTemplateFormValue) => any;
+}
+
 @Component({
   components: {
     ParameterForm,
     Input,
   },
 })
-export default class PredicateTemplateForm extends Vue {
-  private name = '';
-  private description = '';
-  private evalFunctionBody = '';
-  private parameters: ParameterFormValue[] = [];
+export default class PredicateTemplateForm extends TsxComponent<PredicateTemplateFormProps> {
+  @Prop() formValue: PredicateTemplateFormValue;
 
-  get value(): PredicateTemplateFormValue {
-    return {
-      name: this.name,
-      description: this.description,
-      evalFunctionBody: this.evalFunctionBody,
-      parameters: this.parameters,
-    };
-  }
-
-  get isValid() {
-    return !!this.name && !!this.description && !!this.evalFunctionBody;
-  }
-
-  get isInvalid() {
-    return !this.isValid;
-  }
-
-  initialize(value: PredicateTemplateFormValue) {
-    this.name = value.name;
-    this.description = value.description;
-    this.evalFunctionBody = value.evalFunctionBody;
-    this.parameters = value.parameters;
+  @Emit('change')
+  private onChange(change: Partial<PredicateTemplateFormValue>) {
+    return { ...this.formValue, ...change };
   }
 
   private addParameter() {
-    this.parameters.push({
-      name: '',
-      description: '',
-      isRequired: true,
-      valueType: 'string',
-      defaultValue: '',
+    this.onChange({
+      parameters: [
+        ...this.formValue.parameters,
+        {
+          name: '',
+          description: '',
+          isRequired: true,
+          valueType: 'string',
+          defaultValue: '',
+        },
+      ],
+    });
+  }
+
+  private updateParameter(index: number, newFormValue: ParameterFormValue) {
+    this.onChange({
+      parameters: this.spliceOne(index, this.formValue.parameters, newFormValue),
     });
   }
 
   private removeParameter(index: number) {
-    this.parameters.splice(index, 1);
+    this.onChange({
+      parameters: this.spliceOne(index, this.formValue.parameters),
+    });
+  }
+
+  private spliceOne<T>(index: number, arr: T[], ...items: T[]) {
+    const copy = [...arr];
+    copy.splice(index, 1, ...items);
+    return copy;
   }
 
   render() {
@@ -70,9 +80,9 @@ export default class PredicateTemplateForm extends Vue {
             <Input class='input'
                    type='text'
                    placeholder='Name'
-                   value={this.name}
-                   onInput={value => this.name = value} />
-            { !this.name &&
+                   value={this.formValue.name}
+                   onInput={value => this.onChange({ name: value })} />
+            { !this.formValue.name &&
               <span class='help is-danger'>
                 Please enter a name
               </span>
@@ -85,10 +95,10 @@ export default class PredicateTemplateForm extends Vue {
             <TextArea class='textarea'
                       rows={3}
                       placeholder='Description'
-                      value={this.description}
-                      onInput={value => this.description = value}>
+                      value={this.formValue.description}
+                      onInput={value => this.onChange({ description: value })}>
             </TextArea>
-            { !this.description &&
+            { !this.formValue.description &&
               <span class='help is-danger'>
                 Please enter a description
               </span>
@@ -101,10 +111,10 @@ export default class PredicateTemplateForm extends Vue {
           <p class='control'>
             <TextArea class='textarea code'
                       rows={5}
-                      value={this.evalFunctionBody}
-                      onInput={value => this.evalFunctionBody = value}>
+                      value={this.formValue.evalFunctionBody}
+                      onInput={value => this.onChange({ evalFunctionBody: value })}>
             </TextArea>
-            { !this.evalFunctionBody &&
+            { !this.formValue.evalFunctionBody &&
               <span class='help is-danger'>
                 Please enter a function body
               </span>
@@ -119,9 +129,10 @@ export default class PredicateTemplateForm extends Vue {
             </div>
 
             {
-              this.parameters.map((fv, idx) =>
+              this.formValue.parameters.map((fv, idx) =>
                 <ParameterForm class='tile is-12 is-child box parameter'
                                formValue={fv}
+                               onChange={newFormValue => this.updateParameter(idx, newFormValue)}
                                onRemove={() => this.removeParameter(idx)}>
                 </ParameterForm>
               )
