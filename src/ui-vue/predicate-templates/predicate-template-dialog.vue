@@ -9,21 +9,25 @@ import PredicateTemplateForm from './predicate-template-form.vue';
 })
 export default class PredicateTemplateDialog extends Vue {
   private dialogIsOpen = false;
-  private dialogIsClosing = false;
   private isNewItem = true;
-  private isSaving = false;
+  private form: PredicateTemplateForm | null = null;
 
-  private form = () => this.$refs[this.form.name] as PredicateTemplateForm;
-
-  openDialog(isNewItem = true) {
-    this.isSaving = false;
-    this.isNewItem = isNewItem;
-    this.dialogIsOpen = true;
+  mounted() {
+    this.form = this.$refs.form as PredicateTemplateForm;
   }
 
-  private async submitDialog() {
-    this.isSaving = true;
-    await new Promise<void>(resolve => setTimeout(resolve, 2000));
+  openNewItemDialog() {
+    this.isNewItem = true;
+    this.dialogIsOpen = true;
+    this.form!.initialize({
+      name: '',
+      description: '',
+      evalFunctionBody: '',
+      parameters: [],
+    });
+  }
+
+  private submitDialog() {
     this.closeDialog();
   }
 
@@ -32,19 +36,13 @@ export default class PredicateTemplateDialog extends Vue {
   }
 
   private closeDialog() {
-    this.dialogIsClosing = true;
-
-    // to prevent jumping of modal while dialog is fading out
-    setTimeout(() => {
-      this.dialogIsOpen = false;
-      this.dialogIsClosing = false;
-    }, 200);
+    this.dialogIsOpen = false;
   }
 
   render() {
     return (
       <form novalidate onSubmit={(e: Event) => e.preventDefault()}>
-        <div class={`modal ${this.dialogIsOpen && !this.dialogIsClosing ? `is-active` : ``}`}>
+        <div class={`modal ${this.dialogIsOpen ? `is-active` : ``}`}>
           <div class='modal-background' />
           <div class='modal-card'>
             <header class='modal-card-head'>
@@ -53,29 +51,19 @@ export default class PredicateTemplateDialog extends Vue {
               </p>
             </header>
 
-            {
-              /*
-                We remove the body from the DOM while the dialog is not open to
-                prevent any animations from playing when the dialog is opened.
-              */
-            }
-
-            { this.dialogIsOpen &&
-              <section class='modal-card-body'>
-                <PredicateTemplateForm ref={this.form.name} />
-              </section>
-            }
+            <section class='modal-card-body'>
+              <PredicateTemplateForm ref='form' />
+            </section>
 
             <footer class='modal-card-foot justify-content flex-end'>
               <button class='button is-danger is-outlined'
                       type='button'
-                      onClick={() => this.cancelDialog()}
-                      disabled={this.isSaving}>
+                      onClick={() => this.cancelDialog()}>
                 Cancel
               </button>
-              <button class={`button is-success ${this.isSaving ? `is-loading` : ``}`}
+              <button class='button is-success'
                       onClick={() => this.submitDialog()}
-                      disabled={this.form() && this.form().isInvalid && this.form().isSubmitted}>
+                      disabled={this.form && this.form.isInvalid}>
                 Save
               </button>
             </footer>
@@ -88,4 +76,7 @@ export default class PredicateTemplateDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
+.button {
+  transition-duration: 0ms;
+}
 </style>

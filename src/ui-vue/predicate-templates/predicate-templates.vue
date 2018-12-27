@@ -13,7 +13,9 @@ import PredicateTemplateTile from './predicate-template-tile.vue';
 export default class PredicateTemplatesPage extends Vue {
   private filterValue = '';
 
-  private newItemDialog = () => this.$refs[this.newItemDialog.name] as PredicateTemplateDialog;
+  private newItemDialog() {
+    return this.$refs[this.newItemDialog.name] as PredicateTemplateDialog;
+  }
 
   created() {
     predicateTemplates.loadAllAsync();
@@ -45,7 +47,7 @@ export default class PredicateTemplatesPage extends Vue {
               </div>
               <div class='level-right'>
                 <button class='button is-primary'
-                        onClick={() => this.newItemDialog().openDialog()}>
+                        onClick={() => this.newItemDialog().openNewItemDialog()}>
                   <span>Create new template</span>
                   <span class='icon is-small'>
                     <fa-icon icon='plus'></fa-icon>
@@ -70,7 +72,7 @@ export default class PredicateTemplatesPage extends Vue {
             <br />
             { /* TODO: add button to create default predicate templates */ }
             <button class='button is-primary'
-                    onClick={() => this.newItemDialog().openDialog()}>
+                    onClick={() => this.newItemDialog().openNewItemDialog()}>
               <span>Create new template</span>
               <span class='icon is-small'>
                 <fa-icon icon='plus'></fa-icon>

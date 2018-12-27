@@ -1,0 +1,50 @@
+<script lang="tsx">
+import { Component, Emit, Prop } from 'vue-property-decorator';
+import TsxComponent from '../tsx-component';
+
+export interface InputProps<T> {
+  type?: 'text' | 'number' | 'checkbox' | 'radio';
+  placeholder?: string;
+  value?: T;
+  checked?: boolean;
+  onInput?: (value: T) => any;
+}
+
+@Component({
+  components: {},
+})
+export default class Input<T extends string | number | boolean = string> extends TsxComponent<InputProps<T>> implements InputProps<T> {
+  @Prop() type: 'text' | 'number' | 'checkbox' | 'radio' | undefined;
+  @Prop() placeholder: string | undefined;
+  @Prop() value: T | undefined;
+  @Prop() checked: boolean | undefined;
+
+  @Emit('input')
+  onInput(value: T) {
+    return value;
+  }
+
+  render() {
+    return (
+      <input type={this.type}
+             placeholder={this.placeholder}
+             value={this.value}
+             checked={this.checked}
+             onInput={(e: Event) => this.onInput((e.target as HTMLInputElement).value as T)} />
+    );
+  }
+}
+
+@Component({
+  components: {},
+})
+export class BooleanInput extends Input<boolean> {}
+
+@Component({
+  components: {},
+})
+export class NumberInput extends Input<number> {}
+</script>
+
+<style scoped lang="scss">
+</style>

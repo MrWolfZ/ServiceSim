@@ -14,12 +14,14 @@ declare global {
 
 declare module 'vue/types/vue' {
   interface Vue {
-    vueTsxProps: Readonly<{ ref?: string }>;
+    vueTsxProps: Readonly<{ ref?: string; id?: string; class?: string }>;
   }
 }
 
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue> {
     ref?: string;
+    id?: string;
+    class?: string;
   }
 }

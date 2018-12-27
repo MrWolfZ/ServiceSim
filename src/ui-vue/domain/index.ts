@@ -1,1 +1,2 @@
-import './predicate-templates';
+export * from './parameter';
+export * from './predicate-templates';
