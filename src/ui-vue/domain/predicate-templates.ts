@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { BareActionContext, getStoreBuilder } from 'vuex-typex';
 import errors from './errors';
 import { Parameter } from './parameter';
@@ -49,25 +50,9 @@ export async function loadAllAsync(_: BareActionContext<PredicateTemplatesState,
   try {
     predicateTemplates.markAsLoading();
 
-    const templates = await new Promise<PredicateTemplate[]>(resolve => setTimeout(() => resolve([
-      {
-        id: 'test',
-        name: 'Path Prefix',
-        description: 'Predicates based on this template match all requests whose path starts with a provided string.',
-        evalFunctionBody: 'return request.path.startsWith(parameters["Prefix"]);',
-        parameters: [
-          {
-            name: 'Prefix',
-            description: 'The prefix to check the path for.',
-            isRequired: true,
-            valueType: 'string',
-            defaultValue: '/',
-          },
-        ],
-      },
-    ]), 100));
+    const response = await axios.get<PredicateTemplate[]>(`/predicate-templates/ask/all`);
 
-    predicateTemplates.setTemplates(templates);
+    predicateTemplates.setTemplates(response.data);
   } catch (e) {
     errors.setError({ message: JSON.stringify(e) });
     predicateTemplates.setTemplates([]);

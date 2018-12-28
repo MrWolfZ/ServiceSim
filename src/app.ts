@@ -6,8 +6,7 @@ import * as ejp from './infrastructure/event-journal/persistence';
 import * as elp from './infrastructure/event-log/persistence';
 import { PredicateTree } from './simulation';
 import simulationApi from './simulation/api';
-import uiApi from './ui/app/app.api';
-import { PredicateTemplatesApi } from './ui/app/configuration/predicate-templates-page/predicate-templates.api';
+import * as uiApi from './ui-api/ui.api';
 
 // TODO: set adapter based on configuration
 ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());
@@ -15,7 +14,7 @@ elp.setAdapter(new elp.InMemoryEventLogPersistenceAdapter());
 
 export async function initializeAsync() {
   const sub1 = PredicateTree.start();
-  const sub2 = PredicateTemplatesApi.start();
+  const sub2 = uiApi.start();
 
   const staticResponseGeneratorTemplate = ResponseGeneratorTemplate.create(
     'static',
@@ -187,7 +186,7 @@ export async function initializeAsync() {
 
 const app = express.Router();
 app.use('/simulation', simulationApi);
-app.use('/uiApi', uiApi);
+app.use('/ui-api', uiApi.api);
 app.use('/ui', express.static(path.join(__dirname, 'ui', 'dist')));
 app.use((_, res) => res.sendFile(path.join(__dirname, 'ui', 'dist', 'index.html')));
 
