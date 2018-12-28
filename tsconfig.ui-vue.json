@@ -27,7 +27,8 @@
   "include": [
     "src/ui-vue/**/*.ts",
     "src/ui-vue/**/*.tsx",
-    "src/ui-vue/**/*.vue"
+    "src/ui-vue/**/*.vue",
+    "types/**/*"
   ],
   "exclude": [
     "node_modules"
