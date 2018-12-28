@@ -4,6 +4,7 @@
     "target": "esnext",
     "module": "esnext",
     "jsx": "preserve",
+    "sourceMap": true,
     "importHelpers": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -12,11 +13,6 @@
       "webpack-env",
       "jest"
     ],
-    "paths": {
-      "@/*": [
-        "src/ui-vue/*"
-      ]
-    },
     "lib": [
       "esnext",
       "dom",
@@ -25,9 +21,6 @@
     ]
   },
   "include": [
-    "src/ui-vue/**/*.ts",
-    "src/ui-vue/**/*.tsx",
-    "src/ui-vue/**/*.vue",
     "types/**/*"
   ],
   "exclude": [

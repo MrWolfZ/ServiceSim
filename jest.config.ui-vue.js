@@ -1,7 +1,12 @@
 module.exports = {
+  globals: {
+    'vue-jest': {
+      tsConfig: process.cwd() + '/tsconfig.ui-vue.json',
+    },
+  },
   roots: [
     '<rootDir>',
-    '<rootDir>/src/ui-vue',
+    '<rootDir>/src',
   ],
   moduleFileExtensions: [
     'js',
@@ -13,17 +18,14 @@ module.exports = {
   ],
   transform: {
     '^.+\\.vue$': 'vue-jest',
-    '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
     '^.+\\.tsx?$': 'ts-jest',
-  },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/ui-vue/$1',
+    '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
   },
   snapshotSerializers: [
     'jest-serializer-vue',
   ],
   testMatch: [
-    '**/src/ui-vue/**/*.spec.(js|jsx|ts|tsx)',
+    '**/src/**/*.vue.spec.(js|jsx|ts|tsx)',
   ],
   testURL: 'http://localhost/',
 };

@@ -1,13 +1,12 @@
 module.exports = {
   outputDir: 'dist/ui-vue',
   configureWebpack: {
-    resolve: {
-      alias: {
-        '@': __dirname + '/src/ui-vue'
-      }
-    },
     entry: {
-      app: './src/ui-vue/main.ts'
+      app: './src/ui.ts'
+    },
+    performance: {
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000
     }
   },
   devServer: {
@@ -45,7 +44,7 @@ module.exports = {
       .use('sass-loader')
       .loader('sass-loader')
       .tap(options => {
-        options.includePaths = ['src/ui-vue/styles'];
+        options.includePaths = ['src/ui-styles'];
         return options;
       });
   }
