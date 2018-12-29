@@ -1,5 +1,7 @@
-import express, { Request, Response } from 'express';
-import { EventLog } from '../../api-infrastructure';
+import express from 'express';
+import { EventLog, requestHandler } from '../../api-infrastructure';
+import { failure, success } from '../../util/result-monad';
+import { PredicateTemplate } from './predicate-template';
 import { PredicateTemplateCreatedOrUpdated } from './predicate-template-created-or-updated';
 import { PredicateTemplateDeleted } from './predicate-template-deleted';
 import { PredicateTemplateDto } from './predicate-template.dto';
@@ -38,55 +40,65 @@ export function start() {
   });
 }
 
-export function getAllAsync(_: Request, res: Response) {
-  res.status(200).send(getAllResponse);
+export function getAllAsync() {
+  return getAllResponse;
 }
 
-// export async function createOrUpdatePredicateTemplate(tell: Tell): Promise<Result<TellToCreateOrUpdatePredicateTemplate['dto']>> {
-//   const isValid = validatePredicateTemplateDialog(createFormGroupState('', tell.formValue)).isValid;
+export async function createAsync(dto: PredicateTemplateDto) {
+  // TODO: validate
+  if (1 !== 1) {
+    return failure({});
+  }
 
-//   if (!isValid) {
-//     return failure();
-//   }
+  const template = PredicateTemplate.create(
+    dto.name,
+    dto.description,
+    dto.evalFunctionBody,
+    dto.parameters,
+    dto.id,
+  );
 
-//   const template = await (async () => {
-//     if (!!tell.templateId) {
-//       return (await PredicateTemplate.ofIdAsync(tell.templateId!)).update(
-//         tell.formValue.name,
-//         tell.formValue.description,
-//         tell.formValue.evalFunctionBody,
-//         tell.formValue.parameters,
-//       );
-//     }
+  await PredicateTemplate.saveAsync(template);
 
-//     return PredicateTemplate.create(
-//       tell.formValue.name,
-//       tell.formValue.description,
-//       tell.formValue.evalFunctionBody,
-//       tell.formValue.parameters,
-//     );
-//   })();
+  return success();
+}
 
-//   await PredicateTemplate.saveAsync(template);
+export async function updateAsync(dto: PredicateTemplateDto) {
+  // TODO: validate (including exists)
+  if (1 !== 1) {
+    return failure({});
+  }
 
-//   return success({
-//     templateId: template.id,
-//   });
-// }
+  let template = await PredicateTemplate.ofIdAsync(dto.id);
+  template = template.update(
+    dto.name,
+    dto.description,
+    dto.evalFunctionBody,
+    dto.parameters,
+  );
 
-// // TODO: validate predicate kind exists
-// // TODO: only allow if predicate kind is unused
-// export async function deletePredicateTemplate(tell: DeletePredicateTemplateCommand) {
-//   const predicateKind = await PredicateTemplate.ofIdAsync(tell.templateId);
-//   predicateKind.delete();
+  await PredicateTemplate.saveAsync(template);
 
-//   await PredicateTemplate.saveAsync(predicateKind);
+  return success();
+}
 
-//   return success();
-// }
+export async function deleteAsync(params: { templateId: string }) {
+  // TODO: validate exists
+  // TODO: only allow if template is unused
+  if (1 !== 1) {
+    return failure({});
+  }
 
-const askApi = express.Router();
-askApi.get('/all', getAllAsync);
+  let template = await PredicateTemplate.ofIdAsync(params.templateId);
+  template = template.delete();
+
+  await PredicateTemplate.saveAsync(template);
+
+  return success();
+}
 
 export const api = express.Router();
-api.use('/ask', askApi);
+api.get('/', requestHandler(getAllAsync));
+api.post('/', requestHandler(createAsync));
+api.put('/:templateId', requestHandler(updateAsync));
+api.delete('/:templateId', requestHandler(deleteAsync));

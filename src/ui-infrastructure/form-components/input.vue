@@ -30,11 +30,13 @@ export class Input<T extends string | number | boolean = string> extends TsxComp
 
   render() {
     return (
-      <input type={this.type}
-             placeholder={this.placeholder}
-             value={this.value}
-             checked={this.checked}
-             onInput={(e: Event) => this.onInput(this.parseValue(e.target as HTMLInputElement))} />
+      <input
+        type={this.type}
+        placeholder={this.placeholder}
+        value={this.value}
+        checked={this.checked}
+        onInput={(e: Event) => this.onInput(this.parseValue(e.target as HTMLInputElement))}
+      />
     );
   }
 }

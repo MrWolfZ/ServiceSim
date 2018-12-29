@@ -202,7 +202,7 @@
       }
     ],
     "typeof-compare": false,
-    "unified-signatures": true,
+    "unified-signatures": false,
     "use-default-type-parameter": true,
     "use-isnan": true,
     "variable-name": [

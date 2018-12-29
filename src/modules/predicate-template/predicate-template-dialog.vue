@@ -1,5 +1,4 @@
 <script lang="tsx">
-import uuid from 'uuid';
 import { Component, Emit } from 'vue-property-decorator';
 import { TsxComponent } from '../../ui-infrastructure';
 import { ParameterFormValue } from '../parameter/parameter-form.vue';
@@ -7,7 +6,7 @@ import PredicateTemplateForm, { EMPTY_PREDICATE_TEMPLATE_FORM_VALUE, PredicateTe
 import { PredicateTemplate } from './predicate-template.store';
 
 export interface PredicateTemplateDialogProps {
-  onSubmit: (newValue: PredicateTemplate) => any;
+  onSubmit: (newValue: Pick<PredicateTemplate, Exclude<keyof PredicateTemplate, 'id'>> & { id?: string }) => any;
 }
 
 @Component({
@@ -34,9 +33,9 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
   }
 
   @Emit('submit')
-  private onSubmit(): PredicateTemplate {
+  private onSubmit(): Pick<PredicateTemplate, Exclude<keyof PredicateTemplate, 'id'>> & { id?: string } {
     return {
-      id: this.templateId || uuid(),
+      id: this.templateId,
       ...this.formValue,
       parameters: this.formValue.parameters.map(p => ({ ...p })),
     };

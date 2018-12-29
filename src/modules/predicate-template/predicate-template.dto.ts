@@ -4,6 +4,6 @@ export interface PredicateTemplateDto {
   id: string;
   name: string;
   description: string;
-  parameters: ParameterDto[];
   evalFunctionBody: string;
+  parameters: ParameterDto[];
 }

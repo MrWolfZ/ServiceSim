@@ -2,9 +2,9 @@ import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
 import { EventLog } from '../../api-infrastructure';
 import { logger } from '../../util/logger';
-import { PredicateNode, PredicateTree, ResponseGeneratorFunction } from '../predicate-tree/predicate-tree.api';
 import { InvocationResponseWasSet } from '../service-invocation/invocation-response-was-set';
 import { ServiceInvocation, ServiceResponse } from '../service-invocation/service-invocation';
+import { PredicateNode, PredicateTree, ResponseGeneratorFunction } from './predicate-tree.api';
 
 export const processRequest = async (req: Request, res: Response) => {
   const topLevelPredicates = await PredicateTree.getTopLevelNodes();

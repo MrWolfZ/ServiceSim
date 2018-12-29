@@ -21,6 +21,11 @@
     ]
   },
   "include": [
+    "src/**/*.vue",
+    "src/ui-infrastructure/**/*",
+    "src/**/*.dto.ts",
+    "src/**/*.store.ts",
+    "src/util/**/*",
     "types/**/*"
   ],
   "exclude": [

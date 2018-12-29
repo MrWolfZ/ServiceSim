@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BareActionContext, getStoreBuilder } from 'vuex-typex';
+import { getStoreBuilder } from 'vuex-typex';
 import errors from '../errors/errors.store';
 import { Parameter } from '../parameter/parameter';
 
@@ -42,19 +42,58 @@ export function setTemplates(state: PredicateTemplatesState, templates: Predicat
   state.dataWasLoaded = true;
 }
 
-export function createNew(state: PredicateTemplatesState, newTemplate: PredicateTemplate) {
+export function create(state: PredicateTemplatesState, newTemplate: PredicateTemplate) {
   state.templateIds.push(newTemplate.id);
   state.templatesById[newTemplate.id] = newTemplate;
 }
 
-export async function loadAllAsync(_: BareActionContext<PredicateTemplatesState, {}>) {
+export function update(state: PredicateTemplatesState, template: PredicateTemplate) {
+  state.templatesById[template.id] = template;
+}
+
+export function deleteTemplate(state: PredicateTemplatesState, templateId: string) {
+  state.templateIds.splice(state.templateIds.indexOf(templateId), 1);
+  delete state.templatesById[templateId];
+}
+
+export async function loadAllAsync() {
   try {
     predicateTemplates.markAsLoading();
-    const response = await axios.get<PredicateTemplate[]>(`/predicate-templates/ask/all`);
+    const response = await axios.get<PredicateTemplate[]>(`/predicate-templates`);
     predicateTemplates.setTemplates(response.data);
   } catch (e) {
     errors.setError({ message: JSON.stringify(e) });
     predicateTemplates.setTemplates([]);
+    throw e;
+  }
+}
+
+export async function createAsync(_: any, newTemplate: PredicateTemplate) {
+  try {
+    predicateTemplates.create(newTemplate);
+    await axios.post(`/predicate-templates`, newTemplate);
+  } catch (e) {
+    errors.setError({ message: JSON.stringify(e) });
+    throw e;
+  }
+}
+
+export async function updateAsync(_: any, template: PredicateTemplate) {
+  try {
+    predicateTemplates.update(template);
+    await axios.put(`/predicate-templates/${template.id}`, template);
+  } catch (e) {
+    errors.setError({ message: JSON.stringify(e) });
+    throw e;
+  }
+}
+
+export async function deleteAsync(_: any, templateId: string) {
+  try {
+    predicateTemplates.delete(templateId);
+    await axios.delete(`/predicate-templates/${templateId}`);
+  } catch (e) {
+    errors.setError({ message: JSON.stringify(e) });
     throw e;
   }
 }
@@ -67,9 +106,14 @@ const predicateTemplates = {
 
   markAsLoading: b.commit(markAsLoading),
   setTemplates: b.commit(setTemplates),
-  createNew: b.commit(createNew),
+  create: b.commit(create),
+  update: b.commit(update),
+  delete: b.commit(deleteTemplate),
 
   loadAllAsync: b.dispatch(loadAllAsync),
+  createAsync: b.dispatch(createAsync),
+  updateAsync: b.dispatch(updateAsync),
+  deleteAsync: b.dispatch(deleteAsync),
 };
 
 export default predicateTemplates;

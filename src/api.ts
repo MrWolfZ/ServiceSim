@@ -6,8 +6,8 @@ import * as elp from './api-infrastructure/event-log/persistence';
 import { PredicateTemplate } from './modules/predicate-template/predicate-template';
 import * as predicateTemplatesApi from './modules/predicate-template/predicate-template.api';
 import { PredicateNode } from './modules/predicate-tree/predicate-node';
-import { PredicateTree } from './modules/predicate-tree/predicate-tree.api';
 import { ResponseGeneratorTemplate } from './modules/response-generator-template/response-generator-template';
+import { PredicateTree } from './modules/simulation/predicate-tree.api';
 import simulationApi from './modules/simulation/simulation.api';
 
 // TODO: set adapter based on configuration

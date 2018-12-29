@@ -32,6 +32,7 @@
     "build-ui-vue": "vue-cli-service build",
     "lint-ui-vue": "vue-cli-service lint",
     "test-ui-vue": "vue-cli-service test:unit --config jest.config.ui-vue.js",
+    "eject-ui-vue": "vue inspect --mode production | Out-File C:\\Programming\\vue.json",
     "build-schematics": "tsc -p ./schematics/tsconfig.json",
     "generate-module": "node ./node_modules/@angular-devkit/schematics-cli/bin/schematics.js .:module --dry-run false --name",
     "generate-page": "node ./node_modules/@angular-devkit/schematics-cli/bin/schematics.js .:page --dry-run false --styleext scss --name",

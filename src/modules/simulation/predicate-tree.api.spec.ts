@@ -1,6 +1,6 @@
 import { EventLog } from '../../api-infrastructure';
 import { PredicateTemplateCreatedOrUpdated } from '../predicate-template/predicate-template-created-or-updated';
-import { PredicateNodeCreated } from './predicate-node-created';
+import { PredicateNodeCreated } from '../predicate-tree/predicate-node-created';
 import { PredicateTree } from './predicate-tree.api';
 
 describe('all predicates projection', () => {

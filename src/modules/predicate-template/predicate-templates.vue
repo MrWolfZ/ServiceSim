@@ -1,4 +1,5 @@
 <script lang="tsx">
+import uuid from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
 import { Input } from '../../ui-infrastructure';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
@@ -42,12 +43,16 @@ export default class PredicateTemplatesPage extends Vue {
     return predicateTemplates.state.templatesById;
   }
 
-  private createOrUpdateTemplate(template: PredicateTemplate) {
-    console.log(template);
+  private createOrUpdateTemplate(template: Pick<PredicateTemplate, Exclude<keyof PredicateTemplate, 'id'>> & { id?: string }) {
+    if (template.id) {
+      predicateTemplates.updateAsync(template as PredicateTemplate);
+    } else {
+      predicateTemplates.createAsync({ ...template, id: `predicateTemplate.${uuid()}` });
+    }
   }
 
   private deleteTemplate(templateId: string) {
-    console.log(templateId);
+    predicateTemplates.deleteAsync(templateId);
   }
 
   render() {

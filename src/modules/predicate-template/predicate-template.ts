@@ -1,5 +1,4 @@
 import uuid from 'uuid';
-
 import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../api-infrastructure';
 import { Parameter } from '../parameter/parameter';
 import { PredicateTemplateCreatedOrUpdated } from './predicate-template-created-or-updated';
@@ -23,9 +22,10 @@ export class PredicateTemplate extends EventSourcedRootEntity<DomainEvents> {
     description: string,
     evalFunctionBody: string,
     parameters: Parameter[],
+    id?: string,
   ) {
     return new PredicateTemplate().apply(PredicateTemplateCreatedOrUpdated.create({
-      templateId: `predicate-template/${uuid()}`,
+      templateId: id || `predicateTemplate.${uuid()}`,
       name,
       description,
       evalFunctionBody,

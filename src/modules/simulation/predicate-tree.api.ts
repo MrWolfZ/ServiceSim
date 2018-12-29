@@ -1,8 +1,8 @@
 import { EventLog } from '../../api-infrastructure';
+import { PredicateNodeCreated } from '../predicate-tree/predicate-node-created';
+import { ResponseGeneratorSet } from '../predicate-tree/response-generator-set';
+import { isPredicateCustomProperties, isResponseGeneratorCustomProperties } from '../predicate-tree/template-info-or-custom-properties';
 import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation';
-import { PredicateNodeCreated } from './predicate-node-created';
-import { ResponseGeneratorSet } from './response-generator-set';
-import { isPredicateCustomProperties, isResponseGeneratorCustomProperties } from './template-info-or-custom-properties';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
   PredicateNodeCreated.KIND,

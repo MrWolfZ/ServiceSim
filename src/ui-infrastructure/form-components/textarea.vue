@@ -24,11 +24,12 @@ export class TextArea extends TsxComponent<TextAreaProps> implements TextAreaPro
 
   render() {
     return (
-      <textarea rows={this.rows}
-             placeholder={this.placeholder}
-             value={this.value}
-             onInput={(e: Event) => this.onInput((e.target as HTMLTextAreaElement).value)}>
-      </textarea>
+      <textarea
+        rows={this.rows}
+        placeholder={this.placeholder}
+        value={this.value}
+        onInput={(e: Event) => this.onInput((e.target as HTMLTextAreaElement).value)}
+      />
     );
   }
 }
