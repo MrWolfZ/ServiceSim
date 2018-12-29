@@ -62,11 +62,13 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
             Parameter Name
           </label>
           <div class='control'>
-            <Input class='input'
-                   type='text'
-                   value={this.formValue.name}
-                   onInput={value => this.onChange({ name: value })} />
-            { !this.formValue.name &&
+            <Input
+              class='input'
+              type='text'
+              value={this.formValue.name}
+              onInput={value => this.onChange({ name: value })}
+            />
+            {!this.formValue.name &&
               <span class='help is-danger'>
                 Please enter a name
               </span>
@@ -79,11 +81,13 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
             Description
           </label>
           <div class='control'>
-            <Input class='input'
-                   type='text'
-                   value={this.formValue.description}
-                   onInput={value => this.onChange({ description: value })} />
-            { !this.formValue.description &&
+            <Input
+              class='input'
+              type='text'
+              value={this.formValue.description}
+              onInput={value => this.onChange({ description: value })}
+            />
+            {!this.formValue.description &&
               <span class='help is-danger'>
                 Please enter a description
               </span>
@@ -97,21 +101,25 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
             <div class='field'>
               <label class='label'>Is Required?</label>
               <div class='control radio-control'>
-                <BooleanInput type='radio'
-                              id={`parameterForm.isRequired.${this.instanceCount}.yes`}
-                              class='is-checkradio is-rtl is-white'
-                              value={true}
-                              checked={this.formValue.isRequired}
-                              onInput={value => this.onChange({ isRequired: value })} />
+                <BooleanInput
+                  type='radio'
+                  id={`parameterForm.isRequired.${this.instanceCount}.yes`}
+                  class='is-checkradio is-rtl is-white'
+                  value={true}
+                  checked={this.formValue.isRequired}
+                  onInput={value => this.onChange({ isRequired: value })}
+                />
                 <label for={`parameterForm.isRequired.${this.instanceCount}.yes`}>
                   Yes
                 </label>
-                <BooleanInput type='radio'
-                              id={`parameterForm.isRequired.${this.instanceCount}.no`}
-                              class='is-checkradio is-rtl is-white'
-                              value={false}
-                              checked={!this.formValue.isRequired}
-                              onInput={value => this.onChange({ isRequired: value })} />
+                <BooleanInput
+                  type='radio'
+                  id={`parameterForm.isRequired.${this.instanceCount}.no`}
+                  class='is-checkradio is-rtl is-white'
+                  value={false}
+                  checked={!this.formValue.isRequired}
+                  onInput={value => this.onChange({ isRequired: value })}
+                />
                 <label for={`parameterForm.isRequired.${this.instanceCount}.no`}>
                   No
                 </label>
@@ -140,43 +148,51 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
                 Default Value
               </label>
 
-              { this.formValue.valueType === 'string' &&
+              {this.formValue.valueType === 'string' &&
                 <div class='control'>
-                  <Input class='input'
-                         type='text'
-                         value={this.formValue.defaultValue as string}
-                         onInput={value => this.onChange({ defaultValue: value })} />
+                  <Input
+                    class='input'
+                    type='text'
+                    value={this.formValue.defaultValue as string}
+                    onInput={value => this.onChange({ defaultValue: value })}
+                  />
                 </div>
               }
 
-              { this.formValue.valueType === 'number' &&
+              {this.formValue.valueType === 'number' &&
                 <div class='control'>
-                  <NumberInput class='input'
-                               type='number'
-                               value={this.formValue.defaultValue as number}
-                               onInput={value => this.onChange({ defaultValue: value })} />
+                  <NumberInput
+                    class='input'
+                    type='number'
+                    value={this.formValue.defaultValue as number}
+                    onInput={value => this.onChange({ defaultValue: value })}
+                  />
                 </div>
               }
 
-              { this.formValue.valueType === 'boolean' &&
+              {this.formValue.valueType === 'boolean' &&
                 <div class='control radio-control'>
 
-                  <BooleanInput type='radio'
-                                id={`parameterForm.defaultValue.${this.instanceCount}.true`}
-                                class='is-checkradio is-rtl is-white'
-                                value={true}
-                                checked={this.formValue.defaultValue as boolean}
-                                onInput={value => this.onChange({ defaultValue: value })} />
+                  <BooleanInput
+                    type='radio'
+                    id={`parameterForm.defaultValue.${this.instanceCount}.true`}
+                    class='is-checkradio is-rtl is-white'
+                    value={true}
+                    checked={this.formValue.defaultValue as boolean}
+                    onInput={value => this.onChange({ defaultValue: value })}
+                  />
                   <label for={`parameterForm.defaultValue.${this.instanceCount}.true`}>
                     True
                   </label>
 
-                  <BooleanInput type='radio'
-                                id={`parameterForm.defaultValue.${this.instanceCount}.false`}
-                                class='is-checkradio is-rtl is-white'
-                                value={false}
-                                checked={!this.formValue.defaultValue}
-                                onInput={value => this.onChange({ defaultValue: value })} />
+                  <BooleanInput
+                    type='radio'
+                    id={`parameterForm.defaultValue.${this.instanceCount}.false`}
+                    class='is-checkradio is-rtl is-white'
+                    value={false}
+                    checked={!this.formValue.defaultValue}
+                    onInput={value => this.onChange({ defaultValue: value })}
+                  />
                   <label for={`parameterForm.defaultValue.${this.instanceCount}.false`}>
                     False
                   </label>
@@ -188,12 +204,14 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
 
         </div>
 
-        <button class='button is-danger'
-                type='button'
-                onClick={() => this.remove()}>
+        <button
+          class='button is-danger'
+          type='button'
+          onClick={() => this.remove()}
+        >
           <span>Remove</span>
           <span class='icon is-small'>
-            <fa-icon icon='times'></fa-icon>
+            <fa-icon icon='times' />
           </span>
         </button>
 

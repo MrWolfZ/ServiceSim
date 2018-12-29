@@ -14,20 +14,21 @@ export default class App extends Vue {
   }
 
   render() {
-    return <Layout></Layout>;
+    return <Layout />;
   }
 }
 </script>
 
 <style lang="scss">
-@import "~bulmaswatch/darkly/variables";
-@import "ui-styles/_constants";
-@import "~bulma/bulma";
-@import "ui-styles/_darkly-overrides";
+@import '~bulmaswatch/darkly/variables';
+@import 'ui-styles/_constants';
+@import '~bulma/bulma';
+@import 'ui-styles/_darkly-overrides';
 @import '~bulma-checkradio/dist/css/bulma-checkradio';
 @import '~bulma-tooltip/dist/css/bulma-tooltip';
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: auto;
 }
@@ -53,7 +54,7 @@ html, body {
 
   .input,
   .textarea,
-  .select>select {
+  .select > select {
     background-color: $body-background-color;
   }
 }
@@ -64,7 +65,7 @@ html, body {
 }
 
 .textarea.code {
-  font-family: "Inconsolata", "Consolas", "Monaco", monospace;
+  font-family: 'Inconsolata', 'Consolas', 'Monaco', monospace;
 }
 
 .field.title .input {
@@ -74,11 +75,11 @@ html, body {
 
 // override normal sized radio control size
 // to ensure the dot is properly centered
-.is-checkradio[type="radio"] {
-  +label::before,
-  +label:before,
-  +label::after,
-  +label:after {
+.is-checkradio[type='radio'] {
+  + label::before,
+  + label:before,
+  + label::after,
+  + label:after {
     width: 24px;
     height: 24px;
   }

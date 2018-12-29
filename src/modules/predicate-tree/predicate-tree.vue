@@ -7,7 +7,7 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class PredicateTreePage extends Vue {
   render() {
     return (
-      <div></div>
+      <div />
     );
   }
 }

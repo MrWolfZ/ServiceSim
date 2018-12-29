@@ -3,7 +3,8 @@ import { BareActionContext, getStoreBuilder } from 'vuex-typex';
 import errors from '../errors/errors.store';
 import { Parameter } from '../parameter/parameter';
 
-export interface PredicateTemplate {
+// class instead of interface to prevent webpack warnings
+export class PredicateTemplate {
   id: string;
   name: string;
   description: string;
@@ -49,9 +50,7 @@ export function createNew(state: PredicateTemplatesState, newTemplate: Predicate
 export async function loadAllAsync(_: BareActionContext<PredicateTemplatesState, {}>) {
   try {
     predicateTemplates.markAsLoading();
-
     const response = await axios.get<PredicateTemplate[]>(`/predicate-templates/ask/all`);
-
     predicateTemplates.setTemplates(response.data);
   } catch (e) {
     errors.setError({ message: JSON.stringify(e) });

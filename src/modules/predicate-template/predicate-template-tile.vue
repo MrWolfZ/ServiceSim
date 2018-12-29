@@ -9,7 +9,9 @@ export default class PredicateTemplateTile extends TsxComponent<{ templateId: st
   @Prop() templateId!: string;
 
   render() {
-    return <div></div>;
+    return (
+      <div />
+    );
   }
 }
 </script>

@@ -57,7 +57,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
 
   render() {
     return (
-      <form novalidate onSubmit={(e: Event) => e.preventDefault()}>
+      <form novalidate='novalidate' onSubmit={(e: Event) => e.preventDefault()}>
         <div class={`modal ${this.dialogIsOpen ? `is-active` : ``}`}>
           <div class='modal-background' />
           <div class='modal-card'>
@@ -72,14 +72,18 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
             </section>
 
             <footer class='modal-card-foot justify-content flex-end'>
-              <button class='button is-danger is-outlined'
-                      type='button'
-                      onClick={() => this.cancelDialog()}>
+              <button
+                class='button is-danger is-outlined'
+                type='button'
+                onClick={() => this.cancelDialog()}
+              >
                 Cancel
               </button>
-              <button class='button is-success'
-                      onClick={() => this.submitDialog()}
-                      disabled={!isTemplateValid(this.formValue)}>
+              <button
+                class='button is-success'
+                onClick={() => this.submitDialog()}
+                disabled={!isTemplateValid(this.formValue)}
+              >
                 Save
               </button>
             </footer>

@@ -75,12 +75,14 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
 
         <div class='field title'>
           <p class='control'>
-            <Input class='input'
-                   type='text'
-                   placeholder='Name'
-                   value={this.formValue.name}
-                   onInput={value => this.onChange({ name: value })} />
-            { !this.formValue.name &&
+            <Input
+              class='input'
+              type='text'
+              placeholder='Name'
+              value={this.formValue.name}
+              onInput={value => this.onChange({ name: value })}
+            />
+            {!this.formValue.name &&
               <span class='help is-danger'>
                 Please enter a name
               </span>
@@ -90,13 +92,14 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
 
         <div class='field'>
           <p class='control'>
-            <TextArea class='textarea'
-                      rows={3}
-                      placeholder='Description'
-                      value={this.formValue.description}
-                      onInput={value => this.onChange({ description: value })}>
-            </TextArea>
-            { !this.formValue.description &&
+            <TextArea
+              class='textarea'
+              rows={3}
+              placeholder='Description'
+              value={this.formValue.description}
+              onInput={value => this.onChange({ description: value })}
+            />
+            {!this.formValue.description &&
               <span class='help is-danger'>
                 Please enter a description
               </span>
@@ -107,12 +110,13 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
         <div class='field'>
           <label class='label'>Function Body</label>
           <p class='control'>
-            <TextArea class='textarea code'
-                      rows={5}
-                      value={this.formValue.evalFunctionBody}
-                      onInput={value => this.onChange({ evalFunctionBody: value })}>
-            </TextArea>
-            { !this.formValue.evalFunctionBody &&
+            <TextArea
+              class='textarea code'
+              rows={5}
+              value={this.formValue.evalFunctionBody}
+              onInput={value => this.onChange({ evalFunctionBody: value })}
+            />
+            {!this.formValue.evalFunctionBody &&
               <span class='help is-danger'>
                 Please enter a function body
               </span>
@@ -128,21 +132,25 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
 
             {
               this.formValue.parameters.map((fv, idx) =>
-                <ParameterForm class='tile is-12 is-child box parameter'
-                               formValue={fv}
-                               onChange={newFormValue => this.updateParameter(idx, newFormValue)}
-                               onRemove={() => this.removeParameter(idx)}>
-                </ParameterForm>
+                <ParameterForm
+                  key={idx}
+                  class='tile is-12 is-child box parameter'
+                  formValue={fv}
+                  onChange={newFormValue => this.updateParameter(idx, newFormValue)}
+                  onRemove={() => this.removeParameter(idx)}
+                />
               )
             }
 
             <div class='tile is-12 is-child'>
-              <button class='button is-primary'
-                      type='button'
-                      onClick={() => this.addParameter()}>
+              <button
+                class='button is-primary'
+                type='button'
+                onClick={() => this.addParameter()}
+              >
                 <span>Add Parameter</span>
                 <span class='icon is-small'>
-                  <fa-icon icon='plus'></fa-icon>
+                  <fa-icon icon='plus' />
                 </span>
               </button>
             </div>
