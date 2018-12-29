@@ -15,20 +15,39 @@ import predicateTemplates, { PredicateTemplate } from './predicate-template.stor
 export default class PredicateTemplatesPage extends Vue {
   private filterValue = '';
 
-  private newItemDialog() {
-    return this.$refs[this.newItemDialog.name] as PredicateTemplateDialog;
-  }
-
   created() {
     predicateTemplates.loadAllAsync();
   }
 
-  get templates() {
+  private dialog() {
+    return this.$refs[this.dialog.name] as PredicateTemplateDialog;
+  }
+
+  private get templates() {
     return predicateTemplates.all;
   }
 
-  private createNewTemplate(template: PredicateTemplate) {
+  private get filteredTemplates() {
+    const upperCaseFilterValue = this.filterValue.toUpperCase();
+    return this.templates.filter(
+      t =>
+        !upperCaseFilterValue
+        || t.name.toUpperCase().includes(upperCaseFilterValue)
+        || t.description.toUpperCase().includes(upperCaseFilterValue)
+        || t.evalFunctionBody.toUpperCase().includes(upperCaseFilterValue)
+    );
+  }
+
+  private get templatesById() {
+    return predicateTemplates.state.templatesById;
+  }
+
+  private createOrUpdateTemplate(template: PredicateTemplate) {
     console.log(template);
+  }
+
+  private deleteTemplate(templateId: string) {
+    console.log(templateId);
   }
 
   render() {
@@ -56,7 +75,7 @@ export default class PredicateTemplatesPage extends Vue {
               <div class='level-right'>
                 <button
                   class='button is-primary'
-                  onClick={() => this.newItemDialog().openNewItemDialog()}
+                  onClick={() => this.dialog().openForNewTemplate()}
                 >
                   <span>Create new template</span>
                   <span class='icon is-small'>
@@ -67,15 +86,24 @@ export default class PredicateTemplatesPage extends Vue {
             </div>
             <div class='columns is-multiline'>
               {
-                this.templates.map(template =>
+                this.filteredTemplates.map(template =>
                   <div key={template.id} class='column is-4-fullhd is-6-desktop is-12-tablet'>
-                    <PredicateTemplateTile templateId={template.id} />
+                    <PredicateTemplateTile
+                      templateId={template.id}
+                      onEdit={() => this.dialog().openForExistingTemplate(this.templatesById[template.id])}
+                      onDelete={() => this.deleteTemplate(template.id)}
+                    />
                   </div>
                 )
               }
             </div>
+
+            {this.filteredTemplates.length === 0 &&
+              <p>No templates match your filter.</p>
+            }
           </div>
         }
+
         {this.templates.length === 0 &&
           <div>
             <p>There are no predicate templates yet.</p>
@@ -83,7 +111,7 @@ export default class PredicateTemplatesPage extends Vue {
             { /* TODO: add button to create default predicate templates */}
             <button
               class='button is-primary'
-              onClick={() => this.newItemDialog().openNewItemDialog()}
+              onClick={() => this.dialog().openForNewTemplate()}
             >
               <span>Create new template</span>
               <span class='icon is-small'>
@@ -93,7 +121,7 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-        <PredicateTemplateDialog ref={this.newItemDialog.name} onSubmit={t => this.createNewTemplate(t)} />
+        <PredicateTemplateDialog ref={this.dialog.name} onSubmit={t => this.createOrUpdateTemplate(t)} />
       </div>
     );
   }

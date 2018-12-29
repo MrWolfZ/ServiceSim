@@ -20,13 +20,13 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
   private templateId: string | undefined;
   private formValue: PredicateTemplateFormValue = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE;
 
-  openNewItemDialog() {
+  openForNewTemplate() {
     this.templateId = undefined;
     this.dialogIsOpen = true;
     this.formValue = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE;
   }
 
-  openEditItemDialog(template: PredicateTemplate) {
+  openForExistingTemplate(template: PredicateTemplate) {
     this.templateId = template.id;
     this.dialogIsOpen = true;
     const { id, ...rest } = template;

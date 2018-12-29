@@ -1,11 +1,11 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 import predicateTemplates from './modules/predicate-template/predicate-template.store';
-import Layout from './ui-infrastructure/layout.vue';
+import Navbar from './ui-infrastructure/navbar.vue';
 
 @Component({
   components: {
-    Layout,
+    Navbar,
   },
 })
 export default class App extends Vue {
@@ -14,16 +14,21 @@ export default class App extends Vue {
   }
 
   render() {
-    return <Layout />;
+    return (
+      <div class='main-content'>
+        <Navbar />
+        <router-view />
+      </div>
+    );
   }
 }
 </script>
 
 <style lang="scss">
 @import '~bulmaswatch/darkly/variables';
-@import 'ui-styles/_constants';
+@import 'variables';
 @import '~bulma/bulma';
-@import 'ui-styles/_darkly-overrides';
+@import 'darkly-overrides';
 @import '~bulma-checkradio/dist/css/bulma-checkradio';
 @import '~bulma-tooltip/dist/css/bulma-tooltip';
 
@@ -31,6 +36,11 @@ html,
 body {
   height: 100%;
   overflow: auto;
+}
+
+.main-content {
+  margin-top: 4rem;
+  height: calc(100% - 4rem);
 }
 
 .page {

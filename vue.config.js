@@ -10,7 +10,7 @@ module.exports = {
     performance: {
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
-    },    
+    },
     plugins: [
       new CopyWebpackPlugin([{
         from: path.join(__dirname, 'src/assets'),
@@ -58,10 +58,20 @@ module.exports = {
         return options;
       });
 
+    config.module
+      .rule('scss')
+      .oneOf('vue')
+      .use('sass-loader')
+      .loader('sass-loader')
+      .tap(options => {
+        options.includePaths = ['src/ui-styles'];
+        return options;
+      });
+
     config.plugin('html')
-    .tap(args => {
-      args[0].template = path.join(__dirname,'src/index.html');
-      return args;
-    });
+      .tap(args => {
+        args[0].template = path.join(__dirname, 'src/index.html');
+        return args;
+      });
   }
 }
