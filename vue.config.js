@@ -1,5 +1,8 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path');
+
 module.exports = {
-  outputDir: 'dist/ui-vue',
+  outputDir: 'dist/ui',
   configureWebpack: {
     entry: {
       app: './src/ui.ts'
@@ -7,7 +10,14 @@ module.exports = {
     performance: {
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
-    }
+    },    
+    plugins: [
+      new CopyWebpackPlugin([{
+        from: path.join(__dirname, 'src/assets'),
+        to: path.join(__dirname, 'dist/ui/assets'),
+        toType: 'dir',
+      }]),
+    ],
   },
   devServer: {
     disableHostCheck: true
@@ -16,7 +26,7 @@ module.exports = {
     config
       .plugin('fork-ts-checker')
       .tap(args => {
-        args[0].tsconfig = './tsconfig.ui-vue.json';
+        args[0].tsconfig = 'tsconfig.ui-vue.json';
         return args;
       });
 
@@ -47,5 +57,11 @@ module.exports = {
         options.includePaths = ['src/ui-styles'];
         return options;
       });
+
+    config.plugin('html')
+    .tap(args => {
+      args[0].template = path.join(__dirname,'src/index.html');
+      return args;
+    });
   }
 }
