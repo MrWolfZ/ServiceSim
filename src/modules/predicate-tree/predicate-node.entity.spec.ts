@@ -1,9 +1,14 @@
-import { PredicateTemplate } from '../predicate-template/predicate-template';
-import { PredicateNode } from './predicate-node';
+import { PredicateTemplate } from '../predicate-template/predicate-template.entity';
+import { PredicateNode } from './predicate-node.entity';
 
 describe('Predicate', () => {
   it('should save and load', async () => {
-    const predicateTemplate = PredicateTemplate.create('Test', 'Description', 'return true;', []);
+    const predicateTemplate = PredicateTemplate.create({
+      name: 'Test',
+      description: 'test description',
+      evalFunctionBody: 'return true;',
+      parameters: [],
+    });
     const predicateNode = PredicateNode.create(
       'Test',
       '',
@@ -24,7 +29,12 @@ describe('Predicate', () => {
   });
 
   it('should save snapshot and load', async () => {
-    const predicateTemplate = PredicateTemplate.create('Test', 'Description', 'return true;', []);
+    const predicateTemplate = PredicateTemplate.create({
+      name: 'Test',
+      description: 'test description',
+      evalFunctionBody: 'return true;',
+      parameters: [],
+    });
     const predicateNode = PredicateNode.create(
       'Test',
       '',

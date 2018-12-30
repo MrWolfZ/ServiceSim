@@ -1,6 +1,6 @@
 import { EventLog } from '../../api-infrastructure';
-import { PredicateTemplateCreatedOrUpdated } from '../predicate-template/predicate-template-created-or-updated';
-import { PredicateNodeCreated } from '../predicate-tree/predicate-node-created';
+import { PredicateTemplateCreated } from '../predicate-template/predicate-template.events';
+import { PredicateNodeCreated } from '../predicate-tree/predicate-node.events';
 import { PredicateTree } from './predicate-tree.api';
 
 describe('all predicates projection', () => {
@@ -12,31 +12,35 @@ describe('all predicates projection', () => {
   it('should track all created predicates', async () => {
     const sub = PredicateTree.start();
 
-    await EventLog.publishAsync(PredicateTemplateCreatedOrUpdated.create({
+    await EventLog.publishAsync(PredicateTemplateCreated.create({
       templateId: 'url-pattern',
-      name: 'url-patter',
-      description: '',
-      evalFunctionBody: 'return true;',
-      parameters: [],
+      data: {
+        name: 'url-patter',
+        description: '',
+        evalFunctionBody: 'return true;',
+        parameters: [],
+      },
     }));
 
     const matcherId1 = 'predicate/1';
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId1,
-      name: 'Test',
-      description: '',
-      templateInfoOrCustomProperties: {
-        templateSnapshot: {
+      data: {
+        name: 'Test',
+        description: '',
+        templateInfoOrEvalFunctionBody: {
           templateId: 'url-pattern',
-          version: 1,
-          name: 'Test',
-          description: 'Description',
-          evalFunctionBody: 'return true;',
-          parameters: [],
+          templateVersion: 1,
+          templateDataSnapshot: {
+            name: 'Test',
+            description: 'Description',
+            evalFunctionBody: 'return true;',
+            parameters: [],
+          },
+          parameterValues: {},
         },
-        parameterValues: {},
+        childNodeIdsOrResponseGenerator: undefined,
       },
-      parentNodeId: undefined,
     }));
 
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(1);
@@ -44,20 +48,22 @@ describe('all predicates projection', () => {
     const matcherId2 = 'predicate/2';
     await EventLog.publishAsync(PredicateNodeCreated.create({
       nodeId: matcherId2,
-      name: 'Test',
-      description: '',
-      templateInfoOrCustomProperties: {
-        templateSnapshot: {
+      data: {
+        name: 'Test',
+        description: '',
+        templateInfoOrEvalFunctionBody: {
           templateId: 'url-pattern',
-          version: 1,
-          name: 'Test',
-          description: 'Description',
-          evalFunctionBody: 'return true;',
-          parameters: [],
+          templateVersion: 1,
+          templateDataSnapshot: {
+            name: 'Test',
+            description: 'Description',
+            evalFunctionBody: 'return true;',
+            parameters: [],
+          },
+          parameterValues: {},
         },
-        parameterValues: {},
+        childNodeIdsOrResponseGenerator: undefined,
       },
-      parentNodeId: undefined,
     }));
 
     expect((await PredicateTree.getTopLevelNodes()).length).toBe(2);

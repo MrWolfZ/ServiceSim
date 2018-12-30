@@ -1,9 +1,11 @@
+import { DomainEventData } from './api-infrastructure.types';
+
 export interface EventConstructor<T extends DomainEvent<T['kind']>> {
   new(...args: any[]): T;
   readonly KIND: T['kind'];
 }
 
-export abstract class DomainEvent<TKind extends string = string> {
+export abstract class DomainEvent<TKind extends string = string> implements DomainEventData {
   kind: TKind;
   occurredOnEpoch: number;
   eventVersion: number;

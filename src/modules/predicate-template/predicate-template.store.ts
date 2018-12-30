@@ -1,113 +1,98 @@
 import axios from 'axios';
+import uuid from 'uuid';
+import Vue from 'vue';
 import { getStoreBuilder } from 'vuex-typex';
-import errors from '../errors/errors.store';
-import { Parameter } from '../parameter/parameter';
+import {
+  CreatePredicateTemplateCommand,
+  PredicateTemplateData,
+  PredicateTemplateDto,
+  PredicateTemplateState,
+  UpdatePredicateTemplateCommand,
+} from './predicate-template.types';
 
-// class instead of interface to prevent webpack warnings
-export class PredicateTemplate {
-  id: string;
-  name: string;
-  description: string;
-  parameters: Parameter[];
-  evalFunctionBody: string;
-}
-
-export interface PredicateTemplateMap { [templateId: string]: PredicateTemplate; }
 export interface PredicateTemplatesState {
   templateIds: string[];
-  templatesById: PredicateTemplateMap;
-  dataIsLoading: boolean;
-  dataWasLoaded: boolean;
+  templatesById: { [templateId: string]: PredicateTemplateState };
 }
 
 const b = getStoreBuilder<{}>().module<PredicateTemplatesState>('predicateTemplates', {
   templateIds: [],
   templatesById: {},
-  dataIsLoading: false,
-  dataWasLoaded: false,
 });
 
-export function all(state: PredicateTemplatesState) {
+export function getAll(state: PredicateTemplatesState) {
   return state.templateIds.map(id => state.templatesById[id]);
 }
 
-export function markAsLoading(state: PredicateTemplatesState) {
-  state.dataIsLoading = true;
+export function addAll(state: PredicateTemplatesState, templates: PredicateTemplateState[]) {
+  templates.forEach(t => addOrReplace(state, t));
 }
 
-export function setTemplates(state: PredicateTemplatesState, templates: PredicateTemplate[]) {
-  state.templateIds = templates.map(t => t.id);
-  state.templatesById = templates.reduce((agg, template) => ({ ...agg, [template.id]: template }), {} as PredicateTemplateMap);
-  state.dataIsLoading = false;
-  state.dataWasLoaded = true;
-}
+export function addOrReplace(state: PredicateTemplatesState, template: PredicateTemplateState) {
+  if (!state.templateIds.includes(template.id)) {
+    state.templateIds.push(template.id);
+  }
 
-export function create(state: PredicateTemplatesState, newTemplate: PredicateTemplate) {
-  state.templateIds.push(newTemplate.id);
-  state.templatesById[newTemplate.id] = newTemplate;
-}
-
-export function update(state: PredicateTemplatesState, template: PredicateTemplate) {
-  state.templatesById[template.id] = template;
+  Vue.set(state.templatesById, template.id, template);
 }
 
 export function deleteTemplate(state: PredicateTemplatesState, templateId: string) {
   state.templateIds.splice(state.templateIds.indexOf(templateId), 1);
-  delete state.templatesById[templateId];
+  Vue.delete(state.templatesById, templateId);
 }
 
 export async function loadAllAsync() {
-  try {
-    predicateTemplates.markAsLoading();
-    const response = await axios.get<PredicateTemplate[]>(`/predicate-templates`);
-    predicateTemplates.setTemplates(response.data);
-  } catch (e) {
-    errors.setError({ message: JSON.stringify(e) });
-    predicateTemplates.setTemplates([]);
-    throw e;
-  }
+  const response = await axios.get<PredicateTemplateDto[]>(`/predicate-templates`);
+  predicateTemplates.addAll(response.data);
 }
 
-export async function createAsync(_: any, newTemplate: PredicateTemplate) {
-  try {
-    predicateTemplates.create(newTemplate);
-    await axios.post(`/predicate-templates`, newTemplate);
-  } catch (e) {
-    errors.setError({ message: JSON.stringify(e) });
-    throw e;
-  }
+export async function createAsync(_: any, data: PredicateTemplateData) {
+  const templateId = `predicateTemplate.${uuid()}`;
+  const template: PredicateTemplateState = {
+    id: templateId,
+    version: 1,
+    ...data,
+  };
+
+  const command: CreatePredicateTemplateCommand = {
+    templateId,
+    data,
+  };
+
+  predicateTemplates.addOrReplace(template);
+  await axios.post(`/predicate-templates/create`, command);
 }
 
-export async function updateAsync(_: any, template: PredicateTemplate) {
-  try {
-    predicateTemplates.update(template);
-    await axios.put(`/predicate-templates/${template.id}`, template);
-  } catch (e) {
-    errors.setError({ message: JSON.stringify(e) });
-    throw e;
-  }
+export async function updateAsync(_: any, args: { templateId: string; data: PredicateTemplateData }) {
+  const originalTemplate = predicateTemplates.state.templatesById[args.templateId];
+  const template: PredicateTemplateState = {
+    ...predicateTemplates.state.templatesById[args.templateId],
+    version: originalTemplate.version + 1,
+    ...args.data,
+  };
+
+  const command: UpdatePredicateTemplateCommand = {
+    ...args,
+    unmodifiedTemplateVersion: originalTemplate.version,
+  };
+
+  predicateTemplates.addOrReplace(template);
+  await axios.post(`/predicate-templates/update`, command);
 }
 
 export async function deleteAsync(_: any, templateId: string) {
-  try {
-    predicateTemplates.delete(templateId);
-    await axios.delete(`/predicate-templates/${templateId}`);
-  } catch (e) {
-    errors.setError({ message: JSON.stringify(e) });
-    throw e;
-  }
+  predicateTemplates.delete(templateId);
+  await axios.delete(`/predicate-templates/${templateId}`);
 }
 
-const stateGetter = b.state();
-const allGetter = b.read(all);
+const state$ = b.state();
+const getAll$ = b.read(getAll);
 const predicateTemplates = {
-  get state() { return stateGetter(); },
-  get all() { return allGetter(); },
+  get state() { return state$(); },
+  get all() { return getAll$(); },
 
-  markAsLoading: b.commit(markAsLoading),
-  setTemplates: b.commit(setTemplates),
-  create: b.commit(create),
-  update: b.commit(update),
+  addAll: b.commit(addAll),
+  addOrReplace: b.commit(addOrReplace),
   delete: b.commit(deleteTemplate),
 
   loadAllAsync: b.dispatch(loadAllAsync),

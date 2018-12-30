@@ -1,10 +1,10 @@
 <script lang="tsx">
-import uuid from 'uuid';
 import { Component, Vue } from 'vue-property-decorator';
 import { Input } from '../../ui-infrastructure';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
 import PredicateTemplateTile from './predicate-template-tile.vue';
-import predicateTemplates, { PredicateTemplate } from './predicate-template.store';
+import predicateTemplates from './predicate-template.store';
+import { PredicateTemplateData } from './predicate-template.types';
 
 @Component({
   components: {
@@ -43,11 +43,11 @@ export default class PredicateTemplatesPage extends Vue {
     return predicateTemplates.state.templatesById;
   }
 
-  private createOrUpdateTemplate(template: Pick<PredicateTemplate, Exclude<keyof PredicateTemplate, 'id'>> & { id?: string }) {
-    if (template.id) {
-      predicateTemplates.updateAsync(template as PredicateTemplate);
+  private createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
+    if (!id) {
+      predicateTemplates.createAsync(data);
     } else {
-      predicateTemplates.createAsync({ ...template, id: `predicateTemplate.${uuid()}` });
+      predicateTemplates.updateAsync({ templateId: id, data });
     }
   }
 
@@ -126,7 +126,7 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-        <PredicateTemplateDialog ref={this.dialog.name} onSubmit={t => this.createOrUpdateTemplate(t)} />
+        <PredicateTemplateDialog ref={this.dialog.name} onSubmit={(data, id) => this.createOrUpdateTemplate(data, id)} />
       </div>
     );
   }

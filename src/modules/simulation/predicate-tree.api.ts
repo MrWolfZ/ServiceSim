@@ -1,7 +1,5 @@
 import { EventLog } from '../../api-infrastructure';
-import { PredicateNodeCreated } from '../predicate-tree/predicate-node-created';
-import { ResponseGeneratorSet } from '../predicate-tree/response-generator-set';
-import { isPredicateCustomProperties, isResponseGeneratorCustomProperties } from '../predicate-tree/template-info-or-custom-properties';
+import { PredicateNodeCreated, ResponseGeneratorSet } from '../predicate-tree/predicate-node.events';
 import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
@@ -37,11 +35,11 @@ export class PredicateTree {
         case PredicateNodeCreated.KIND: {
           let evaluate: PredicateNode['evaluate'];
 
-          if (isPredicateCustomProperties(ev.templateInfoOrCustomProperties)) {
-            evaluate = new Function('request', ev.templateInfoOrCustomProperties.evalFunctionBody) as typeof evaluate;
+          if (typeof ev.data.templateInfoOrEvalFunctionBody === 'string') {
+            evaluate = new Function('request', ev.data.templateInfoOrEvalFunctionBody) as typeof evaluate;
           } else {
-            const functionBody = ev.templateInfoOrCustomProperties.templateSnapshot.evalFunctionBody;
-            const parameterValues = ev.templateInfoOrCustomProperties.parameterValues;
+            const functionBody = ev.data.templateInfoOrEvalFunctionBody.templateDataSnapshot.evalFunctionBody;
+            const parameterValues = ev.data.templateInfoOrEvalFunctionBody.parameterValues;
             const evaluationFunction = new Function('request', 'parameters', functionBody) as PredicateEvaluationFunction;
             evaluate = (request => evaluationFunction(request, parameterValues)) as typeof evaluate;
           }
@@ -58,17 +56,17 @@ export class PredicateTree {
         }
 
         case ResponseGeneratorSet.KIND:
-          const predicateNode = predicateNodesById.get(ev.predicateNodeId)!;
+          const predicateNode = predicateNodesById.get(ev.nodeId)!;
 
           let generate: ResponseGeneratorFunction;
 
-          if (isResponseGeneratorCustomProperties(ev.templateInfoOrCustomProperties)) {
-            generate = new Function('request', ev.templateInfoOrCustomProperties.generateFunctionBody) as typeof generate;
+          if (typeof ev.responseGenerator.templateInfoOrGeneratorFunctionBody === 'string') {
+            generate = new Function('request', ev.responseGenerator.templateInfoOrGeneratorFunctionBody) as typeof generate;
           } else {
-            const functionBody = ev.templateInfoOrCustomProperties.templateSnapshot.generatorFunctionBody;
-            const defaultParameterValues = ev.templateInfoOrCustomProperties.templateSnapshot.parameters
+            const functionBody = ev.responseGenerator.templateInfoOrGeneratorFunctionBody.templateDataSnapshot.generatorFunctionBody;
+            const defaultParameterValues = ev.responseGenerator.templateInfoOrGeneratorFunctionBody.templateDataSnapshot.parameters
               .reduce<{ [prop: string]: any }>((pv, p) => ({ ...pv, [p.name]: p.defaultValue }), {});
-            const parameterValues = ev.templateInfoOrCustomProperties.parameterValues;
+            const parameterValues = ev.responseGenerator.templateInfoOrGeneratorFunctionBody.parameterValues;
             const generatorFunction = new Function('request', 'parameters', functionBody) as ResponseGeneratorGenerateFunction;
             generate = (request => generatorFunction(request, { ...defaultParameterValues, ...parameterValues })) as typeof generate;
           }

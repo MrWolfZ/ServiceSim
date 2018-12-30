@@ -1,6 +1,7 @@
 import uuid from 'uuid';
 
-import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../api-infrastructure';
+import { EventSourcedEntityRepository, EventSourcedRootEntity } from '../../api-infrastructure';
+import { EventHandlerMap } from '../../api-infrastructure/api-infrastructure.types';
 import { InvocationResponseWasSet } from './invocation-response-was-set';
 import { ServiceRequestReceived } from './service-request-received';
 

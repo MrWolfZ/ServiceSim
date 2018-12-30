@@ -1,41 +1,40 @@
 import express from 'express';
 import { EventLog, requestHandler } from '../../api-infrastructure';
 import { failure, success } from '../../util/result-monad';
-import { PredicateTemplate } from './predicate-template';
-import { PredicateTemplateCreatedOrUpdated } from './predicate-template-created-or-updated';
-import { PredicateTemplateDeleted } from './predicate-template-deleted';
-import { PredicateTemplateDto } from './predicate-template.dto';
+import { PredicateTemplate } from './predicate-template.entity';
+import { PredicateTemplateCreated, PredicateTemplateDeleted, PredicateTemplateUpdated } from './predicate-template.events';
+import { CreatePredicateTemplateCommand, PredicateTemplateDto, UpdatePredicateTemplateCommand } from './predicate-template.types';
 
 const SUBSCRIBED_EVENT_KINDS: SubscribedEvents['kind'][] = [
-  PredicateTemplateCreatedOrUpdated.KIND,
+  PredicateTemplateCreated.KIND,
+  PredicateTemplateUpdated.KIND,
   PredicateTemplateDeleted.KIND,
 ];
 
 type SubscribedEvents =
-  | PredicateTemplateCreatedOrUpdated
+  | PredicateTemplateCreated
+  | PredicateTemplateUpdated
   | PredicateTemplateDeleted
   ;
 
-let getAllResponse: PredicateTemplateDto[] = [];
+const getAllResponse: PredicateTemplateDto[] = [];
 
 export function start() {
   return EventLog.subscribeToStream<SubscribedEvents>(SUBSCRIBED_EVENT_KINDS, {
-    [PredicateTemplateCreatedOrUpdated.KIND]: ev => {
-      const item: PredicateTemplateDto = {
+    [PredicateTemplateCreated.KIND]: ev => {
+      getAllResponse.push({
         id: ev.templateId,
-        name: ev.name,
-        description: ev.description,
-        evalFunctionBody: ev.evalFunctionBody,
-        parameters: ev.parameters,
-      };
-
-      getAllResponse = [
-        ...getAllResponse.filter(i => i.id !== item.id),
-        item,
-      ].sort((l, r) => l.name.localeCompare(r.name));
+        version: 1,
+        ...ev.data,
+      });
+    },
+    [PredicateTemplateUpdated.KIND]: ev => {
+      const item = getAllResponse.find(dto => dto.id === ev.templateId)!;
+      Object.assign(item, ev.data);
+      item.version += 1;
     },
     [PredicateTemplateDeleted.KIND]: ev => {
-      getAllResponse = getAllResponse.filter(i => i.id !== ev.templateId);
+      getAllResponse.splice(getAllResponse.findIndex(dto => dto.id === ev.templateId), 1);
     },
   });
 }
@@ -44,18 +43,15 @@ export function getAllAsync() {
   return getAllResponse;
 }
 
-export async function createAsync(dto: PredicateTemplateDto) {
+export async function createAsync(command: CreatePredicateTemplateCommand) {
   // TODO: validate
   if (1 !== 1) {
     return failure({});
   }
 
   const template = PredicateTemplate.create(
-    dto.name,
-    dto.description,
-    dto.evalFunctionBody,
-    dto.parameters,
-    dto.id,
+    command.data,
+    command.templateId,
   );
 
   await PredicateTemplate.saveAsync(template);
@@ -63,19 +59,14 @@ export async function createAsync(dto: PredicateTemplateDto) {
   return success();
 }
 
-export async function updateAsync(dto: PredicateTemplateDto) {
+export async function updateAsync(command: UpdatePredicateTemplateCommand) {
   // TODO: validate (including exists)
   if (1 !== 1) {
     return failure({});
   }
 
-  let template = await PredicateTemplate.ofIdAsync(dto.id);
-  template = template.update(
-    dto.name,
-    dto.description,
-    dto.evalFunctionBody,
-    dto.parameters,
-  );
+  let template = await PredicateTemplate.ofIdAsync(command.templateId);
+  template = template.update(command.data);
 
   await PredicateTemplate.saveAsync(template);
 
@@ -99,6 +90,6 @@ export async function deleteAsync(params: { templateId: string }) {
 
 export const api = express.Router();
 api.get('/', requestHandler(getAllAsync));
-api.post('/', requestHandler(createAsync));
-api.put('/:templateId', requestHandler(updateAsync));
+api.post('/create', requestHandler(createAsync));
+api.post('/update', requestHandler(updateAsync));
 api.delete('/:templateId', requestHandler(deleteAsync));

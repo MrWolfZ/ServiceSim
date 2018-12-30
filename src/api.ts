@@ -3,9 +3,10 @@ import path from 'path';
 import { Subscription } from 'rxjs';
 import * as ejp from './api-infrastructure/event-journal/persistence';
 import * as elp from './api-infrastructure/event-log/persistence';
-import { PredicateTemplate } from './modules/predicate-template/predicate-template';
 import * as predicateTemplatesApi from './modules/predicate-template/predicate-template.api';
-import { PredicateNode } from './modules/predicate-tree/predicate-node';
+import { PredicateTemplate } from './modules/predicate-template/predicate-template.entity';
+import { PredicateNode } from './modules/predicate-tree/predicate-node.entity';
+import * as predicateTreeApi from './modules/predicate-tree/predicate-tree.api';
 import { ResponseGeneratorTemplate } from './modules/response-generator-template/response-generator-template';
 import { PredicateTree } from './modules/simulation/predicate-tree.api';
 import simulationApi from './modules/simulation/simulation.api';
@@ -17,6 +18,7 @@ elp.setAdapter(new elp.InMemoryEventLogPersistenceAdapter());
 export function startUiApiSubscriptions() {
   const subscriptions = [
     predicateTemplatesApi.start(),
+    predicateTreeApi.start(),
   ];
 
   return new Subscription(() => subscriptions.forEach(sub => sub.unsubscribe()));
@@ -61,11 +63,11 @@ export async function initializeAsync() {
 
   await ResponseGeneratorTemplate.saveAsync(staticResponseGeneratorTemplate);
 
-  const pathPrefixPredicateTemplate = PredicateTemplate.create(
-    'Path Prefix',
-    'Predicates based on this template match all requests whose path starts with a provided string.',
-    'return request.path.startsWith(parameters["Prefix"]);',
-    [
+  const pathPrefixPredicateTemplate = PredicateTemplate.create({
+    name: 'Path Prefix',
+    description: 'Predicates based on this template match all requests whose path starts with a provided string.',
+    evalFunctionBody: 'return request.path.startsWith(parameters["Prefix"]);',
+    parameters: [
       {
         name: 'Prefix',
         description: 'The prefix to check the path for.',
@@ -74,15 +76,15 @@ export async function initializeAsync() {
         defaultValue: '/',
       },
     ],
-  );
+  });
 
   await PredicateTemplate.saveAsync(pathPrefixPredicateTemplate);
 
-  const methodPredicateTemplate = PredicateTemplate.create(
-    'Method',
-    'Predicates based on this template match all requests that have one of a specified list of methods.',
-    'return parameters["Allowed Methods"].split(",").map(m => m.trim().toUpperCase()).includes(request.method.toUpperCase());',
-    [
+  const methodPredicateTemplate = PredicateTemplate.create({
+    name: 'Method',
+    description: 'Predicates based on this template match all requests that have one of a specified list of methods.',
+    evalFunctionBody: 'return parameters["Allowed Methods"].split(",").map(m => m.trim().toUpperCase()).includes(request.method.toUpperCase());',
+    parameters: [
       {
         name: 'Allowed Methods',
         description: 'A comma separated list of methods to match.',
@@ -91,95 +93,131 @@ export async function initializeAsync() {
         defaultValue: 'GET,POST,PUT,DELETE',
       },
     ],
-  );
+  });
 
   await PredicateTemplate.saveAsync(methodPredicateTemplate);
 
-  const getPredicateTemplate = PredicateTemplate.create(
-    'GET',
-    'Predicates based on this template match all GET requests.',
-    'return request.method.toUpperCase() === "GET"',
-    [],
-  );
+  const getPredicateTemplate = PredicateTemplate.create({
+    name: 'GET',
+    description: 'Predicates based on this template match all GET requests.',
+    evalFunctionBody: 'return request.method.toUpperCase() === "GET"',
+    parameters: [],
+  });
 
   await PredicateTemplate.saveAsync(getPredicateTemplate);
 
-  const allPredicateTemplate = PredicateTemplate.create(
-    'All',
-    'Predicates based on this template match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
-    'return true;',
-    [],
-  );
+  const allPredicateTemplate = PredicateTemplate.create({
+    name: 'All',
+    // tslint:disable-next-line:max-line-length
+    description: 'Predicates based on this template match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
+    evalFunctionBody: 'return true;',
+    parameters: [],
+  });
 
   await PredicateTemplate.saveAsync(allPredicateTemplate);
 
-  const topLevelPredicateNode1 = PredicateNode.create(
-    pathPrefixPredicateTemplate.name,
-    '',
-    {
-      template: pathPrefixPredicateTemplate,
+  const topLevelPredicateNode1 = PredicateNode.create({
+    name: pathPrefixPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: pathPrefixPredicateTemplate.id,
+      templateVersion: pathPrefixPredicateTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: pathPrefixPredicateTemplate.name,
+        description: pathPrefixPredicateTemplate.description,
+        evalFunctionBody: pathPrefixPredicateTemplate.evalFunctionBody,
+        parameters: pathPrefixPredicateTemplate.parameters,
+      },
       parameterValues: {
         Prefix: '/api',
       },
     },
-    undefined,
-  );
+    childNodeIdsOrResponseGenerator: undefined,
+  });
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const childPredicateNode1 = PredicateNode.create(
-    pathPrefixPredicateTemplate.name,
-    '',
-    {
-      template: pathPrefixPredicateTemplate,
+  const childPredicateNode1 = PredicateNode.create({
+    name: pathPrefixPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: pathPrefixPredicateTemplate.id,
+      templateVersion: pathPrefixPredicateTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: pathPrefixPredicateTemplate.name,
+        description: pathPrefixPredicateTemplate.description,
+        evalFunctionBody: pathPrefixPredicateTemplate.evalFunctionBody,
+        parameters: pathPrefixPredicateTemplate.parameters,
+      },
       parameterValues: {
         Prefix: '/api/books',
       },
     },
-    undefined,
-  );
+    childNodeIdsOrResponseGenerator: undefined,
+  });
 
-  childPredicateNode1.setResponseGenerator(
-    'Static',
-    '',
-    {
-      template: staticResponseGeneratorTemplate,
+  childPredicateNode1.setResponseGenerator({
+    name: 'Static',
+    description: '',
+    templateInfoOrGeneratorFunctionBody: {
+      templateId: staticResponseGeneratorTemplate.id,
+      templateVersion: staticResponseGeneratorTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: staticResponseGeneratorTemplate.name,
+        description: staticResponseGeneratorTemplate.description,
+        generatorFunctionBody: staticResponseGeneratorTemplate.generatorFunctionBody,
+        parameters: staticResponseGeneratorTemplate.parameters,
+      },
       parameterValues: {
         'Status Code': 200,
         'Body': JSON.stringify([{ title: 'LOTR' }]),
         'Content Type': 'application/json',
       },
     },
-  );
+  });
 
   await PredicateNode.saveAsync(childPredicateNode1);
 
   topLevelPredicateNode1.addChildPredicate(childPredicateNode1.id);
 
-  const childPredicateNode2 = PredicateNode.create(
-    pathPrefixPredicateTemplate.name,
-    '',
-    {
-      template: pathPrefixPredicateTemplate,
+  const childPredicateNode2 = PredicateNode.create({
+    name: pathPrefixPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: pathPrefixPredicateTemplate.id,
+      templateVersion: pathPrefixPredicateTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: pathPrefixPredicateTemplate.name,
+        description: pathPrefixPredicateTemplate.description,
+        evalFunctionBody: pathPrefixPredicateTemplate.evalFunctionBody,
+        parameters: pathPrefixPredicateTemplate.parameters,
+      },
       parameterValues: {
         Prefix: '/api/authors',
       },
     },
-    undefined,
-  );
+    childNodeIdsOrResponseGenerator: undefined,
+  });
 
-  childPredicateNode2.setResponseGenerator(
-    'Static',
-    '',
-    {
-      template: staticResponseGeneratorTemplate,
+  childPredicateNode2.setResponseGenerator({
+    name: 'Static',
+    description: '',
+    templateInfoOrGeneratorFunctionBody: {
+      templateId: staticResponseGeneratorTemplate.id,
+      templateVersion: staticResponseGeneratorTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: staticResponseGeneratorTemplate.name,
+        description: staticResponseGeneratorTemplate.description,
+        generatorFunctionBody: staticResponseGeneratorTemplate.generatorFunctionBody,
+        parameters: staticResponseGeneratorTemplate.parameters,
+      },
       parameterValues: {
         'Status Code': 200,
         'Body': JSON.stringify([{ name: 'Tolkien' }]),
         'Content Type': 'application/json',
       },
     },
-  );
+  });
 
   await PredicateNode.saveAsync(childPredicateNode2);
 
@@ -187,8 +225,40 @@ export async function initializeAsync() {
 
   await PredicateNode.saveAsync(topLevelPredicateNode1);
 
-  const topLevelPredicateNode2 = PredicateNode.create(allPredicateTemplate.name, '', { template: allPredicateTemplate, parameterValues: {} }, undefined);
-  topLevelPredicateNode2.setResponseGenerator('Status Code', '', { template: staticResponseGeneratorTemplate, parameterValues: { 'Status Code': 204 } });
+  const topLevelPredicateNode2 = PredicateNode.create({
+    name: allPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: allPredicateTemplate.id,
+      templateVersion: allPredicateTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: allPredicateTemplate.name,
+        description: allPredicateTemplate.description,
+        evalFunctionBody: allPredicateTemplate.evalFunctionBody,
+        parameters: allPredicateTemplate.parameters,
+      },
+      parameterValues: {},
+    },
+    childNodeIdsOrResponseGenerator: undefined,
+  });
+
+  topLevelPredicateNode2.setResponseGenerator({
+    name: 'Status Code',
+    description: '',
+    templateInfoOrGeneratorFunctionBody: {
+      templateId: staticResponseGeneratorTemplate.id,
+      templateVersion: staticResponseGeneratorTemplate.unmutatedVersion,
+      templateDataSnapshot: {
+        name: staticResponseGeneratorTemplate.name,
+        description: staticResponseGeneratorTemplate.description,
+        generatorFunctionBody: staticResponseGeneratorTemplate.generatorFunctionBody,
+        parameters: staticResponseGeneratorTemplate.parameters,
+      },
+      parameterValues: {
+        'Status Code': 204,
+      },
+    },
+  });
 
   await PredicateNode.saveAsync(topLevelPredicateNode2);
 

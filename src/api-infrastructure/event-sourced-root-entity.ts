@@ -1,10 +1,15 @@
+import { NonFunctionProperties, Omit } from '../util/types';
+import { EventHandlerMap, EventOfKind, EventSourcedRootEntityData } from './api-infrastructure.types';
 import { DomainEvent } from './domain-event';
 
-export interface EntityConstructor<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> {
+export interface EntityConstructor<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']>> {
   new(...args: any[]): T;
 }
 
-export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> {
+export type Snapshot<T extends EventSourcedRootEntity<TEvent>, TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> =
+  NonFunctionProperties<Omit<T, keyof EventSourcedRootEntity<TEvent> | 'getSnapshotValue'>>;
+
+export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['kind']>> implements EventSourcedRootEntityData<TEvent> {
   id = '';
   mutatingEvents: TEvent[] = [];
   mutatedVersion = 1;
@@ -56,11 +61,3 @@ export abstract class EventSourcedRootEntity<TEvent extends DomainEvent<TEvent['
     };
   }
 }
-
-export type EntityEventHandler<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>> = (event: TEvent) => void;
-
-export type EventOfKind<TEvent, TKind extends string> = TEvent extends DomainEvent<TKind> ? TEvent : never;
-
-export type EventHandlerMap<TEvent extends DomainEvent> = {
-  [eventKind in TEvent['kind']]: EntityEventHandler<EventOfKind<TEvent, eventKind>>;
-};

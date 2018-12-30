@@ -1,5 +1,5 @@
 import { DomainEvent } from '../../api-infrastructure';
-import { Parameter } from '../parameter/parameter';
+import { Parameter } from '../parameter/parameter.types';
 
 export class ResponseGeneratorTemplateCreatedOrUpdated extends DomainEvent<typeof ResponseGeneratorTemplateCreatedOrUpdated.KIND> {
   templateId: string;

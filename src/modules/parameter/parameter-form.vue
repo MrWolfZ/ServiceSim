@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { Component, Emit, Prop } from 'vue-property-decorator';
 import { BooleanInput, Input, NumberInput, TsxComponent } from '../../ui-infrastructure';
-import { Parameter } from './parameter';
+import { Parameter } from './parameter.types';
 
 export type ParameterFormValue = Parameter;
 

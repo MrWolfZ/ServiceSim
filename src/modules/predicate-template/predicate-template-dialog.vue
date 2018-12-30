@@ -3,10 +3,10 @@ import { Component, Emit } from 'vue-property-decorator';
 import { TsxComponent } from '../../ui-infrastructure';
 import { ParameterFormValue } from '../parameter/parameter-form.vue';
 import PredicateTemplateForm, { EMPTY_PREDICATE_TEMPLATE_FORM_VALUE, PredicateTemplateFormValue } from './predicate-template-form.vue';
-import { PredicateTemplate } from './predicate-template.store';
+import { PredicateTemplateData, PredicateTemplateState } from './predicate-template.types';
 
 export interface PredicateTemplateDialogProps {
-  onSubmit: (newValue: Pick<PredicateTemplate, Exclude<keyof PredicateTemplate, 'id'>> & { id?: string }) => any;
+  onSubmit: (data: PredicateTemplateData, id?: string) => any;
 }
 
 @Component({
@@ -14,7 +14,7 @@ export interface PredicateTemplateDialogProps {
     PredicateTemplateForm,
   },
 })
-export default class PredicateTemplateDialog extends TsxComponent<PredicateTemplateDialogProps> {
+export default class PredicateTemplateDialog extends TsxComponent<PredicateTemplateDialogProps> implements PredicateTemplateDialogProps {
   private dialogIsOpen = false;
   private templateId: string | undefined;
   private formValue: PredicateTemplateFormValue = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE;
@@ -25,7 +25,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
     this.formValue = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE;
   }
 
-  openForExistingTemplate(template: PredicateTemplate) {
+  openForExistingTemplate(template: PredicateTemplateState) {
     this.templateId = template.id;
     this.dialogIsOpen = true;
     const { id, ...rest } = template;
@@ -33,16 +33,14 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
   }
 
   @Emit('submit')
-  private onSubmit(): Pick<PredicateTemplate, Exclude<keyof PredicateTemplate, 'id'>> & { id?: string } {
-    return {
-      id: this.templateId,
-      ...this.formValue,
-      parameters: this.formValue.parameters.map(p => ({ ...p })),
-    };
-  }
+  onSubmit(_1: PredicateTemplateData, _2?: string) { }
 
   private submitDialog() {
-    this.onSubmit();
+    this.onSubmit({
+      ...this.formValue,
+      parameters: this.formValue.parameters.map(p => ({ ...p })),
+    }, this.templateId);
+
     this.closeDialog();
   }
 

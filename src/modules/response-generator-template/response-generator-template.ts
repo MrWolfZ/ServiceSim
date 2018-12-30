@@ -1,7 +1,8 @@
 import uuid from 'uuid';
 
-import { EventHandlerMap, EventSourcedEntityRepository, EventSourcedRootEntity } from '../../api-infrastructure';
-import { Parameter } from '../parameter/parameter';
+import { EventSourcedEntityRepository, EventSourcedRootEntity } from '../../api-infrastructure';
+import { EventHandlerMap } from '../../api-infrastructure/api-infrastructure.types';
+import { Parameter } from '../parameter/parameter.types';
 import { ResponseGeneratorTemplateCreatedOrUpdated } from './response-generator-template-created-or-updated';
 
 const JOURNAL_NAME = 'response-generator-template/Journal';
@@ -13,8 +14,8 @@ type DomainEvents =
 export class ResponseGeneratorTemplate extends EventSourcedRootEntity<DomainEvents> {
   name = '';
   description = '';
-  parameters: Parameter[] = [];
   generatorFunctionBody = 'return { statusCode: 500, body: \'missing generator function body\' }';
+  parameters: Parameter[] = [];
 
   static create(
     name: string,
@@ -52,7 +53,7 @@ export class ResponseGeneratorTemplate extends EventSourcedRootEntity<DomainEven
       this.name = event.name;
       this.description = event.description;
       this.generatorFunctionBody = event.generatorFunctionBody,
-      this.parameters = event.parameters;
+        this.parameters = event.parameters;
     },
   };
 

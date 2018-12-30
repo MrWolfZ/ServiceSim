@@ -1,8 +1,8 @@
 import { ConnectableObservable, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
 
+import { EventHandlerMap, EventOfKind } from '../api-infrastructure.types';
 import { DomainEvent } from '../domain-event';
-import { EventHandlerMap, EventOfKind } from '../event-sourced-root-entity';
 import { loadEventsAsync, persistEventsAsync } from './persistence';
 
 const allEventsSubject = new Subject<[DomainEvent, number]>();
