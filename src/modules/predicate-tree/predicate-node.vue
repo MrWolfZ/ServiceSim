@@ -5,9 +5,9 @@ import { TsxComponent } from '../../ui-infrastructure/tsx-component';
 import predicateNodes from './predicate-node.store';
 
 export interface PredicateNodeViewProps {
- nodeId: string;
- selectedNodeId: string;
- onSelect: (nodeId: string) => any;
+  nodeId: string;
+  selectedNodeId: string;
+  onSelect: (nodeId: string) => any;
 }
 
 @Component({
@@ -19,7 +19,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
   @Prop() nodeId: string;
   @Prop() selectedNodeId: string;
 
-  @Emit('select')
+  @Emit()
   onSelect(_: string) { }
 
   private isExpanded = true;

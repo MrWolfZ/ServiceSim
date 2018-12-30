@@ -31,8 +31,8 @@ export interface PredicateTemplateFormProps {
 export default class PredicateTemplateForm extends TsxComponent<PredicateTemplateFormProps> {
   @Prop() formValue: PredicateTemplateFormValue;
 
-  @Emit('change')
-  private onChange(change: Partial<PredicateTemplateFormValue>) {
+  @Emit()
+  onChange(change: Partial<PredicateTemplateFormValue>) {
     return { ...this.formValue, ...change };
   }
 

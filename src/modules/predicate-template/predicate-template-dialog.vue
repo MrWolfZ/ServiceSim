@@ -32,7 +32,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
     this.formValue = rest;
   }
 
-  @Emit('submit')
+  @Emit()
   onSubmit(_1: PredicateTemplateData, _2?: string) { }
 
   private submitDialog() {

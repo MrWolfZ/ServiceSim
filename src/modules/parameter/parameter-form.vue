@@ -25,15 +25,13 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
 
   private instanceCount = instanceCount++;
 
-  @Emit('change')
-  private onChange(change: Partial<ParameterFormValue>) {
+  @Emit()
+  onChange(change: Partial<ParameterFormValue>) {
     return { ...this.formValue, ...change };
   }
 
-  @Emit('remove')
-  private remove() {
-    // we just need to emit
-  }
+  @Emit()
+  onRemove() { }
 
   private updateValueType(newValueType: ParameterFormValue['valueType']) {
     const newDefaultValue = (() => {
@@ -207,7 +205,7 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> {
         <button
           class='button is-danger'
           type='button'
-          onClick={() => this.remove()}
+          onClick={() => this.onRemove()}
         >
           <span>Remove</span>
           <span class='icon is-small'>

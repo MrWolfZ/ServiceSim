@@ -12,22 +12,18 @@ export interface PredicateTemplateTileProps {
 @Component({
   components: {},
 })
-export default class PredicateTemplateTile extends TsxComponent<PredicateTemplateTileProps> {
+export default class PredicateTemplateTile extends TsxComponent<PredicateTemplateTileProps> implements PredicateTemplateTileProps {
   @Prop() templateId!: string;
 
   get template() {
     return predicateTemplates.state.templatesById[this.templateId];
   }
 
-  @Emit('delete')
-  delete() {
-    // g
-  }
+  @Emit()
+  onEdit() { }
 
-  @Emit('edit')
-  edit() {
-    // g
-  }
+  @Emit()
+  onDelete() { }
 
   render() {
     return (
@@ -44,7 +40,7 @@ export default class PredicateTemplateTile extends TsxComponent<PredicateTemplat
                 <button
                   class='button is-danger'
                   type='button'
-                  onClick={() => this.delete()}
+                  onClick={() => this.onDelete()}
                 >
                   <span>Delete</span>
                   <span class='icon is-small'>
@@ -54,7 +50,7 @@ export default class PredicateTemplateTile extends TsxComponent<PredicateTemplat
                 <button
                   class='button is-primary'
                   type='button'
-                  onClick={() => this.edit()}
+                  onClick={() => this.onEdit()}
                 >
                   <span>Edit</span>
                   <span class='icon is-small'>

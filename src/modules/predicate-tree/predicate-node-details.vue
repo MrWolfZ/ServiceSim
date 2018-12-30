@@ -20,25 +20,25 @@ export interface PredicateNodeDetailsProps {
 export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDetailsProps> implements PredicateNodeDetailsProps {
   @Prop() nodeId: string;
 
-  @Emit('edit')
+  @Emit()
   onEdit() { }
 
-  @Emit('delete')
+  @Emit()
   onDelete() { }
 
-  @Emit('addChildNode')
+  @Emit()
   onAddChildNode() { }
 
-  @Emit('setResponseGenerator')
+  @Emit()
   onSetResponseGenerator() { }
 
-  @Emit('removeResponseGenerator')
+  @Emit()
   onRemoveResponseGenerator() { }
 
-  @Emit('editResponseGenerator')
+  @Emit()
   onEditResponseGenerator() { }
 
-  @Emit('selectChildNode')
+  @Emit()
   onSelectChildNode(_: string) { }
 
   private get node() {

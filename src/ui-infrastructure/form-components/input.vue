@@ -5,9 +5,9 @@ import { TsxComponent } from '../tsx-component';
 export interface InputProps<T> {
   type?: 'text' | 'number' | 'checkbox' | 'radio';
   placeholder?: string;
-  value?: T;
+  value: T;
   checked?: boolean;
-  onInput?: (value: T) => any;
+  onInput: (value: T) => any;
 }
 
 @Component({
@@ -16,13 +16,11 @@ export interface InputProps<T> {
 export class Input<T extends string | number | boolean = string> extends TsxComponent<InputProps<T>> implements InputProps<T> {
   @Prop() type: 'text' | 'number' | 'checkbox' | 'radio' | undefined;
   @Prop() placeholder: string | undefined;
-  @Prop() value: T | undefined;
+  @Prop() value: T;
   @Prop() checked: boolean | undefined;
 
-  @Emit('input')
-  onInput(value: T) {
-    return value;
-  }
+  @Emit()
+  onInput(_: T) { }
 
   parseValue(el: HTMLInputElement) {
     return el.value as T;

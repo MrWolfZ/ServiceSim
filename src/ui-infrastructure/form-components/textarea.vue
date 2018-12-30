@@ -17,10 +17,8 @@ export class TextArea extends TsxComponent<TextAreaProps> implements TextAreaPro
   @Prop() placeholder: string | undefined;
   @Prop() value: string | undefined;
 
-  @Emit('input')
-  onInput(value: string) {
-    return value;
-  }
+  @Emit()
+  onInput(_: string) { }
 
   render() {
     return (
