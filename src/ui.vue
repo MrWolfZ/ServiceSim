@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 import predicateTemplates from './modules/predicate-template/predicate-template.store';
+import predicateNodes from './modules/predicate-tree/predicate-node.store';
 import Navbar from './ui-infrastructure/navbar.vue';
 
 @Component({
@@ -9,15 +10,24 @@ import Navbar from './ui-infrastructure/navbar.vue';
   },
 })
 export default class App extends Vue {
-  created() {
-    predicateTemplates.loadAllAsync();
+  private dataWasLoaded = false;
+
+  async created() {
+    await Promise.all([
+      predicateNodes.loadAllAsync(),
+      predicateTemplates.loadAllAsync(),
+    ]);
+
+    this.dataWasLoaded = true;
   }
 
   render() {
     return (
       <div class='main-content'>
         <Navbar />
-        <router-view />
+        {this.dataWasLoaded &&
+          <router-view />
+        }
       </div>
     );
   }

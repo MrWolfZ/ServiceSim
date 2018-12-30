@@ -3,8 +3,8 @@ import { getStoreBuilder } from 'vuex-typex';
 import { PredicateNodeDto, PredicateNodeState } from './predicate-node.types';
 
 export interface PredicateNodesState {
-  nodeIds: string[];
   nodesById: { [templateId: string]: PredicateNodeState };
+  nodeIds: string[];
 }
 
 const b = getStoreBuilder<{}>().module<PredicateNodesState>('predicateNodes', {
@@ -29,7 +29,7 @@ export function addOrReplace(state: PredicateNodesState, node: PredicateNodeStat
 }
 
 export async function loadAllAsync() {
-  const response = await axios.get<PredicateNodeDto[]>(`/predicate-nodes`);
+  const response = await axios.get<PredicateNodeDto[]>(`/predicate-tree/nodes`);
   predicateTemplates.addAll(response.data);
 }
 

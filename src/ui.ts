@@ -9,6 +9,7 @@ import Vuex from 'vuex';
 import { getStoreBuilder } from 'vuex-typex';
 import './modules/errors/errors.store';
 import './modules/predicate-template/predicate-template.store';
+import './modules/predicate-tree/predicate-node.store';
 import App from './ui.vue';
 
 library.add(faArrowLeft);

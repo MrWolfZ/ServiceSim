@@ -26,6 +26,7 @@ export function startUiApiSubscriptions() {
 
 export const uiApi = express.Router();
 uiApi.use('/predicate-templates', predicateTemplatesApi.api);
+uiApi.use('/predicate-tree', predicateTreeApi.api);
 
 // TODO: fix issue that mock data is created multiple times when this function is called multiple times
 export async function initializeAsync() {
