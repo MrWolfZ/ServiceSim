@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { Action, FormControlState, SetValueAction } from 'pure-forms';
+import { Action, FormControlState, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
@@ -11,9 +11,8 @@ export interface TextInputProps {
   onAction: (action: Action) => any;
 }
 
-@Component({
-  components: {},
-})
+// TODO: focus handling
+@Component({})
 export class TextInput extends TsxComponent<TextInputProps> implements TextInputProps {
   @Prop() placeholder: string | undefined;
   @Prop() rows: number | undefined;
@@ -25,6 +24,16 @@ export class TextInput extends TsxComponent<TextInputProps> implements TextInput
   private onInput(e: Event) {
     const value = (e.target as HTMLInputElement | HTMLTextAreaElement).value;
     this.onAction(new SetValueAction(this.controlState.id, value));
+
+    if (this.controlState.isPristine) {
+      this.onAction(new MarkAsDirtyAction(this.controlState.id));
+    }
+  }
+
+  private onBlur() {
+    if (this.controlState.isUntouched) {
+      this.onAction(new MarkAsTouchedAction(this.controlState.id));
+    }
   }
 
   render() {
@@ -36,6 +45,8 @@ export class TextInput extends TsxComponent<TextInputProps> implements TextInput
           placeholder={this.placeholder}
           value={this.controlState.value}
           onInput={(e: Event) => this.onInput(e)}
+          onBlur={() => this.onBlur()}
+          disabled={this.controlState.isDisabled}
         />
       );
     }
@@ -47,6 +58,8 @@ export class TextInput extends TsxComponent<TextInputProps> implements TextInput
         placeholder={this.placeholder}
         value={this.controlState.value}
         onInput={(e: Event) => this.onInput(e)}
+        onBlur={() => this.onBlur()}
+        disabled={this.controlState.isDisabled}
       />
     );
   }

@@ -10,9 +10,7 @@ export interface ParameterFormProps {
   onRemove: () => any;
 }
 
-@Component({
-  components: {},
-})
+@Component({})
 export default class ParameterForm extends TsxComponent<ParameterFormProps> implements ParameterFormProps {
   @Prop() formState: FormGroupState<ParameterFormValue>;
 
@@ -96,11 +94,6 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> impl
 
             </FormField>
 
-            <div class='field'>
-              <label class='label'>
-                Default Value
-              </label>
-            </div>
           </div>
 
         </div>

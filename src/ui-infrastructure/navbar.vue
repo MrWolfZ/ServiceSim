@@ -1,9 +1,7 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 
-@Component({
-  components: {},
-})
+@Component({})
 export default class Navbar extends Vue {
   menuIsOpen = false;
 

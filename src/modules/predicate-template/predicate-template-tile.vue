@@ -9,9 +9,7 @@ export interface PredicateTemplateTileProps {
   onDelete: () => any;
 }
 
-@Component({
-  components: {},
-})
+@Component({})
 export default class PredicateTemplateTile extends TsxComponent<PredicateTemplateTileProps> implements PredicateTemplateTileProps {
   @Prop() templateId!: string;
 

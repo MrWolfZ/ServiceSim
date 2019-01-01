@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { Action, FormControlState, FormControlValueTypes, isBoxed, SetValueAction } from 'pure-forms';
+import { Action, FormControlState, FormControlValueTypes, isBoxed, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
@@ -10,9 +10,8 @@ export interface RadioInputProps {
   onAction: (action: Action) => any;
 }
 
-@Component({
-  components: {},
-})
+// TODO: focus handling
+@Component({})
 export class RadioInput extends TsxComponent<RadioInputProps> implements RadioInputProps {
   @Prop() options: { [key: string]: { label?: string; value: FormControlValueTypes } | FormControlValueTypes };
   @Prop() controlState: FormControlState<FormControlValueTypes>;
@@ -30,6 +29,20 @@ export class RadioInput extends TsxComponent<RadioInputProps> implements RadioIn
     return !isBoxed(this.options[key]) && optionsValue !== undefined ? optionsValue : this.options[key];
   }
 
+  private onInput(key: string) {
+    this.onAction(new SetValueAction(this.controlState.id, this.getValue(key)));
+
+    if (this.controlState.isPristine) {
+      this.onAction(new MarkAsDirtyAction(this.controlState.id));
+    }
+  }
+
+  private onBlur() {
+    if (this.controlState.isUntouched) {
+      this.onAction(new MarkAsTouchedAction(this.controlState.id));
+    }
+  }
+
   render() {
     return (
       <div class='radio-input'>
@@ -43,7 +56,9 @@ export class RadioInput extends TsxComponent<RadioInputProps> implements RadioIn
                 type='radio'
                 value={key}
                 checked={this.controlState.value === this.getValue(key)}
-                onInput={() => this.onAction(new SetValueAction(this.controlState.id, this.getValue(key)))}
+                onInput={() => this.onInput(key)}
+                onBlur={() => this.onBlur()}
+                disabled={this.controlState.isDisabled}
               />
             ),
             (

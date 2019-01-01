@@ -1,8 +1,7 @@
 <script lang="tsx">
 import { Action, createFormGroupState, FormGroupState, formStateReducer } from 'pure-forms';
 import { Component } from 'vue-property-decorator';
-import { Emit, TsxComponent } from '../../ui-infrastructure';
-import { ParameterFormValue } from '../parameter/parameter.types';
+import { Emit, Form, TsxComponent } from '../../ui-infrastructure';
 import PredicateTemplateForm from './predicate-template-form.vue';
 import { PredicateTemplateData, PredicateTemplateFormValue, PredicateTemplateState } from './predicate-template.types';
 import { validatePredicateTemplateForm } from './predicate-template.validation';
@@ -18,7 +17,9 @@ export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
   parameters: [],
 };
 
-const createFormState = (value = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE) => Object.freeze(createFormGroupState('predicateTemplateDialog', value));
+const createFormState = (value = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE) =>
+  Object.freeze(validatePredicateTemplateForm(createFormGroupState('predicateTemplateDialog', value)));
+
 function formReducer(state: FormGroupState<PredicateTemplateFormValue>, action: Action) {
   return Object.freeze(validatePredicateTemplateForm(formStateReducer(state, action)));
 }
@@ -47,6 +48,10 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
   onSubmit(_1: PredicateTemplateData, _2?: string) { }
 
   private submitDialog() {
+    if (this.formState.isInvalid) {
+      return;
+    }
+
     this.onSubmit({
       ...this.formState.value,
       parameters: this.formState.value.parameters.map(p => ({ ...p })),
@@ -65,7 +70,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
 
   render() {
     return (
-      <form novalidate='novalidate' onSubmit={(e: Event) => e.preventDefault()}>
+      <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
         <div class={`modal ${this.dialogIsOpen ? `is-active` : ``}`}>
           <div class='modal-background' />
           <div class='modal-card'>
@@ -90,24 +95,16 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
               <button
                 class='button is-success'
                 onClick={() => this.submitDialog()}
-                disabled={!isTemplateValid(this.formState.value)}
+                disabled={this.formState.isInvalid && this.formState.isSubmitted}
               >
                 Save
               </button>
             </footer>
           </div>
         </div>
-      </form>
+      </Form>
     );
   }
-}
-
-function isParameterValid(formValue: ParameterFormValue) {
-  return !!formValue.name && !!formValue.description;
-}
-
-function isTemplateValid(formValue: PredicateTemplateFormValue) {
-  return !!formValue.name && !!formValue.description && !!formValue.evalFunctionBody && formValue.parameters.every(isParameterValid);
 }
 </script>
 

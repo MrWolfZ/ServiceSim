@@ -10,11 +10,7 @@ export interface PredicateNodeViewProps {
   onSelect: (nodeId: string) => any;
 }
 
-@Component({
-  components: {
-    ExpansionContainer,
-  },
-})
+@Component({})
 export default class PredicateNodeView extends TsxComponent<PredicateNodeViewProps> implements PredicateNodeViewProps {
   @Prop() nodeId: string;
   @Prop() selectedNodeId: string;

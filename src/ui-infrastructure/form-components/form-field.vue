@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { FormControlState } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
+import ExpansionContainer from '../expansion-container.vue';
 import { TsxComponent } from '../tsx-component';
 
 export interface FormFieldProps {
@@ -10,9 +11,7 @@ export interface FormFieldProps {
   errorMessages?: { [errorName: string]: string };
 }
 
-@Component({
-  components: {},
-})
+@Component({})
 export class FormField extends TsxComponent<FormFieldProps> implements FormFieldProps {
   @Prop() label: string | undefined;
   @Prop() controlState: FormControlState<any>;
@@ -37,6 +36,10 @@ export class FormField extends TsxComponent<FormFieldProps> implements FormField
     return errorMessage;
   }
 
+  private get errorsAreShown() {
+    return this.controlState.isInvalid && (this.controlState.isSubmitted || this.controlState.isTouched);
+  }
+
   render() {
     return (
       <div class='field'>
@@ -49,13 +52,15 @@ export class FormField extends TsxComponent<FormFieldProps> implements FormField
 
         <div class='control'>
           {this.$slots.default}
-          {
-            this.errorNames.map(name =>
-              <span key={name} class='help is-danger'>
-                {this.getErrorMessage(name)}
-              </span>
-            )
-          }
+          <ExpansionContainer isExpanded={this.errorsAreShown}>
+            {
+              this.errorNames.map(name =>
+                <span key={name} class='help is-danger'>
+                  {this.getErrorMessage(name)}
+                </span>
+              )
+            }
+          </ExpansionContainer>
         </div>
 
       </div>

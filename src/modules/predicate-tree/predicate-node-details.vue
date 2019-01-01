@@ -14,9 +14,7 @@ export interface PredicateNodeDetailsProps {
   onSelectChildNode: (nodeId: string) => any;
 }
 
-@Component({
-  components: {},
-})
+@Component({})
 export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDetailsProps> implements PredicateNodeDetailsProps {
   @Prop() nodeId: string;
 

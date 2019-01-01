@@ -1,11 +1,20 @@
-import { Emit as OrigEmit } from 'vue-property-decorator';
-
+// tslint:disable:no-invalid-this
 export function Emit(event?: string): MethodDecorator {
-  return function (target: Object, key: string | symbol, descriptor: any) {
+  return function (_: Object, key: string | symbol, descriptor: any) {
     if (typeof key === 'string') {
-      key = key.replace(/^on/g, '');
+      key = key.replace(/^on/g, '').replace(/^(.)/, v => v.toLowerCase());
     }
 
-    return OrigEmit(event)(target, key, descriptor);
+    const original = descriptor.value;
+    descriptor.value = function emitter(...args: any[]) {
+      const emit = (returnValue: any) => {
+        if (returnValue !== undefined) { args.unshift(returnValue); }
+        this.$emit(event || key, ...args);
+      };
+
+      const returnValue: any = original.apply(this, args);
+
+      Promise.resolve(returnValue).then(emit);
+    };
   };
 }

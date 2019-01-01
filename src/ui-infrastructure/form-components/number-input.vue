@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { Action, FormControlState, SetValueAction } from 'pure-forms';
+import { Action, FormControlState, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
@@ -10,9 +10,8 @@ export interface NumberInputProps {
   onAction: (action: Action) => any;
 }
 
-@Component({
-  components: {},
-})
+// TODO: focus handling
+@Component({})
 export class NumberInput extends TsxComponent<NumberInputProps> implements NumberInputProps {
   @Prop() placeholder: string | undefined;
   @Prop() controlState: FormControlState<number>;
@@ -23,6 +22,16 @@ export class NumberInput extends TsxComponent<NumberInputProps> implements Numbe
   private onInput(e: Event) {
     const value = (e.target as HTMLInputElement | HTMLTextAreaElement).value;
     this.onAction(new SetValueAction(this.controlState.id, parseInt(value, 10)));
+
+    if (this.controlState.isPristine) {
+      this.onAction(new MarkAsDirtyAction(this.controlState.id));
+    }
+  }
+
+  private onBlur() {
+    if (this.controlState.isUntouched) {
+      this.onAction(new MarkAsTouchedAction(this.controlState.id));
+    }
   }
 
   render() {
@@ -33,6 +42,8 @@ export class NumberInput extends TsxComponent<NumberInputProps> implements Numbe
         placeholder={this.placeholder}
         value={this.controlState.value}
         onInput={(e: Event) => this.onInput(e)}
+        onBlur={() => this.onBlur()}
+        disabled={this.controlState.isDisabled}
       />
     );
   }

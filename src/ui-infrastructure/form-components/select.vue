@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { Action, FormControlState, FormControlValueTypes, isBoxed, SetValueAction } from 'pure-forms';
+import { Action, FormControlState, FormControlValueTypes, isBoxed, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
@@ -10,9 +10,9 @@ export interface SelectProps {
   onAction: (action: Action) => any;
 }
 
-@Component({
-  components: {},
-})
+// TODO: add support for multiple selection
+// TODO: focus handling
+@Component({})
 export class Select extends TsxComponent<SelectProps> implements SelectProps {
   @Prop() options: { [key: string]: { label?: string; value: FormControlValueTypes } | FormControlValueTypes };
   @Prop() controlState: FormControlState<FormControlValueTypes>;
@@ -33,13 +33,28 @@ export class Select extends TsxComponent<SelectProps> implements SelectProps {
   private onChange(e: Event) {
     const key = (e.target as HTMLSelectElement).value;
     this.onAction(new SetValueAction(this.controlState.id, this.getValue(key)));
+
+    if (this.controlState.isPristine) {
+      this.onAction(new MarkAsDirtyAction(this.controlState.id));
+    }
+  }
+
+  private onBlur() {
+    if (this.controlState.isUntouched) {
+      this.onAction(new MarkAsTouchedAction(this.controlState.id));
+    }
   }
 
   render() {
     return (
       <div class='select'>
 
-        <select class='is-borderless' onChange={(e: Event) => this.onChange(e)}>
+        <select
+          class='is-borderless'
+          onChange={(e: Event) => this.onChange(e)}
+          onBlur={() => this.onBlur()}
+          disabled={this.controlState.isDisabled}
+        >
           {
             Object.keys(this.options).map(key =>
               <option key={key} value={key}>{this.getLabel(key)}</option>

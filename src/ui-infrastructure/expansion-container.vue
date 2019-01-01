@@ -2,9 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TsxComponent } from './tsx-component';
 
-@Component({
-  components: {},
-})
+@Component({})
 export default class ExpansionContainer extends TsxComponent<{ isExpanded: boolean }> {
   @Prop() isExpanded: boolean;
 

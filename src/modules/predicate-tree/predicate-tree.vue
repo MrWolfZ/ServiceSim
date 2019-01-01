@@ -5,12 +5,7 @@ import PredicateNodeDialog from './predicate-node-dialog.vue';
 import predicateNodes from './predicate-node.store';
 import PredicateNodeView from './predicate-node.vue';
 
-@Component({
-  components: {
-    PredicateNodeView,
-    PredicateNodeDetails,
-  },
-})
+@Component({})
 export default class PredicateTreePage extends Vue {
   private selectedNodeId = this.topLevelNodeIds[0];
 

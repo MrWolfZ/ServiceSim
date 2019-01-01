@@ -20,9 +20,9 @@ export function clearError(state: ErrorsState) {
   state.apiError = undefined;
 }
 
-const stateGetter = b.state();
+const state$ = b.state();
 const errors = {
-  get state() { return stateGetter(); },
+  get state() { return state$(); },
 
   setError: b.commit(setError),
   clearError: b.commit(clearError),
