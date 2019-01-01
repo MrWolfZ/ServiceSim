@@ -1,5 +1,6 @@
 <script lang="tsx">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
+import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
 
 export interface TextAreaProps {

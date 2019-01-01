@@ -17,6 +17,8 @@ export interface PredicateTemplateDto extends PredicateTemplateData {
 
 export interface PredicateTemplateState extends PredicateTemplateDto { }
 
+export interface PredicateTemplateFormValue extends PredicateTemplateData { }
+
 export interface CreatePredicateTemplateCommand {
   templateId: string;
   data: PredicateTemplateData;

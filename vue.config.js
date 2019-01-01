@@ -26,7 +26,7 @@ module.exports = {
     config
       .plugin('fork-ts-checker')
       .tap(args => {
-        args[0].tsconfig = 'tsconfig.ui-vue.json';
+        args[0].tsconfig = path.join(__dirname, 'tsconfig.ui-vue.json');
         return args;
       });
 
@@ -35,7 +35,7 @@ module.exports = {
       .use('ts-loader')
       .loader('ts-loader')
       .tap(options => {
-        options.configFile = 'tsconfig.ui-vue.json';
+        options.configFile = path.join(__dirname, 'tsconfig.ui-vue.json');
         return options;
       });
 
@@ -44,7 +44,7 @@ module.exports = {
       .use('ts-loader')
       .loader('ts-loader')
       .tap(options => {
-        options.configFile = 'tsconfig.ui-vue.json';
+        options.configFile = path.join(__dirname, 'tsconfig.ui-vue.json');
         return options;
       });
 

@@ -20,6 +20,9 @@
       "scripthost"
     ]
   },
+  "files": [
+    "src/ui.ts"
+  ],
   "include": [
     "src/**/*.vue",
     "src/ui-infrastructure/**/*",

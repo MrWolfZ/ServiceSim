@@ -15,3 +15,5 @@ export type Parameter =
   | NumberParameter
   | StringParameter
   ;
+
+export type ParameterFormValue = Parameter;

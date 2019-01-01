@@ -1,27 +1,26 @@
 <script lang="tsx">
+import { Action, FormControlState, FormControlValueTypes, SetValueAction } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
 
-export interface InputProps<T> {
+export interface FormInputProps<T extends FormControlValueTypes = string> {
   type?: 'text' | 'number' | 'checkbox' | 'radio';
   placeholder?: string;
-  value: T;
-  checked?: boolean;
-  onInput: (value: T) => any;
+  controlState: FormControlState<T>;
+  onAction: (action: Action) => any;
 }
 
 @Component({
   components: {},
 })
-export class Input<T extends string | number | boolean = string> extends TsxComponent<InputProps<T>> implements InputProps<T> {
+export class FormInput<T extends FormControlValueTypes = string> extends TsxComponent<FormInputProps<T>> implements FormInputProps<T> {
   @Prop() type: 'text' | 'number' | 'checkbox' | 'radio' | undefined;
   @Prop() placeholder: string | undefined;
-  @Prop() value: T;
-  @Prop() checked: boolean | undefined;
+  @Prop() controlState: FormControlState<T>;
 
   @Emit()
-  onInput(_: T) { }
+  onAction(_: Action) { }
 
   parseValue(el: HTMLInputElement) {
     return el.value as T;
@@ -32,9 +31,9 @@ export class Input<T extends string | number | boolean = string> extends TsxComp
       <input
         type={this.type}
         placeholder={this.placeholder}
-        value={this.value}
-        checked={this.checked}
-        onInput={(e: Event) => this.onInput(this.parseValue(e.target as HTMLInputElement))}
+        value={this.controlState.value}
+        checked={this.controlState.value === true}
+        onInput={(e: Event) => this.onAction(new SetValueAction(this.controlState.id, this.parseValue(e.target as HTMLInputElement)))}
       />
     );
   }
@@ -43,7 +42,7 @@ export class Input<T extends string | number | boolean = string> extends TsxComp
 @Component({
   components: {},
 })
-export class BooleanInput extends Input<boolean> {
+export class BooleanFormInput extends FormInput<boolean> {
   parseValue(el: HTMLInputElement) {
     return el.value === 'true';
   }
@@ -52,13 +51,13 @@ export class BooleanInput extends Input<boolean> {
 @Component({
   components: {},
 })
-export class NumberInput extends Input<number> {
+export class NumberFormInput extends FormInput<number> {
   parseValue(el: HTMLInputElement) {
     return parseInt(el.value, 10);
   }
 }
 
-export default Input;
+export default FormInput;
 </script>
 
 <style scoped lang="scss">

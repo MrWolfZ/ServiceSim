@@ -9,7 +9,7 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "strict": true,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,

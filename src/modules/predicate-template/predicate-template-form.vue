@@ -1,45 +1,27 @@
 <script lang="tsx">
-import { Component, Emit, Prop } from 'vue-property-decorator';
-import { Input, TextArea, TsxComponent } from '../../ui-infrastructure';
-import ParameterForm, { ParameterFormValue } from '../parameter/parameter-form.vue';
-
-export interface PredicateTemplateFormValue {
-  name: string;
-  description: string;
-  evalFunctionBody: string;
-  parameters: ParameterFormValue[];
-}
-
-export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE = {
-  name: '',
-  description: '',
-  evalFunctionBody: '',
-  parameters: [],
-};
+import { Action, AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'pure-forms';
+import { Component, Prop } from 'vue-property-decorator';
+import { Emit, FormField, TextInput, TsxComponent } from '../../ui-infrastructure';
+import ParameterForm from '../parameter/parameter-form.vue';
+import { ParameterFormValue } from '../parameter/parameter.types';
+import { PredicateTemplateFormValue } from './predicate-template.types';
 
 export interface PredicateTemplateFormProps {
-  formValue: PredicateTemplateFormValue;
-  onChange: (newValue: PredicateTemplateFormValue) => any;
+  formState: FormGroupState<PredicateTemplateFormValue>;
+  onAction: (action: Action) => any;
 }
 
-@Component({
-  components: {
-    ParameterForm,
-    Input,
-  },
-})
-export default class PredicateTemplateForm extends TsxComponent<PredicateTemplateFormProps> {
-  @Prop() formValue: PredicateTemplateFormValue;
+@Component({})
+export default class PredicateTemplateForm extends TsxComponent<PredicateTemplateFormProps> implements PredicateTemplateFormProps {
+  @Prop() formState: FormGroupState<PredicateTemplateFormValue>;
 
   @Emit()
-  onChange(change: Partial<PredicateTemplateFormValue>) {
-    return { ...this.formValue, ...change };
-  }
+  onAction(_: Action) { }
 
   private addParameter() {
-    this.onChange({
-      parameters: [
-        ...this.formValue.parameters,
+    this.onAction(
+      new AddArrayControlAction<ParameterFormValue>(
+        this.formState.controls.parameters.id,
         {
           name: '',
           description: '',
@@ -47,82 +29,50 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
           valueType: 'string',
           defaultValue: '',
         },
-      ],
-    });
-  }
-
-  private updateParameter(index: number, newFormValue: ParameterFormValue) {
-    this.onChange({
-      parameters: this.spliceOne(index, this.formValue.parameters, newFormValue),
-    });
+      )
+    );
   }
 
   private removeParameter(index: number) {
-    this.onChange({
-      parameters: this.spliceOne(index, this.formValue.parameters),
-    });
-  }
-
-  private spliceOne<T>(index: number, arr: T[], ...items: T[]) {
-    const copy = [...arr];
-    copy.splice(index, 1, ...items);
-    return copy;
+    this.onAction(new RemoveArrayControlAction(this.formState.controls.parameters.id, index));
   }
 
   render() {
     return (
       <div>
 
-        <div class='field title'>
-          <p class='control'>
-            <Input
-              class='input'
-              type='text'
-              placeholder='Name'
-              value={this.formValue.name}
-              onInput={value => this.onChange({ name: value })}
-            />
-            {!this.formValue.name &&
-              <span class='help is-danger'>
-                Please enter a name
-              </span>
-            }
-          </p>
-        </div>
+        <FormField
+          class='title'
+          controlState={this.formState.controls.name}
+          errorMessages={{ required: 'Please enter a name' }}
+        >
+          <TextInput controlState={this.formState.controls.name} onAction={a => this.onAction(a)} />
+        </FormField>
 
-        <div class='field'>
-          <p class='control'>
-            <TextArea
-              class='textarea'
-              rows={3}
-              placeholder='Description'
-              value={this.formValue.description}
-              onInput={value => this.onChange({ description: value })}
-            />
-            {!this.formValue.description &&
-              <span class='help is-danger'>
-                Please enter a description
-              </span>
-            }
-          </p>
-        </div>
+        <FormField
+          controlState={this.formState.controls.description}
+          errorMessages={{ required: 'Please enter a description' }}
+        >
+          <TextInput
+            rows={3}
+            placeholder='Description'
+            controlState={this.formState.controls.description}
+            onAction={a => this.onAction(a)}
+          />
+        </FormField>
 
-        <div class='field'>
-          <label class='label'>Function Body</label>
-          <p class='control'>
-            <TextArea
-              class='textarea code'
-              rows={5}
-              value={this.formValue.evalFunctionBody}
-              onInput={value => this.onChange({ evalFunctionBody: value })}
-            />
-            {!this.formValue.evalFunctionBody &&
-              <span class='help is-danger'>
-                Please enter a function body
-              </span>
-            }
-          </p>
-        </div>
+        <FormField
+          label='Function Body'
+          controlState={this.formState.controls.evalFunctionBody}
+          errorMessages={{ required: 'Please enter a function body' }}
+        >
+          <TextInput
+            class='code'
+            rows={5}
+            controlState={this.formState.controls.evalFunctionBody}
+            onAction={a => this.onAction(a)}
+          />
+        </FormField>
 
         <div class='tile is-ancestor parameters'>
           <div class='tile is-12 is-vertical is-parent'>
@@ -131,12 +81,12 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
             </div>
 
             {
-              this.formValue.parameters.map((fv, idx) =>
+              this.formState.controls.parameters.controls.map((form, idx) =>
                 <ParameterForm
                   key={idx}
                   class='tile is-12 is-child box parameter'
-                  formValue={fv}
-                  onChange={newFormValue => this.updateParameter(idx, newFormValue)}
+                  formState={form}
+                  onAction={a => this.onAction(a)}
                   onRemove={() => this.removeParameter(idx)}
                 />
               )

@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { Component, Emit, Prop } from 'vue-property-decorator';
-import { TsxComponent } from '../../ui-infrastructure';
+import { Component, Prop } from 'vue-property-decorator';
+import { Emit, TsxComponent } from '../../ui-infrastructure';
 import predicateTemplates from './predicate-template.store';
 
 export interface PredicateTemplateTileProps {
