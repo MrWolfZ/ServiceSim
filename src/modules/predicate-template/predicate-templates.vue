@@ -1,18 +1,11 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
-import { Input } from '../../ui-infrastructure';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
 import PredicateTemplateTile from './predicate-template-tile.vue';
 import predicateTemplates from './predicate-template.store';
 import { PredicateTemplateData } from './predicate-template.types';
 
-@Component({
-  components: {
-    PredicateTemplateDialog,
-    PredicateTemplateTile,
-    Input,
-  },
-})
+@Component({})
 export default class PredicateTemplatesPage extends Vue {
   private filterValue = '';
 
@@ -68,11 +61,11 @@ export default class PredicateTemplatesPage extends Vue {
               <div class='level-left'>
                 <div class='field'>
                   <p class='control'>
-                    <Input
+                    <input
                       class='input filter'
                       placeholder='Filter...'
                       value={this.filterValue}
-                      onInput={v => this.filterValue = v}
+                      onInput={(e: Event) => this.filterValue = (e.target as HTMLInputElement).value}
                     />
                   </p>
                 </div>

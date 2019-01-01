@@ -1,10 +1,11 @@
 <script lang="tsx">
-import { createFormGroupState, formStateReducer } from 'pure-forms';
+import { Action, createFormGroupState, FormGroupState, formStateReducer } from 'pure-forms';
 import { Component } from 'vue-property-decorator';
 import { Emit, TsxComponent } from '../../ui-infrastructure';
 import { ParameterFormValue } from '../parameter/parameter.types';
 import PredicateTemplateForm from './predicate-template-form.vue';
 import { PredicateTemplateData, PredicateTemplateFormValue, PredicateTemplateState } from './predicate-template.types';
+import { validatePredicateTemplateForm } from './predicate-template.validation';
 
 export interface PredicateTemplateDialogProps {
   onSubmit: (data: PredicateTemplateData, id?: string) => any;
@@ -18,6 +19,9 @@ export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
 };
 
 const createFormState = (value = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE) => Object.freeze(createFormGroupState('predicateTemplateDialog', value));
+function formReducer(state: FormGroupState<PredicateTemplateFormValue>, action: Action) {
+  return Object.freeze(validatePredicateTemplateForm(formStateReducer(state, action)));
+}
 
 @Component({})
 export default class PredicateTemplateDialog extends TsxComponent<PredicateTemplateDialogProps> implements PredicateTemplateDialogProps {
@@ -72,7 +76,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
             </header>
 
             <section class='modal-card-body'>
-              <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = Object.freeze(formStateReducer(this.formState, a))} />
+              <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
             </section>
 
             <footer class='modal-card-foot justify-content flex-end'>

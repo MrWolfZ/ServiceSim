@@ -5,7 +5,7 @@ import { TsxComponent } from '../tsx-component';
 
 export interface FormFieldProps {
   label?: string;
-  controlState: FormControlState<string>;
+  controlState: FormControlState<any>;
   errorMessageFactory?: (errorName: string, errorValue: any) => string;
   errorMessages?: { [errorName: string]: string };
 }
@@ -15,7 +15,7 @@ export interface FormFieldProps {
 })
 export class FormField extends TsxComponent<FormFieldProps> implements FormFieldProps {
   @Prop() label: string | undefined;
-  @Prop() controlState: FormControlState<string>;
+  @Prop() controlState: FormControlState<any>;
   @Prop() errorMessageFactory: ((errorName: string, errorValue: any) => string) | undefined;
   @Prop() errorMessages?: { [errorName: string]: string };
 

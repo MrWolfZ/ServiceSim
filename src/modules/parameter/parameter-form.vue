@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { Action, FormGroupState, SetValueAction } from 'pure-forms';
+import { Action, FormControlState, FormGroupState } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
-import { BooleanInput, Emit, FormField, Input, NumberInput, TextInput, TsxComponent } from '../../ui-infrastructure';
+import { Emit, FormField, NumberInput, RadioInput, Select, TextInput, TsxComponent } from '../../ui-infrastructure';
 import { ParameterFormValue } from './parameter.types';
 
 export interface ParameterFormProps {
@@ -10,40 +10,17 @@ export interface ParameterFormProps {
   onRemove: () => any;
 }
 
-let instanceCount = 0;
-
 @Component({
   components: {},
 })
 export default class ParameterForm extends TsxComponent<ParameterFormProps> implements ParameterFormProps {
   @Prop() formState: FormGroupState<ParameterFormValue>;
 
-  private instanceCount = instanceCount++;
-
   @Emit()
   onAction(_: Action) { }
 
   @Emit()
   onRemove() { }
-
-  private updateValueType(newValueType: ParameterFormValue['valueType']) {
-    const newDefaultValue = (() => {
-      switch (newValueType) {
-        case 'string':
-        default:
-          return '';
-
-        case 'number':
-          return 0;
-
-        case 'boolean':
-          return false;
-      }
-    })();
-
-    this.onAction(new SetValueAction(this.formState.controls.valueType.id, newValueType));
-    this.onAction(new SetValueAction(this.formState.controls.defaultValue.id, newDefaultValue));
-  }
 
   render() {
     return (
@@ -68,107 +45,61 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> impl
         <div class='columns'>
 
           <div class='column is-narrow'>
-            <div class='field'>
-              <label class='label'>Is Required?</label>
-              <div class='control radio-control'>
-                <BooleanInput
-                  type='radio'
-                  id={`parameterForm.isRequired.${this.instanceCount}.yes`}
-                  class='is-checkradio is-rtl is-white'
-                  value={true}
-                  checked={this.formState.value.isRequired}
-                  onInput={value => this.onAction(new SetValueAction(this.formState.controls.isRequired.id, value))}
-                />
-                <label for={`parameterForm.isRequired.${this.instanceCount}.yes`}>
-                  Yes
-                </label>
-                <BooleanInput
-                  type='radio'
-                  id={`parameterForm.isRequired.${this.instanceCount}.no`}
-                  class='is-checkradio is-rtl is-white'
-                  value={false}
-                  checked={!this.formState.value.isRequired}
-                  onInput={value => this.onAction(new SetValueAction(this.formState.controls.isRequired.id, value))}
-                />
-                <label for={`parameterForm.isRequired.${this.instanceCount}.no`}>
-                  No
-                </label>
-              </div>
-            </div>
+
+            <FormField label='Is Required?' controlState={this.formState.controls.isRequired}>
+              <RadioInput
+                options={{ Yes: true, No: false }}
+                controlState={this.formState.controls.isRequired}
+                onAction={a => this.onAction(a)}
+              />
+            </FormField>
+
           </div>
 
           <div class='column is-narrow'>
-            <div class='field'>
-              <label class='label'>Value Type</label>
-              <div class='control'>
-                <div class='select'>
-                  <select class='is-borderless' onChange={(e: Event) => this.updateValueType((e.target as HTMLSelectElement).value as any)}>
-                    <option value='string'>string</option>
-                    <option value='boolean'>boolean</option>
-                    <option value='number'>number</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+
+            <FormField label='Value Type' controlState={this.formState.controls.valueType}>
+              <Select
+                options={{ string: 'string', boolean: 'boolean', number: 'number' }}
+                controlState={this.formState.controls.valueType}
+                onAction={a => this.onAction(a)}
+              />
+            </FormField>
+
           </div>
 
           <div class='column'>
+
+            <FormField label='Default Value' controlState={this.formState.controls.defaultValue}>
+
+              {this.formState.value.valueType === 'string' &&
+                <TextInput
+                  controlState={this.formState.controls.defaultValue as FormControlState<string>}
+                  onAction={a => this.onAction(a)}
+                />
+              }
+
+              {this.formState.value.valueType === 'number' &&
+                <NumberInput
+                  controlState={this.formState.controls.defaultValue as FormControlState<number>}
+                  onAction={a => this.onAction(a)}
+                />
+              }
+
+              {this.formState.value.valueType === 'boolean' &&
+                <RadioInput
+                  options={{ True: true, False: false }}
+                  controlState={this.formState.controls.defaultValue}
+                  onAction={a => this.onAction(a)}
+                />
+              }
+
+            </FormField>
+
             <div class='field'>
               <label class='label'>
                 Default Value
               </label>
-
-              {this.formState.value.valueType === 'string' &&
-                <div class='control'>
-                  <Input
-                    class='input'
-                    type='text'
-                    value={this.formState.value.defaultValue as string}
-                    onInput={value => this.onAction(new SetValueAction(this.formState.controls.defaultValue.id, value))}
-                  />
-                </div>
-              }
-
-              {this.formState.value.valueType === 'number' &&
-                <div class='control'>
-                  <NumberInput
-                    class='input'
-                    type='number'
-                    value={this.formState.value.defaultValue as number}
-                    onInput={value => this.onAction(new SetValueAction(this.formState.controls.defaultValue.id, value))}
-                  />
-                </div>
-              }
-
-              {this.formState.value.valueType === 'boolean' &&
-                <div class='control radio-control'>
-
-                  <BooleanInput
-                    type='radio'
-                    id={`parameterForm.defaultValue.${this.instanceCount}.true`}
-                    class='is-checkradio is-rtl is-white'
-                    value={true}
-                    checked={this.formState.value.defaultValue as boolean}
-                    onInput={value => this.onAction(new SetValueAction(this.formState.controls.defaultValue.id, value))}
-                  />
-                  <label for={`parameterForm.defaultValue.${this.instanceCount}.true`}>
-                    True
-                  </label>
-
-                  <BooleanInput
-                    type='radio'
-                    id={`parameterForm.defaultValue.${this.instanceCount}.false`}
-                    class='is-checkradio is-rtl is-white'
-                    value={false}
-                    checked={!this.formState.value.defaultValue}
-                    onInput={value => this.onAction(new SetValueAction(this.formState.controls.defaultValue.id, value))}
-                  />
-                  <label for={`parameterForm.defaultValue.${this.instanceCount}.false`}>
-                    False
-                  </label>
-
-                </div>
-              }
             </div>
           </div>
 
@@ -192,12 +123,4 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> impl
 </script>
 
 <style scoped lang="scss">
-.select:not(.is-multiple) {
-  height: 2.5em;
-}
-
-.radio-control {
-  padding-top: 0.45rem;
-  padding-bottom: 0.45rem;
-}
 </style>
