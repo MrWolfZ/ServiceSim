@@ -166,7 +166,7 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
                     </label>
 
                     <span class='value'>
-                      {this.templateInfo!.parameterValues[name]}
+                      {this.templateInfo!.parameterValues[name].toString()}
                     </span>
 
                   </div>
@@ -337,7 +337,7 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
                       </label>
 
                       <span class='value'>
-                        {this.responseGeneratorTemplateInfo!.parameterValues[name]}
+                        {this.responseGeneratorTemplateInfo!.parameterValues[name].toString()}
                       </span>
 
                     </div>

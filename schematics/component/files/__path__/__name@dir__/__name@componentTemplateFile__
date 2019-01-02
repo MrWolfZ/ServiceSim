@@ -1,4 +1,0 @@
-<p><%= name %> works!</p>
-Component State:
-<pre>{{ state | json }}</pre>
-

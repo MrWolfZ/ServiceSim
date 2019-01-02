@@ -80,7 +80,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
                 this.parameterNames.map(name =>
                   <span key={name} class='parameter'>
                     <label class='label'>{name}:</label>
-                    <span class='value'>{this.templateInfo!.parameterValues[name]}</span>
+                    <span class='value'>{this.templateInfo!.parameterValues[name].toString()}</span>
                   </span>
                 )
               }
@@ -111,7 +111,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
                   this.responseGeneratorParameterNames.map(name =>
                     <span key={name} class='parameter'>
                       <label class='label'>{name}:</label>
-                      <span class='value'>{this.responseGeneratorTemplateInfo!.parameterValues[name]}</span>
+                      <span class='value'>{this.responseGeneratorTemplateInfo!.parameterValues[name].toString()}</span>
                     </span>
                   )
                 }

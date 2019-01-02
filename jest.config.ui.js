@@ -1,7 +1,7 @@
 module.exports = {
   globals: {
     'vue-jest': {
-      tsConfig: process.cwd() + '/tsconfig.ui-vue.json',
+      tsConfig: process.cwd() + '/tsconfig.ui.json',
     },
   },
   roots: [

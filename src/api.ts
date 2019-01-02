@@ -272,8 +272,8 @@ export async function initializeAsync() {
 export const api = express.Router();
 api.use('/simulation', simulationApi);
 api.use('/ui-api', uiApi);
-api.use('/ui', express.static(path.join(__dirname, 'ui', 'dist')));
-api.use((_, res) => res.sendFile(path.join(__dirname, 'ui', 'dist', 'index.html')));
+api.use('/ui', express.static(path.join(__dirname, 'ui')));
+api.use((_, res) => res.sendFile(path.join(__dirname, 'ui', 'index.html')));
 
 api.use(function (err: any, _: express.Request, res: express.Response, next: express.NextFunction) {
   if (res.headersSent) {
