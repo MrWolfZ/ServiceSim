@@ -76,9 +76,21 @@ export class RadioInput extends TsxComponent<RadioInputProps> implements RadioIn
 export default RadioInput;
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .radio-input {
   padding-top: 0.45rem;
   padding-bottom: 0.45rem;
+}
+
+// override normal sized radio control size
+// to ensure the dot is properly centered
+.is-checkradio[type='radio'] {
+  + label::before,
+  + label:before,
+  + label::after,
+  + label:after {
+    width: 24px;
+    height: 24px;
+  }
 }
 </style>

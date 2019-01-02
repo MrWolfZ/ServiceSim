@@ -25,7 +25,7 @@ export default class Navbar extends Vue {
           <div class='navbar-brand'>
             <a
               role='button'
-              class={`navbar-burger has-text-white${this.menuIsOpen ? ` is-active` : ``}`}
+              class={`navbar-burger has-text-white ${this.menuIsOpen ? `is-active` : ``}`}
               onClick={() => this.toggleMenu()}
             >
               <span />
@@ -34,7 +34,7 @@ export default class Navbar extends Vue {
             </a>
           </div>
 
-          <div class={`navbar-menu${this.menuIsOpen ? ` is-active` : ``}`}>
+          <div class={`navbar-menu ${this.menuIsOpen ? `is-active` : ``}`}>
             <div class='navbar-start'>
 
               <router-link

@@ -64,7 +64,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
               >
                 <fa-icon icon='chevron-right' class='expansion-toggle-icon' />
               </div>
-              <h3 class='is-size-5'>
+              <h3 class='name is-size-5'>
                 {this.node.name}
               </h3>
             </div>
@@ -95,7 +95,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
                 <div class='icon'>
                   <fa-icon icon='arrow-left' />
                 </div>
-                <h3 class='is-size-5'>
+                <h3 class='name is-size-5'>
                   {this.responseGenerator!.name}
                 </h3>
               </div>
@@ -122,20 +122,23 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
 
         </div>
 
-        <ExpansionContainer isExpanded={this.isExpanded}>
-          <div class='child-nodes'>
-            {
-              this.childNodeIds.map(id =>
-                <PredicateNodeView
-                  key={id}
-                  nodeId={id}
-                  selectedNodeId={this.selectedNodeId}
-                  onSelect={nodeId => this.onSelect(nodeId)}
-                />
-              )
-            }
-          </div>
-        </ExpansionContainer>
+        {this.childNodeIds.length > 0 &&
+          <ExpansionContainer isExpanded={this.isExpanded}>
+            <div class='child-nodes'>
+              {
+                this.childNodeIds.map(id =>
+                  <PredicateNodeView
+                    key={id}
+                    nodeId={id}
+                    selectedNodeId={this.selectedNodeId}
+                    onSelect={nodeId => this.onSelect(nodeId)}
+                  />
+                )
+              }
+            </div>
+          </ExpansionContainer>
+        }
+
       </div>
     );
   }
@@ -151,6 +154,10 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
   &.is-disabled {
     opacity: 0.3;
   }
+
+  + .node {
+    margin-top: 1.5rem;
+  }
 }
 
 .box {
@@ -161,6 +168,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
   position: relative;
   border: 0.125rem solid transparent;
   transition: border-color ease 200ms;
+  margin: 0;
 
   &.is-selected {
     border-color: rgba($link, 0.5);
@@ -187,7 +195,7 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
   text-overflow: ellipsis;
 }
 
-h3 {
+.name {
   white-space: nowrap;
   margin-left: 0.2em;
 }
@@ -212,6 +220,10 @@ h3 {
 .child-nodes {
   padding-left: 2.5em;
   border-left: 1px solid $grey-dark;
+
+  > .node:first-child {
+    margin-top: 1.5rem;
+  }
 }
 
 .expansion-toggle-trigger {

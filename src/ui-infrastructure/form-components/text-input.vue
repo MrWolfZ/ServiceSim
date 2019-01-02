@@ -68,5 +68,13 @@ export class TextInput extends TsxComponent<TextInputProps> implements TextInput
 export default TextInput;
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+.input,
+.textarea {
+  border: 0;
+}
+
+.textarea.code {
+  font-family: 'Inconsolata', 'Consolas', 'Monaco', monospace;
+}
 </style>

@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { Action, AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
-import { Emit, FormField, TextInput, TsxComponent } from '../../ui-infrastructure';
+import { Emit, ExpansionContainer, FormField, TextInput, TsxComponent } from '../../ui-infrastructure';
 import ParameterForm from '../parameter/parameter-form.vue';
 import { ParameterFormValue } from '../parameter/parameter.types';
 import { PredicateTemplateFormValue } from './predicate-template.types';
@@ -42,11 +42,15 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
       <div>
 
         <FormField
-          class='title'
           controlState={this.formState.controls.name}
           errorMessages={{ required: 'Please enter a name' }}
         >
-          <TextInput controlState={this.formState.controls.name} onAction={a => this.onAction(a)} />
+          <TextInput
+            placeholder='Name'
+            class='name-input'
+            controlState={this.formState.controls.name}
+            onAction={a => this.onAction(a)}
+          />
         </FormField>
 
         <FormField
@@ -74,38 +78,44 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
           />
         </FormField>
 
-        <div class='tile is-ancestor parameters'>
-          <div class='tile is-12 is-vertical is-parent'>
-            <div class='tile is-12 is-child parameters-title'>
-              <label class='label'>Parameters</label>
-            </div>
+        <ExpansionContainer isExpanded={true}>
 
-            {
-              this.formState.controls.parameters.controls.map((form, idx) =>
-                <ParameterForm
-                  key={idx}
-                  class='tile is-12 is-child box parameter'
-                  formState={form}
-                  onAction={a => this.onAction(a)}
-                  onRemove={() => this.removeParameter(idx)}
-                />
-              )
-            }
+          <div class='tile is-ancestor parameters'>
+            <div class='tile is-12 is-vertical is-parent'>
 
-            <div class='tile is-12 is-child'>
-              <button
-                class='button is-primary'
-                type='button'
-                onClick={() => this.addParameter()}
-              >
-                <span>Add Parameter</span>
-                <span class='icon is-small'>
-                  <fa-icon icon='plus' />
-                </span>
-              </button>
+              <div class='tile is-12 is-child parameters-title'>
+                <label class='label'>Parameters</label>
+              </div>
+
+              {
+                this.formState.controls.parameters.controls.map((form, idx) =>
+                  <ParameterForm
+                    key={idx}
+                    class='tile is-12 is-child box parameter'
+                    formState={form}
+                    onAction={a => this.onAction(a)}
+                    onRemove={() => this.removeParameter(idx)}
+                  />
+                )
+              }
+
+              <div class='tile is-12 is-child'>
+                <button
+                  class='button is-primary'
+                  type='button'
+                  onClick={() => this.addParameter()}
+                >
+                  <span>Add Parameter</span>
+                  <span class='icon is-small'>
+                    <fa-icon icon='plus' />
+                  </span>
+                </button>
+              </div>
+
             </div>
           </div>
-        </div>
+
+        </ExpansionContainer>
 
       </div>
     );
@@ -114,4 +124,8 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
 </script>
 
 <style scoped lang="scss">
+.name-input {
+  font-size: 120%;
+  font-weight: bold;
+}
 </style>

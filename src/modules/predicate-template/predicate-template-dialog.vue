@@ -1,13 +1,13 @@
 <script lang="tsx">
 import { Action, createFormGroupState, FormGroupState, formStateReducer } from 'pure-forms';
 import { Component } from 'vue-property-decorator';
-import { Emit, Form, TsxComponent } from '../../ui-infrastructure';
+import { Emit, Form, ModalDialog, TsxComponent } from '../../ui-infrastructure';
 import PredicateTemplateForm from './predicate-template-form.vue';
 import { PredicateTemplateData, PredicateTemplateFormValue, PredicateTemplateState } from './predicate-template.types';
 import { validatePredicateTemplateForm } from './predicate-template.validation';
 
 export interface PredicateTemplateDialogProps {
-  onSubmit: (data: PredicateTemplateData, id?: string) => any;
+  onSubmit: (data: PredicateTemplateData, templateId?: string) => any;
 }
 
 export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
@@ -71,37 +71,30 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
   render() {
     return (
       <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
-        <div class={`modal ${this.dialogIsOpen ? `is-active` : ``}`}>
-          <div class='modal-background' />
-          <div class='modal-card'>
-            <header class='modal-card-head'>
-              <p class='modal-card-title'>
-                {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
-              </p>
-            </header>
+        <ModalDialog isOpen={this.dialogIsOpen} onAfterFadeOut={() => this.formState = createFormState()}>
+          <span slot='header'>
+            {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
+          </span>
 
-            <section class='modal-card-body'>
-              <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
-            </section>
+          <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
 
-            <footer class='modal-card-foot justify-content flex-end'>
-              <button
-                class='button is-danger is-outlined'
-                type='button'
-                onClick={() => this.cancelDialog()}
-              >
-                Cancel
-              </button>
-              <button
-                class='button is-success'
-                onClick={() => this.submitDialog()}
-                disabled={this.formState.isInvalid && this.formState.isSubmitted}
-              >
-                Save
-              </button>
-            </footer>
+          <div slot='footer' class='buttons'>
+            <button
+              class='button is-danger is-outlined'
+              type='button'
+              onClick={() => this.cancelDialog()}
+            >
+              Cancel
+            </button>
+            <button
+              class='button is-success'
+              onClick={() => this.submitDialog()}
+              disabled={this.formState.isInvalid && this.formState.isSubmitted}
+            >
+              Save
+            </button>
           </div>
-        </div>
+        </ModalDialog>
       </Form>
     );
   }
@@ -109,6 +102,12 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
 </script>
 
 <style scoped lang="scss">
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+}
+
 .button {
   transition-duration: 0ms;
 }
