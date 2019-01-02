@@ -6,6 +6,8 @@ import { TsxComponent } from '../tsx-component';
 
 export interface FormFieldProps {
   label?: string;
+  tooltip?: string;
+  tooltipIcon?: string;
   controlState: FormControlState<any>;
   errorMessageFactory?: (errorName: string, errorValue: any) => string;
   errorMessages?: { [errorName: string]: string };
@@ -14,6 +16,8 @@ export interface FormFieldProps {
 @Component({})
 export class FormField extends TsxComponent<FormFieldProps> implements FormFieldProps {
   @Prop() label: string | undefined;
+  @Prop() tooltip: string | undefined;
+  @Prop() tooltipIcon: string | undefined;
   @Prop() controlState: FormControlState<any>;
   @Prop() errorMessageFactory: ((errorName: string, errorValue: any) => string) | undefined;
   @Prop() errorMessages?: { [errorName: string]: string };
@@ -47,6 +51,12 @@ export class FormField extends TsxComponent<FormFieldProps> implements FormField
         {this.label &&
           <label class='label'>
             {this.label}
+
+            {this.tooltip &&
+              <span class='tooltip is-tooltip-primary is-tooltip-right' data-tooltip={this.tooltip}>
+                <fa-icon icon={this.tooltipIcon || 'info-circle'} />
+              </span>
+            }
           </label>
         }
 
@@ -72,4 +82,7 @@ export default FormField;
 </script>
 
 <style scoped lang="scss">
+.tooltip {
+  margin-left: 0.25rem;
+}
 </style>

@@ -33,3 +33,12 @@ export interface PredicateNodeDto extends PredicateNodeData {
 }
 
 export interface PredicateNodeState extends PredicateNodeDto { }
+
+export interface PredicateNodeFormValue {
+  name: string;
+  description: string;
+  evalFunctionBody: string;
+  parameterValues: {
+    [param: string]: string | boolean | number;
+  };
+}

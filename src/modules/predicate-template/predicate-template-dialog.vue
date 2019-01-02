@@ -72,6 +72,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
     return (
       <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
         <ModalDialog isOpen={this.dialogIsOpen} onAfterFadeOut={() => this.formState = createFormState()}>
+
           <span slot='header'>
             {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
           </span>
@@ -94,6 +95,7 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
               Save
             </button>
           </div>
+
         </ModalDialog>
       </Form>
     );

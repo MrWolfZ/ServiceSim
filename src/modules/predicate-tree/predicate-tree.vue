@@ -13,16 +13,16 @@ export default class PredicateTreePage extends Vue {
     predicateNodes.loadAllAsync();
   }
 
+  private dialog() {
+    return this.$refs[this.dialog.name] as PredicateNodeDialog;
+  }
+
   get rootNode() {
     return predicateNodes.all[0];
   }
 
   get topLevelNodeIds() {
     return this.rootNode.childNodeIdsOrResponseGenerator as string[];
-  }
-
-  private editNode(nodeId: string) {
-    console.log('edit', nodeId);
   }
 
   private deleteNode(nodeId: string) {
@@ -74,7 +74,7 @@ export default class PredicateTreePage extends Vue {
             <PredicateNodeDetails
               class='node-details'
               nodeId={this.selectedNodeId}
-              onEdit={() => this.editNode(this.selectedNodeId)}
+              onEdit={() => this.dialog().openForExistingNode(predicateNodes.state.nodesById[this.selectedNodeId])}
               onDelete={() => this.deleteNode(this.selectedNodeId)}
               onAddChildNode={() => this.addChildNode(this.selectedNodeId)}
               onSetResponseGenerator={() => this.setResponseGenerator(this.selectedNodeId)}
@@ -85,7 +85,7 @@ export default class PredicateTreePage extends Vue {
           </div>
         </div>
 
-        <PredicateNodeDialog />
+        <PredicateNodeDialog ref={this.dialog.name} onSubmit={() => void 0} />
       </div>
     );
   }
