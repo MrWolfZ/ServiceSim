@@ -1,21 +1,31 @@
 module.exports = {
-  globals: {
-    'ts-jest': {
-      tsConfigFile: 'tsconfig.json',
-    },
-  },
+  roots: [
+    '<rootDir>',
+    '<rootDir>/src',
+  ],
   moduleFileExtensions: [
-    'ts',
     'js',
+    'jsx',
+    'json',
+    'vue',
+    'ts',
+    'tsx',
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': './node_modules/ts-jest/preprocessor.js',
+    '^.+\\.vue$': 'vue-jest',
+    '^.+\\.tsx?$': 'ts-jest',
+    '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
+    '^.+\\.jsx?$': 'babel-jest',
   },
+  snapshotSerializers: [
+    'jest-serializer-vue',
+  ],
   testMatch: [
     '**/src/**/*.spec.(ts|js)',
   ],
   testPathIgnorePatterns: [
-    "/src/ui/",
+    '/src/ui/',
+    'vue.spec',
   ],
   testEnvironment: 'node',
 };

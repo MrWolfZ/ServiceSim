@@ -1,24 +1,37 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./src/ui/",
-    "outDir": "./dist/ui",
-    "target": "es5",
-    "typeRoots": [
-      "node_modules/@types"
+    "target": "esnext",
+    "module": "esnext",
+    "jsx": "preserve",
+    "sourceMap": true,
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "types": [
+      "webpack-env",
+      "jest"
     ],
     "lib": [
-      "es2017",
-      "dom"
-    ],
-    "paths": {
-      "app/*": [
-        "app/*"
-      ],
-      "environments/*": [
-        "environments/*"
-      ]
-    }
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
   },
-  "include": []
+  "files": [
+    "src/ui.ts"
+  ],
+  "include": [
+    "src/**/*.vue",
+    "src/ui-infrastructure/**/*",
+    "src/**/*.types.ts",
+    "src/**/*.store.ts",
+    "src/util/**/*",
+    "types/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
