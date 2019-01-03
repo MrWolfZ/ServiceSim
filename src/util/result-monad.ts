@@ -2,12 +2,12 @@ export type Result<TSuccess = never, TFailure = never> = Success<TSuccess> | Fai
 
 export interface Success<TSuccess = never> {
   type: 'success';
-  success: TSuccess;
+  payload: TSuccess;
 }
 
 export interface Failure<TFailure = never> {
   type: 'failure';
-  failure: TFailure;
+  payload: TFailure;
 }
 
 export function isResult<TSuccess = never, TFailure = never>(object: any): object is Result<TSuccess, TFailure> {
@@ -19,11 +19,11 @@ export function matchResult<TResult, TSuccess = never, TFailure = never>(
   onSuccess: (value: TSuccess) => TResult,
   onFailure: (value: TFailure) => TResult,
 ): TResult {
-  return isSuccess(result) ? onSuccess(result.success) : onFailure(result.failure);
+  return isSuccess(result) ? onSuccess(result.payload) : onFailure(result.payload);
 }
 
 export function isSuccess<TSuccess>(result: Result<TSuccess, any>): result is Success<TSuccess> {
-  return result.type === 'success' && hasProperty(result, 'success');
+  return result.type === 'success' && hasProperty(result, 'payload');
 }
 
 export function success(): Success;
@@ -31,12 +31,12 @@ export function success<TSuccess>(value: TSuccess): Success<TSuccess>;
 export function success<TSuccess>(value?: TSuccess): Success<TSuccess> {
   return {
     type: 'success',
-    success: value!,
+    payload: value!,
   };
 }
 
 export function isFailure<TFailure>(result: Result<any, TFailure>): result is Failure<TFailure> {
-  return result.type === 'failure' && hasProperty(result, 'failure');
+  return result.type === 'failure' && hasProperty(result, 'payload');
 }
 
 export function failure(): Failure;
@@ -44,7 +44,7 @@ export function failure<TFailure>(value: TFailure): Failure<TFailure>;
 export function failure<TFailure>(value?: TFailure): Failure<TFailure> {
   return {
     type: 'failure',
-    failure: value!,
+    payload: value!,
   };
 }
 

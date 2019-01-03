@@ -1,5 +1,5 @@
 import express from 'express';
-import { EventLog, requestHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, EventLog, queryHandler } from '../../api-infrastructure';
 import { failure, success } from '../../util/result-monad';
 import { PredicateTemplate } from './predicate-template.entity';
 import { PredicateTemplateCreated, PredicateTemplateDeleted, PredicateTemplateUpdated } from './predicate-template.events';
@@ -40,7 +40,7 @@ export function start() {
 }
 
 export function getAllAsync() {
-  return getAllResponse;
+  return success(getAllResponse);
 }
 
 export async function createAsync(command: CreatePredicateTemplateCommand) {
@@ -50,7 +50,7 @@ export async function createAsync(command: CreatePredicateTemplateCommand) {
   }
 
   const template = PredicateTemplate.create(
-    command.data,
+    command,
     command.templateId,
   );
 
@@ -59,6 +59,14 @@ export async function createAsync(command: CreatePredicateTemplateCommand) {
   return success();
 }
 
+export const createCommandConstraints: CommandValidationConstraints<CreatePredicateTemplateCommand> = {
+  templateId: {},
+  name: {},
+  description: {},
+  evalFunctionBody: {},
+  parameters: {},
+};
+
 export async function updateAsync(command: UpdatePredicateTemplateCommand) {
   // TODO: validate (including exists)
   if (1 !== 1) {
@@ -66,14 +74,23 @@ export async function updateAsync(command: UpdatePredicateTemplateCommand) {
   }
 
   let template = await PredicateTemplate.ofIdAsync(command.templateId);
-  template = template.update(command.data);
+  template = template.update(command);
 
   await PredicateTemplate.saveAsync(template);
 
   return success();
 }
 
-export async function deleteAsync(params: { templateId: string }) {
+export const updateCommandConstraints: CommandValidationConstraints<UpdatePredicateTemplateCommand> = {
+  templateId: {},
+  unmodifiedTemplateVersion: {},
+  name: {},
+  description: {},
+  evalFunctionBody: {},
+  parameters: {},
+};
+
+export async function deleteAsync(_: never, params: { templateId: string }) {
   // TODO: validate exists
   // TODO: only allow if template is unused
   if (1 !== 1) {
@@ -89,7 +106,7 @@ export async function deleteAsync(params: { templateId: string }) {
 }
 
 export const api = express.Router();
-api.get('/', requestHandler(getAllAsync));
-api.post('/create', requestHandler(createAsync));
-api.post('/update', requestHandler(updateAsync));
-api.delete('/:templateId', requestHandler(deleteAsync));
+api.get('/', queryHandler(getAllAsync));
+api.post('/create', commandHandler(createAsync, createCommandConstraints));
+api.post('/update', commandHandler(updateAsync, updateCommandConstraints));
+api.delete('/:templateId', commandHandler(deleteAsync));

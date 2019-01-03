@@ -56,7 +56,7 @@ export async function createAsync(_: any, data: PredicateTemplateData) {
 
   const command: CreatePredicateTemplateCommand = {
     templateId,
-    data,
+    ...data,
   };
 
   predicateTemplates.addOrReplace(template);
@@ -72,7 +72,8 @@ export async function updateAsync(_: any, args: { templateId: string; data: Pred
   };
 
   const command: UpdatePredicateTemplateCommand = {
-    ...args,
+    templateId: args.templateId,
+    ...args.data,
     unmodifiedTemplateVersion: originalTemplate.version,
   };
 

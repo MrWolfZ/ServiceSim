@@ -1,5 +1,6 @@
 import express from 'express';
-import { EventLog, requestHandler } from '../../api-infrastructure';
+import { success } from 'src/util/result-monad';
+import { EventLog, queryHandler } from '../../api-infrastructure';
 import { assertNever } from '../../util/assert';
 import { ChildPredicateNodeAdded, PredicateNodeCreated, ResponseGeneratorSet } from './predicate-node.events';
 import { PredicateNodeDto } from './predicate-node.types';
@@ -47,12 +48,12 @@ export function start() {
 }
 
 export function getAllAsync() {
-  // return getAllResponse;
-  return getMockData();
+  // return success(getAllResponse);
+  return success(getMockData());
 }
 
 export const api = express.Router();
-api.get('/nodes', requestHandler(getAllAsync));
+api.get('/nodes', queryHandler(getAllAsync));
 
 function getMockData(): PredicateNodeDto[] {
   return [

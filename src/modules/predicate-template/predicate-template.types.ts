@@ -19,13 +19,11 @@ export interface PredicateTemplateState extends PredicateTemplateDto { }
 
 export interface PredicateTemplateFormValue extends PredicateTemplateData { }
 
-export interface CreatePredicateTemplateCommand {
+export interface CreatePredicateTemplateCommand extends PredicateTemplateData {
   templateId: string;
-  data: PredicateTemplateData;
 }
 
-export interface UpdatePredicateTemplateCommand {
+export interface UpdatePredicateTemplateCommand extends Partial<PredicateTemplateData> {
   templateId: string;
   unmodifiedTemplateVersion: number;
-  data: Partial<PredicateTemplateData>;
 }
