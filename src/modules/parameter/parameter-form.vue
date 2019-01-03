@@ -1,5 +1,6 @@
 <script lang="tsx">
-import { Action, FormControlState, FormGroupState } from 'pure-forms';
+import { Action, FormControlState, FormGroupState, setValue, updateGroup, validate } from 'pure-forms';
+import { required } from 'pure-forms/validation';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit, FormField, NumberInput, RadioInput, Select, TextInput, TsxComponent } from '../../ui-infrastructure';
 import { ParameterFormValue } from './parameter.types';
@@ -9,6 +10,26 @@ export interface ParameterFormProps {
   onAction: (action: Action) => any;
   onRemove: () => any;
 }
+
+export const validateParameterForm = updateGroup<ParameterFormValue>({
+  name: validate(required),
+  description: validate(required),
+  defaultValue: (defaultValue: FormControlState<any>, parameter: FormGroupState<ParameterFormValue>) => {
+    if (parameter.value.valueType === 'string' && typeof defaultValue.value !== 'string') {
+      defaultValue = setValue<string>(defaultValue, '');
+    }
+
+    if (parameter.value.valueType === 'number' && typeof defaultValue.value !== 'number') {
+      defaultValue = setValue<number>(defaultValue, 0);
+    }
+
+    if (parameter.value.valueType === 'boolean' && typeof defaultValue.value !== 'boolean') {
+      defaultValue = setValue<boolean>(defaultValue, false);
+    }
+
+    return defaultValue;
+  },
+});
 
 @Component({})
 export default class ParameterForm extends TsxComponent<ParameterFormProps> implements ParameterFormProps {

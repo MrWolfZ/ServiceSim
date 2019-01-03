@@ -1,7 +1,7 @@
 import express from 'express';
-import { success } from 'src/util/result-monad';
 import { EventLog, queryHandler } from '../../api-infrastructure';
 import { assertNever } from '../../util/assert';
+import { success } from '../../util/result-monad';
 import { ChildPredicateNodeAdded, PredicateNodeCreated, ResponseGeneratorSet } from './predicate-node.events';
 import { PredicateNodeDto } from './predicate-node.types';
 

@@ -18,3 +18,11 @@ export type EventOfKind<TEvent, TKind extends string> = TEvent extends DomainEve
 export type EventHandlerMap<TEvent extends DomainEventData> = {
   [eventKind in TEvent['kind']]: EntityEventHandler<EventOfKind<TEvent, eventKind>>;
 };
+
+export interface RootEntityData {
+  id: string;
+}
+
+export interface RavenDbDocument {
+  $collection: string;
+}

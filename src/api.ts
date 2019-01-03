@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
+import { db } from './api-infrastructure';
 import * as ejp from './api-infrastructure/event-journal/persistence';
 import * as elp from './api-infrastructure/event-log/persistence';
 import { setupMockData } from './mock-data';
@@ -18,11 +19,12 @@ uiApi.use('/predicate-templates', predicateTemplatesApi.api);
 uiApi.use('/predicate-tree', predicateTreeApi.api);
 
 export async function initializeAsync() {
+  await db.initializeAsync();
+
   await setupMockData();
 
   const subscriptions = [
     PredicateTree.start(),
-    predicateTemplatesApi.start(),
     predicateTreeApi.start(),
   ];
 

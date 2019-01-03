@@ -1,10 +1,11 @@
 <script lang="tsx">
-import { Action, createFormGroupState, FormGroupState, formStateReducer } from 'pure-forms';
+import { Action, createFormGroupState, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
+import { required } from 'pure-forms/validation';
 import { Component } from 'vue-property-decorator';
 import { Emit, Form, ModalDialog, TsxComponent } from '../../ui-infrastructure';
+import { validateParameterForm } from '../parameter/parameter-form.vue';
 import PredicateTemplateForm from './predicate-template-form.vue';
 import { PredicateTemplateData, PredicateTemplateFormValue, PredicateTemplateState } from './predicate-template.types';
-import { validatePredicateTemplateForm } from './predicate-template.validation';
 
 export interface PredicateTemplateDialogProps {
   onSubmit: (data: PredicateTemplateData, templateId?: string) => any;
@@ -16,6 +17,13 @@ export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
   evalFunctionBody: '',
   parameters: [],
 };
+
+export const validatePredicateTemplateForm = updateGroup<PredicateTemplateFormValue>({
+  name: validate(required),
+  description: validate(required),
+  evalFunctionBody: validate(required),
+  parameters: updateArray(validateParameterForm),
+});
 
 const createFormState = (value = EMPTY_PREDICATE_TEMPLATE_FORM_VALUE) =>
   Object.freeze(validatePredicateTemplateForm(createFormGroupState('predicateTemplateDialog', value)));

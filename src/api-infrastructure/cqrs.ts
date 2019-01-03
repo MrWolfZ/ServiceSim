@@ -1,69 +1,95 @@
 import { Request, RequestHandler, Response } from 'express';
 import validate from 'validate.js';
-import { failure, isFailure, isSuccess, Result, success } from '../util/result-monad';
+import { failure, isFailure, isResult, isSuccess, Result, success } from '../util/result-monad';
+import { keys } from '../util/util';
 
-export type CommandValidationErrors = string[];
-export type CommandValidationFn<TCommand, TParams = never> =
-  (command: TCommand, params: TParams) => Result<never, CommandValidationErrors> | Promise<Result<never, CommandValidationErrors>>;
+export type CommandValidationFn<TCommand> = (command: TCommand) => Result<never, string[]> | Promise<Result<never, string[]>>;
 
 export interface ValidationConstraint<T> {
   presence?: boolean;
   exclusion?: { within: T[]; message?: string };
 }
 
-export type CommandValidationConstraints<TCommand, TParams = never> = {
-  [prop in keyof TCommand | keyof TParams]: ValidationConstraint<(TCommand & TParams)[prop]>;
+export type CommandValidationConstraints<TCommand> = {
+  [prop in keyof TCommand]: ValidationConstraint<TCommand[prop]>;
 };
 
-export type CommandValidator<TCommand, TParams = never> = CommandValidationFn<TCommand, TParams> | CommandValidationConstraints<TCommand, TParams>;
+export type CommandValidator<TCommand> = CommandValidationFn<TCommand> | CommandValidationConstraints<TCommand>;
 
-// TODO: move to utils
-function keys<T>(t: T): (keyof T)[] {
-  return Object.keys(t) as (keyof T)[];
-}
-
-export function evaluateCommandValidationMap<TCommand, TParams = never>(
-  constraints: CommandValidationConstraints<TCommand, TParams>,
+export function evaluateCommandValidationConstraints<TCommand>(
+  constraints: CommandValidationConstraints<TCommand>,
   command: TCommand,
-  params: TParams,
-): Result<never, CommandValidationErrors> {
-  const commandAndParams = { ...command, ...params };
-  const messages: string[] = validate(commandAndParams, constraints, { format: 'flat' }) || [];
-
-  keys(commandAndParams).filter(key => !constraints[key]).forEach(key => messages.push(`${key} is not a valid property on this type of command`));
-
+): Result<never, string[]> {
+  const messages: string[] = validate(command, constraints, { format: 'flat' }) || [];
+  keys(command).filter(key => !constraints[key]).forEach(key => messages.push(`${key} is not a valid property on this type of command`));
   return messages.length > 0 ? failure(messages) : success();
 }
 
-export function commandHandler<TCommand, TParams = never, TSuccess = never, TFailure = never>(
-  handler: (command: TCommand, params: TParams) => Result<TSuccess, TFailure> | Promise<Result<TSuccess, TFailure>>,
-  validator?: CommandValidator<TCommand, TParams>,
+export interface CommandHandler<TCommand, TSuccess = void> {
+  (command: TCommand): TSuccess | Promise<TSuccess> | Result<TSuccess, string[]> | Promise<Result<TSuccess, string[]>>;
+  validationFn?: CommandValidationFn<TCommand>;
+  constraints?: CommandValidationConstraints<TCommand>;
+}
+
+export function commandHandler<TCommand, TSuccess = void>(
+  handler: CommandHandler<TCommand, TSuccess>,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const command = req.body as TCommand;
-    const params = { ...req.params, ...req.query } as TParams;
+    try {
+      const command = req.body as TCommand;
 
-    if (validator) {
-      const validationResult = typeof validator === 'function'
-        ? await validator(command, params)
-        : evaluateCommandValidationMap(validator, command, params);
+      const validationMessages: string[] = [];
 
-      if (isFailure(validationResult)) {
-        res.status(400).send(validationResult.payload);
+      if (handler.validationFn) {
+        const validationResult = await handler.validationFn(command);
+
+        if (isFailure(validationResult)) {
+          validationMessages.push(...validationResult.failure);
+        }
+      }
+
+      if (handler.constraints) {
+        const validationResult = evaluateCommandValidationConstraints(handler.constraints, command);
+
+        if (isFailure(validationResult)) {
+          validationMessages.push(...validationResult.failure);
+        }
+      }
+
+      if (validationMessages.length > 0) {
+        res.status(400).send(validationMessages);
         return;
       }
-    }
 
-    const result = await handler(command, params);
-    res.status(isSuccess(result) ? result.payload ? 200 : 204 : 400).send(result.payload);
+      let result = await handler(command);
+      result = isResult<TSuccess, string[]>(result) ? result : success(result);
+
+      if (isSuccess(result)) {
+        res.status(result.success ? 200 : 204).send(result.success);
+      } else {
+        res.status(400).send(result.failure);
+      }
+    } catch (error) {
+      res.status(500).send({ error });
+    }
   };
 }
 
-export function queryHandler<TParams = never, TSuccess = never, TFailure = never>(
-  handler: (params: TParams) => Result<TSuccess, TFailure> | Promise<Result<TSuccess, TFailure>>,
+export function queryHandler<TParams = never, TSuccess = void, TFailure = never>(
+  handler: (params: TParams) => TSuccess | Promise<TSuccess> | Result<TSuccess, TFailure> | Promise<Result<TSuccess, TFailure>>,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const result = await handler({ ...req.params, ...req.query });
-    res.status(isSuccess(result) ? result.payload ? 200 : 204 : 400).send(result.payload);
+    try {
+      let result = await handler({ ...req.params, ...req.query });
+      result = isResult<TSuccess, TFailure>(result) ? result : success(result);
+
+      if (isSuccess(result)) {
+        res.status(result.success ? 200 : 204).send(result.success);
+      } else {
+        res.status(400).send(result.failure);
+      }
+    } catch (error) {
+      res.status(500).send({ error });
+    }
   };
 }

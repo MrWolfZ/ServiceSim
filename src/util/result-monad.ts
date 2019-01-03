@@ -2,12 +2,12 @@ export type Result<TSuccess = never, TFailure = never> = Success<TSuccess> | Fai
 
 export interface Success<TSuccess = never> {
   type: 'success';
-  payload: TSuccess;
+  success: TSuccess;
 }
 
 export interface Failure<TFailure = never> {
   type: 'failure';
-  payload: TFailure;
+  failure: TFailure;
 }
 
 export function isResult<TSuccess = never, TFailure = never>(object: any): object is Result<TSuccess, TFailure> {
@@ -19,11 +19,11 @@ export function matchResult<TResult, TSuccess = never, TFailure = never>(
   onSuccess: (value: TSuccess) => TResult,
   onFailure: (value: TFailure) => TResult,
 ): TResult {
-  return isSuccess(result) ? onSuccess(result.payload) : onFailure(result.payload);
+  return isSuccess(result) ? onSuccess(result.success) : onFailure(result.failure);
 }
 
 export function isSuccess<TSuccess>(result: Result<TSuccess, any>): result is Success<TSuccess> {
-  return result.type === 'success' && hasProperty(result, 'payload');
+  return !!result && result.type === 'success' && hasProperty(result, 'success');
 }
 
 export function success(): Success;
@@ -31,12 +31,12 @@ export function success<TSuccess>(value: TSuccess): Success<TSuccess>;
 export function success<TSuccess>(value?: TSuccess): Success<TSuccess> {
   return {
     type: 'success',
-    payload: value!,
+    success: value!,
   };
 }
 
 export function isFailure<TFailure>(result: Result<any, TFailure>): result is Failure<TFailure> {
-  return result.type === 'failure' && hasProperty(result, 'payload');
+  return !!result && result.type === 'failure' && hasProperty(result, 'failure');
 }
 
 export function failure(): Failure;
@@ -44,8 +44,20 @@ export function failure<TFailure>(value: TFailure): Failure<TFailure>;
 export function failure<TFailure>(value?: TFailure): Failure<TFailure> {
   return {
     type: 'failure',
-    payload: value!,
+    failure: value!,
   };
+}
+
+export function unwrap<TSuccess>(result: TSuccess | Result<TSuccess, any>) {
+  if (!isResult<TSuccess, any>(result)) {
+    return result;
+  }
+
+  if (isSuccess(result)) {
+    return result.success;
+  }
+
+  throw new Error(`cannot unwrap a failure! payload: ${result.failure}`);
 }
 
 function hasProperty<T>(instance: T, propertyName: keyof T) {

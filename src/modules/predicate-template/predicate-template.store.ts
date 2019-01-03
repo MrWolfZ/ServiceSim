@@ -4,6 +4,7 @@ import Vue from 'vue';
 import { getStoreBuilder } from 'vuex-typex';
 import {
   CreatePredicateTemplateCommand,
+  DeletePredicateTemplateCommand,
   PredicateTemplateData,
   PredicateTemplateDto,
   PredicateTemplateState,
@@ -55,7 +56,6 @@ export async function createAsync(_: any, data: PredicateTemplateData) {
   };
 
   const command: CreatePredicateTemplateCommand = {
-    templateId,
     ...data,
   };
 
@@ -83,7 +83,13 @@ export async function updateAsync(_: any, args: { templateId: string; data: Pred
 
 export async function deleteAsync(_: any, templateId: string) {
   predicateTemplates.delete(templateId);
-  await axios.delete(`/predicate-templates/${templateId}`);
+
+  const command: DeletePredicateTemplateCommand = {
+    templateId,
+    unmodifiedTemplateVersion: 1,
+  };
+
+  await axios.post(`/predicate-templates/delete`, command);
 }
 
 const state$ = b.state();
