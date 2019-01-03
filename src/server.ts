@@ -38,9 +38,9 @@ host.use(
 
 host.use(api.api);
 
-api.initializeAsync().then(shutdown => {
+api.initializeAsync().then(sub => {
   process.on('SIGTERM', () => {
-    shutdown();
+    sub.unsubscribe();
   });
 });
 
