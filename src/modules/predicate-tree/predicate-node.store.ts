@@ -28,20 +28,26 @@ export function addOrReplace(state: PredicateNodesState, node: PredicateNodeStat
   state.nodesById[node.id] = node;
 }
 
+export function reset(state: PredicateNodesState) {
+  state.nodeIds = [];
+  state.nodesById = {};
+}
+
 export async function loadAllAsync() {
   const response = await axios.get<PredicateNodeDto[]>(`/predicate-tree/nodes`);
-  predicateTemplates.addAll(response.data);
+  predicateNodes.addAll(response.data);
 }
 
 const state$ = b.state();
 const getAll$ = b.read(getAll);
-const predicateTemplates = {
+const predicateNodes = {
   get state() { return state$(); },
   get all() { return getAll$(); },
 
   addAll: b.commit(addAll),
+  reset: b.commit(reset),
 
   loadAllAsync: b.dispatch(loadAllAsync),
 };
 
-export default predicateTemplates;
+export default predicateNodes;

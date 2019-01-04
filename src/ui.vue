@@ -13,12 +13,32 @@ export default class App extends Vue {
   private dataWasLoaded = false;
 
   async created() {
+    await this.loadAllDataAsync();
+    this.dataWasLoaded = true;
+
+    const eventSource = new EventSource(`${process.env.VUE_APP_UI_BASE_URL}/events`);
+
+    eventSource.onmessage = msg => {
+      console.log(msg);
+      this.loadAllDataAsync();
+    };
+
+    eventSource.addEventListener('event', msg => {
+      console.log(msg);
+      this.loadAllDataAsync();
+    });
+
+    // eventSource.close();
+  }
+
+  private async loadAllDataAsync() {
+    predicateNodes.reset();
+    predicateTemplates.reset();
+
     await Promise.all([
       predicateNodes.loadAllAsync(),
       predicateTemplates.loadAllAsync(),
     ]);
-
-    this.dataWasLoaded = true;
   }
 
   render() {

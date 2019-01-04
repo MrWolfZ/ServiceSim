@@ -42,6 +42,11 @@ export function deleteTemplate(state: PredicateTemplatesState, templateId: strin
   Vue.delete(state.templatesById, templateId);
 }
 
+export function reset(state: PredicateTemplatesState) {
+  state.templateIds = [];
+  state.templatesById = {};
+}
+
 export async function loadAllAsync() {
   const response = await axios.get<PredicateTemplateDto[]>(`/predicate-templates`);
   predicateTemplates.addAll(response.data);
@@ -101,6 +106,7 @@ const predicateTemplates = {
   addAll: b.commit(addAll),
   addOrReplace: b.commit(addOrReplace),
   delete: b.commit(deleteTemplate),
+  reset: b.commit(reset),
 
   loadAllAsync: b.dispatch(loadAllAsync),
   createAsync: b.dispatch(createAsync),
