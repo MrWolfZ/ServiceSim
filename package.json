@@ -29,6 +29,10 @@
     "eject-ui": "vue inspect --mode production | Out-File C:\\Programming\\vue.json",
     "heroku-postbuild": "npm run build-full"
   },
+  "engines": {
+    "node": ">=8.0.0",
+    "npm": ">=5.0.0"
+  },
   "jest": {
     "moduleDirectories": [
       "node_modules",
