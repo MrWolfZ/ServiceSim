@@ -100,8 +100,10 @@ call :SelectNodeVersion
 :: 3. Install npm packages
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   pushd "%DEPLOYMENT_TARGET%"
-  call :ExecuteCmd !NPM_CMD! install --production
-  call :ExecuteCmd !NPM_CMD! install --only=dev
+  echo Installing production dependencies...
+  call :ExecuteCmd !NPM_CMD! install --production --scripts-prepend-node-path
+  echo Installing dev dependencies...
+  call :ExecuteCmd !NPM_CMD! install --only=dev --scripts-prepend-node-path
   IF !ERRORLEVEL! NEQ 0 goto error
   popd
 )
@@ -109,7 +111,8 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
 :: 4. Build app
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   pushd "%DEPLOYMENT_TARGET%"
-  call :ExecuteCmd !NPM_CMD! run build-full
+  echo Building app...
+  call :ExecuteCmd !NPM_CMD! run build-full --scripts-prepend-node-path
   IF !ERRORLEVEL! NEQ 0 goto error
   popd
 )
