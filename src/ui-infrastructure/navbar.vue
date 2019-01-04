@@ -61,6 +61,14 @@ export default class Navbar extends Vue {
                 Response Generator Templates
               </router-link>
 
+              <router-link
+                to='admin'
+                class='navbar-item has-text-white'
+                onClick={() => this.closeMenu()}
+              >
+                Admin
+              </router-link>
+
             </div>
 
           </div>

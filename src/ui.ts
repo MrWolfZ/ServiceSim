@@ -1,5 +1,14 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowLeft, faCheck, faChevronRight, faEdit, faInfoCircle, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowLeft,
+  faCheck,
+  faChevronRight,
+  faEdit,
+  faExclamation,
+  faInfoCircle,
+  faPlus,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
 import Vue from 'vue';
@@ -35,6 +44,7 @@ library.add(faEdit);
 library.add(faInfoCircle);
 library.add(faPlus);
 library.add(faTimes);
+library.add(faExclamation);
 
 Vue.component('fa-icon', FontAwesomeIcon as any);
 Vue.use(Router);
@@ -50,6 +60,7 @@ Vue.use(Vuex);
 Vue.config.productionTip = false;
 
 axios.defaults.baseURL = process.env.VUE_APP_UI_BASE_URL;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 new Vue({
   router: new Router({
@@ -65,6 +76,11 @@ new Vue({
         path: '/predicate-templates',
         name: 'predicate-templates',
         component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-templates.vue'),
+      },
+      {
+        path: '/admin',
+        name: 'admin',
+        component: () => import(/* webpackChunkName: "admin" */ './modules/admin/admin.vue'),
       },
       {
         path: '/',
