@@ -101,9 +101,9 @@ call :SelectNodeVersion
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   pushd "%DEPLOYMENT_TARGET%"
   echo Installing production dependencies...
-  call :ExecuteCmd !NPM_CMD! install --production --scripts-prepend-node-path
+  call :ExecuteCmd !NPM_CMD! install --production --no-audit --scripts-prepend-node-path
   echo Installing dev dependencies...
-  call :ExecuteCmd !NPM_CMD! install --only=dev --scripts-prepend-node-path
+  call :ExecuteCmd !NPM_CMD! install --only=dev --no-audit --scripts-prepend-node-path
   IF !ERRORLEVEL! NEQ 0 goto error
   popd
 )
