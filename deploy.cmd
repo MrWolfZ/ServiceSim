@@ -107,7 +107,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   echo Installing dev dependencies...
   call :ExecuteCmd !NPM_CMD! install --only=dev --scripts-prepend-node-path
   echo Rebuilding node-sass...
-  call :ExecuteCmd !NPM_CMD! rebuild node-sass
+  call :ExecuteCmd !NPM_CMD! rebuild node-sass --scripts-prepend-node-path
   IF !ERRORLEVEL! NEQ 0 goto error
   popd
 )
