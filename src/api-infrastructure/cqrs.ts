@@ -3,7 +3,7 @@ import validate from 'validate.js';
 import { failure, isFailure, isResult, isSuccess, Result, success } from '../util/result-monad';
 import { keys } from '../util/util';
 
-export type CommandValidationFn<TCommand> = (command: TCommand) => Result<never, string[]> | Promise<Result<never, string[]>>;
+export type CommandValidationFn<TCommand> = (command: TCommand) => Result<void, string[]> | Promise<Result<void, string[]>>;
 
 export interface ValidationConstraint<T> {
   presence?: boolean;
@@ -11,7 +11,7 @@ export interface ValidationConstraint<T> {
 }
 
 export type CommandValidationConstraints<TCommand> = {
-  [prop in keyof TCommand]: ValidationConstraint<TCommand[prop]>;
+  [prop in keyof TCommand]?: ValidationConstraint<TCommand[prop]>;
 };
 
 export type CommandValidator<TCommand> = CommandValidationFn<TCommand> | CommandValidationConstraints<TCommand>;
@@ -19,19 +19,19 @@ export type CommandValidator<TCommand> = CommandValidationFn<TCommand> | Command
 export function evaluateCommandValidationConstraints<TCommand>(
   constraints: CommandValidationConstraints<TCommand>,
   command: TCommand,
-): Result<never, string[]> {
+): Result<void, string[]> {
   const messages: string[] = validate(command, constraints, { format: 'flat' }) || [];
   keys(command).filter(key => !constraints[key]).forEach(key => messages.push(`${key} is not a valid property on this type of command`));
   return messages.length > 0 ? failure(messages) : success();
 }
 
-export interface CommandHandler<TCommand, TSuccess = void> {
-  (command: TCommand): TSuccess | Promise<TSuccess> | Result<TSuccess, string[]> | Promise<Result<TSuccess, string[]>>;
+export interface CommandHandler<TCommand = void, TSuccess = void> {
+  (command: TCommand): TSuccess | Result<TSuccess, string[]> | Promise<TSuccess | Result<TSuccess, string[]>>;
   validationFn?: CommandValidationFn<TCommand>;
   constraints?: CommandValidationConstraints<TCommand>;
 }
 
-export function commandHandler<TCommand, TSuccess = void>(
+export function commandHandler<TCommand = void, TSuccess = void>(
   handler: CommandHandler<TCommand, TSuccess>,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
@@ -70,7 +70,11 @@ export function commandHandler<TCommand, TSuccess = void>(
         res.status(400).send(result.failure);
       }
     } catch (error) {
-      res.status(500).send({ error });
+      res.status(500).send(error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stackTrace: error.stack,
+      } : { error });
     }
   };
 }

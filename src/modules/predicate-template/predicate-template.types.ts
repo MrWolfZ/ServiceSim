@@ -1,4 +1,4 @@
-import { RavenDbDocument, RootEntityData } from '../../api-infrastructure/api-infrastructure.types';
+import { VersionedRootEntity, VersionedRootEntityDefinition } from '../../api-infrastructure/api-infrastructure.types';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface PredicateTemplateData {
@@ -8,7 +8,11 @@ export interface PredicateTemplateData {
   parameters: Parameter[];
 }
 
-export type PredicateTemplateEntity = PredicateTemplateData & RootEntityData & RavenDbDocument;
+export type PredicateTemplateEntityType = 'predicate-template';
+
+export type PredicateTemplateEntity = PredicateTemplateData & VersionedRootEntity<PredicateTemplateEntityType>;
+
+export type PredicateTemplateEntityDefinition = VersionedRootEntityDefinition<PredicateTemplateEntity, PredicateTemplateEntityType>;
 
 export interface PredicateTemplateDto extends PredicateTemplateData {
   id: string;
@@ -18,6 +22,11 @@ export interface PredicateTemplateDto extends PredicateTemplateData {
 export interface PredicateTemplateState extends PredicateTemplateDto { }
 
 export interface PredicateTemplateFormValue extends PredicateTemplateData { }
+
+export interface CommandResponse {
+  templateId: string;
+  templateVersion: number;
+}
 
 export interface CreatePredicateTemplateCommand extends PredicateTemplateData { }
 

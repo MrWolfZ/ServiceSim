@@ -1,4 +1,3 @@
-import { NonFunctionProperties, Omit } from '../util/types';
 import { EventHandlerMap, EventOfKind, EventSourcedRootEntityData } from './api-infrastructure.types';
 import { DomainEvent } from './domain-event';
 

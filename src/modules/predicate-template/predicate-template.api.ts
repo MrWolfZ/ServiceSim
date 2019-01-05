@@ -1,47 +1,43 @@
 import express from 'express';
-import { DeleteByQueryOperation, IndexQuery } from 'ravendb';
-import { commandHandler, CommandHandler, db, queryHandler } from '../../api-infrastructure';
-import { failure, success } from '../../util/result-monad';
-import { copyProps } from '../../util/util';
+import { commandHandler, CommandHandler, DB, queryHandler } from '../../api-infrastructure';
+import { failure, isFailure } from '../../util/result-monad';
+import { keys, omit } from '../../util/util';
+import * as DEFAULT_TEMPLATES from './default-templates';
 import {
+  CommandResponse as PredicateTemplateCommandResponse,
   CreatePredicateTemplateCommand,
   DeletePredicateTemplateCommand,
   PredicateTemplateDto,
-  PredicateTemplateEntity,
+  PredicateTemplateEntityDefinition,
   UpdatePredicateTemplateCommand,
 } from './predicate-template.types';
 
-const COLLECTION_NAME = 'predicate-templates';
+export const PREDICATE_TEMPLATE_ENTITY_DEFINITION: PredicateTemplateEntityDefinition = {
+  entityType: 'predicate-template',
+  '@': 'VersionedRootEntityDefinition',
+};
 
 export async function getAllAsync() {
-  const allTemplates = await db.withSession(s =>
-    s.query<PredicateTemplateEntity>({ collection: COLLECTION_NAME }).all()
-  );
+  const allTemplates = await DB.queryVersion(PREDICATE_TEMPLATE_ENTITY_DEFINITION).allLatestAsync();
 
   return allTemplates.map<PredicateTemplateDto>(t => ({
     id: t.id,
+    version: t.$metadata.version,
     name: t.name,
     description: t.description,
     evalFunctionBody: t.evalFunctionBody,
     parameters: t.parameters,
-    version: 1,
   }));
 }
 
-export const createAsync: CommandHandler<CreatePredicateTemplateCommand, { templateId: string }> = async command => {
-  const template: PredicateTemplateEntity = {
-    id: undefined!,
-    $collection: COLLECTION_NAME,
-    ...command,
-  };
+type PredicateTemplateCommandHandler<TCommand> = CommandHandler<TCommand, PredicateTemplateCommandResponse>;
 
-  await db.withSession(async s => {
-    await s.store(template);
-    await s.saveChanges();
-  });
+export const createAsync: PredicateTemplateCommandHandler<CreatePredicateTemplateCommand> = async command => {
+  const template = await DB.createVersionAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command);
 
   return {
     templateId: template.id,
+    templateVersion: template.$metadata.version,
   };
 };
 
@@ -53,19 +49,22 @@ createAsync.constraints = {
   parameters: {},
 };
 
-export const updateAsync: CommandHandler<UpdatePredicateTemplateCommand> = async command => {
-  // TODO: validate (including exists and version)
-  if (1 !== 1) {
-    return failure([]);
+export const updateAsync: PredicateTemplateCommandHandler<UpdatePredicateTemplateCommand> = async command => {
+  const result = await DB.patchVersionAsync(
+    PREDICATE_TEMPLATE_ENTITY_DEFINITION,
+    command.templateId,
+    command.unmodifiedTemplateVersion,
+    omit(command, 'templateId', 'unmodifiedTemplateVersion'),
+  );
+
+  if (isFailure(result)) {
+    return result;
   }
 
-  await db.withSession(async s => {
-    const template = await s.load<PredicateTemplateEntity>(command.templateId);
-    copyProps(template, command);
-    await s.saveChanges();
-  });
-
-  return success();
+  return {
+    templateId: result.success.id,
+    templateVersion: result.success.$metadata.version,
+  };
 };
 
 // TODO: validate
@@ -79,18 +78,7 @@ updateAsync.constraints = {
 };
 
 export const deleteAsync: CommandHandler<DeletePredicateTemplateCommand> = async command => {
-  // TODO: validate exists
-  // TODO: only allow if template is unused
-  if (1 !== 1) {
-    return failure([]);
-  }
-
-  await db.withSession(async s => {
-    await s.delete(command.templateId);
-    await s.saveChanges();
-  });
-
-  return success();
+  await DB.deleteVersionAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
 };
 
 // TODO: validate
@@ -99,11 +87,24 @@ deleteAsync.constraints = {
   unmodifiedTemplateVersion: {},
 };
 
-export const deleteAllAsync: CommandHandler<void> = async () => {
-  await db.withSession(async s => {
-    await s.advanced.documentStore.operations.send(new DeleteByQueryOperation(new IndexQuery('from \'predicate-templates\'')));
-    await s.saveChanges();
-  });
+export const dropAllAsync: CommandHandler = async () => {
+  await DB.dropAllAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION.entityType);
+};
+
+export const createDefaultTemplatesAsync: CommandHandler = async () => {
+  const failureMessages: string[] = [];
+
+  for (const key of keys(DEFAULT_TEMPLATES)) {
+    const result = await createAsync(DEFAULT_TEMPLATES[key]);
+
+    if (isFailure(result)) {
+      failureMessages.push(...result.failure);
+    }
+  }
+
+  if (failureMessages.length > 0) {
+    return failure(failureMessages);
+  }
 };
 
 export const api = express.Router();

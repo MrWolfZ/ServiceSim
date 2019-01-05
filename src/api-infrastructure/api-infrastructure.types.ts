@@ -19,10 +19,35 @@ export type EventHandlerMap<TEvent extends DomainEventData> = {
   [eventKind in TEvent['kind']]: EntityEventHandler<EventOfKind<TEvent, eventKind>>;
 };
 
-export interface RootEntityData {
+export interface RootEntity<TEntityType extends string> {
   id: string;
+  $metadata: {
+    entityType: TEntityType;
+    createdOnEpoch: number;
+    lastUpdatedOnEpoch: number;
+  };
 }
 
-export interface RavenDbDocument {
-  $collection: string;
+// @ts-ignore (type params only used for type inference)
+export interface RootEntityDefinition<TEntity extends RootEntity<TEntityType>, TEntityType extends string> {
+  entityType: TEntityType;
+  '@': 'RootEntityDefinition';
+}
+
+export interface VersionedRootEntity<TEntityType extends string> extends RootEntity<TEntityType> {
+  $metadata: RootEntity<TEntityType>['$metadata'] & {
+    version: number;
+    isDeleted: boolean;
+  };
+}
+
+// @ts-ignore (type params only used for type inference)
+export interface VersionedRootEntityDefinition<TEntity extends VersionedRootEntity<TEntityType>, TEntityType extends string> {
+  entityType: TEntityType;
+  '@': 'VersionedRootEntityDefinition';
+}
+
+export interface IdAndVersion {
+  id: string;
+  version: number;
 }

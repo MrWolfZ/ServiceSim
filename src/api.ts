@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { bus, db } from './api-infrastructure';
+import { bus, DB } from './api-infrastructure';
 import * as ejp from './api-infrastructure/event-journal/persistence';
 import * as elp from './api-infrastructure/event-log/persistence';
 import * as adminApi from './modules/admin/admin.api';
@@ -46,7 +46,7 @@ uiApi.get('/events', (req, res) => {
 });
 
 export async function initializeAsync() {
-  await db.initializeAsync();
+  await DB.initializeAsync();
 
   const subscriptions = [
     PredicateTree.start(),

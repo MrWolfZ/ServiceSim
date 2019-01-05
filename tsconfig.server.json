@@ -6,10 +6,15 @@
     "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,
-    "paths": {}
+    "paths": {},
+    "lib": [
+      "esnext"
+    ]
   },
   "files": [
     "./src/server.ts",
   ],
-  "include": []
+  "include": [
+    "types/**/*"
+  ]
 }

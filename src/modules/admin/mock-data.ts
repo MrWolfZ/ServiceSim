@@ -1,11 +1,9 @@
-import { unwrap } from '../../util/result-monad';
+import { ALL, PATH_PREFIX } from '../predicate-template/default-templates';
 import * as predicateTemplateApi from '../predicate-template/predicate-template.api';
 import { PredicateNode } from '../predicate-tree/predicate-node.entity';
 import { ResponseGeneratorTemplate } from '../response-generator-template/response-generator-template';
 
 export async function setupMockData() {
-  await predicateTemplateApi.deleteAllAsync();
-
   const staticResponseGeneratorTemplate = ResponseGeneratorTemplate.create(
     'static',
     'Response generators based on this template return a static configured response.',
@@ -37,54 +35,9 @@ export async function setupMockData() {
 
   await ResponseGeneratorTemplate.saveAsync(staticResponseGeneratorTemplate);
 
-  const pathPrefixPredicateTemplateId = unwrap(await predicateTemplateApi.createAsync({
-    name: 'Path Prefix',
-    description: 'Predicates based on this template match all requests whose path starts with a provided string.',
-    evalFunctionBody: 'return request.path.startsWith(parameters["Prefix"]);',
-    parameters: [
-      {
-        name: 'Prefix',
-        description: 'The prefix to check the path for.',
-        isRequired: true,
-        valueType: 'string',
-        defaultValue: '/',
-      },
-    ],
-  })).templateId;
-
-  await predicateTemplateApi.createAsync({
-    name: 'Method',
-    description: 'Predicates based on this template match all requests that have one of a specified list of methods.',
-    evalFunctionBody: 'return parameters["Allowed Methods"].split(",").map(m => m.trim().toUpperCase()).includes(request.method.toUpperCase());',
-    parameters: [
-      {
-        name: 'Allowed Methods',
-        description: 'A comma separated list of methods to match.',
-        isRequired: true,
-        valueType: 'string',
-        defaultValue: 'GET,POST,PUT,DELETE',
-      },
-    ],
-  });
-
-  await predicateTemplateApi.createAsync({
-    name: 'GET',
-    description: 'Predicates based on this template match all GET requests.',
-    evalFunctionBody: 'return request.method.toUpperCase() === "GET"',
-    parameters: [],
-  });
-
-  const allPredicateTemplateId = unwrap(await predicateTemplateApi.createAsync({
-    name: 'All',
-    // tslint:disable-next-line:max-line-length
-    description: 'Predicates based on this template match all requests unconditionally. They are usually used for fallback scenarios in case not other predicates match.',
-    evalFunctionBody: 'return true;',
-    parameters: [],
-  })).templateId;
-
   const allTemplates = await predicateTemplateApi.getAllAsync();
-  const pathPrefixPredicateTemplate = allTemplates.find(t => t.id === pathPrefixPredicateTemplateId)!;
-  const allPredicateTemplate = allTemplates.find(t => t.id === allPredicateTemplateId)!;
+  const pathPrefixPredicateTemplate = allTemplates.find(t => t.name === PATH_PREFIX.name)!;
+  const allPredicateTemplate = allTemplates.find(t => t.name === ALL.name)!;
 
   const topLevelPredicateNode1 = PredicateNode.create({
     name: pathPrefixPredicateTemplate.name,

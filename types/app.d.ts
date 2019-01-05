@@ -1,1 +1,4 @@
-// this file contains all type definitions required for the application
+declare type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+declare type NonFunctionProperties<T> = Pick<T, NonFunctionPropertyNames<T>>;
+declare type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+declare type Exact<A, B = {}> = A & Record<keyof Omit<B, keyof A>, never>;

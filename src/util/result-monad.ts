@@ -1,20 +1,20 @@
-export type Result<TSuccess = never, TFailure = never> = Success<TSuccess> | Failure<TFailure>;
+export type Result<TSuccess = void, TFailure = void> = Success<TSuccess> | Failure<TFailure>;
 
-export interface Success<TSuccess = never> {
+export interface Success<TSuccess = void> {
   type: 'success';
   success: TSuccess;
 }
 
-export interface Failure<TFailure = never> {
+export interface Failure<TFailure = void> {
   type: 'failure';
   failure: TFailure;
 }
 
-export function isResult<TSuccess = never, TFailure = never>(object: any): object is Result<TSuccess, TFailure> {
+export function isResult<TSuccess = void, TFailure = void>(object: any): object is Result<TSuccess, TFailure> {
   return isSuccess(object) || isFailure(object);
 }
 
-export function matchResult<TResult, TSuccess = never, TFailure = never>(
+export function matchResult<TResult, TSuccess = void, TFailure = void>(
   result: Result<TSuccess, TFailure>,
   onSuccess: (value: TSuccess) => TResult,
   onFailure: (value: TFailure) => TResult,
@@ -22,8 +22,8 @@ export function matchResult<TResult, TSuccess = never, TFailure = never>(
   return isSuccess(result) ? onSuccess(result.success) : onFailure(result.failure);
 }
 
-export function isSuccess<TSuccess>(result: Result<TSuccess, any>): result is Success<TSuccess> {
-  return !!result && result.type === 'success' && hasProperty(result, 'success');
+export function isSuccess<TSuccess>(obj: any): obj is Success<TSuccess> {
+  return !!obj && (obj as Success).type === 'success' && hasProperty(obj as Success, 'success');
 }
 
 export function success(): Success;
@@ -35,8 +35,8 @@ export function success<TSuccess>(value?: TSuccess): Success<TSuccess> {
   };
 }
 
-export function isFailure<TFailure>(result: Result<any, TFailure>): result is Failure<TFailure> {
-  return !!result && result.type === 'failure' && hasProperty(result, 'failure');
+export function isFailure<TFailure>(obj: any): obj is Failure<TFailure> {
+  return !!obj && (obj as Failure).type === 'failure' && hasProperty(obj as Failure, 'failure');
 }
 
 export function failure(): Failure;

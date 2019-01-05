@@ -4,8 +4,9 @@ import * as predicateTemplateApi from '../predicate-template/predicate-template.
 import { setupMockData } from './mock-data';
 
 export const resetToDefaultDataAsync: CommandHandler<void> = async () => {
-  await predicateTemplateApi.deleteAllAsync();
+  await predicateTemplateApi.dropAllAsync();
 
+  await predicateTemplateApi.createDefaultTemplatesAsync();
   await setupMockData();
 
   bus.publish(undefined, { payload: 'resetToDefaultDataAsync' });
