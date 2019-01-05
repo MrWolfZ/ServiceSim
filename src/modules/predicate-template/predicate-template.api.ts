@@ -15,7 +15,7 @@ const COLLECTION_NAME = 'predicate-templates';
 
 export async function getAllAsync() {
   const allTemplates = await db.withSession(s =>
-    s.query<PredicateTemplateEntity>({ collection: COLLECTION_NAME }).waitForNonStaleResults().all()
+    s.query<PredicateTemplateEntity>({ collection: COLLECTION_NAME }).all()
   );
 
   return allTemplates.map<PredicateTemplateDto>(t => ({
@@ -37,7 +37,6 @@ export const createAsync: CommandHandler<CreatePredicateTemplateCommand, { templ
 
   await db.withSession(async s => {
     await s.store(template);
-
     await s.saveChanges();
   });
 

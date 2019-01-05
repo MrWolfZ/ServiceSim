@@ -15,6 +15,7 @@ import { SESSION_SECRET } from './util/secrets';
 dotenv.config({ path: '.env.example' });
 
 import * as api from './api';
+import { logger } from './util/logger';
 
 const host = express();
 
@@ -47,12 +48,8 @@ api.initializeAsync().then(sub => {
 host.use(errorHandler());
 
 const server = host.listen(host.get('port'), () => {
-  console.log(
-    '  App is running at http://localhost:%d in %s mode',
-    host.get('port'),
-    host.get('env')
-  );
-  console.log('  Press CTRL-C to stop\n');
+  logger.info(`App is running at http://localhost:${host.get('port')} in ${host.get('env')} mode`);
+  logger.info('Press CTRL-C to stop\n');
 });
 
 export default server;
