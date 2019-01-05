@@ -18,9 +18,13 @@ export default class App extends Vue {
 
     const eventSource = new EventSource(`${process.env.VUE_APP_UI_BASE_URL}/events`);
 
-    eventSource.onmessage = msg => {
-      console.log(msg);
+    eventSource.onmessage = evt => {
+      console.log(evt);
       this.loadAllDataAsync();
+    };
+
+    eventSource.onerror = evt => {
+      console.log(evt);
     };
 
     eventSource.addEventListener('event', msg => {
