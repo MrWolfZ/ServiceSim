@@ -21,7 +21,7 @@ function getEntityCollection<TEntity>(entityType: string): { [id: string]: TEnti
   return inMemoryDb[entityType] = inMemoryDb[entityType] || {};
 }
 
-async function createAsync<
+async function create<
   TEntity extends RootEntity<TEntityType>,
   TEntityType extends string,
   TData extends Omit<TEntity, keyof RootEntity<TEntityType>>,
@@ -30,7 +30,7 @@ async function createAsync<
     data: TData & Exact<Omit<TEntity, keyof RootEntity<TEntityType>>, TData>,
 ): Promise<TEntity>;
 
-async function createAsync<
+async function create<
   TEntity extends VersionedRootEntity<TEntity, TEntityType>,
   TEntityType extends string,
   TData extends Omit<TEntity, keyof VersionedRootEntity<TEntity, TEntityType>>,
@@ -39,7 +39,7 @@ async function createAsync<
     data: TData & Exact<Omit<TEntity, keyof VersionedRootEntity<TEntity, TEntityType>>, TData>,
 ): Promise<TEntity>;
 
-async function createAsync<
+async function create<
   TEntity extends EventDrivenRootEntity<TEntity, TEntityType, TEvent>,
   TEntityType extends string,
   TEvent extends DomainEvent<TEntityType, TEvent['eventType']>,
@@ -49,7 +49,7 @@ async function createAsync<
     data: TData & Exact<Omit<TEntity, keyof EventDrivenRootEntity<TEntity, TEntityType, TEvent>>, TData>,
 ): Promise<TEntity>;
 
-async function createAsync(
+async function create(
   entityTypeDefinition:
     RootEntityDefinition<any, any> |
     VersionedRootEntityDefinition<any, any> |
@@ -105,7 +105,7 @@ async function createAsync(
   return newEntity;
 }
 
-async function patchAsync<
+async function patch<
   TEntity extends RootEntity<TEntityType>,
   TEntityType extends string,
   TData extends Omit<Partial<TEntity>, keyof RootEntity<TEntityType>>,
@@ -115,7 +115,7 @@ async function patchAsync<
     data: TData & Exact<Omit<Partial<TEntity>, keyof RootEntity<any>>, TData>,
 ): Promise<void>;
 
-async function patchAsync<
+async function patch<
   TEntity extends VersionedRootEntity<TEntity, TEntityType>,
   TEntityType extends string,
   TData extends Omit<Partial<TEntity>, keyof VersionedRootEntity<TEntity, TEntityType>>,
@@ -126,7 +126,7 @@ async function patchAsync<
     data: TData & Exact<Omit<Partial<TEntity>, keyof VersionedRootEntity<TEntity, TEntityType>>, TData>,
 ): Promise<number>;
 
-async function patchAsync<
+async function patch<
   TEntity extends EventDrivenRootEntity<TEntity, TEntityType, TEvent>,
   TEntityType extends string,
   TEvent extends DomainEvent<TEntityType, TEvent['eventType']>,
@@ -139,7 +139,7 @@ async function patchAsync<
     ...events: TEvent[]
   ): Promise<number>;
 
-async function patchAsync(
+async function patch(
   entityTypeDefinition:
     RootEntityDefinition<any, any> |
     VersionedRootEntityDefinition<any, any> |
@@ -240,18 +240,18 @@ async function patchAsync(
   return ($metadata as any as VersionedRootEntity<any, any>['$metadata']).version;
 }
 
-async function deleteAsync<TEntity extends RootEntity<TEntityType>, TEntityType extends string>(
+async function delete$<TEntity extends RootEntity<TEntityType>, TEntityType extends string>(
   entityTypeDefinition: RootEntityDefinition<TEntity, TEntityType>,
   id: string,
 ): Promise<void>;
 
-async function deleteAsync<TEntity extends VersionedRootEntity<TEntity, TEntityType>, TEntityType extends string>(
+async function delete$<TEntity extends VersionedRootEntity<TEntity, TEntityType>, TEntityType extends string>(
   entityTypeDefinition: VersionedRootEntityDefinition<TEntity, TEntityType>,
   id: string,
   expectedVersion: number,
 ): Promise<void>;
 
-async function deleteAsync<
+async function delete$<
   TEntity extends EventDrivenRootEntity<TEntity, TEntityType, TEvent>,
   TEntityType extends string,
   TEvent extends DomainEvent<TEntityType, TEvent['eventType']>,
@@ -261,7 +261,7 @@ async function deleteAsync<
     expectedVersion: number,
 ): Promise<void>;
 
-async function deleteAsync(
+async function delete$(
   entityTypeDefinition:
     RootEntityDefinition<any, any> |
     VersionedRootEntityDefinition<any, any> |
@@ -345,16 +345,16 @@ async function deleteAsync(
 }
 
 export interface QueryOperations<TEntity extends RootEntity<TEntityType>, TEntityType extends string> {
-  byIdAsync(id: string): Promise<TEntity>;
-  allAsync(): Promise<TEntity[]>;
-  byPropertiesAsync(props: Partial<TEntity>): Promise<TEntity[]>;
+  byId(id: string): Promise<TEntity>;
+  all(): Promise<TEntity[]>;
+  byProperties(props: Partial<TEntity>): Promise<TEntity[]>;
 }
 
 export interface VersionQueryOperations<
   TEntity extends VersionedRootEntity<TEntity, TEntityType>,
   TEntityType extends string,
   > extends QueryOperations<TEntity, TEntityType> {
-  byIdAndVersionAsync(id: string, version: number): Promise<TEntity>;
+  byIdAndVersion(id: string, version: number): Promise<TEntity>;
 }
 
 function query<TEntity extends RootEntity<TEntityType>, TEntityType extends string>(
@@ -380,7 +380,7 @@ function query(
     EventDrivenRootEntityDefinition<any, any, any>,
 ): VersionQueryOperations<any, any> {
   return {
-    async byIdAsync(id) {
+    async byId(id) {
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
 
       if (!col[id] || col[id].length === 0) {
@@ -396,7 +396,7 @@ function query(
       return latestEntity;
     },
 
-    async byIdAndVersionAsync(id, version) {
+    async byIdAndVersion(id, version) {
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
 
       if (!col[id] || col[id].length === 0) {
@@ -416,7 +416,7 @@ function query(
       return entity;
     },
 
-    async allAsync() {
+    async all() {
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
       return keys(col)
         .map(k => col[k])
@@ -425,7 +425,7 @@ function query(
         .filter(e => !(e as VersionedRootEntity<any, any>).$metadata.isDeleted);
     },
 
-    async byPropertiesAsync(props) {
+    async byProperties(props) {
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
       const propNames = keys(props);
       return keys(col)
@@ -448,17 +448,17 @@ function getEventStream<TEvent extends DomainEvent<any, TEvent['eventType']> = D
 }
 
 export const DB = {
-  async initializeAsync() {
+  async initialize() {
     // nothing to do
 
     // TODO: initialize connection to data storage
   },
 
-  createAsync,
-  patchAsync,
-  deleteAsync,
+  create,
+  patch,
+  delete: delete$,
 
-  async dropAllAsync<TEntityType extends string>(entityType: TEntityType): Promise<void> {
+  async dropAll<TEntityType extends string>(entityType: TEntityType): Promise<void> {
     inMemoryDb[entityType] = {};
   },
 

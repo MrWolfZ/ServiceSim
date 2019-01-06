@@ -39,7 +39,7 @@ host.use(
 
 host.use(api.api);
 
-api.initializeAsync().then(sub => {
+api.initialize().then(sub => {
   process.on('SIGTERM', () => {
     sub.unsubscribe();
   });

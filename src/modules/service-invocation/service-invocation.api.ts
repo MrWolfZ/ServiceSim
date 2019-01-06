@@ -25,7 +25,7 @@ export const SERVICE_INVOCATION_ENTITY_DEFINITION: ServiceInvocationEntityDefini
 };
 
 export async function createServiceInvocation(command: CreateServiceInvocationCommand) {
-  const newInvocation = await DB.createAsync(SERVICE_INVOCATION_ENTITY_DEFINITION, {
+  const newInvocation = await DB.create(SERVICE_INVOCATION_ENTITY_DEFINITION, {
     state: 'processing pending',
     request: {
       path: command.path,
@@ -47,13 +47,13 @@ createServiceInvocation.constraints = {
 };
 
 export async function setServiceInvocationResponse(command: SetServiceResponseCommand) {
-  const invocation = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byIdAsync(command.invocationId);
+  const invocation = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byId(command.invocationId);
 
   if (invocation.response) {
     throw failure(`Cannot set response for service invocation ${invocation.id} since it already has a response!`);
   }
 
-  const newVersion = await DB.patchAsync(
+  const newVersion = await DB.patch(
     SERVICE_INVOCATION_ENTITY_DEFINITION,
     command.invocationId,
     command.unmodifiedInvocationVersion,
@@ -84,5 +84,5 @@ setServiceInvocationResponse.constraints = {
 };
 
 export async function dropAllServiceInvocations() {
-  await DB.dropAllAsync(SERVICE_INVOCATION_ENTITY_DEFINITION.entityType);
+  await DB.dropAll(SERVICE_INVOCATION_ENTITY_DEFINITION.entityType);
 }

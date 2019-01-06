@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import { Subscription } from 'rxjs';
 import request from 'supertest';
-import { api, initializeAsync } from './api';
+import { api, initialize } from './api';
 
 describe('simulation', () => {
   let rootApp: Express;
@@ -11,7 +11,7 @@ describe('simulation', () => {
     rootApp = express();
     rootApp.use(api);
 
-    subscription = await initializeAsync();
+    subscription = await initialize();
   });
 
   afterEach(() => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { bus, commandHandler } from '../../api-infrastructure';
-import { createDefaultPredicateTemplatesAsync, dropAllPredicateTemplates } from '../predicate-template/predicate-template.api';
+import { createDefaultPredicateTemplates, dropAllPredicateTemplates } from '../predicate-template/predicate-template.api';
 import { dropAllPredicateNodes, ensureRootPredicateNodeExists } from '../predicate-tree/predicate-node.api';
 import { createDefaultResponseGeneratorTemplates, dropAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
 import { dropAllServiceInvocations } from '../service-invocation/service-invocation.api';
@@ -12,7 +12,7 @@ export async function resetToDefaultData() {
   await dropAllResponseGeneratorTemplates();
   await dropAllServiceInvocations();
 
-  await createDefaultPredicateTemplatesAsync();
+  await createDefaultPredicateTemplates();
   await createDefaultResponseGeneratorTemplates();
   await ensureRootPredicateNodeExists();
 

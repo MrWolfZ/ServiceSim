@@ -18,10 +18,10 @@ export async function getPredicateTree() {
 
   const rootNodeName: RootNodeName = 'ROOT';
   const rootNode = allNodes.find(n => n.name === rootNodeName);
-  return rootNode && await buildNodeAsync(rootNode.id, allNodes);
+  return rootNode && await buildNode(rootNode.id, allNodes);
 }
 
-export async function buildNodeAsync(nodeId: string, allNodes: PredicateNodeDto[]): Promise<PredicateNode> {
+export async function buildNode(nodeId: string, allNodes: PredicateNodeDto[]): Promise<PredicateNode> {
   const dto = allNodes.find(n => n.id === nodeId)!;
 
   let evaluate: PredicateNode['evaluate'];
@@ -38,7 +38,7 @@ export async function buildNodeAsync(nodeId: string, allNodes: PredicateNodeDto[
   let childNodesOrResponseGenerator: PredicateNode['childNodesOrResponseGenerator'];
 
   if (Array.isArray(dto.childNodeIdsOrResponseGenerator)) {
-    childNodesOrResponseGenerator = await Promise.all(dto.childNodeIdsOrResponseGenerator.map(id => buildNodeAsync(id, allNodes)));
+    childNodesOrResponseGenerator = await Promise.all(dto.childNodeIdsOrResponseGenerator.map(id => buildNode(id, allNodes)));
   } else {
     let generate: ResponseGeneratorFunction;
 

@@ -39,8 +39,8 @@ uiApi.get('/events', (req, res) => {
   res.flush();
 });
 
-export async function initializeAsync() {
-  await DB.initializeAsync();
+export async function initialize() {
+  await DB.initialize();
 
   await ensureRootPredicateNodeExists();
 

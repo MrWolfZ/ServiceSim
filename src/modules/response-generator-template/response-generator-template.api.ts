@@ -17,7 +17,7 @@ export const RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION: ResponseGeneratorTem
 };
 
 export async function getAllResponseGeneratorTemplates() {
-  const allTemplates = await DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).allAsync();
+  const allTemplates = await DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).all();
 
   return allTemplates.map<ResponseGeneratorTemplateDto>(t => ({
     id: t.id,
@@ -34,7 +34,7 @@ export async function getResponseGeneratorTemplatesByIdsAndVersions(idsAndVersio
     keys(idsAndVersions)
       .reduce((agg, id) => [
         ...agg,
-        ...idsAndVersions[id].map(v => DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).byIdAndVersionAsync(id, v)),
+        ...idsAndVersions[id].map(v => DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).byIdAndVersion(id, v)),
       ], [] as Promise<ResponseGeneratorTemplateEntity>[])
   );
 
@@ -49,7 +49,7 @@ export async function getResponseGeneratorTemplatesByIdsAndVersions(idsAndVersio
 }
 
 export async function createResponseGeneratorTemplate(command: CreateResponseGeneratorTemplateCommand) {
-  const template = await DB.createAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command);
+  const template = await DB.create(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command);
 
   return {
     templateId: template.id,
@@ -66,7 +66,7 @@ export const createResponseGeneratorTemplateConstraints: CommandValidationConstr
 };
 
 export async function updateResponseGeneratorTemplate(command: UpdateResponseGeneratorTemplateCommand) {
-  const newVersion = await DB.patchAsync(
+  const newVersion = await DB.patch(
     RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION,
     command.templateId,
     command.unmodifiedTemplateVersion,
@@ -90,7 +90,7 @@ export const updateResponseGeneratorTemplateConstraints: CommandValidationConstr
 };
 
 export async function deleteResponseGeneratorTemplate(command: DeleteResponseGeneratorTemplateCommand) {
-  return await DB.deleteAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
+  return await DB.delete(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
 }
 
 // TODO: validate
@@ -100,7 +100,7 @@ export const deleteResponseGeneratorTemplateConstraints: CommandValidationConstr
 };
 
 export async function dropAllResponseGeneratorTemplates() {
-  await DB.dropAllAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION.entityType);
+  await DB.dropAll(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION.entityType);
 }
 
 export async function createDefaultResponseGeneratorTemplates() {
