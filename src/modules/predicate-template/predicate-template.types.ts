@@ -10,7 +10,7 @@ export interface PredicateTemplateData {
 
 export type PredicateTemplateEntityType = 'predicate-template';
 
-export type PredicateTemplateEntity = PredicateTemplateData & VersionedRootEntity<PredicateTemplateEntityType>;
+export interface PredicateTemplateEntity extends PredicateTemplateData, VersionedRootEntity<PredicateTemplateEntity, PredicateTemplateEntityType> { }
 
 export type PredicateTemplateEntityDefinition = VersionedRootEntityDefinition<PredicateTemplateEntity, PredicateTemplateEntityType>;
 
@@ -23,17 +23,13 @@ export interface PredicateTemplateState extends PredicateTemplateDto { }
 
 export interface PredicateTemplateFormValue extends PredicateTemplateData { }
 
-export interface CommandResponse {
-  templateId: string;
-  templateVersion: number;
-}
-
 export interface CreatePredicateTemplateCommand extends PredicateTemplateData { }
 
 export interface UpdatePredicateTemplateCommand extends Partial<PredicateTemplateData> {
   templateId: string;
   unmodifiedTemplateVersion: number;
 }
+
 export interface DeletePredicateTemplateCommand {
   templateId: string;
   unmodifiedTemplateVersion: number;

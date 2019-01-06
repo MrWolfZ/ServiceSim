@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getStoreBuilder } from 'vuex-typex';
-import { PredicateNodeDto, PredicateNodeState } from './predicate-node.types';
+import { PredicateNodeDto, PredicateNodeState, RootNodeName } from './predicate-node.types';
 
 export interface PredicateNodesState {
   nodesById: { [templateId: string]: PredicateNodeState };
@@ -14,6 +14,11 @@ const b = getStoreBuilder<{}>().module<PredicateNodesState>('predicateNodes', {
 
 export function getAll(state: PredicateNodesState) {
   return state.nodeIds.map(id => state.nodesById[id]);
+}
+
+export function getRootNode(state: PredicateNodesState) {
+  const rootNodeName: RootNodeName = 'ROOT';
+  return state.nodeIds.map(id => state.nodesById[id]).find(n => n.name === rootNodeName)!;
 }
 
 export function addAll(state: PredicateNodesState, nodes: PredicateNodeState[]) {
@@ -40,9 +45,11 @@ export async function loadAllAsync() {
 
 const state$ = b.state();
 const getAll$ = b.read(getAll);
+const getRootNode$ = b.read(getRootNode);
 const predicateNodes = {
   get state() { return state$(); },
   get all() { return getAll$(); },
+  get rootNode() { return getRootNode$(); },
 
   addAll: b.commit(addAll),
   reset: b.commit(reset),

@@ -6,6 +6,7 @@ import * as ejp from './api-infrastructure/event-journal/persistence';
 import * as elp from './api-infrastructure/event-log/persistence';
 import * as adminApi from './modules/admin/admin.api';
 import * as predicateTemplatesApi from './modules/predicate-template/predicate-template.api';
+import * as predicateNodeApi from './modules/predicate-tree/predicate-node.api';
 import * as predicateTreeApi from './modules/predicate-tree/predicate-tree.api';
 import { PredicateTree } from './modules/simulation/predicate-tree.api';
 import simulationApi from './modules/simulation/simulation.api';
@@ -48,9 +49,10 @@ uiApi.get('/events', (req, res) => {
 export async function initializeAsync() {
   await DB.initializeAsync();
 
+  await predicateNodeApi.ensureRootNodeExistsAsync();
+
   const subscriptions = [
     PredicateTree.start(),
-    predicateTreeApi.start(),
   ];
 
   return new Subscription(() => subscriptions.forEach(sub => sub.unsubscribe()));

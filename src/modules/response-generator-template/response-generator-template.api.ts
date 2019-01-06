@@ -4,38 +4,38 @@ import { failure, isFailure } from '../../util/result-monad';
 import { keys, omit } from '../../util/util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
-  CreatePredicateTemplateCommand,
-  DeletePredicateTemplateCommand,
-  PredicateTemplateDto,
-  PredicateTemplateEntityDefinition,
-  UpdatePredicateTemplateCommand,
-} from './predicate-template.types';
+  CreateResponseGeneratorTemplateCommand,
+  DeleteResponseGeneratorTemplateCommand,
+  ResponseGeneratorTemplateDto,
+  ResponseGeneratorTemplateEntityDefinition,
+  UpdateResponseGeneratorTemplateCommand,
+} from './response-generator-template.types';
 
-export const PREDICATE_TEMPLATE_ENTITY_DEFINITION: PredicateTemplateEntityDefinition = {
-  entityType: 'predicate-template',
+export const RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION: ResponseGeneratorTemplateEntityDefinition = {
+  entityType: 'response-generator-template',
   '@': 'VersionedRootEntityDefinition',
 };
 
 export async function getAllAsync() {
-  const allTemplates = await DB.query(PREDICATE_TEMPLATE_ENTITY_DEFINITION).allAsync();
+  const allTemplates = await DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).allAsync();
 
-  return allTemplates.map<PredicateTemplateDto>(t => ({
+  return allTemplates.map<ResponseGeneratorTemplateDto>(t => ({
     id: t.id,
     version: t.$metadata.version,
     name: t.name,
     description: t.description,
-    evalFunctionBody: t.evalFunctionBody,
+    generatorFunctionBody: t.generatorFunctionBody,
     parameters: t.parameters,
   }));
 }
 
-type PredicateTemplateCommandHandler<TCommand> = CommandHandler<TCommand, {
+type ResponseGeneratorTemplateCommandHandler<TCommand> = CommandHandler<TCommand, {
   templateId: string;
   templateVersion: number;
 }>;
 
-export const createAsync: PredicateTemplateCommandHandler<CreatePredicateTemplateCommand> = async command => {
-  const template = await DB.createAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command);
+export const createAsync: ResponseGeneratorTemplateCommandHandler<CreateResponseGeneratorTemplateCommand> = async command => {
+  const template = await DB.createAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command);
 
   return {
     templateId: template.id,
@@ -47,13 +47,13 @@ export const createAsync: PredicateTemplateCommandHandler<CreatePredicateTemplat
 createAsync.constraints = {
   name: {},
   description: {},
-  evalFunctionBody: {},
+  generatorFunctionBody: {},
   parameters: {},
 };
 
-export const updateAsync: PredicateTemplateCommandHandler<UpdatePredicateTemplateCommand> = async command => {
+export const updateAsync: ResponseGeneratorTemplateCommandHandler<UpdateResponseGeneratorTemplateCommand> = async command => {
   const result = await DB.patchAsync(
-    PREDICATE_TEMPLATE_ENTITY_DEFINITION,
+    RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION,
     command.templateId,
     command.unmodifiedTemplateVersion,
     omit(command, 'templateId', 'unmodifiedTemplateVersion'),
@@ -75,12 +75,12 @@ updateAsync.constraints = {
   unmodifiedTemplateVersion: {},
   name: {},
   description: {},
-  evalFunctionBody: {},
+  generatorFunctionBody: {},
   parameters: {},
 };
 
-export const deleteAsync: CommandHandler<DeletePredicateTemplateCommand> = async command => {
-  return await DB.deleteAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
+export const deleteAsync: CommandHandler<DeleteResponseGeneratorTemplateCommand> = async command => {
+  return await DB.deleteAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
 };
 
 // TODO: validate
@@ -90,7 +90,7 @@ deleteAsync.constraints = {
 };
 
 export const dropAllAsync: CommandHandler = async () => {
-  await DB.dropAllAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION.entityType);
+  await DB.dropAllAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION.entityType);
 };
 
 export const createDefaultTemplatesAsync: CommandHandler = async () => {

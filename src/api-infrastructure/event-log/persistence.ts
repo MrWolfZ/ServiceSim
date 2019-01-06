@@ -1,4 +1,4 @@
-import { DomainEvent } from '../domain-event';
+import { DomainEvent } from '../api-infrastructure.types';
 import { StoredEvent } from './stored-event';
 
 export interface EventLogPersistenceAdapter {
@@ -31,14 +31,14 @@ export function setAdapter(a: EventLogPersistenceAdapter) {
 
 // TODO: fix event index mess
 export async function persistEventsAsync(
-  events: DomainEvent[],
+  events: DomainEvent<any, any>[],
 ): Promise<number[]> {
   const eventCount = await adapter.getEventCountAsync();
 
   await adapter.persistEventsAsync(
     events.map((ev, idx) => ({
       id: eventCount + idx + 1,
-      eventKind: ev.kind,
+      eventKind: ev.eventType,
       body: JSON.stringify(ev),
     })),
   );
@@ -46,7 +46,7 @@ export async function persistEventsAsync(
   return events.map((_, idx) => eventCount + idx + 1);
 }
 
-export async function loadEventsAsync<TEvent extends DomainEvent = DomainEvent>(
+export async function loadEventsAsync<TEvent extends DomainEvent<any, any> = DomainEvent<any, any>>(
   ...eventKinds: string[]
 ): Promise<[TEvent[], number]> {
   const storedEvents = await adapter.loadEventsAsync(...eventKinds);

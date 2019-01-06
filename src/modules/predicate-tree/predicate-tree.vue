@@ -18,7 +18,7 @@ export default class PredicateTreePage extends Vue {
   }
 
   get rootNode() {
-    return predicateNodes.all[0];
+    return predicateNodes.rootNode;
   }
 
   get topLevelNodeIds() {

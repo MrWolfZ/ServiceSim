@@ -1,19 +1,18 @@
 import { ConnectableObservable, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
 
-import { EventHandlerMap, EventOfKind } from '../api-infrastructure.types';
-import { DomainEvent } from '../domain-event';
+import { DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
 import { loadEventsAsync, persistEventsAsync } from './persistence';
 
-const allEventsSubject = new Subject<[DomainEvent, number]>();
+const allEventsSubject = new Subject<[DomainEvent<any, any>, number]>();
 
 export class EventLog {
-  static getStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>>(
-    eventKinds: TEvent['kind'][],
+  static getStream<TEvent extends DomainEvent<any, TEvent['eventType']> = DomainEvent<any, TEvent['eventType']>>(
+    eventKinds: TEvent['eventType'][],
   ): Observable<TEvent> {
     return Observable.create((obs: Observer<TEvent>) => {
       const replayObs = allEventsSubject.pipe(
-        filter(([ev]) => eventKinds.indexOf(ev.kind as TEvent['kind']) >= 0),
+        filter(([ev]) => eventKinds.indexOf(ev.eventType as TEvent['eventType']) >= 0),
         map(t => t as [TEvent, number]),
         publishReplay(),
       ) as ConnectableObservable<[TEvent, number]>;
@@ -44,18 +43,18 @@ export class EventLog {
     });
   }
 
-  static subscribeToStream<TEvent extends DomainEvent<TEvent['kind']> = DomainEvent<TEvent['kind']>>(
-    eventKinds: TEvent['kind'][],
-    eventHandlerMap: EventHandlerMap<TEvent>,
+  static subscribeToStream<TEvent extends DomainEvent<any, TEvent['eventType']> = DomainEvent<any, TEvent['eventType']>>(
+    eventKinds: TEvent['eventType'][],
+    eventHandlerMap: DomainEventHandlerMap<any, TEvent>,
   ): Subscription {
     return EventLog.getStream(eventKinds).subscribe(ev => {
-      const handler = eventHandlerMap[ev.kind];
-      handler(ev as EventOfKind<TEvent, TEvent['kind']>);
+      const handler = eventHandlerMap[ev.eventType];
+      handler(undefined!, ev as DomainEventOfType<TEvent, TEvent['eventType']>);
     });
   }
 
   static async publishAsync(
-    ...events: DomainEvent[]
+    ...events: DomainEvent<any, any>[]
   ): Promise<void> {
     // ensure the events are persisted before making them visible inside the app
     const indexes = await persistEventsAsync(events);

@@ -1,4 +1,4 @@
-import { EventSourcedRootEntityData } from '../../api-infrastructure/api-infrastructure.types';
+import { VersionedRootEntity, VersionedRootEntityDefinition } from '../../api-infrastructure/api-infrastructure.types';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface ResponseGeneratorTemplateData {
@@ -8,7 +8,13 @@ export interface ResponseGeneratorTemplateData {
   parameters: Parameter[];
 }
 
-export type ResponseGeneratorTemplateEntity = ResponseGeneratorTemplateData & EventSourcedRootEntityData<any>;
+export type ResponseGeneratorTemplateEntityType = 'response-generator-template';
+
+export interface ResponseGeneratorTemplateEntity
+  extends ResponseGeneratorTemplateData, VersionedRootEntity<ResponseGeneratorTemplateEntity, ResponseGeneratorTemplateEntityType> { }
+
+export type ResponseGeneratorTemplateEntityDefinition
+  = VersionedRootEntityDefinition<ResponseGeneratorTemplateEntity, ResponseGeneratorTemplateEntityType>;
 
 export interface ResponseGeneratorTemplateDto extends ResponseGeneratorTemplateData {
   id: string;
@@ -17,13 +23,14 @@ export interface ResponseGeneratorTemplateDto extends ResponseGeneratorTemplateD
 
 export interface ResponseGeneratorTemplateState extends ResponseGeneratorTemplateDto { }
 
-export interface CreateResponseGeneratorTemplateCommand {
-  templateId: string;
-  data: ResponseGeneratorTemplateData;
-}
+export interface CreateResponseGeneratorTemplateCommand extends ResponseGeneratorTemplateData { }
 
-export interface UpdateResponseGeneratorTemplateCommand {
+export interface UpdateResponseGeneratorTemplateCommand extends Partial<ResponseGeneratorTemplateData> {
   templateId: string;
   unmodifiedTemplateVersion: number;
-  data: Partial<ResponseGeneratorTemplateData>;
+}
+
+export interface DeleteResponseGeneratorTemplateCommand {
+  templateId: string;
+  unmodifiedTemplateVersion: number;
 }
