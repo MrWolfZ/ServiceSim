@@ -1,11 +1,11 @@
 import express from 'express';
-import { commandHandler, CommandHandler, createDomainEvent, DB, queryHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, createDomainEvent, DB, queryHandler } from '../../api-infrastructure';
 import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import { getPredicateTemplatesByIdsAndVersions } from '../predicate-template/predicate-template.api';
 import { getResponseGeneratorTemplatesByIdsAndVersions } from '../response-generator-template/response-generator-template.api';
 import {
-  CreatePredicateNodeCommand,
+  CreatePredicateNodeCommand as AddChildPredicateNodeCommand,
   DeletePredicateNodeCommand,
   PredicateNodeDto,
   PredicateNodeEntityDefinition,
@@ -131,12 +131,7 @@ export async function getAllPredicateNodes() {
   });
 }
 
-type PredicateNodeCommandHandler<TCommand> = CommandHandler<TCommand, {
-  nodeId: string;
-  nodeVersion: number;
-}>;
-
-export const ensureRootPredicateNodeExists: CommandHandler<void, { nodeId: string }> = async () => {
+export async function ensureRootPredicateNodeExists() {
   const rootNodeName: RootNodeName = 'ROOT';
 
   const rootNodes = (await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byPropertiesAsync({ name: rootNodeName }));
@@ -155,9 +150,9 @@ export const ensureRootPredicateNodeExists: CommandHandler<void, { nodeId: strin
   return {
     nodeId: rootNode.id,
   };
-};
+}
 
-export const addChildPredicateNode: PredicateNodeCommandHandler<CreatePredicateNodeCommand> = async command => {
+export async function addChildPredicateNode(command: AddChildPredicateNodeCommand) {
   const parentNode = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byIdAsync(command.parentNodeId);
 
   if (!Array.isArray(parentNode.childNodeIdsOrResponseGenerator)) {
@@ -188,16 +183,16 @@ export const addChildPredicateNode: PredicateNodeCommandHandler<CreatePredicateN
     nodeId: newNode.id,
     nodeVersion: newNode.$metadata.version,
   };
-};
+}
 
 // TODO: validate
-addChildPredicateNode.constraints = {
+export const addChildPredicateNodeConstraints: CommandValidationConstraints<AddChildPredicateNodeCommand> = {
   name: {},
   description: {},
   templateInfoOrEvalFunctionBody: {},
 };
 
-export const updatePredicateNode: PredicateNodeCommandHandler<UpdatePredicateNodeCommand> = async command => {
+export async function updatePredicateNode(command: UpdatePredicateNodeCommand) {
   const newVersion = await DB.patchAsync(
     PREDICATE_NODE_ENTITY_DEFINITION,
     command.nodeId,
@@ -215,10 +210,10 @@ export const updatePredicateNode: PredicateNodeCommandHandler<UpdatePredicateNod
     nodeId: command.nodeId,
     nodeVersion: newVersion,
   };
-};
+}
 
 // TODO: validate
-updatePredicateNode.constraints = {
+export const updatePredicateNodeConstraints: CommandValidationConstraints<UpdatePredicateNodeCommand> = {
   nodeId: {},
   unmodifiedNodeVersion: {},
   name: {},
@@ -226,7 +221,7 @@ updatePredicateNode.constraints = {
   parameterValuesOrEvalFunctionBody: {},
 };
 
-export const setPredicateNodeResponseGenerator: PredicateNodeCommandHandler<SetResponseGeneratorCommand> = async command => {
+export async function setPredicateNodeResponseGenerator(command: SetResponseGeneratorCommand) {
   const node = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byIdAsync(command.nodeId);
 
   if (Array.isArray(node.childNodeIdsOrResponseGenerator) && node.childNodeIdsOrResponseGenerator.length > 0) {
@@ -256,10 +251,10 @@ export const setPredicateNodeResponseGenerator: PredicateNodeCommandHandler<SetR
     nodeId: command.nodeId,
     nodeVersion: newVersion,
   };
-};
+}
 
 // TODO: validate
-setPredicateNodeResponseGenerator.constraints = {
+export const setPredicateNodeResponseGeneratorConstraints: CommandValidationConstraints<SetResponseGeneratorCommand> = {
   nodeId: {},
   unmodifiedNodeVersion: {},
   name: {},
@@ -267,23 +262,23 @@ setPredicateNodeResponseGenerator.constraints = {
   templateInfoOrGeneratorFunctionBody: {},
 };
 
-export const deletePredicateNode: CommandHandler<DeletePredicateNodeCommand> = async command => {
+export async function deletePredicateNode(command: DeletePredicateNodeCommand) {
   return await DB.deleteAsync(PREDICATE_NODE_ENTITY_DEFINITION, command.nodeId, command.unmodifiedNodeVersion);
-};
+}
 
 // TODO: validate
-deletePredicateNode.constraints = {
+export const deletePredicateNodeConstraints: CommandValidationConstraints<DeletePredicateNodeCommand> = {
   nodeId: {},
   unmodifiedNodeVersion: {},
 };
 
-export const dropAllPredicateNodes: CommandHandler = async () => {
+export async function dropAllPredicateNodes() {
   await DB.dropAllAsync(PREDICATE_NODE_ENTITY_DEFINITION.entityType);
-};
+}
 
 export const predicateNodeApi = express.Router()
   .get('/', queryHandler(getAllPredicateNodes))
-  .post('/addChildNode', commandHandler(addChildPredicateNode))
-  .post('/update', commandHandler(updatePredicateNode))
-  .post('/setResponseGenerator', commandHandler(setPredicateNodeResponseGenerator))
-  .post('/delete', commandHandler(deletePredicateNode));
+  .post('/addChildNode', commandHandler(addChildPredicateNode, addChildPredicateNodeConstraints))
+  .post('/update', commandHandler(updatePredicateNode, updatePredicateNodeConstraints))
+  .post('/setResponseGenerator', commandHandler(setPredicateNodeResponseGenerator, setPredicateNodeResponseGeneratorConstraints))
+  .post('/delete', commandHandler(deletePredicateNode, deletePredicateNodeConstraints));

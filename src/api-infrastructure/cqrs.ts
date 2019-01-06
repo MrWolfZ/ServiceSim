@@ -25,19 +25,15 @@ export function evaluateCommandValidationConstraints<TCommand>(
   return messages.length > 0 ? failure(messages) : success();
 }
 
-export interface CommandHandler<TCommand = void, TResult = void> {
-  (command: TCommand): TResult | Promise<TResult>;
-  validationFn?: CommandValidationFn<TCommand>;
-  constraints?: CommandValidationConstraints<TCommand>;
-}
-
 export interface ErrorResponsePayload {
   messages: string[];
   stackTrace?: string;
 }
 
-export function commandHandler<TCommand = void, TSuccess = void>(
-  handler: CommandHandler<TCommand, TSuccess>,
+export function commandHandler<TCommand = void, TResult = void>(
+  handler: (command: TCommand) => TResult | Promise<TResult>,
+  constraints?: CommandValidationConstraints<TCommand>,
+  validationFn?: CommandValidationFn<TCommand>,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
     try {
@@ -45,16 +41,16 @@ export function commandHandler<TCommand = void, TSuccess = void>(
 
       const validationMessages: string[] = [];
 
-      if (handler.validationFn) {
-        const validationResult = await handler.validationFn(command);
+      if (validationFn) {
+        const validationResult = await validationFn(command);
 
         if (isFailure(validationResult)) {
           validationMessages.push(...validationResult.failure);
         }
       }
 
-      if (handler.constraints) {
-        const validationResult = evaluateCommandValidationConstraints(handler.constraints, command);
+      if (constraints) {
+        const validationResult = evaluateCommandValidationConstraints(constraints, command);
 
         if (isFailure(validationResult)) {
           validationMessages.push(...validationResult.failure);

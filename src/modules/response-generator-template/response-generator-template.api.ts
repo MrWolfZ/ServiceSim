@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, CommandHandler, DB, queryHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
 import { keys, omit } from '../../util/util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
@@ -48,29 +48,24 @@ export async function getResponseGeneratorTemplatesByIdsAndVersions(idsAndVersio
   }));
 }
 
-type ResponseGeneratorTemplateCommandHandler<TCommand> = CommandHandler<TCommand, {
-  templateId: string;
-  templateVersion: number;
-}>;
-
-export const createResponseGeneratorTemplate: ResponseGeneratorTemplateCommandHandler<CreateResponseGeneratorTemplateCommand> = async command => {
+export async function createResponseGeneratorTemplate(command: CreateResponseGeneratorTemplateCommand) {
   const template = await DB.createAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command);
 
   return {
     templateId: template.id,
     templateVersion: template.$metadata.version,
   };
-};
+}
 
 // TODO: validate
-createResponseGeneratorTemplate.constraints = {
+export const createResponseGeneratorTemplateConstraints: CommandValidationConstraints<CreateResponseGeneratorTemplateCommand> = {
   name: {},
   description: {},
   generatorFunctionBody: {},
   parameters: {},
 };
 
-export const updateResponseGeneratorTemplate: ResponseGeneratorTemplateCommandHandler<UpdateResponseGeneratorTemplateCommand> = async command => {
+export async function updateResponseGeneratorTemplate(command: UpdateResponseGeneratorTemplateCommand) {
   const newVersion = await DB.patchAsync(
     RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION,
     command.templateId,
@@ -82,10 +77,10 @@ export const updateResponseGeneratorTemplate: ResponseGeneratorTemplateCommandHa
     templateId: command.templateId,
     templateVersion: newVersion,
   };
-};
+}
 
 // TODO: validate
-updateResponseGeneratorTemplate.constraints = {
+export const updateResponseGeneratorTemplateConstraints: CommandValidationConstraints<UpdateResponseGeneratorTemplateCommand> = {
   templateId: {},
   unmodifiedTemplateVersion: {},
   name: {},
@@ -94,29 +89,29 @@ updateResponseGeneratorTemplate.constraints = {
   parameters: {},
 };
 
-export const deleteResponseGeneratorTemplate: CommandHandler<DeleteResponseGeneratorTemplateCommand> = async command => {
+export async function deleteResponseGeneratorTemplate(command: DeleteResponseGeneratorTemplateCommand) {
   return await DB.deleteAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
-};
+}
 
 // TODO: validate
-deleteResponseGeneratorTemplate.constraints = {
+export const deleteResponseGeneratorTemplateConstraints: CommandValidationConstraints<DeleteResponseGeneratorTemplateCommand> = {
   templateId: {},
   unmodifiedTemplateVersion: {},
 };
 
-export const dropAllResponseGeneratorTemplates: CommandHandler = async () => {
+export async function dropAllResponseGeneratorTemplates() {
   await DB.dropAllAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION.entityType);
-};
+}
 
-export const createDefaultResponseGeneratorTemplates: CommandHandler = async () => {
+export async function createDefaultResponseGeneratorTemplates() {
   for (const key of keys(DEFAULT_TEMPLATES)) {
     await createResponseGeneratorTemplate(DEFAULT_TEMPLATES[key]);
   }
-};
+}
 
-export const api = express.Router();
-api.get('/', queryHandler(getAllResponseGeneratorTemplates));
-api.post('/create', commandHandler(createResponseGeneratorTemplate));
-api.post('/update', commandHandler(updateResponseGeneratorTemplate));
-api.post('/delete', commandHandler(deleteResponseGeneratorTemplate));
-api.post('/createDefaultTemplates', commandHandler(createDefaultResponseGeneratorTemplates));
+export const responseGeneratorTemplateApi = express.Router()
+  .get('/', queryHandler(getAllResponseGeneratorTemplates))
+  .post('/create', commandHandler(createResponseGeneratorTemplate, createResponseGeneratorTemplateConstraints))
+  .post('/update', commandHandler(updateResponseGeneratorTemplate, updateResponseGeneratorTemplateConstraints))
+  .post('/delete', commandHandler(deleteResponseGeneratorTemplate, deleteResponseGeneratorTemplateConstraints))
+  .post('/createDefaultTemplates', commandHandler(createDefaultResponseGeneratorTemplates));

@@ -1,12 +1,12 @@
 import express from 'express';
-import { bus, commandHandler, CommandHandler } from '../../api-infrastructure';
+import { bus, commandHandler } from '../../api-infrastructure';
 import { createDefaultPredicateTemplatesAsync, dropAllPredicateTemplates } from '../predicate-template/predicate-template.api';
 import { dropAllPredicateNodes, ensureRootPredicateNodeExists } from '../predicate-tree/predicate-node.api';
 import { createDefaultResponseGeneratorTemplates, dropAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
 import { dropAllServiceInvocations } from '../service-invocation/service-invocation.api';
 import { setupMockData } from './mock-data';
 
-export const resetToDefaultData: CommandHandler = async () => {
+export async function resetToDefaultData() {
   await dropAllPredicateNodes();
   await dropAllPredicateTemplates();
   await dropAllResponseGeneratorTemplates();
@@ -19,7 +19,7 @@ export const resetToDefaultData: CommandHandler = async () => {
   await setupMockData();
 
   bus.publish(undefined, { payload: 'resetToDefaultDataAsync' });
-};
+}
 
 export const adminApi = express.Router()
   .post('/resetToDefaultData', commandHandler(resetToDefaultData));

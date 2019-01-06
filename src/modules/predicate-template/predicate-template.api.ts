@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, CommandHandler, DB, queryHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
 import { keys, omit } from '../../util/util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
@@ -48,29 +48,24 @@ export async function getPredicateTemplatesByIdsAndVersions(idsAndVersions: { [t
   }));
 }
 
-type PredicateTemplateCommandHandler<TCommand> = CommandHandler<TCommand, {
-  templateId: string;
-  templateVersion: number;
-}>;
-
-export const createPredicateTemplate: PredicateTemplateCommandHandler<CreatePredicateTemplateCommand> = async command => {
+export async function createPredicateTemplate(command: CreatePredicateTemplateCommand) {
   const template = await DB.createAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command);
 
   return {
     templateId: template.id,
     templateVersion: template.$metadata.version,
   };
-};
+}
 
 // TODO: validate
-createPredicateTemplate.constraints = {
+export const createPredicateTemplateConstraints: CommandValidationConstraints<CreatePredicateTemplateCommand> = {
   name: {},
   description: {},
   evalFunctionBody: {},
   parameters: {},
 };
 
-export const updatePredicateTemplate: PredicateTemplateCommandHandler<UpdatePredicateTemplateCommand> = async command => {
+export async function updatePredicateTemplate(command: UpdatePredicateTemplateCommand) {
   const newVersion = await DB.patchAsync(
     PREDICATE_TEMPLATE_ENTITY_DEFINITION,
     command.templateId,
@@ -82,10 +77,10 @@ export const updatePredicateTemplate: PredicateTemplateCommandHandler<UpdatePred
     templateId: command.templateId,
     templateVersion: newVersion,
   };
-};
+}
 
 // TODO: validate
-updatePredicateTemplate.constraints = {
+export const updatePredicateTemplateConstraints: CommandValidationConstraints<UpdatePredicateTemplateCommand> = {
   templateId: {},
   unmodifiedTemplateVersion: {},
   name: {},
@@ -94,29 +89,29 @@ updatePredicateTemplate.constraints = {
   parameters: {},
 };
 
-export const deletePredicateTemplate: CommandHandler<DeletePredicateTemplateCommand> = async command => {
+export async function deletePredicateTemplate(command: DeletePredicateTemplateCommand) {
   return await DB.deleteAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
-};
+}
 
 // TODO: validate
-deletePredicateTemplate.constraints = {
+export const deletePredicateTemplateConstraints: CommandValidationConstraints<DeletePredicateTemplateCommand> = {
   templateId: {},
   unmodifiedTemplateVersion: {},
 };
 
-export const dropAllPredicateTemplates: CommandHandler = async () => {
+export async function dropAllPredicateTemplates() {
   await DB.dropAllAsync(PREDICATE_TEMPLATE_ENTITY_DEFINITION.entityType);
-};
+}
 
-export const createDefaultPredicateTemplatesAsync: CommandHandler = async () => {
+export async function createDefaultPredicateTemplatesAsync() {
   for (const key of keys(DEFAULT_TEMPLATES)) {
     await createPredicateTemplate(DEFAULT_TEMPLATES[key]);
   }
-};
+}
 
 export const predicateTemplatesApi = express.Router()
   .get('/', queryHandler(getAllPredicateTemplates))
-  .post('/create', commandHandler(createPredicateTemplate))
-  .post('/update', commandHandler(updatePredicateTemplate))
-  .post('/delete', commandHandler(deletePredicateTemplate))
+  .post('/create', commandHandler(createPredicateTemplate, createPredicateTemplateConstraints))
+  .post('/update', commandHandler(updatePredicateTemplate, updatePredicateTemplateConstraints))
+  .post('/delete', commandHandler(deletePredicateTemplate, deletePredicateTemplateConstraints))
   .post('/createDefaultTemplates', commandHandler(createDefaultPredicateTemplatesAsync));

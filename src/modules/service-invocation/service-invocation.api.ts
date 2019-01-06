@@ -1,4 +1,4 @@
-import { CommandHandler, createDomainEvent, DB } from '../../api-infrastructure';
+import { createDomainEvent, DB } from '../../api-infrastructure';
 import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import {
@@ -24,12 +24,7 @@ export const SERVICE_INVOCATION_ENTITY_DEFINITION: ServiceInvocationEntityDefini
   },
 };
 
-type ServiceInvocationCommandHandler<TCommand> = CommandHandler<TCommand, {
-  invocationId: string;
-  invocationVersion: number;
-}>;
-
-export const createServiceInvocation: ServiceInvocationCommandHandler<CreateServiceInvocationCommand> = async command => {
+export async function createServiceInvocation(command: CreateServiceInvocationCommand) {
   const newInvocation = await DB.createAsync(SERVICE_INVOCATION_ENTITY_DEFINITION, {
     state: 'processing pending',
     request: {
@@ -43,7 +38,7 @@ export const createServiceInvocation: ServiceInvocationCommandHandler<CreateServ
     invocationId: newInvocation.id,
     invocationVersion: newInvocation.$metadata.version,
   };
-};
+}
 
 // TODO: validate
 createServiceInvocation.constraints = {
@@ -51,7 +46,7 @@ createServiceInvocation.constraints = {
   body: {},
 };
 
-export const setServiceInvocationResponse: ServiceInvocationCommandHandler<SetServiceResponseCommand> = async command => {
+export async function setServiceInvocationResponse(command: SetServiceResponseCommand) {
   const invocation = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byIdAsync(command.invocationId);
 
   if (invocation.response) {
@@ -77,7 +72,7 @@ export const setServiceInvocationResponse: ServiceInvocationCommandHandler<SetSe
     invocationId: command.invocationId,
     invocationVersion: newVersion,
   };
-};
+}
 
 // TODO: validate
 setServiceInvocationResponse.constraints = {
@@ -88,6 +83,6 @@ setServiceInvocationResponse.constraints = {
   contentType: {},
 };
 
-export const dropAllServiceInvocations: CommandHandler = async () => {
+export async function dropAllServiceInvocations() {
   await DB.dropAllAsync(SERVICE_INVOCATION_ENTITY_DEFINITION.entityType);
-};
+}
