@@ -2,8 +2,8 @@ import express from 'express';
 import { commandHandler, CommandHandler, createDomainEvent, DB, queryHandler } from '../../api-infrastructure';
 import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
-import * as predicateTemplatesApi from '../predicate-template/predicate-template.api';
-import * as responseGeneratorTemplatesApi from '../response-generator-template/response-generator-template.api';
+import { getPredicateTemplatesByIdsAndVersions } from '../predicate-template/predicate-template.api';
+import { getResponseGeneratorTemplatesByIdsAndVersions } from '../response-generator-template/response-generator-template.api';
 import {
   CreatePredicateNodeCommand,
   DeletePredicateNodeCommand,
@@ -41,7 +41,7 @@ export const PREDICATE_NODE_ENTITY_DEFINITION: PredicateNodeEntityDefinition = {
   },
 };
 
-export async function getAllAsync() {
+export async function getAllPredicateNodes() {
   const allNodes = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).allAsync();
   const allReferencedPredicateTemplateIdsAndVersions = allNodes
     .filter(n => typeof n.templateInfoOrEvalFunctionBody !== 'string')
@@ -56,7 +56,7 @@ export async function getAllAsync() {
       return agg;
     }, {} as { [templateId: string]: number[] });
 
-  const allReferencedPredicateTemplates = await predicateTemplatesApi.getByIdsAndVersionsAsync(allReferencedPredicateTemplateIdsAndVersions);
+  const allReferencedPredicateTemplates = await getPredicateTemplatesByIdsAndVersions(allReferencedPredicateTemplateIdsAndVersions);
 
   const allReferencedResponseGeneratorTemplateIdsAndVersions = allNodes
     .filter(n => !Array.isArray(n.childNodeIdsOrResponseGenerator) && typeof n.templateInfoOrEvalFunctionBody !== 'string')
@@ -71,8 +71,7 @@ export async function getAllAsync() {
       return agg;
     }, {} as { [templateId: string]: number[] });
 
-  const allReferencedResponseGeneratorTemplates =
-    await responseGeneratorTemplatesApi.getByIdsAndVersionsAsync(allReferencedResponseGeneratorTemplateIdsAndVersions);
+  const allReferencedResponseGeneratorTemplates = await getResponseGeneratorTemplatesByIdsAndVersions(allReferencedResponseGeneratorTemplateIdsAndVersions);
 
   return allNodes.map<PredicateNodeDto>(n => {
     let templateInfoOrEvalFunctionBody: PredicateNodeDto['templateInfoOrEvalFunctionBody'];
@@ -137,7 +136,7 @@ type PredicateNodeCommandHandler<TCommand> = CommandHandler<TCommand, {
   nodeVersion: number;
 }>;
 
-export const ensureRootNodeExistsAsync: CommandHandler<void, { nodeId: string }> = async () => {
+export const ensureRootPredicateNodeExists: CommandHandler<void, { nodeId: string }> = async () => {
   const rootNodeName: RootNodeName = 'ROOT';
 
   const rootNodes = (await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byPropertiesAsync({ name: rootNodeName }));
@@ -158,7 +157,7 @@ export const ensureRootNodeExistsAsync: CommandHandler<void, { nodeId: string }>
   };
 };
 
-export const createAsync: PredicateNodeCommandHandler<CreatePredicateNodeCommand> = async command => {
+export const addChildPredicateNode: PredicateNodeCommandHandler<CreatePredicateNodeCommand> = async command => {
   const parentNode = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byIdAsync(command.parentNodeId);
 
   if (!Array.isArray(parentNode.childNodeIdsOrResponseGenerator)) {
@@ -192,13 +191,13 @@ export const createAsync: PredicateNodeCommandHandler<CreatePredicateNodeCommand
 };
 
 // TODO: validate
-createAsync.constraints = {
+addChildPredicateNode.constraints = {
   name: {},
   description: {},
   templateInfoOrEvalFunctionBody: {},
 };
 
-export const updateAsync: PredicateNodeCommandHandler<UpdatePredicateNodeCommand> = async command => {
+export const updatePredicateNode: PredicateNodeCommandHandler<UpdatePredicateNodeCommand> = async command => {
   const newVersion = await DB.patchAsync(
     PREDICATE_NODE_ENTITY_DEFINITION,
     command.nodeId,
@@ -219,7 +218,7 @@ export const updateAsync: PredicateNodeCommandHandler<UpdatePredicateNodeCommand
 };
 
 // TODO: validate
-updateAsync.constraints = {
+updatePredicateNode.constraints = {
   nodeId: {},
   unmodifiedNodeVersion: {},
   name: {},
@@ -227,7 +226,7 @@ updateAsync.constraints = {
   parameterValuesOrEvalFunctionBody: {},
 };
 
-export const setResponseGeneratorAsync: PredicateNodeCommandHandler<SetResponseGeneratorCommand> = async command => {
+export const setPredicateNodeResponseGenerator: PredicateNodeCommandHandler<SetResponseGeneratorCommand> = async command => {
   const node = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byIdAsync(command.nodeId);
 
   if (Array.isArray(node.childNodeIdsOrResponseGenerator) && node.childNodeIdsOrResponseGenerator.length > 0) {
@@ -260,7 +259,7 @@ export const setResponseGeneratorAsync: PredicateNodeCommandHandler<SetResponseG
 };
 
 // TODO: validate
-setResponseGeneratorAsync.constraints = {
+setPredicateNodeResponseGenerator.constraints = {
   nodeId: {},
   unmodifiedNodeVersion: {},
   name: {},
@@ -268,23 +267,23 @@ setResponseGeneratorAsync.constraints = {
   templateInfoOrGeneratorFunctionBody: {},
 };
 
-export const deleteAsync: CommandHandler<DeletePredicateNodeCommand> = async command => {
+export const deletePredicateNode: CommandHandler<DeletePredicateNodeCommand> = async command => {
   return await DB.deleteAsync(PREDICATE_NODE_ENTITY_DEFINITION, command.nodeId, command.unmodifiedNodeVersion);
 };
 
 // TODO: validate
-deleteAsync.constraints = {
+deletePredicateNode.constraints = {
   nodeId: {},
   unmodifiedNodeVersion: {},
 };
 
-export const dropAllAsync: CommandHandler = async () => {
+export const dropAllPredicateNodes: CommandHandler = async () => {
   await DB.dropAllAsync(PREDICATE_NODE_ENTITY_DEFINITION.entityType);
 };
 
-export const api = express.Router();
-api.get('/', queryHandler(getAllAsync));
-api.post('/create', commandHandler(createAsync));
-api.post('/update', commandHandler(updateAsync));
-api.post('/setResponseGenerator', commandHandler(setResponseGeneratorAsync));
-api.post('/delete', commandHandler(deleteAsync));
+export const predicateNodeApi = express.Router()
+  .get('/', queryHandler(getAllPredicateNodes))
+  .post('/addChildNode', commandHandler(addChildPredicateNode))
+  .post('/update', commandHandler(updatePredicateNode))
+  .post('/setResponseGenerator', commandHandler(setPredicateNodeResponseGenerator))
+  .post('/delete', commandHandler(deletePredicateNode));

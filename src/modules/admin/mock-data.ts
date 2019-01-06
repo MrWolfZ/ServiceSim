@@ -1,51 +1,46 @@
-import { unwrap } from '../../util/result-monad';
 import { ALL, PATH_PREFIX } from '../predicate-template/default-templates';
-import * as predicateTemplateApi from '../predicate-template/predicate-template.api';
-import * as predicateNodeApi from '../predicate-tree/predicate-node.api';
+import { getAllPredicateTemplates } from '../predicate-template/predicate-template.api';
+import { addChildPredicateNode, getAllPredicateNodes, setPredicateNodeResponseGenerator } from '../predicate-tree/predicate-node.api';
 import { STATIC } from '../response-generator-template/default-templates';
-import * as responseGeneratorTemplateApi from '../response-generator-template/response-generator-template.api';
+import { getAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
 
 export async function setupMockData() {
-  const allTemplates = await predicateTemplateApi.getAllAsync();
+  const allTemplates = await getAllPredicateTemplates();
   const pathPrefixPredicateTemplate = allTemplates.find(t => t.name === PATH_PREFIX.name)!;
   const allPredicateTemplate = allTemplates.find(t => t.name === ALL.name)!;
 
-  const allResponseGeneratorTemplates = await responseGeneratorTemplateApi.getAllAsync();
+  const allResponseGeneratorTemplates = await getAllResponseGeneratorTemplates();
   const staticResponseGeneratorTemplate = allResponseGeneratorTemplates.find(t => t.name === STATIC.name)!;
 
-  const rootNode = unwrap(await predicateNodeApi.getAllAsync())[0];
+  const rootNode = (await getAllPredicateNodes())[0];
 
-  const topLevelPredicateNode1Result = unwrap(
-    await predicateNodeApi.createAsync({
-      parentNodeId: rootNode.id,
-      name: pathPrefixPredicateTemplate.name,
-      description: '',
-      templateInfoOrEvalFunctionBody: {
-        templateId: pathPrefixPredicateTemplate.id,
-        templateVersion: pathPrefixPredicateTemplate.version,
-        parameterValues: {
-          Prefix: '/api',
-        },
+  const topLevelPredicateNode1Result = await addChildPredicateNode({
+    parentNodeId: rootNode.id,
+    name: pathPrefixPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: pathPrefixPredicateTemplate.id,
+      templateVersion: pathPrefixPredicateTemplate.version,
+      parameterValues: {
+        Prefix: '/api',
       },
-    })
-  );
+    },
+  });
 
-  const childPredicateNode1Result = unwrap(
-    await predicateNodeApi.createAsync({
-      parentNodeId: topLevelPredicateNode1Result.nodeId,
-      name: pathPrefixPredicateTemplate.name,
-      description: '',
-      templateInfoOrEvalFunctionBody: {
-        templateId: pathPrefixPredicateTemplate.id,
-        templateVersion: pathPrefixPredicateTemplate.version,
-        parameterValues: {
-          Prefix: '/api/books',
-        },
+  const childPredicateNode1Result = await addChildPredicateNode({
+    parentNodeId: topLevelPredicateNode1Result.nodeId,
+    name: pathPrefixPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: pathPrefixPredicateTemplate.id,
+      templateVersion: pathPrefixPredicateTemplate.version,
+      parameterValues: {
+        Prefix: '/api/books',
       },
-    })
-  );
+    },
+  });
 
-  await predicateNodeApi.setResponseGeneratorAsync({
+  await setPredicateNodeResponseGenerator({
     nodeId: childPredicateNode1Result.nodeId,
     unmodifiedNodeVersion: childPredicateNode1Result.nodeVersion,
     name: 'Static',
@@ -61,22 +56,20 @@ export async function setupMockData() {
     },
   });
 
-  const childPredicateNode2Result = unwrap(
-    await predicateNodeApi.createAsync({
-      parentNodeId: topLevelPredicateNode1Result.nodeId,
-      name: pathPrefixPredicateTemplate.name,
-      description: '',
-      templateInfoOrEvalFunctionBody: {
-        templateId: pathPrefixPredicateTemplate.id,
-        templateVersion: pathPrefixPredicateTemplate.version,
-        parameterValues: {
-          Prefix: '/api/authors',
-        },
+  const childPredicateNode2Result = await addChildPredicateNode({
+    parentNodeId: topLevelPredicateNode1Result.nodeId,
+    name: pathPrefixPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: pathPrefixPredicateTemplate.id,
+      templateVersion: pathPrefixPredicateTemplate.version,
+      parameterValues: {
+        Prefix: '/api/authors',
       },
-    })
-  );
+    },
+  });
 
-  await predicateNodeApi.setResponseGeneratorAsync({
+  await setPredicateNodeResponseGenerator({
     nodeId: childPredicateNode2Result.nodeId,
     unmodifiedNodeVersion: childPredicateNode2Result.nodeVersion,
     name: 'Static',
@@ -92,20 +85,18 @@ export async function setupMockData() {
     },
   });
 
-  const topLevelPredicateNode2Result = unwrap(
-    await predicateNodeApi.createAsync({
-      parentNodeId: rootNode.id,
-      name: allPredicateTemplate.name,
-      description: '',
-      templateInfoOrEvalFunctionBody: {
-        templateId: allPredicateTemplate.id,
-        templateVersion: allPredicateTemplate.version,
-        parameterValues: {},
-      },
-    })
-  );
+  const topLevelPredicateNode2Result = await addChildPredicateNode({
+    parentNodeId: rootNode.id,
+    name: allPredicateTemplate.name,
+    description: '',
+    templateInfoOrEvalFunctionBody: {
+      templateId: allPredicateTemplate.id,
+      templateVersion: allPredicateTemplate.version,
+      parameterValues: {},
+    },
+  });
 
-  await predicateNodeApi.setResponseGeneratorAsync({
+  await setPredicateNodeResponseGenerator({
     nodeId: topLevelPredicateNode2Result.nodeId,
     unmodifiedNodeVersion: topLevelPredicateNode2Result.nodeVersion,
     name: 'Status Code',

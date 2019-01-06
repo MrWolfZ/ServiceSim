@@ -2,19 +2,19 @@ import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
 import { DB } from '../../api-infrastructure';
 import { logger } from '../../util/logger';
-import * as serviceInvocationApi from '../service-invocation/service-invocation.api';
+import { createServiceInvocation, setServiceInvocationResponse } from '../service-invocation/service-invocation.api';
 import { InvocationResponseWasSet, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
-import * as predicateTreeApi from './predicate-tree.api';
+import { getPredicateTree, PredicateNode, ResponseGeneratorFunction } from './predicate-tree.api';
 
-export const processRequest = async (req: Request, res: Response) => {
-  const rootNode = await predicateTreeApi.getTreeAsync();
+export const processSimulationRequest = async (req: Request, res: Response) => {
+  const rootNode = await getPredicateTree();
 
   const request: ServiceRequest = {
     path: req.path,
     body: req.body,
   };
 
-  const { invocationId, invocationVersion } = await serviceInvocationApi.createAsync(request);
+  const { invocationId, invocationVersion } = await createServiceInvocation(request);
 
   DB.getEventStream<InvocationResponseWasSet>(['InvocationResponseWasSet']).pipe(
     filter(ev => ev.rootEntityId === invocationId),
@@ -35,20 +35,20 @@ export const processRequest = async (req: Request, res: Response) => {
   };
 
   if (rootNode) {
-    const node = await findNode(rootNode.childNodesOrResponseGenerator as predicateTreeApi.PredicateNode[]);
+    const node = await findNode(rootNode.childNodesOrResponseGenerator as PredicateNode[]);
     if (node) {
-      const generator = node.childNodesOrResponseGenerator as predicateTreeApi.ResponseGeneratorFunction;
+      const generator = node.childNodesOrResponseGenerator as ResponseGeneratorFunction;
       response = await Promise.resolve(generator(request));
     }
   }
 
-  await serviceInvocationApi.setServiceResponseAsync({
+  await setServiceInvocationResponse({
     invocationId,
     unmodifiedInvocationVersion: invocationVersion,
     ...response,
   });
 
-  async function findNode(nodes: predicateTreeApi.PredicateNode[]): Promise<predicateTreeApi.PredicateNode | undefined> {
+  async function findNode(nodes: PredicateNode[]): Promise<PredicateNode | undefined> {
     for (const node of nodes) {
       if (!node.childNodesOrResponseGenerator || Array.isArray(node.childNodesOrResponseGenerator) && node.childNodesOrResponseGenerator.length === 0) {
         logger.debug(`simulation API: skipping node ${node.nodeId} since it has neither child nodes nor a response generator`);
@@ -82,7 +82,5 @@ export const processRequest = async (req: Request, res: Response) => {
   }
 };
 
-const api = express.Router();
-api.use(processRequest);
-
-export default api;
+export const simulationApi = express.Router()
+  .use(processSimulationRequest);

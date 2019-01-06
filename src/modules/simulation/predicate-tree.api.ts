@@ -1,4 +1,4 @@
-import * as predicateNodeApi from '../predicate-tree/predicate-node.api';
+import { getAllPredicateNodes } from '../predicate-tree/predicate-node.api';
 import { PredicateNodeDto, RootNodeName } from '../predicate-tree/predicate-node.types';
 import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 
@@ -13,8 +13,8 @@ export interface PredicateNode {
 export type PredicateEvaluationFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => boolean;
 export type ResponseGeneratorGenerateFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => ServiceResponse;
 
-export async function getTreeAsync() {
-  const allNodes = await predicateNodeApi.getAllAsync();
+export async function getPredicateTree() {
+  const allNodes = await getAllPredicateNodes();
 
   const rootNodeName: RootNodeName = 'ROOT';
   const rootNode = allNodes.find(n => n.name === rootNodeName);

@@ -1,9 +1,9 @@
 import express from 'express';
-import { api as nodeApi } from './predicate-node.api';
+import { predicateNodeApi } from './predicate-node.api';
 import { PredicateNodeDto } from './predicate-node.types';
 
-export const api = express.Router();
-api.use('/nodes', nodeApi);
+export const predicateTreeApi = express.Router()
+  .use('/nodes', predicateNodeApi);
 
 export function getMockData(): PredicateNodeDto[] {
   return [

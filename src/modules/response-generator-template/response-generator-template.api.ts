@@ -16,7 +16,7 @@ export const RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION: ResponseGeneratorTem
   '@': 'VersionedRootEntityDefinition',
 };
 
-export async function getAllAsync() {
+export async function getAllResponseGeneratorTemplates() {
   const allTemplates = await DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).allAsync();
 
   return allTemplates.map<ResponseGeneratorTemplateDto>(t => ({
@@ -29,7 +29,7 @@ export async function getAllAsync() {
   }));
 }
 
-export async function getByIdsAndVersionsAsync(idsAndVersions: { [templateId: string]: number[] }) {
+export async function getResponseGeneratorTemplatesByIdsAndVersions(idsAndVersions: { [templateId: string]: number[] }) {
   const templates = await Promise.all(
     keys(idsAndVersions)
       .reduce((agg, id) => [
@@ -53,7 +53,7 @@ type ResponseGeneratorTemplateCommandHandler<TCommand> = CommandHandler<TCommand
   templateVersion: number;
 }>;
 
-export const createAsync: ResponseGeneratorTemplateCommandHandler<CreateResponseGeneratorTemplateCommand> = async command => {
+export const createResponseGeneratorTemplate: ResponseGeneratorTemplateCommandHandler<CreateResponseGeneratorTemplateCommand> = async command => {
   const template = await DB.createAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command);
 
   return {
@@ -63,14 +63,14 @@ export const createAsync: ResponseGeneratorTemplateCommandHandler<CreateResponse
 };
 
 // TODO: validate
-createAsync.constraints = {
+createResponseGeneratorTemplate.constraints = {
   name: {},
   description: {},
   generatorFunctionBody: {},
   parameters: {},
 };
 
-export const updateAsync: ResponseGeneratorTemplateCommandHandler<UpdateResponseGeneratorTemplateCommand> = async command => {
+export const updateResponseGeneratorTemplate: ResponseGeneratorTemplateCommandHandler<UpdateResponseGeneratorTemplateCommand> = async command => {
   const newVersion = await DB.patchAsync(
     RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION,
     command.templateId,
@@ -85,7 +85,7 @@ export const updateAsync: ResponseGeneratorTemplateCommandHandler<UpdateResponse
 };
 
 // TODO: validate
-updateAsync.constraints = {
+updateResponseGeneratorTemplate.constraints = {
   templateId: {},
   unmodifiedTemplateVersion: {},
   name: {},
@@ -94,29 +94,29 @@ updateAsync.constraints = {
   parameters: {},
 };
 
-export const deleteAsync: CommandHandler<DeleteResponseGeneratorTemplateCommand> = async command => {
+export const deleteResponseGeneratorTemplate: CommandHandler<DeleteResponseGeneratorTemplateCommand> = async command => {
   return await DB.deleteAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
 };
 
 // TODO: validate
-deleteAsync.constraints = {
+deleteResponseGeneratorTemplate.constraints = {
   templateId: {},
   unmodifiedTemplateVersion: {},
 };
 
-export const dropAllAsync: CommandHandler = async () => {
+export const dropAllResponseGeneratorTemplates: CommandHandler = async () => {
   await DB.dropAllAsync(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION.entityType);
 };
 
-export const createDefaultTemplatesAsync: CommandHandler = async () => {
+export const createDefaultResponseGeneratorTemplates: CommandHandler = async () => {
   for (const key of keys(DEFAULT_TEMPLATES)) {
-    await createAsync(DEFAULT_TEMPLATES[key]);
+    await createResponseGeneratorTemplate(DEFAULT_TEMPLATES[key]);
   }
 };
 
 export const api = express.Router();
-api.get('/', queryHandler(getAllAsync));
-api.post('/create', commandHandler(createAsync));
-api.post('/update', commandHandler(updateAsync));
-api.post('/delete', commandHandler(deleteAsync));
-api.post('/createDefaultTemplates', commandHandler(createDefaultTemplatesAsync));
+api.get('/', queryHandler(getAllResponseGeneratorTemplates));
+api.post('/create', commandHandler(createResponseGeneratorTemplate));
+api.post('/update', commandHandler(updateResponseGeneratorTemplate));
+api.post('/delete', commandHandler(deleteResponseGeneratorTemplate));
+api.post('/createDefaultTemplates', commandHandler(createDefaultResponseGeneratorTemplates));

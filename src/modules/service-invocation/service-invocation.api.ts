@@ -29,7 +29,7 @@ type ServiceInvocationCommandHandler<TCommand> = CommandHandler<TCommand, {
   invocationVersion: number;
 }>;
 
-export const createAsync: ServiceInvocationCommandHandler<CreateServiceInvocationCommand> = async command => {
+export const createServiceInvocation: ServiceInvocationCommandHandler<CreateServiceInvocationCommand> = async command => {
   const newInvocation = await DB.createAsync(SERVICE_INVOCATION_ENTITY_DEFINITION, {
     state: 'processing pending',
     request: {
@@ -46,12 +46,12 @@ export const createAsync: ServiceInvocationCommandHandler<CreateServiceInvocatio
 };
 
 // TODO: validate
-createAsync.constraints = {
+createServiceInvocation.constraints = {
   path: {},
   body: {},
 };
 
-export const setServiceResponseAsync: ServiceInvocationCommandHandler<SetServiceResponseCommand> = async command => {
+export const setServiceInvocationResponse: ServiceInvocationCommandHandler<SetServiceResponseCommand> = async command => {
   const invocation = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byIdAsync(command.invocationId);
 
   if (invocation.response) {
@@ -80,7 +80,7 @@ export const setServiceResponseAsync: ServiceInvocationCommandHandler<SetService
 };
 
 // TODO: validate
-setServiceResponseAsync.constraints = {
+setServiceInvocationResponse.constraints = {
   invocationId: {},
   unmodifiedInvocationVersion: {},
   statusCode: {},
@@ -88,6 +88,6 @@ setServiceResponseAsync.constraints = {
   contentType: {},
 };
 
-export const dropAllAsync: CommandHandler = async () => {
+export const dropAllServiceInvocations: CommandHandler = async () => {
   await DB.dropAllAsync(SERVICE_INVOCATION_ENTITY_DEFINITION.entityType);
 };

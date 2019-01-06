@@ -2,17 +2,11 @@ import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
 import { bus, DB } from './api-infrastructure';
-import * as ejp from './api-infrastructure/event-journal/persistence';
-import * as elp from './api-infrastructure/event-log/persistence';
-import * as adminApi from './modules/admin/admin.api';
-import * as predicateTemplatesApi from './modules/predicate-template/predicate-template.api';
-import * as predicateNodeApi from './modules/predicate-tree/predicate-node.api';
-import * as predicateTreeApi from './modules/predicate-tree/predicate-tree.api';
-import simulationApi from './modules/simulation/simulation.api';
-
-// TODO: set adapter based on configuration
-ejp.setAdapter(new ejp.InMemoryEventJournalPersistenceAdapter());
-elp.setAdapter(new elp.InMemoryEventLogPersistenceAdapter());
+import { adminApi } from './modules/admin/admin.api';
+import { predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
+import { ensureRootPredicateNodeExists } from './modules/predicate-tree/predicate-node.api';
+import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
+import { simulationApi } from './modules/simulation/simulation.api';
 
 declare module 'http' {
   interface ServerResponse {
@@ -21,9 +15,9 @@ declare module 'http' {
 }
 
 export const uiApi = express.Router();
-uiApi.use('/admin', adminApi.api);
-uiApi.use('/predicate-templates', predicateTemplatesApi.api);
-uiApi.use('/predicate-tree', predicateTreeApi.api);
+uiApi.use('/admin', adminApi);
+uiApi.use('/predicate-templates', predicateTemplatesApi);
+uiApi.use('/predicate-tree', predicateTreeApi);
 
 uiApi.get('/events', (req, res) => {
   const unsubscribe = bus.subscribe(undefined, message => {
@@ -48,7 +42,7 @@ uiApi.get('/events', (req, res) => {
 export async function initializeAsync() {
   await DB.initializeAsync();
 
-  await predicateNodeApi.ensureRootNodeExistsAsync();
+  await ensureRootPredicateNodeExists();
 
   const subscriptions: Subscription[] = [];
 

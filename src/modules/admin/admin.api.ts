@@ -1,23 +1,25 @@
 import express from 'express';
 import { bus, commandHandler, CommandHandler } from '../../api-infrastructure';
-import * as predicateTemplateApi from '../predicate-template/predicate-template.api';
-import * as predicateNodeApi from '../predicate-tree/predicate-node.api';
-import * as responseGeneratorTemplateApi from '../response-generator-template/response-generator-template.api';
+import { createDefaultPredicateTemplatesAsync, dropAllPredicateTemplates } from '../predicate-template/predicate-template.api';
+import { dropAllPredicateNodes, ensureRootPredicateNodeExists } from '../predicate-tree/predicate-node.api';
+import { createDefaultResponseGeneratorTemplates, dropAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
+import { dropAllServiceInvocations } from '../service-invocation/service-invocation.api';
 import { setupMockData } from './mock-data';
 
-export const resetToDefaultDataAsync: CommandHandler = async () => {
-  await predicateNodeApi.dropAllAsync();
-  await predicateTemplateApi.dropAllAsync();
-  await responseGeneratorTemplateApi.dropAllAsync();
+export const resetToDefaultData: CommandHandler = async () => {
+  await dropAllPredicateNodes();
+  await dropAllPredicateTemplates();
+  await dropAllResponseGeneratorTemplates();
+  await dropAllServiceInvocations();
 
-  await predicateTemplateApi.createDefaultTemplatesAsync();
-  await responseGeneratorTemplateApi.createDefaultTemplatesAsync();
-  await predicateNodeApi.ensureRootNodeExistsAsync();
+  await createDefaultPredicateTemplatesAsync();
+  await createDefaultResponseGeneratorTemplates();
+  await ensureRootPredicateNodeExists();
 
   await setupMockData();
 
   bus.publish(undefined, { payload: 'resetToDefaultDataAsync' });
 };
 
-export const api = express.Router();
-api.post('/resetToDefaultData', commandHandler(resetToDefaultDataAsync));
+export const adminApi = express.Router()
+  .post('/resetToDefaultData', commandHandler(resetToDefaultData));
