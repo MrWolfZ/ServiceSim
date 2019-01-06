@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import validate from 'validate.js';
-import { failure, isFailure, isResult, isSuccess, Result, success } from '../util/result-monad';
+import { failure, isFailure, Result, success } from '../util/result-monad';
 import { keys } from '../util/util';
 
 export type CommandValidationFn<TCommand> = (command: TCommand) => Result<void, string[]> | Promise<Result<void, string[]>>;
@@ -25,10 +25,15 @@ export function evaluateCommandValidationConstraints<TCommand>(
   return messages.length > 0 ? failure(messages) : success();
 }
 
-export interface CommandHandler<TCommand = void, TSuccess = void> {
-  (command: TCommand): TSuccess | Result<TSuccess, string[]> | Promise<TSuccess | Result<TSuccess, string[]>>;
+export interface CommandHandler<TCommand = void, TResult = void> {
+  (command: TCommand): TResult | Promise<TResult>;
   validationFn?: CommandValidationFn<TCommand>;
   constraints?: CommandValidationConstraints<TCommand>;
+}
+
+export interface ErrorResponsePayload {
+  messages: string[];
+  stackTrace?: string;
 }
 
 export function commandHandler<TCommand = void, TSuccess = void>(
@@ -61,39 +66,53 @@ export function commandHandler<TCommand = void, TSuccess = void>(
         return;
       }
 
-      let result = await handler(command);
-      result = isResult<TSuccess, string[]>(result) ? result : success(result);
-
-      if (isSuccess(result)) {
-        res.status(result.success ? 200 : 204).send(result.success);
-      } else {
-        res.status(400).send(result.failure);
-      }
+      const result = await handler(command);
+      res.status(result ? 200 : 204).send(result);
     } catch (error) {
-      res.status(500).send(error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stackTrace: error.stack,
-      } : { error });
+      writeErrorResponse(res, error);
     }
   };
 }
 
-export function queryHandler<TParams = never, TSuccess = void, TFailure = never>(
-  handler: (params: TParams) => TSuccess | Promise<TSuccess> | Result<TSuccess, TFailure> | Promise<Result<TSuccess, TFailure>>,
+export function queryHandler<TParams = never, TResult = void>(
+  handler: (params: TParams) => TResult | Promise<TResult>,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
     try {
-      let result = await handler({ ...req.params, ...req.query });
-      result = isResult<TSuccess, TFailure>(result) ? result : success(result);
-
-      if (isSuccess(result)) {
-        res.status(result.success ? 200 : 204).send(result.success);
-      } else {
-        res.status(400).send(result.failure);
-      }
+      const result = await handler({ ...req.params, ...req.query });
+      res.status(result ? 200 : 204).send(result);
     } catch (error) {
-      res.status(500).send({ error });
+      writeErrorResponse(res, error);
     }
   };
+}
+
+export function writeErrorResponse(res: Response, error: any) {
+  const isProduction = process.env.NODE_ENV !== 'production';
+
+  let statusCode = 500;
+  let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];
+  let stackTrace: string | undefined;
+
+  // TODO: only print stack trace if env var allows to
+  if (isFailure<string | string[]>(error)) {
+    statusCode = 400;
+    messages = Array.isArray(error.failure) ? error.failure : [error.failure];
+    stackTrace = error.stackTrace;
+  }
+
+  if (error instanceof Error) {
+    messages = [error.message];
+    stackTrace = error.stack;
+  }
+
+  const payload: ErrorResponsePayload = {
+    messages,
+  };
+
+  if (!isProduction) {
+    payload.stackTrace = stackTrace;
+  }
+
+  res.status(statusCode).send(payload);
 }

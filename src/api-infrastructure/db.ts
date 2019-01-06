@@ -1,7 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { assertNever } from '../util/assert';
-import { failure, Result, success } from '../util/result-monad';
+import { failure } from '../util/result-monad';
 import { keys } from '../util/util';
 import {
   DomainEvent,
@@ -113,7 +113,7 @@ async function patchAsync<
     entityTypeDefinition: RootEntityDefinition<TEntity, TEntityType>,
     id: string,
     data: TData & Exact<Omit<Partial<TEntity>, keyof RootEntity<any>>, TData>,
-): Promise<Result<void, string[]>>;
+): Promise<void>;
 
 async function patchAsync<
   TEntity extends VersionedRootEntity<TEntity, TEntityType>,
@@ -124,7 +124,7 @@ async function patchAsync<
     id: string,
     expectedVersion: number,
     data: TData & Exact<Omit<Partial<TEntity>, keyof VersionedRootEntity<TEntity, TEntityType>>, TData>,
-): Promise<Result<number, string[]>>;
+): Promise<number>;
 
 async function patchAsync<
   TEntity extends EventDrivenRootEntity<TEntity, TEntityType, TEvent>,
@@ -137,7 +137,7 @@ async function patchAsync<
     expectedVersion: number,
     data: TData & Exact<Omit<Partial<TEntity>, keyof EventDrivenRootEntity<TEntity, TEntityType, TEvent>>, TData>,
     ...events: TEvent[]
-  ): Promise<Result<number, string[]>>;
+  ): Promise<number>;
 
 async function patchAsync(
   entityTypeDefinition:
@@ -148,11 +148,11 @@ async function patchAsync(
   expectedVersionOrData: number | object,
   data?: any,
   ...events: any[]
-): Promise<Result<number | void, string[]>> {
+): Promise<number | void> {
   const col = getEntityCollection<any>(entityTypeDefinition.entityType);
 
   if (!col[id] || col[id].length === 0) {
-    return failure([`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`]);
+    throw failure(`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`);
   }
 
   const latestEntity = col[id][col[id].length - 1];
@@ -161,11 +161,11 @@ async function patchAsync(
 
   if (expectedVersion !== -1 && (latestEntity as VersionedRootEntity<any, any>).$metadata.version !== expectedVersion) {
     // tslint:disable-next-line:max-line-length
-    return failure([`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not match the expected version (expected: ${expectedVersion}, actual: ${latestEntity.$metadata.version})`]);
+    throw failure(`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not match the expected version (expected: ${expectedVersion}, actual: ${latestEntity.$metadata.version})`);
   }
 
   if ((latestEntity as VersionedRootEntity<any, any>).$metadata.isDeleted) {
-    return failure([`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`]);
+    throw failure(`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`);
   }
 
   // TODO: perform deep merge and filter all properties that do not differ
@@ -237,19 +237,19 @@ async function patchAsync(
 
   events.forEach(evt => allEventsSubject.next(evt));
 
-  return success(($metadata as any as VersionedRootEntity<any, any>['$metadata']).version);
+  return ($metadata as any as VersionedRootEntity<any, any>['$metadata']).version;
 }
 
 async function deleteAsync<TEntity extends RootEntity<TEntityType>, TEntityType extends string>(
   entityTypeDefinition: RootEntityDefinition<TEntity, TEntityType>,
   id: string,
-): Promise<Result<void, string[]>>;
+): Promise<void>;
 
 async function deleteAsync<TEntity extends VersionedRootEntity<TEntity, TEntityType>, TEntityType extends string>(
   entityTypeDefinition: VersionedRootEntityDefinition<TEntity, TEntityType>,
   id: string,
   expectedVersion: number,
-): Promise<Result<void, string[]>>;
+): Promise<void>;
 
 async function deleteAsync<
   TEntity extends EventDrivenRootEntity<TEntity, TEntityType, TEvent>,
@@ -259,7 +259,7 @@ async function deleteAsync<
     entityTypeDefinition: EventDrivenRootEntityDefinition<TEntity, TEntityType, TEvent>,
     id: string,
     expectedVersion: number,
-): Promise<Result<void, string[]>>;
+): Promise<void>;
 
 async function deleteAsync(
   entityTypeDefinition:
@@ -268,22 +268,22 @@ async function deleteAsync(
     EventDrivenRootEntityDefinition<any, any, any>,
   id: string,
   expectedVersion = -1,
-): Promise<Result<void, string[]>> {
+): Promise<void> {
   const col = getEntityCollection<any>(entityTypeDefinition.entityType);
 
   if (!col[id] || col[id].length === 0) {
-    return failure([`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`]);
+    throw failure(`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`);
   }
 
   const latestEntity = col[id][col[id].length - 1];
 
   if (expectedVersion !== -1 && (latestEntity as VersionedRootEntity<any, any>).$metadata.version !== expectedVersion) {
     // tslint:disable-next-line:max-line-length
-    return failure([`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not match the expected version (expected: ${expectedVersion}, actual: ${latestEntity.$metadata.version})`]);
+    throw failure(`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not match the expected version (expected: ${expectedVersion}, actual: ${latestEntity.$metadata.version})`);
   }
 
   if ((latestEntity as VersionedRootEntity<any, any>).$metadata.isDeleted) {
-    return failure([`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`]);
+    throw failure(`patch failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`);
   }
 
   const epoch = Date.now();
@@ -342,12 +342,10 @@ async function deleteAsync(
       assertNever(entityTypeDefinition);
       break;
   }
-
-  return success();
 }
 
 export interface QueryOperations<TEntity extends RootEntity<TEntityType>, TEntityType extends string> {
-  byIdAsync(id: string): Promise<Result<TEntity, string[]>>;
+  byIdAsync(id: string): Promise<TEntity>;
   allAsync(): Promise<TEntity[]>;
   byPropertiesAsync(props: Partial<TEntity>): Promise<TEntity[]>;
 }
@@ -356,7 +354,7 @@ export interface VersionQueryOperations<
   TEntity extends VersionedRootEntity<TEntity, TEntityType>,
   TEntityType extends string,
   > extends QueryOperations<TEntity, TEntityType> {
-  byIdAndVersionAsync(id: string, version: number): Promise<Result<TEntity, string[]>>;
+  byIdAndVersionAsync(id: string, version: number): Promise<TEntity>;
 }
 
 function query<TEntity extends RootEntity<TEntityType>, TEntityType extends string>(
@@ -386,36 +384,36 @@ function query(
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
 
       if (!col[id] || col[id].length === 0) {
-        return failure([`byIdAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`]);
+        throw failure(`byIdAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`);
       }
 
       const latestEntity = col[id][col[id].length - 1];
 
       if ((latestEntity as VersionedRootEntity<any, any>).$metadata.isDeleted) {
-        return failure([`byIdAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`]);
+        throw failure(`byIdAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`);
       }
 
-      return success(latestEntity);
+      return latestEntity;
     },
 
     async byIdAndVersionAsync(id, version) {
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
 
       if (!col[id] || col[id].length === 0) {
-        return failure([`byIdAndVersionAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`]);
+        throw failure(`byIdAndVersionAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not exist`);
       }
 
       const entity = col[id].find(e => (e as VersionedRootEntity<any, any>).$metadata.version === version);
 
       if (!entity) {
-        return failure([`byIdAndVersionAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not have version ${version}`]);
+        throw failure(`byIdAndVersionAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} does not have version ${version}`);
       }
 
       if ((entity as VersionedRootEntity<any, any>).$metadata.isDeleted) {
-        return failure([`byIdAndVersionAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`]);
+        throw failure(`byIdAndVersionAsync failed: entity with id ${id} of type ${entityTypeDefinition.entityType} is deleted`);
       }
 
-      return success(entity);
+      return entity;
     },
 
     async allAsync() {

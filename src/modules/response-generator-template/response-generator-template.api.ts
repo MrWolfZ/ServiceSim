@@ -1,6 +1,5 @@
 import express from 'express';
 import { commandHandler, CommandHandler, DB, queryHandler } from '../../api-infrastructure';
-import { failure, Failure, isFailure, Result, unwrap } from '../../util/result-monad';
 import { keys, omit } from '../../util/util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
@@ -31,23 +30,13 @@ export async function getAllAsync() {
 }
 
 export async function getByIdsAndVersionsAsync(idsAndVersions: { [templateId: string]: number[] }) {
-  const results = await Promise.all(
+  const templates = await Promise.all(
     keys(idsAndVersions)
       .reduce((agg, id) => [
         ...agg,
         ...idsAndVersions[id].map(v => DB.query(RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION).byIdAndVersionAsync(id, v)),
-      ], [] as Promise<Result<ResponseGeneratorTemplateEntity, string[]>>[])
+      ], [] as Promise<ResponseGeneratorTemplateEntity>[])
   );
-
-  const messages = results
-    .filter(isFailure).map(r => r as any as Failure<string>)
-    .reduce((agg, f) => [...agg, ...f.failure], [] as string[]);
-
-  if (messages.length > 0) {
-    return failure(messages);
-  }
-
-  const templates = results.map(unwrap);
 
   return templates.map<ResponseGeneratorTemplateDto>(t => ({
     id: t.id,
@@ -82,20 +71,16 @@ createAsync.constraints = {
 };
 
 export const updateAsync: ResponseGeneratorTemplateCommandHandler<UpdateResponseGeneratorTemplateCommand> = async command => {
-  const result = await DB.patchAsync(
+  const newVersion = await DB.patchAsync(
     RESPONSE_GENERATOR_TEMPLATE_ENTITY_DEFINITION,
     command.templateId,
     command.unmodifiedTemplateVersion,
     omit(command, 'templateId', 'unmodifiedTemplateVersion'),
   );
 
-  if (isFailure(result)) {
-    return result;
-  }
-
   return {
     templateId: command.templateId,
-    templateVersion: result.success,
+    templateVersion: newVersion,
   };
 };
 
@@ -124,18 +109,8 @@ export const dropAllAsync: CommandHandler = async () => {
 };
 
 export const createDefaultTemplatesAsync: CommandHandler = async () => {
-  const failureMessages: string[] = [];
-
   for (const key of keys(DEFAULT_TEMPLATES)) {
-    const result = await createAsync(DEFAULT_TEMPLATES[key]);
-
-    if (isFailure(result)) {
-      failureMessages.push(...result.failure);
-    }
-  }
-
-  if (failureMessages.length > 0) {
-    return failure(failureMessages);
+    await createAsync(DEFAULT_TEMPLATES[key]);
   }
 };
 

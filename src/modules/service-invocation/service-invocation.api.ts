@@ -1,5 +1,5 @@
 import { CommandHandler, createDomainEvent, DB } from '../../api-infrastructure';
-import { failure, isFailure } from '../../util/result-monad';
+import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import {
   CreateServiceInvocationCommand,
@@ -52,19 +52,13 @@ createAsync.constraints = {
 };
 
 export const setServiceResponseAsync: ServiceInvocationCommandHandler<SetServiceResponseCommand> = async command => {
-  const invocationResult = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byIdAsync(command.invocationId);
-
-  if (isFailure(invocationResult)) {
-    return invocationResult;
-  }
-
-  const invocation = invocationResult.success;
+  const invocation = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byIdAsync(command.invocationId);
 
   if (invocation.response) {
-    return failure([`Cannot set response for service invocation ${invocation.id} since it already has a response!`]);
+    throw failure(`Cannot set response for service invocation ${invocation.id} since it already has a response!`);
   }
 
-  const result = await DB.patchAsync(
+  const newVersion = await DB.patchAsync(
     SERVICE_INVOCATION_ENTITY_DEFINITION,
     command.invocationId,
     command.unmodifiedInvocationVersion,
@@ -79,13 +73,9 @@ export const setServiceResponseAsync: ServiceInvocationCommandHandler<SetService
     ),
   );
 
-  if (isFailure(result)) {
-    return result;
-  }
-
   return {
     invocationId: command.invocationId,
-    invocationVersion: result.success,
+    invocationVersion: newVersion,
   };
 };
 

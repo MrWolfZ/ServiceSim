@@ -1,4 +1,3 @@
-import { isFailure, unwrap } from '../../util/result-monad';
 import * as predicateNodeApi from '../predicate-tree/predicate-node.api';
 import { PredicateNodeDto, RootNodeName } from '../predicate-tree/predicate-node.types';
 import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
@@ -15,16 +14,11 @@ export type PredicateEvaluationFunction = (request: ServiceRequest, parameters: 
 export type ResponseGeneratorGenerateFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => ServiceResponse;
 
 export async function getTreeAsync() {
-  const getAllAsyncResult = await predicateNodeApi.getAllAsync();
+  const allNodes = await predicateNodeApi.getAllAsync();
 
-  if (isFailure(getAllAsyncResult)) {
-    return getAllAsyncResult;
-  }
-
-  const allNodes = unwrap(getAllAsyncResult);
   const rootNodeName: RootNodeName = 'ROOT';
-  const rootNode = allNodes.find(n => n.name === rootNodeName)!;
-  return await buildNodeAsync(rootNode.id, allNodes);
+  const rootNode = allNodes.find(n => n.name === rootNodeName);
+  return rootNode && await buildNodeAsync(rootNode.id, allNodes);
 }
 
 export async function buildNodeAsync(nodeId: string, allNodes: PredicateNodeDto[]): Promise<PredicateNode> {

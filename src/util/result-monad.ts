@@ -8,6 +8,7 @@ export interface Success<TSuccess = void> {
 export interface Failure<TFailure = void> {
   type: 'failure';
   failure: TFailure;
+  stackTrace: string | undefined;
 }
 
 export function isResult<TSuccess = void, TFailure = void>(object: any): object is Result<TSuccess, TFailure> {
@@ -42,10 +43,19 @@ export function isFailure<TFailure>(obj: any): obj is Failure<TFailure> {
 export function failure(): Failure;
 export function failure<TFailure>(value: TFailure): Failure<TFailure>;
 export function failure<TFailure>(value?: TFailure): Failure<TFailure> {
-  return {
+  const result: Failure<TFailure> = {
     type: 'failure',
     failure: value!,
+    stackTrace: undefined,
   };
+
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(result, failure);
+  } else {
+    result.stackTrace = new Error().stack;
+  }
+
+  return result;
 }
 
 export function unwrap<TSuccess>(result: TSuccess | Result<TSuccess, any>) {
