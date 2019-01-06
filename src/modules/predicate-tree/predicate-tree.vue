@@ -7,7 +7,7 @@ import PredicateNodeView from './predicate-node.vue';
 
 @Component({})
 export default class PredicateTreePage extends Vue {
-  private selectedNodeId = this.topLevelNodeIds[0];
+  private selectedNodeId: string | undefined = this.topLevelNodeIds[0];
 
   created() {
     predicateNodes.loadAllAsync();
@@ -22,7 +22,7 @@ export default class PredicateTreePage extends Vue {
   }
 
   get topLevelNodeIds() {
-    return this.rootNode.childNodeIdsOrResponseGenerator as string[];
+    return this.rootNode ? this.rootNode.childNodeIdsOrResponseGenerator as string[] : [];
   }
 
   private deleteNode(nodeId: string) {
@@ -54,34 +54,54 @@ export default class PredicateTreePage extends Vue {
               Predicate Tree
             </h1>
 
-            <div class='nodes'>
-              {
-                this.topLevelNodeIds.map(id =>
-                  <PredicateNodeView
-                    class='node'
-                    key={id}
-                    nodeId={id}
-                    selectedNodeId={this.selectedNodeId}
-                    onSelect={nodeId => this.selectedNodeId = nodeId}
-                  />
-                )
-              }
-            </div>
+            {this.topLevelNodeIds.length > 0 &&
+              <div class='nodes'>
+                {
+                  this.topLevelNodeIds.map(id =>
+                    <PredicateNodeView
+                      class='node'
+                      key={id}
+                      nodeId={id}
+                      selectedNodeId={this.selectedNodeId!}
+                      onSelect={nodeId => this.selectedNodeId = nodeId}
+                    />
+                  )
+                }
+              </div>
+            }
+
+            {this.topLevelNodeIds.length === 0 &&
+              <div>
+                <p>There are no predicate nodes yet.</p>
+                <br />
+                <button
+                  class='button is-primary'
+                  onClick={() => this.dialog().openForNewNode()}
+                >
+                  <span>Create new node</span>
+                  <span class='icon is-small'>
+                    <fa-icon icon='plus' />
+                  </span>
+                </button>
+              </div>
+            }
           </div>
 
           { /* TODO build open and close mechanism for small devices */}
           <div class='column is-12-tablet is-6-desktop is-4-widescreen details-column'>
-            <PredicateNodeDetails
-              class='node-details'
-              nodeId={this.selectedNodeId}
-              onEdit={() => this.dialog().openForExistingNode(predicateNodes.state.nodesById[this.selectedNodeId])}
-              onDelete={() => this.deleteNode(this.selectedNodeId)}
-              onAddChildNode={() => this.addChildNode(this.selectedNodeId)}
-              onSetResponseGenerator={() => this.setResponseGenerator(this.selectedNodeId)}
-              onEditResponseGenerator={() => this.editResponseGenerator(this.selectedNodeId)}
-              onRemoveResponseGenerator={() => this.removeResponseGenerator(this.selectedNodeId)}
-              onSelectChildNode={nodeId => this.selectedNodeId = nodeId}
-            />
+            {this.selectedNodeId &&
+              <PredicateNodeDetails
+                class='node-details'
+                nodeId={this.selectedNodeId}
+                onEdit={() => this.dialog().openForExistingNode(predicateNodes.state.nodesById[this.selectedNodeId!])}
+                onDelete={() => this.deleteNode(this.selectedNodeId!)}
+                onAddChildNode={() => this.addChildNode(this.selectedNodeId!)}
+                onSetResponseGenerator={() => this.setResponseGenerator(this.selectedNodeId!)}
+                onEditResponseGenerator={() => this.editResponseGenerator(this.selectedNodeId!)}
+                onRemoveResponseGenerator={() => this.removeResponseGenerator(this.selectedNodeId!)}
+                onSelectChildNode={nodeId => this.selectedNodeId = nodeId}
+              />
+            }
           </div>
         </div>
 
@@ -104,6 +124,7 @@ export default class PredicateTreePage extends Vue {
 .columns {
   height: 100%;
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .column {

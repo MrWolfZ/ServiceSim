@@ -115,6 +115,8 @@ export async function setupMockData() {
       templateVersion: staticResponseGeneratorTemplate.version,
       parameterValues: {
         'Status Code': 204,
+        'Body': '',
+        'Content Type': '',
       },
     },
   });

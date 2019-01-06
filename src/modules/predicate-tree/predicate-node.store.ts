@@ -18,7 +18,7 @@ export function getAll(state: PredicateNodesState) {
 
 export function getRootNode(state: PredicateNodesState) {
   const rootNodeName: RootNodeName = 'ROOT';
-  return state.nodeIds.map(id => state.nodesById[id]).find(n => n.name === rootNodeName)!;
+  return state.nodeIds.map(id => state.nodesById[id]).find(n => n.name === rootNodeName);
 }
 
 export function addAll(state: PredicateNodesState, nodes: PredicateNodeState[]) {
