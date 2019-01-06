@@ -1,3 +1,5 @@
+import { Observable, Subject } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { assertNever } from '../util/assert';
 import { failure, Result, success } from '../util/result-monad';
 import { keys } from '../util/util';
@@ -12,6 +14,8 @@ import {
 } from './api-infrastructure.types';
 
 const inMemoryDb: { [entityType: string]: { [id: string]: any[] } } = {};
+
+const allEventsSubject = new Subject<DomainEvent<any, any>>();
 
 function getEntityCollection<TEntity>(entityType: string): { [id: string]: TEntity[] } {
   return inMemoryDb[entityType] = inMemoryDb[entityType] || {};
@@ -141,7 +145,7 @@ async function patchAsync(
     VersionedRootEntityDefinition<any, any> |
     EventDrivenRootEntityDefinition<any, any, any>,
   id: string,
-  expectedVersionOrData: number,
+  expectedVersionOrData: number | object,
   data?: any,
   ...events: any[]
 ): Promise<Result<number | void, string[]>> {
@@ -230,6 +234,8 @@ async function patchAsync(
       assertNever(entityTypeDefinition);
       break;
   }
+
+  events.forEach(evt => allEventsSubject.next(evt));
 
   return success(($metadata as any as VersionedRootEntity<any, any>['$metadata']).version);
 }
@@ -423,7 +429,7 @@ function query(
 
     async byPropertiesAsync(props) {
       const col = getEntityCollection<any>(entityTypeDefinition.entityType);
-      const propNames = keys(props) as string[];
+      const propNames = keys(props);
       return keys(col)
         .map(k => col[k])
         .filter(entities => entities.length > 0)
@@ -432,6 +438,15 @@ function query(
         .filter(e => propNames.every(p => e[p] === props[p]));
     },
   };
+}
+
+function getEventStream<TEvent extends DomainEvent<any, TEvent['eventType']> = DomainEvent<any, TEvent['eventType']>>(
+  eventKinds: TEvent['eventType'][],
+): Observable<TEvent> {
+  return allEventsSubject.pipe(
+    filter(ev => eventKinds.indexOf(ev.eventType as TEvent['eventType']) >= 0),
+    map(t => t as TEvent),
+  );
 }
 
 export const DB = {
@@ -450,6 +465,8 @@ export const DB = {
   },
 
   query,
+
+  getEventStream,
 };
 
 // await DB.withSession(async s => {

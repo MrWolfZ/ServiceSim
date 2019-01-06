@@ -5,7 +5,7 @@ import * as predicateNodeApi from '../predicate-tree/predicate-node.api';
 import * as responseGeneratorTemplateApi from '../response-generator-template/response-generator-template.api';
 import { setupMockData } from './mock-data';
 
-export const resetToDefaultDataAsync: CommandHandler<void> = async () => {
+export const resetToDefaultDataAsync: CommandHandler = async () => {
   await predicateNodeApi.dropAllAsync();
   await predicateTemplateApi.dropAllAsync();
   await responseGeneratorTemplateApi.dropAllAsync();

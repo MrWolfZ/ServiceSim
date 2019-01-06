@@ -1,5 +1,6 @@
 import { DomainEvent, DomainEventOfType, EventDrivenRootEntity, EventDrivenRootEntityDefinition } from './api-infrastructure.types';
 
+// TODO: make custom props exact
 export function createDomainEvent<
   TEntity extends EventDrivenRootEntity<TEntity, TEntityType, TEvent>,
   TEntityType extends string,

@@ -1,12 +1,13 @@
 import express from 'express';
 import { commandHandler, CommandHandler, DB, queryHandler } from '../../api-infrastructure';
-import { failure, isFailure } from '../../util/result-monad';
+import { failure, Failure, isFailure, Result, unwrap } from '../../util/result-monad';
 import { keys, omit } from '../../util/util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
   CreatePredicateTemplateCommand,
   DeletePredicateTemplateCommand,
   PredicateTemplateDto,
+  PredicateTemplateEntity,
   PredicateTemplateEntityDefinition,
   UpdatePredicateTemplateCommand,
 } from './predicate-template.types';
@@ -20,6 +21,35 @@ export async function getAllAsync() {
   const allTemplates = await DB.query(PREDICATE_TEMPLATE_ENTITY_DEFINITION).allAsync();
 
   return allTemplates.map<PredicateTemplateDto>(t => ({
+    id: t.id,
+    version: t.$metadata.version,
+    name: t.name,
+    description: t.description,
+    evalFunctionBody: t.evalFunctionBody,
+    parameters: t.parameters,
+  }));
+}
+
+export async function getByIdsAndVersionsAsync(idsAndVersions: { [templateId: string]: number[] }) {
+  const results = await Promise.all(
+    keys(idsAndVersions)
+      .reduce((agg, id) => [
+        ...agg,
+        ...idsAndVersions[id].map(v => DB.query(PREDICATE_TEMPLATE_ENTITY_DEFINITION).byIdAndVersionAsync(id, v)),
+      ], [] as Promise<Result<PredicateTemplateEntity, string[]>>[])
+  );
+
+  const messages = results
+    .filter(isFailure).map(r => r as any as Failure<string>)
+    .reduce((agg, f) => [...agg, ...f.failure], [] as string[]);
+
+  if (messages.length > 0) {
+    return failure(messages);
+  }
+
+  const templates = results.map(unwrap);
+
+  return templates.map<PredicateTemplateDto>(t => ({
     id: t.id,
     version: t.$metadata.version,
     name: t.name,

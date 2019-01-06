@@ -13,7 +13,7 @@ export async function setupMockData() {
   const allResponseGeneratorTemplates = await responseGeneratorTemplateApi.getAllAsync();
   const staticResponseGeneratorTemplate = allResponseGeneratorTemplates.find(t => t.name === STATIC.name)!;
 
-  const rootNode = (await predicateTemplateApi.getAllAsync())[0];
+  const rootNode = unwrap(await predicateNodeApi.getAllAsync())[0];
 
   const topLevelPredicateNode1Result = unwrap(
     await predicateNodeApi.createAsync({

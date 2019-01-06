@@ -1,5 +1,5 @@
-export function keys<T>(t: T): (keyof T)[] {
-  return Object.keys(t) as (keyof T)[];
+export function keys<T extends { [key: string]: any }, TKey extends keyof T = string>(t: T): TKey[] {
+  return Object.keys(t) as TKey[];
 }
 
 export function copyProps<T>(target: T, props: Partial<T>) {

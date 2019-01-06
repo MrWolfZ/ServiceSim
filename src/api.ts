@@ -8,7 +8,6 @@ import * as adminApi from './modules/admin/admin.api';
 import * as predicateTemplatesApi from './modules/predicate-template/predicate-template.api';
 import * as predicateNodeApi from './modules/predicate-tree/predicate-node.api';
 import * as predicateTreeApi from './modules/predicate-tree/predicate-tree.api';
-import { PredicateTree } from './modules/simulation/predicate-tree.api';
 import simulationApi from './modules/simulation/simulation.api';
 
 // TODO: set adapter based on configuration
@@ -51,9 +50,7 @@ export async function initializeAsync() {
 
   await predicateNodeApi.ensureRootNodeExistsAsync();
 
-  const subscriptions = [
-    PredicateTree.start(),
-  ];
+  const subscriptions: Subscription[] = [];
 
   return new Subscription(() => subscriptions.forEach(sub => sub.unsubscribe()));
 }

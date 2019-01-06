@@ -1,14 +1,19 @@
 import express from 'express';
 import { commandHandler, CommandHandler, createDomainEvent, DB, queryHandler } from '../../api-infrastructure';
-import { failure, isFailure } from '../../util/result-monad';
+import { failure, isFailure, success, unwrap } from '../../util/result-monad';
 import { omit } from '../../util/util';
+import * as predicateTemplatesApi from '../predicate-template/predicate-template.api';
+import * as responseGeneratorTemplatesApi from '../response-generator-template/response-generator-template.api';
 import {
   CreatePredicateNodeCommand,
   DeletePredicateNodeCommand,
   PredicateNodeDto,
   PredicateNodeEntityDefinition,
+  ResponseGeneratorData,
+  ResponseGeneratorDataWithTemplateSnapshot,
   RootNodeName,
   SetResponseGeneratorCommand,
+  TemplateInfo,
   UpdatePredicateNodeCommand,
 } from './predicate-node.types';
 
@@ -23,34 +28,124 @@ export const PREDICATE_NODE_ENTITY_DEFINITION: PredicateNodeEntityDefinition = {
       };
     },
 
-    ResponseGeneratorSet: (entity, _) => {
-      // TODO: move validation to command handler
-      if (Array.isArray(entity.childNodeIdsOrResponseGenerator) && entity.childNodeIdsOrResponseGenerator.length > 0) {
-        throw new Error(`Cannot set response generator for predicate node ${entity.id} since it already has child nodes!`);
-      }
-
-      // TODO: implement
-      return entity;
+    ResponseGeneratorSet: (entity, evt) => {
+      return {
+        ...entity,
+        childNodeIdsOrResponseGenerator: {
+          name: evt.responseGenerator.name,
+          description: evt.responseGenerator.description,
+          templateInfoOrGeneratorFunctionBody: evt.responseGenerator.templateInfoOrGeneratorFunctionBody,
+        },
+      };
     },
   },
 };
 
 export async function getAllAsync() {
-  const allTemplates = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).allAsync();
+  const allNodes = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).allAsync();
+  const allReferencedPredicateTemplateIdsAndVersions = allNodes
+    .filter(n => typeof n.templateInfoOrEvalFunctionBody !== 'string')
+    .map(n => n.templateInfoOrEvalFunctionBody as TemplateInfo)
+    .reduce((agg, ti) => {
+      agg[ti.templateId] = agg[ti.templateId] || [];
 
-  // TODO: load templates in correct versions and apply data to DTOs
+      if (!agg[ti.templateId].includes(ti.templateVersion)) {
+        agg[ti.templateId].push(ti.templateVersion);
+      }
 
-  return allTemplates.map<PredicateNodeDto>(n => ({
-    id: n.id,
-    version: n.$metadata.version,
-    name: n.name,
-    description: n.description,
-    templateInfoOrEvalFunctionBody: undefined!,
-    childNodeIdsOrResponseGenerator: [],
-  }));
+      return agg;
+    }, {} as { [templateId: string]: number[] });
+
+  const getPredicateTemplatesByIdsAndVersionsAsyncResult = await predicateTemplatesApi.getByIdsAndVersionsAsync(allReferencedPredicateTemplateIdsAndVersions);
+
+  if (isFailure(getPredicateTemplatesByIdsAndVersionsAsyncResult)) {
+    return getPredicateTemplatesByIdsAndVersionsAsyncResult;
+  }
+
+  const allReferencedResponseGeneratorTemplateIdsAndVersions = allNodes
+    .filter(n => !Array.isArray(n.childNodeIdsOrResponseGenerator) && typeof n.templateInfoOrEvalFunctionBody !== 'string')
+    .map(n => (n.childNodeIdsOrResponseGenerator as ResponseGeneratorData).templateInfoOrGeneratorFunctionBody as TemplateInfo)
+    .reduce((agg, ti) => {
+      agg[ti.templateId] = agg[ti.templateId] || [];
+
+      if (!agg[ti.templateId].includes(ti.templateVersion)) {
+        agg[ti.templateId].push(ti.templateVersion);
+      }
+
+      return agg;
+    }, {} as { [templateId: string]: number[] });
+
+  const getResponseGeneratorTemplatesByIdsAndVersionsAsyncResult =
+    await responseGeneratorTemplatesApi.getByIdsAndVersionsAsync(allReferencedResponseGeneratorTemplateIdsAndVersions);
+
+  if (isFailure(getResponseGeneratorTemplatesByIdsAndVersionsAsyncResult)) {
+    return getResponseGeneratorTemplatesByIdsAndVersionsAsyncResult;
+  }
+
+  const allReferencedPredicateTemplates = unwrap(getPredicateTemplatesByIdsAndVersionsAsyncResult);
+  const allReferencedResponseGeneratorTemplates = unwrap(getResponseGeneratorTemplatesByIdsAndVersionsAsyncResult);
+
+  return success(
+    allNodes.map<PredicateNodeDto>(n => {
+      let templateInfoOrEvalFunctionBody: PredicateNodeDto['templateInfoOrEvalFunctionBody'];
+
+      if (typeof n.templateInfoOrEvalFunctionBody === 'string') {
+        templateInfoOrEvalFunctionBody = n.templateInfoOrEvalFunctionBody;
+      } else {
+        const templateId = n.templateInfoOrEvalFunctionBody.templateId;
+        const templateVersion = n.templateInfoOrEvalFunctionBody.templateVersion;
+        const template = allReferencedPredicateTemplates.find(t => t.id === templateId && t.version === templateVersion)!;
+
+        templateInfoOrEvalFunctionBody = {
+          templateId,
+          templateVersion,
+          parameterValues: n.templateInfoOrEvalFunctionBody.parameterValues,
+          templateDataSnapshot: omit(template, 'id', 'version'),
+        };
+      }
+
+      let childNodeIdsOrResponseGenerator: PredicateNodeDto['childNodeIdsOrResponseGenerator'];
+
+      if (Array.isArray(n.childNodeIdsOrResponseGenerator)) {
+        childNodeIdsOrResponseGenerator = n.childNodeIdsOrResponseGenerator;
+      } else {
+        let templateInfoOrGeneratorFunctionBody: ResponseGeneratorDataWithTemplateSnapshot['templateInfoOrGeneratorFunctionBody'];
+
+        if (typeof n.childNodeIdsOrResponseGenerator.templateInfoOrGeneratorFunctionBody === 'string') {
+          templateInfoOrGeneratorFunctionBody = n.childNodeIdsOrResponseGenerator.templateInfoOrGeneratorFunctionBody;
+        } else {
+          const templateId = n.childNodeIdsOrResponseGenerator.templateInfoOrGeneratorFunctionBody.templateId;
+          const templateVersion = n.childNodeIdsOrResponseGenerator.templateInfoOrGeneratorFunctionBody.templateVersion;
+          const template = allReferencedResponseGeneratorTemplates.find(t => t.id === templateId && t.version === templateVersion)!;
+
+          templateInfoOrGeneratorFunctionBody = {
+            templateId,
+            templateVersion,
+            parameterValues: n.childNodeIdsOrResponseGenerator.templateInfoOrGeneratorFunctionBody.parameterValues,
+            templateDataSnapshot: omit(template, 'id', 'version'),
+          };
+        }
+
+        childNodeIdsOrResponseGenerator = {
+          name: n.childNodeIdsOrResponseGenerator.name,
+          description: n.childNodeIdsOrResponseGenerator.description,
+          templateInfoOrGeneratorFunctionBody,
+        };
+      }
+
+      return {
+        id: n.id,
+        version: n.$metadata.version,
+        name: n.name,
+        description: n.description,
+        templateInfoOrEvalFunctionBody,
+        childNodeIdsOrResponseGenerator,
+      };
+    })
+  );
 }
 
-type PredicateTemplateCommandHandler<TCommand> = CommandHandler<TCommand, {
+type PredicateNodeCommandHandler<TCommand> = CommandHandler<TCommand, {
   nodeId: string;
   nodeVersion: number;
 }>;
@@ -76,7 +171,7 @@ export const ensureRootNodeExistsAsync: CommandHandler<void, { nodeId: string }>
   };
 };
 
-export const createAsync: PredicateTemplateCommandHandler<CreatePredicateNodeCommand> = async command => {
+export const createAsync: PredicateNodeCommandHandler<CreatePredicateNodeCommand> = async command => {
   const parentNodeResult = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byIdAsync(command.parentNodeId);
 
   if (isFailure(parentNodeResult)) {
@@ -122,7 +217,7 @@ createAsync.constraints = {
   templateInfoOrEvalFunctionBody: {},
 };
 
-export const updateAsync: PredicateTemplateCommandHandler<UpdatePredicateNodeCommand> = async command => {
+export const updateAsync: PredicateNodeCommandHandler<UpdatePredicateNodeCommand> = async command => {
   const result = await DB.patchAsync(
     PREDICATE_NODE_ENTITY_DEFINITION,
     command.nodeId,
@@ -155,7 +250,19 @@ updateAsync.constraints = {
   parameterValuesOrEvalFunctionBody: {},
 };
 
-export const setResponseGeneratorAsync: PredicateTemplateCommandHandler<SetResponseGeneratorCommand> = async command => {
+export const setResponseGeneratorAsync: PredicateNodeCommandHandler<SetResponseGeneratorCommand> = async command => {
+  const nodeResult = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byIdAsync(command.nodeId);
+
+  if (isFailure(nodeResult)) {
+    return nodeResult;
+  }
+
+  const node = nodeResult.success;
+
+  if (Array.isArray(node.childNodeIdsOrResponseGenerator) && node.childNodeIdsOrResponseGenerator.length > 0) {
+    return failure([`Cannot set response generator for predicate node ${node.id} since it already has child nodes!`]);
+  }
+
   const result = await DB.patchAsync(
     PREDICATE_NODE_ENTITY_DEFINITION,
     command.nodeId,

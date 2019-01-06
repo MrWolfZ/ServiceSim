@@ -1,19 +1,36 @@
 import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
-import { EventLog } from '../../api-infrastructure';
+import { DB } from '../../api-infrastructure';
 import { logger } from '../../util/logger';
-import { InvocationResponseWasSet } from '../service-invocation/invocation-response-was-set';
-import { ServiceInvocation, ServiceResponse } from '../service-invocation/service-invocation';
-import { PredicateNode, PredicateTree, ResponseGeneratorFunction } from './predicate-tree.api';
+import { isFailure, unwrap } from '../../util/result-monad';
+import * as serviceInvocationApi from '../service-invocation/service-invocation.api';
+import { InvocationResponseWasSet, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
+import * as predicateTreeApi from './predicate-tree.api';
 
 export const processRequest = async (req: Request, res: Response) => {
-  const topLevelPredicates = await PredicateTree.getTopLevelNodes();
+  const getTreeResult = await predicateTreeApi.getTreeAsync();
 
-  const invocation = ServiceInvocation.create(req.path, req.body);
-  await ServiceInvocation.saveAsync(invocation);
+  if (isFailure(getTreeResult)) {
+    res.status(500).send({ messages: getTreeResult.failure });
+    return;
+  }
 
-  EventLog.getStream<InvocationResponseWasSet>([InvocationResponseWasSet.KIND]).pipe(
-    filter(ev => ev.invocationId === invocation.id),
+  const rootNode = unwrap(getTreeResult);
+
+  const request: ServiceRequest = {
+    path: req.path,
+    body: req.body,
+  };
+
+  const createResult = await serviceInvocationApi.createAsync(request);
+
+  if (isFailure(createResult)) {
+    res.status(500).send({ messages: createResult.failure });
+    return;
+  }
+
+  DB.getEventStream<InvocationResponseWasSet>(['InvocationResponseWasSet']).pipe(
+    filter(ev => ev.rootEntityId === unwrap(createResult).invocationId),
     take(1),
     timeout(60000),
   ).subscribe(ev => {
@@ -30,23 +47,34 @@ export const processRequest = async (req: Request, res: Response) => {
     contentType: '',
   };
 
-  const node = await findNode(topLevelPredicates);
+  const node = await findNode(rootNode.childNodesOrResponseGenerator as predicateTreeApi.PredicateNode[]);
   if (node) {
-    const generator = node.childNodesOrResponseGenerator as ResponseGeneratorFunction;
-    response = await Promise.resolve(generator(invocation.request));
+    const generator = node.childNodesOrResponseGenerator as predicateTreeApi.ResponseGeneratorFunction;
+    response = await Promise.resolve(generator(request));
   }
 
-  invocation.setResponse(response.statusCode, response.body, response.contentType);
-  await ServiceInvocation.saveAsync(invocation);
+  const setResponseResult = await serviceInvocationApi.setServiceResponseAsync({
+    invocationId: unwrap(createResult).invocationId,
+    unmodifiedInvocationVersion: unwrap(createResult).invocationVersion,
+    ...response,
+  });
 
-  async function findNode(nodes: PredicateNode[]): Promise<PredicateNode | undefined> {
+  if (isFailure(setResponseResult)) {
+    res.status(500).send({ messages: setResponseResult.failure });
+    return;
+  }
+
+  async function findNode(nodes: predicateTreeApi.PredicateNode[]): Promise<predicateTreeApi.PredicateNode | undefined> {
     for (const node of nodes) {
-      if (!node.childNodesOrResponseGenerator) {
+      if (!node.childNodesOrResponseGenerator || Array.isArray(node.childNodesOrResponseGenerator) && node.childNodesOrResponseGenerator.length === 0) {
+        logger.debug(`simulation API: skipping node ${node.nodeId} since it has neither child nodes nor a response generator`);
         continue;
       }
 
       try {
-        if (!await Promise.resolve(node.evaluate(invocation.request))) {
+        const nodeEvalutedToTrue = await node.evaluate(request);
+        logger.debug(`simulation API: node ${node.nodeId} evaluated to ${nodeEvalutedToTrue}`);
+        if (!nodeEvalutedToTrue) {
           continue;
         }
       } catch (e) {
@@ -55,15 +83,17 @@ export const processRequest = async (req: Request, res: Response) => {
       }
 
       if (!Array.isArray(node.childNodesOrResponseGenerator)) {
+        logger.debug(`simulation API: using response generator of node ${node.nodeId}`);
         return node;
       }
 
-      const childNode = findNode(node.childNodesOrResponseGenerator);
+      const childNode = await findNode(node.childNodesOrResponseGenerator);
       if (childNode) {
         return childNode;
       }
     }
 
+    logger.debug(`simulation API: no matching node found`);
     return undefined;
   }
 };

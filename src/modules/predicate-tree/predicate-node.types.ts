@@ -43,13 +43,23 @@ export type PredicateNodeDomainEvents =
   | ResponseGeneratorSet
   ;
 
+export interface PredicateTemplateInfoWithSnapshot extends TemplateInfo {
+  templateDataSnapshot: PredicateTemplateData;
+}
+
+export interface ResponseGeneratorTemplateInfoWithSnapshot extends TemplateInfo {
+  templateDataSnapshot: ResponseGeneratorTemplateData;
+}
+
+export interface ResponseGeneratorDataWithTemplateSnapshot extends ResponseGeneratorData {
+  templateInfoOrGeneratorFunctionBody: ResponseGeneratorTemplateInfoWithSnapshot | string;
+}
+
 export interface PredicateNodeDto extends PredicateNodeData {
   id: string;
   version: number;
-  templateInfoOrEvalFunctionBody: (TemplateInfo & { templateDataSnapshot: PredicateTemplateData }) | string;
-  childNodeIdsOrResponseGenerator: string[] |
-  (ResponseGeneratorData & { templateInfoOrGeneratorFunctionBody: (TemplateInfo & { templateDataSnapshot: ResponseGeneratorTemplateData }) | string })
-  ;
+  templateInfoOrEvalFunctionBody: PredicateTemplateInfoWithSnapshot | string;
+  childNodeIdsOrResponseGenerator: string[] | ResponseGeneratorDataWithTemplateSnapshot;
 }
 
 export interface PredicateNodeState extends PredicateNodeDto { }
