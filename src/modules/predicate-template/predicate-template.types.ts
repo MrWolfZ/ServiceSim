@@ -1,4 +1,4 @@
-import { VersionedRootEntity, VersionedRootEntityDefinition } from '../../api-infrastructure/api-infrastructure.types';
+import { RootEntity } from '../../api-infrastructure/api-infrastructure.types';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface PredicateTemplateData {
@@ -10,9 +10,7 @@ export interface PredicateTemplateData {
 
 export type PredicateTemplateEntityType = 'predicate-template';
 
-export interface PredicateTemplateEntity extends PredicateTemplateData, VersionedRootEntity<PredicateTemplateEntity, PredicateTemplateEntityType> { }
-
-export type PredicateTemplateEntityDefinition = VersionedRootEntityDefinition<PredicateTemplateEntity, PredicateTemplateEntityType>;
+export type PredicateTemplateEntity = PredicateTemplateData & RootEntity;
 
 export interface PredicateTemplateDto extends PredicateTemplateData {
   id: string;

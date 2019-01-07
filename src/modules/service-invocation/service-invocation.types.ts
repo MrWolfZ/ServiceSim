@@ -1,4 +1,4 @@
-import { DomainEvent, EventDrivenRootEntity, EventDrivenRootEntityDefinition } from '../../api-infrastructure/api-infrastructure.types';
+import { DomainEvent, RootEntity } from '../../api-infrastructure/api-infrastructure.types';
 
 export interface ServiceRequest {
   path: string;
@@ -19,11 +19,7 @@ export interface ServiceInvocationData {
 
 export type ServiceInvocationEntityType = 'service-invocation';
 
-export interface ServiceInvocationEntity extends
-  ServiceInvocationData, EventDrivenRootEntity<ServiceInvocationEntity, ServiceInvocationEntityType, ServiceInvocationDomainEvents> { }
-
-export type ServiceInvocationEntityDefinition =
-  EventDrivenRootEntityDefinition<ServiceInvocationEntity, ServiceInvocationEntityType, ServiceInvocationDomainEvents>;
+export type ServiceInvocationEntity = ServiceInvocationData & RootEntity;
 
 export interface InvocationResponseWasSet extends DomainEvent<ServiceInvocationEntityType, 'InvocationResponseWasSet'> {
   statusCode: number;

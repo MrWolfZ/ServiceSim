@@ -1,4 +1,4 @@
-import { DomainEvent, EventDrivenRootEntity, EventDrivenRootEntityDefinition } from '../../api-infrastructure/api-infrastructure.types';
+import { DomainEvent, RootEntity } from '../../api-infrastructure/api-infrastructure.types';
 import { PredicateTemplateData } from '../predicate-template/predicate-template.types';
 import { ResponseGeneratorTemplateData } from '../response-generator-template/response-generator-template.types';
 
@@ -25,10 +25,7 @@ export type PredicateNodeEntityType = 'predicate-node';
 
 export type RootNodeName = 'ROOT';
 
-export interface PredicateNodeEntity extends
-  PredicateNodeData, EventDrivenRootEntity<PredicateNodeEntity, PredicateNodeEntityType, PredicateNodeDomainEvents> { }
-
-export type PredicateNodeEntityDefinition = EventDrivenRootEntityDefinition<PredicateNodeEntity, PredicateNodeEntityType, PredicateNodeDomainEvents>;
+export type PredicateNodeEntity = PredicateNodeData & RootEntity;
 
 export interface ChildPredicateNodeAdded extends DomainEvent<PredicateNodeEntityType, 'ChildPredicateNodeAdded'> {
   childNodeId: string;

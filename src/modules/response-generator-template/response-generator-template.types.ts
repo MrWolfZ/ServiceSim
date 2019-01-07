@@ -1,4 +1,4 @@
-import { VersionedRootEntity, VersionedRootEntityDefinition } from '../../api-infrastructure/api-infrastructure.types';
+import { RootEntity } from '../../api-infrastructure/api-infrastructure.types';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface ResponseGeneratorTemplateData {
@@ -10,11 +10,7 @@ export interface ResponseGeneratorTemplateData {
 
 export type ResponseGeneratorTemplateEntityType = 'response-generator-template';
 
-export interface ResponseGeneratorTemplateEntity
-  extends ResponseGeneratorTemplateData, VersionedRootEntity<ResponseGeneratorTemplateEntity, ResponseGeneratorTemplateEntityType> { }
-
-export type ResponseGeneratorTemplateEntityDefinition
-  = VersionedRootEntityDefinition<ResponseGeneratorTemplateEntity, ResponseGeneratorTemplateEntityType>;
+export type ResponseGeneratorTemplateEntity = ResponseGeneratorTemplateData & RootEntity;
 
 export interface ResponseGeneratorTemplateDto extends ResponseGeneratorTemplateData {
   id: string;

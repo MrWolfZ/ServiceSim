@@ -3,29 +3,27 @@ import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import {
   CreateServiceInvocationCommand,
-  ServiceInvocationEntityDefinition,
+  ServiceInvocationDomainEvents,
+  ServiceInvocationEntity,
+  ServiceInvocationEntityType,
   SetServiceResponseCommand,
 } from './service-invocation.types';
 
-export const SERVICE_INVOCATION_ENTITY_DEFINITION: ServiceInvocationEntityDefinition = {
-  entityType: 'service-invocation',
-  '@': 'EventDrivenRootEntityDefinition',
-  eventHandlers: {
-    InvocationResponseWasSet: (entity, evt) => {
-      return {
-        ...entity,
-        response: {
-          statusCode: evt.statusCode,
-          body: evt.body,
-          contentType: evt.contentType,
-        },
-      };
-    },
+const repo = DB.eventDrivenRepository<ServiceInvocationEntityType, ServiceInvocationEntity, ServiceInvocationDomainEvents>('service-invocation', {
+  InvocationResponseWasSet: (entity, evt) => {
+    return {
+      ...entity,
+      response: {
+        statusCode: evt.statusCode,
+        body: evt.body,
+        contentType: evt.contentType,
+      },
+    };
   },
-};
+});
 
 export async function createServiceInvocation(command: CreateServiceInvocationCommand) {
-  const newInvocation = await DB.create(SERVICE_INVOCATION_ENTITY_DEFINITION, {
+  const newInvocation = await repo.create({
     state: 'processing pending',
     request: {
       path: command.path,
@@ -36,7 +34,7 @@ export async function createServiceInvocation(command: CreateServiceInvocationCo
 
   return {
     invocationId: newInvocation.id,
-    invocationVersion: newInvocation.$metadata.version,
+    invocationVersion: 1,
   };
 }
 
@@ -47,19 +45,18 @@ createServiceInvocation.constraints = {
 };
 
 export async function setServiceInvocationResponse(command: SetServiceResponseCommand) {
-  const invocation = await DB.query(SERVICE_INVOCATION_ENTITY_DEFINITION).byId(command.invocationId);
+  const invocation = await repo.query.byId(command.invocationId);
 
   if (invocation.response) {
     throw failure(`Cannot set response for service invocation ${invocation.id} since it already has a response!`);
   }
 
-  const newVersion = await DB.patch(
-    SERVICE_INVOCATION_ENTITY_DEFINITION,
+  const newVersion = await repo.patch(
     command.invocationId,
     command.unmodifiedInvocationVersion,
     {},
     createDomainEvent(
-      SERVICE_INVOCATION_ENTITY_DEFINITION,
+      'service-invocation',
       'InvocationResponseWasSet',
       {
         rootEntityId: command.invocationId,
@@ -84,5 +81,5 @@ setServiceInvocationResponse.constraints = {
 };
 
 export async function dropAllServiceInvocations() {
-  await DB.dropAll(SERVICE_INVOCATION_ENTITY_DEFINITION.entityType);
+  await repo.dropAll();
 }

@@ -7,17 +7,16 @@ import {
   DeletePredicateTemplateCommand,
   PredicateTemplateDto,
   PredicateTemplateEntity,
-  PredicateTemplateEntityDefinition,
+  PredicateTemplateEntityType,
   UpdatePredicateTemplateCommand,
 } from './predicate-template.types';
 
-export const PREDICATE_TEMPLATE_ENTITY_DEFINITION: PredicateTemplateEntityDefinition = {
-  entityType: 'predicate-template',
-  '@': 'VersionedRootEntityDefinition',
-};
+const repo = DB.versionedRepository<PredicateTemplateEntityType, PredicateTemplateEntity>('predicate-template');
 
 export async function getAllPredicateTemplates() {
-  const allTemplates = await DB.query(PREDICATE_TEMPLATE_ENTITY_DEFINITION).all();
+  const allTemplates = await repo.query.all();
+
+  allTemplates[0].$metadata.changesSinceLastVersion;
 
   return allTemplates.map<PredicateTemplateDto>(t => ({
     id: t.id,
@@ -34,8 +33,8 @@ export async function getPredicateTemplatesByIdsAndVersions(idsAndVersions: { [t
     keys(idsAndVersions)
       .reduce((agg, id) => [
         ...agg,
-        ...idsAndVersions[id].map(v => DB.query(PREDICATE_TEMPLATE_ENTITY_DEFINITION).byIdAndVersion(id, v)),
-      ], [] as Promise<PredicateTemplateEntity>[])
+        ...idsAndVersions[id].map(v => repo.query.byIdAndVersion(id, v)),
+      ], [] as ReturnType<typeof repo.query.byIdAndVersion>[])
   );
 
   return templates.map<PredicateTemplateDto>(t => ({
@@ -49,11 +48,11 @@ export async function getPredicateTemplatesByIdsAndVersions(idsAndVersions: { [t
 }
 
 export async function createPredicateTemplate(command: CreatePredicateTemplateCommand) {
-  const template = await DB.create(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command);
+  const template = await repo.create(command);
 
   return {
     templateId: template.id,
-    templateVersion: template.$metadata.version,
+    templateVersion: 1,
   };
 }
 
@@ -66,8 +65,7 @@ export const createPredicateTemplateConstraints: CommandValidationConstraints<Cr
 };
 
 export async function updatePredicateTemplate(command: UpdatePredicateTemplateCommand) {
-  const newVersion = await DB.patch(
-    PREDICATE_TEMPLATE_ENTITY_DEFINITION,
+  const newVersion = await repo.patch(
     command.templateId,
     command.unmodifiedTemplateVersion,
     omit(command, 'templateId', 'unmodifiedTemplateVersion'),
@@ -90,7 +88,7 @@ export const updatePredicateTemplateConstraints: CommandValidationConstraints<Up
 };
 
 export async function deletePredicateTemplate(command: DeletePredicateTemplateCommand) {
-  return await DB.delete(PREDICATE_TEMPLATE_ENTITY_DEFINITION, command.templateId, command.unmodifiedTemplateVersion);
+  return await repo.delete(command.templateId, command.unmodifiedTemplateVersion);
 }
 
 // TODO: validate
@@ -100,7 +98,7 @@ export const deletePredicateTemplateConstraints: CommandValidationConstraints<De
 };
 
 export async function dropAllPredicateTemplates() {
-  await DB.dropAll(PREDICATE_TEMPLATE_ENTITY_DEFINITION.entityType);
+  await repo.dropAll();
 }
 
 export async function createDefaultPredicateTemplates() {

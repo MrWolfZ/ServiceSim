@@ -7,8 +7,10 @@ import { getResponseGeneratorTemplatesByIdsAndVersions } from '../response-gener
 import {
   CreatePredicateNodeCommand as AddChildPredicateNodeCommand,
   DeletePredicateNodeCommand,
+  PredicateNodeDomainEvents,
   PredicateNodeDto,
-  PredicateNodeEntityDefinition,
+  PredicateNodeEntity,
+  PredicateNodeEntityType,
   ResponseGeneratorData,
   ResponseGeneratorDataWithTemplateSnapshot,
   RootNodeName,
@@ -17,32 +19,28 @@ import {
   UpdatePredicateNodeCommand,
 } from './predicate-node.types';
 
-export const PREDICATE_NODE_ENTITY_DEFINITION: PredicateNodeEntityDefinition = {
-  entityType: 'predicate-node',
-  '@': 'EventDrivenRootEntityDefinition',
-  eventHandlers: {
-    ChildPredicateNodeAdded: (entity, evt) => {
-      return {
-        ...entity,
-        childNodeIdsOrResponseGenerator: [...entity.childNodeIdsOrResponseGenerator as string[], evt.childNodeId],
-      };
-    },
-
-    ResponseGeneratorSet: (entity, evt) => {
-      return {
-        ...entity,
-        childNodeIdsOrResponseGenerator: {
-          name: evt.responseGenerator.name,
-          description: evt.responseGenerator.description,
-          templateInfoOrGeneratorFunctionBody: evt.responseGenerator.templateInfoOrGeneratorFunctionBody,
-        },
-      };
-    },
+const repo = DB.eventDrivenRepository<PredicateNodeEntityType, PredicateNodeEntity, PredicateNodeDomainEvents>('predicate-node', {
+  ChildPredicateNodeAdded: (entity, evt) => {
+    return {
+      ...entity,
+      childNodeIdsOrResponseGenerator: [...entity.childNodeIdsOrResponseGenerator as string[], evt.childNodeId],
+    };
   },
-};
+
+  ResponseGeneratorSet: (entity, evt) => {
+    return {
+      ...entity,
+      childNodeIdsOrResponseGenerator: {
+        name: evt.responseGenerator.name,
+        description: evt.responseGenerator.description,
+        templateInfoOrGeneratorFunctionBody: evt.responseGenerator.templateInfoOrGeneratorFunctionBody,
+      },
+    };
+  },
+});
 
 export async function getAllPredicateNodes() {
-  const allNodes = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).all();
+  const allNodes = await repo.query.all();
   const allReferencedPredicateTemplateIdsAndVersions = allNodes
     .filter(n => typeof n.templateInfoOrEvalFunctionBody !== 'string')
     .map(n => n.templateInfoOrEvalFunctionBody as TemplateInfo)
@@ -134,18 +132,20 @@ export async function getAllPredicateNodes() {
 export async function ensureRootPredicateNodeExists() {
   const rootNodeName: RootNodeName = 'ROOT';
 
-  const rootNodes = (await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byProperties({ name: rootNodeName }));
+  const rootNodes = (await repo.query.byProperties({ name: rootNodeName }));
 
-  let rootNode = rootNodes[0];
-
-  if (rootNodes.length === 0) {
-    rootNode = await DB.create(PREDICATE_NODE_ENTITY_DEFINITION, {
-      name: rootNodeName,
-      description: 'Root node of the predicate tree. This node should never be exposed to the user directly.',
-      templateInfoOrEvalFunctionBody: 'return true;',
-      childNodeIdsOrResponseGenerator: [],
-    });
+  if (rootNodes.length > 0) {
+    return {
+      nodeId: rootNodes[0].id,
+    };
   }
+
+  const rootNode = await repo.create({
+    name: rootNodeName,
+    description: 'Root node of the predicate tree. This node should never be exposed to the user directly.',
+    templateInfoOrEvalFunctionBody: 'return true;',
+    childNodeIdsOrResponseGenerator: [],
+  });
 
   return {
     nodeId: rootNode.id,
@@ -153,24 +153,23 @@ export async function ensureRootPredicateNodeExists() {
 }
 
 export async function addChildPredicateNode(command: AddChildPredicateNodeCommand) {
-  const parentNode = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byId(command.parentNodeId);
+  const parentNode = await repo.query.byId(command.parentNodeId);
 
   if (!Array.isArray(parentNode.childNodeIdsOrResponseGenerator)) {
     throw failure(`Cannot add child predicate node for predicate node ${parentNode.id} since it already has a response generator set!`);
   }
 
-  const newNode = await DB.create(PREDICATE_NODE_ENTITY_DEFINITION, {
+  const newNode = await repo.create({
     ...omit(command, 'parentNodeId'),
     childNodeIdsOrResponseGenerator: [],
   });
 
-  await DB.patch(
-    PREDICATE_NODE_ENTITY_DEFINITION,
+  await repo.patch(
     parentNode.id,
     parentNode.$metadata.version,
     {},
     createDomainEvent(
-      PREDICATE_NODE_ENTITY_DEFINITION,
+      'predicate-node',
       'ChildPredicateNodeAdded',
       {
         rootEntityId: parentNode.id,
@@ -181,7 +180,7 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
 
   return {
     nodeId: newNode.id,
-    nodeVersion: newNode.$metadata.version,
+    nodeVersion: 1,
   };
 }
 
@@ -193,8 +192,7 @@ export const addChildPredicateNodeConstraints: CommandValidationConstraints<AddC
 };
 
 export async function updatePredicateNode(command: UpdatePredicateNodeCommand) {
-  const newVersion = await DB.patch(
-    PREDICATE_NODE_ENTITY_DEFINITION,
+  const newVersion = await repo.patch(
     command.nodeId,
     command.unmodifiedNodeVersion,
     {
@@ -222,19 +220,18 @@ export const updatePredicateNodeConstraints: CommandValidationConstraints<Update
 };
 
 export async function setPredicateNodeResponseGenerator(command: SetResponseGeneratorCommand) {
-  const node = await DB.query(PREDICATE_NODE_ENTITY_DEFINITION).byId(command.nodeId);
+  const node = await repo.query.byId(command.nodeId);
 
   if (Array.isArray(node.childNodeIdsOrResponseGenerator) && node.childNodeIdsOrResponseGenerator.length > 0) {
     throw failure(`Cannot set response generator for predicate node ${node.id} since it already has child nodes!`);
   }
 
-  const newVersion = await DB.patch(
-    PREDICATE_NODE_ENTITY_DEFINITION,
+  const newVersion = await repo.patch(
     command.nodeId,
     command.unmodifiedNodeVersion,
     {},
     createDomainEvent(
-      PREDICATE_NODE_ENTITY_DEFINITION,
+      'predicate-node',
       'ResponseGeneratorSet',
       {
         rootEntityId: command.nodeId,
@@ -263,7 +260,7 @@ export const setPredicateNodeResponseGeneratorConstraints: CommandValidationCons
 };
 
 export async function deletePredicateNode(command: DeletePredicateNodeCommand) {
-  return await DB.delete(PREDICATE_NODE_ENTITY_DEFINITION, command.nodeId, command.unmodifiedNodeVersion);
+  return await repo.delete(command.nodeId, command.unmodifiedNodeVersion);
 }
 
 // TODO: validate
@@ -273,7 +270,7 @@ export const deletePredicateNodeConstraints: CommandValidationConstraints<Delete
 };
 
 export async function dropAllPredicateNodes() {
-  await DB.dropAll(PREDICATE_NODE_ENTITY_DEFINITION.entityType);
+  await repo.dropAll();
 }
 
 export const predicateNodeApi = express.Router()
