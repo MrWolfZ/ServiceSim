@@ -10,12 +10,13 @@ import {
   EventDrivenAggregateMetadata,
   VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
+import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
 )
   : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
     id: string,
@@ -25,7 +26,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Versioned',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
 )
   : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
     id: string,
@@ -36,7 +37,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
   metadataType: 'EventDriven',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject: Subject<DomainEvent<any, any>>,
 )
@@ -50,7 +51,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers?: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject?: Subject<TEvent>,
 ) {
@@ -60,13 +61,11 @@ export default function patch<TAggregateType extends string, TAggregate extends 
     data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
     ...events: TEvent[]
   ): Promise<number | void> => {
-    const col = getAggregateCollection<TAggregate>(aggregateType);
+    const latestAggregate = await col.getLatestVersionById(id);
 
-    if (!col[id] || col[id].length === 0) {
+    if (!latestAggregate) {
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not exist`);
     }
-
-    const latestAggregate = col[id][col[id].length - 1];
 
     const expectedVersion = typeof expectedVersionOrData === 'number' ? expectedVersionOrData : -1;
     const actualVersion = (latestAggregate.$metadata as VersionedAggregateMetadata<any, any>).version;
@@ -125,12 +124,12 @@ export default function patch<TAggregateType extends string, TAggregate extends 
 
     switch (metadataType) {
       case 'Default':
-        col[id] = [updatedAggregateWithMetadata];
+        await col.set(id, updatedAggregateWithMetadata);
         break;
 
       case 'Versioned':
       case 'EventDriven':
-        col[id].push(updatedAggregateWithMetadata);
+        await col.addVersion(id, updatedAggregateWithMetadata);
         break;
 
       default:

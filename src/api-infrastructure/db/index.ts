@@ -1,42 +1,44 @@
 import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
+import { PersistenceAdapter } from './adapters';
+import { inMemoryPersistenceAdapter } from './adapters/in-memory';
 import create from './create';
 import delete$ from './delete';
 import patch from './patch';
 import query from './query';
 
-const inMemoryDb: { [aggregateType: string]: { [id: string]: any[] } } = {};
-
 const allEventsSubject = new Subject<DomainEvent<any, any>>();
 
-function getAggregateCollection<TAggregate>(aggregateType: string): { [id: string]: (TAggregate & { $metadata: any })[] } {
-  return inMemoryDb[aggregateType] = inMemoryDb[aggregateType] || {};
-}
+const adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
 
 function repository<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
 ) {
-  return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'Default', getAggregateCollection),
-    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Default', getAggregateCollection),
-    delete: delete$<TAggregateType>(aggregateType, 'Default', getAggregateCollection),
-    async dropAll() { inMemoryDb[aggregateType] = {}; },
+  const col = adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
-    query: query<TAggregateType, TAggregate>(aggregateType, 'Default', getAggregateCollection),
+  return {
+    create: create<TAggregateType, TAggregate>(aggregateType, 'Default', col),
+    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Default', col),
+    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Default', col),
+    async dropAll() { await col.dropAll(); },
+
+    query: query<TAggregateType, TAggregate>(aggregateType, 'Default', col),
   };
 }
 
 function versionedRepository<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
 ) {
-  return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'Versioned', getAggregateCollection),
-    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Versioned', getAggregateCollection),
-    delete: delete$<TAggregateType>(aggregateType, 'Versioned', getAggregateCollection),
-    async dropAll() { inMemoryDb[aggregateType] = {}; },
+  const col = adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
-    query: query<TAggregateType, TAggregate>(aggregateType, 'Versioned', getAggregateCollection),
+  return {
+    create: create<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
+    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
+    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
+    async dropAll() { await col.dropAll(); },
+
+    query: query<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
   };
 }
 
@@ -44,13 +46,15 @@ function eventDrivenRepository<TAggregateType extends string, TAggregate extends
   aggregateType: TAggregateType,
   eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
 ) {
-  return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', getAggregateCollection),
-    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', getAggregateCollection, eventHandlers, allEventsSubject),
-    delete: delete$<TAggregateType>(aggregateType, 'EventDriven', getAggregateCollection),
-    async dropAll() { inMemoryDb[aggregateType] = {}; },
+  const col = adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
-    query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', getAggregateCollection),
+  return {
+    create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', col),
+    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', col, eventHandlers, allEventsSubject),
+    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'EventDriven', col),
+    async dropAll() { await col.dropAll(); },
+
+    query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', col),
 
     createDomainEvent<
       TEventType extends TEvent['eventType'],

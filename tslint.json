@@ -77,7 +77,7 @@
     "no-empty": false,
     "no-empty-interface": false,
     "no-eval": true,
-    "no-floating-promises": false,
+    "no-floating-promises": true,
     "no-for-in-array": true,
     "no-import-side-effect": false,
     "no-inferrable-types": [

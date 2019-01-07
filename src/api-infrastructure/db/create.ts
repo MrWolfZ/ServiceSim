@@ -1,17 +1,15 @@
-import { keys } from '../../util/util';
 import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
+import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
 export default function create<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
 ) {
   return async <TData extends Omit<TAggregate, keyof Aggregate>>(
     data: TData & Exact<Omit<TAggregate, keyof Aggregate>, TData>,
   ): Promise<TAggregate> => {
-    const col = getAggregateCollection<TAggregate>(aggregateType);
-
     const epoch = Date.now();
 
     const $aggregateMetadata: AggregateMetadata<TAggregateType> = {
@@ -32,7 +30,7 @@ export default function create<TAggregateType extends string, TAggregate extends
       eventsSinceLastVersion: [],
     };
 
-    const id = `${aggregateType}/${keys(col).length + 1}`;
+    const id = await col.generateId();
     const $metadata = getMetadataOfType(metadataType, $aggregateMetadata, $versionedMetadata, $eventDrivenMetadata);
 
     const newAggregate: TAggregate & { $metadata: any } = {
@@ -41,7 +39,7 @@ export default function create<TAggregateType extends string, TAggregate extends
       ...data as any,
     };
 
-    col[id] = [newAggregate];
+    await col.addVersion(id, newAggregate);
     return newAggregate;
   };
 }

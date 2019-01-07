@@ -41,6 +41,7 @@ host.use(
 
 host.use(api.api);
 
+// tslint:disable-next-line:no-floating-promises
 api.initialize().then(sub => {
   process.on('SIGTERM', () => {
     sub.unsubscribe();

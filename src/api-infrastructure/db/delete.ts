@@ -6,33 +6,32 @@ import {
   EventDrivenAggregateMetadata,
   VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
+import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
-export default function delete$<TAggregateType extends string>(
+export default function delete$<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
 ): (id: string) => Promise<void>;
 
-export default function delete$<TAggregateType extends string>(
+export default function delete$<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Versioned' | 'EventDriven',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
 ): (id: string, expectedVersion: number) => Promise<void>;
 
 export default function delete$<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  col: DocumentCollection<TAggregate & { $metadata: any }>,
 ) {
   return async (id: string, expectedVersion = -1) => {
-    const col = getAggregateCollection<TAggregate>(aggregateType);
+    const latestAggregate = await col.getLatestVersionById(id);
 
-    if (!col[id] || col[id].length === 0) {
+    if (!latestAggregate) {
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not exist`);
     }
-
-    const latestAggregate = col[id][col[id].length - 1];
 
     const actualVersion = (latestAggregate.$metadata as VersionedAggregateMetadata<any, any>).version;
 
@@ -75,12 +74,12 @@ export default function delete$<TAggregateType extends string, TAggregate extend
 
     switch (metadataType) {
       case 'Default':
-        delete col[id];
+        await col.delete(id);
         break;
 
       case 'Versioned':
       case 'EventDriven':
-        col[id].push(updatedAggregate);
+        await col.addVersion(id, updatedAggregate);
         break;
 
       default:
