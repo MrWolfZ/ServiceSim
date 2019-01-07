@@ -1,4 +1,4 @@
-import { createDomainEvent, DB } from '../../api-infrastructure';
+import { DB } from '../../api-infrastructure';
 import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import {
@@ -55,8 +55,7 @@ export async function setServiceInvocationResponse(command: SetServiceResponseCo
     command.invocationId,
     command.unmodifiedInvocationVersion,
     {},
-    createDomainEvent(
-      'service-invocation',
+    repo.createDomainEvent(
       'InvocationResponseWasSet',
       {
         aggregateId: command.invocationId,

@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { Aggregate, DomainEvent, DomainEventHandlerMap } from '../api-infrastructure.types';
+import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
 import create from './create';
 import delete$ from './delete';
 import patch from './patch';
@@ -51,6 +51,26 @@ function eventDrivenRepository<TAggregateType extends string, TAggregate extends
     async dropAll() { inMemoryDb[aggregateType] = {}; },
 
     query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', getAggregateCollection),
+
+    createDomainEvent<
+      TEventType extends TEvent['eventType'],
+      TCustomProps extends Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregateType, TEventType>, 'aggregateId'>>,
+      >(
+        eventType: TEventType,
+        // tslint:disable-next-line:max-line-length
+        customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregateType, TEventType>, 'aggregateId'>>, TCustomProps>,
+    ): TEvent {
+      const domainEventProps: Omit<DomainEvent<TAggregateType, TEventType>, 'aggregateId'> = {
+        aggregateType,
+        eventType,
+        occurredOnEpoch: Date.now(),
+      };
+
+      return {
+        ...domainEventProps,
+        ...customProps as any,
+      };
+    },
   };
 }
 
@@ -68,11 +88,15 @@ export const DB = {
   getEventStream,
 };
 
-function getEventStream<TEvent extends DomainEvent<any, TEvent['eventType']> = DomainEvent<any, TEvent['eventType']>>(
-  eventKinds: TEvent['eventType'][],
-): Observable<TEvent> {
+function getEventStream<
+  TAggregateType extends string,
+  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']> = DomainEvent<TAggregateType, TEvent['eventType']>,
+  >(
+    aggregateType: TAggregateType,
+    ...eventTypes: TEvent['eventType'][]
+  ): Observable<TEvent> {
   return allEventsSubject.pipe(
-    filter(ev => eventKinds.indexOf(ev.eventType as TEvent['eventType']) >= 0),
+    filter(ev => ev.aggregateType === aggregateType && eventTypes.indexOf(ev.eventType as TEvent['eventType']) >= 0),
     map(t => t as TEvent),
   );
 }

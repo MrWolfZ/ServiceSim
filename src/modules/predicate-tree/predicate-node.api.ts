@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, CommandValidationConstraints, createDomainEvent, DB, queryHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
 import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import { getPredicateTemplatesByIdsAndVersions } from '../predicate-template/predicate-template.api';
@@ -168,8 +168,7 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
     parentNode.id,
     parentNode.$metadata.version,
     {},
-    createDomainEvent(
-      'predicate-node',
+    repo.createDomainEvent(
       'ChildPredicateNodeAdded',
       {
         aggregateId: parentNode.id,
@@ -230,8 +229,7 @@ export async function setPredicateNodeResponseGenerator(command: SetResponseGene
     command.nodeId,
     command.unmodifiedNodeVersion,
     {},
-    createDomainEvent(
-      'predicate-node',
+    repo.createDomainEvent(
       'ResponseGeneratorSet',
       {
         aggregateId: command.nodeId,
