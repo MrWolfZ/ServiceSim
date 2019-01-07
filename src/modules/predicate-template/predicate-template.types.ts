@@ -1,4 +1,4 @@
-import { RootEntity } from '../../api-infrastructure/api-infrastructure.types';
+import { Aggregate } from '../../api-infrastructure/api-infrastructure.types';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface PredicateTemplateData {
@@ -8,9 +8,9 @@ export interface PredicateTemplateData {
   parameters: Parameter[];
 }
 
-export type PredicateTemplateEntityType = 'predicate-template';
+export type PredicateTemplateAggregateType = 'predicate-template';
 
-export type PredicateTemplateEntity = PredicateTemplateData & RootEntity;
+export type PredicateTemplateAggregate = PredicateTemplateData & Aggregate;
 
 export interface PredicateTemplateDto extends PredicateTemplateData {
   id: string;

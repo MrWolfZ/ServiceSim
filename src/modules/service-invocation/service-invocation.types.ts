@@ -1,4 +1,4 @@
-import { DomainEvent, RootEntity } from '../../api-infrastructure/api-infrastructure.types';
+import { Aggregate, DomainEvent } from '../../api-infrastructure/api-infrastructure.types';
 
 export interface ServiceRequest {
   path: string;
@@ -17,11 +17,11 @@ export interface ServiceInvocationData {
   response: ServiceResponse | undefined;
 }
 
-export type ServiceInvocationEntityType = 'service-invocation';
+export type ServiceInvocationAggregateType = 'service-invocation';
 
-export type ServiceInvocationEntity = ServiceInvocationData & RootEntity;
+export type ServiceInvocationAggregate = ServiceInvocationData & Aggregate;
 
-export interface InvocationResponseWasSet extends DomainEvent<ServiceInvocationEntityType, 'InvocationResponseWasSet'> {
+export interface InvocationResponseWasSet extends DomainEvent<ServiceInvocationAggregateType, 'InvocationResponseWasSet'> {
   statusCode: number;
   body: string;
   contentType: string;

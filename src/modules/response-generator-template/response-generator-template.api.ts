@@ -5,13 +5,13 @@ import * as DEFAULT_TEMPLATES from './default-templates';
 import {
   CreateResponseGeneratorTemplateCommand,
   DeleteResponseGeneratorTemplateCommand,
+  ResponseGeneratorTemplateAggregate,
+  ResponseGeneratorTemplateAggregateType,
   ResponseGeneratorTemplateDto,
-  ResponseGeneratorTemplateEntity,
-  ResponseGeneratorTemplateEntityType,
   UpdateResponseGeneratorTemplateCommand,
 } from './response-generator-template.types';
 
-const repo = DB.versionedRepository<ResponseGeneratorTemplateEntityType, ResponseGeneratorTemplateEntity>('response-generator-template');
+const repo = DB.versionedRepository<ResponseGeneratorTemplateAggregateType, ResponseGeneratorTemplateAggregate>('response-generator-template');
 
 export async function getAllResponseGeneratorTemplates() {
   const allTemplates = await repo.query.all();

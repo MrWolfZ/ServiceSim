@@ -5,13 +5,13 @@ import * as DEFAULT_TEMPLATES from './default-templates';
 import {
   CreatePredicateTemplateCommand,
   DeletePredicateTemplateCommand,
+  PredicateTemplateAggregate,
+  PredicateTemplateAggregateType,
   PredicateTemplateDto,
-  PredicateTemplateEntity,
-  PredicateTemplateEntityType,
   UpdatePredicateTemplateCommand,
 } from './predicate-template.types';
 
-const repo = DB.versionedRepository<PredicateTemplateEntityType, PredicateTemplateEntity>('predicate-template');
+const repo = DB.versionedRepository<PredicateTemplateAggregateType, PredicateTemplateAggregate>('predicate-template');
 
 export async function getAllPredicateTemplates() {
   const allTemplates = await repo.query.all();

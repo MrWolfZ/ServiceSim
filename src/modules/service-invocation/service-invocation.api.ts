@@ -3,16 +3,16 @@ import { failure } from '../../util/result-monad';
 import { omit } from '../../util/util';
 import {
   CreateServiceInvocationCommand,
+  ServiceInvocationAggregate,
+  ServiceInvocationAggregateType,
   ServiceInvocationDomainEvents,
-  ServiceInvocationEntity,
-  ServiceInvocationEntityType,
   SetServiceResponseCommand,
 } from './service-invocation.types';
 
-const repo = DB.eventDrivenRepository<ServiceInvocationEntityType, ServiceInvocationEntity, ServiceInvocationDomainEvents>('service-invocation', {
-  InvocationResponseWasSet: (entity, evt) => {
+const repo = DB.eventDrivenRepository<ServiceInvocationAggregateType, ServiceInvocationAggregate, ServiceInvocationDomainEvents>('service-invocation', {
+  InvocationResponseWasSet: (aggregate, evt) => {
     return {
-      ...entity,
+      ...aggregate,
       response: {
         statusCode: evt.statusCode,
         body: evt.body,
@@ -59,7 +59,7 @@ export async function setServiceInvocationResponse(command: SetServiceResponseCo
       'service-invocation',
       'InvocationResponseWasSet',
       {
-        rootEntityId: command.invocationId,
+        aggregateId: command.invocationId,
         ...omit(command, 'invocationId', 'unmodifiedInvocationVersion'),
       },
     ),

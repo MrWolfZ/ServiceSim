@@ -1,56 +1,56 @@
 import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { DomainEvent, DomainEventHandlerMap, RootEntity } from '../api-infrastructure.types';
+import { Aggregate, DomainEvent, DomainEventHandlerMap } from '../api-infrastructure.types';
 import create from './create';
 import delete$ from './delete';
 import patch from './patch';
 import query from './query';
 
-const inMemoryDb: { [entityType: string]: { [id: string]: any[] } } = {};
+const inMemoryDb: { [aggregateType: string]: { [id: string]: any[] } } = {};
 
 const allEventsSubject = new Subject<DomainEvent<any, any>>();
 
-function getEntityCollection<TEntity>(entityType: string): { [id: string]: (TEntity & { $metadata: any })[] } {
-  return inMemoryDb[entityType] = inMemoryDb[entityType] || {};
+function getAggregateCollection<TAggregate>(aggregateType: string): { [id: string]: (TAggregate & { $metadata: any })[] } {
+  return inMemoryDb[aggregateType] = inMemoryDb[aggregateType] || {};
 }
 
-function repository<TEntityType extends string, TEntity extends RootEntity>(
-  entityType: TEntityType,
+function repository<TAggregateType extends string, TAggregate extends Aggregate>(
+  aggregateType: TAggregateType,
 ) {
   return {
-    create: create<TEntityType, TEntity>(entityType, 'Default', getEntityCollection),
-    patch: patch<TEntityType, TEntity>(entityType, 'Default', getEntityCollection),
-    delete: delete$<TEntityType, TEntity>(entityType, 'Default', getEntityCollection),
-    async dropAll() { inMemoryDb[entityType] = {}; },
+    create: create<TAggregateType, TAggregate>(aggregateType, 'Default', getAggregateCollection),
+    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Default', getAggregateCollection),
+    delete: delete$<TAggregateType>(aggregateType, 'Default', getAggregateCollection),
+    async dropAll() { inMemoryDb[aggregateType] = {}; },
 
-    query: query<TEntityType, TEntity>(entityType, 'Default', getEntityCollection),
+    query: query<TAggregateType, TAggregate>(aggregateType, 'Default', getAggregateCollection),
   };
 }
 
-function versionedRepository<TEntityType extends string, TEntity extends RootEntity>(
-  entityType: TEntityType,
+function versionedRepository<TAggregateType extends string, TAggregate extends Aggregate>(
+  aggregateType: TAggregateType,
 ) {
   return {
-    create: create<TEntityType, TEntity>(entityType, 'Versioned', getEntityCollection),
-    patch: patch<TEntityType, TEntity>(entityType, 'Versioned', getEntityCollection),
-    delete: delete$<TEntityType, TEntity>(entityType, 'Versioned', getEntityCollection),
-    async dropAll() { inMemoryDb[entityType] = {}; },
+    create: create<TAggregateType, TAggregate>(aggregateType, 'Versioned', getAggregateCollection),
+    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Versioned', getAggregateCollection),
+    delete: delete$<TAggregateType>(aggregateType, 'Versioned', getAggregateCollection),
+    async dropAll() { inMemoryDb[aggregateType] = {}; },
 
-    query: query<TEntityType, TEntity>(entityType, 'Versioned', getEntityCollection),
+    query: query<TAggregateType, TAggregate>(aggregateType, 'Versioned', getAggregateCollection),
   };
 }
 
-function eventDrivenRepository<TEntityType extends string, TEntity extends RootEntity, TEvent extends DomainEvent<TEntityType, TEvent['eventType']>>(
-  entityType: TEntityType,
-  eventHandlers: DomainEventHandlerMap<TEntityType, TEntity, TEvent>,
+function eventDrivenRepository<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
+  aggregateType: TAggregateType,
+  eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
 ) {
   return {
-    create: create<TEntityType, TEntity>(entityType, 'EventDriven', getEntityCollection),
-    patch: patch<TEntityType, TEntity, TEvent>(entityType, 'EventDriven', getEntityCollection, eventHandlers, allEventsSubject),
-    delete: delete$<TEntityType, TEntity>(entityType, 'EventDriven', getEntityCollection),
-    async dropAll() { inMemoryDb[entityType] = {}; },
+    create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', getAggregateCollection),
+    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', getAggregateCollection, eventHandlers, allEventsSubject),
+    delete: delete$<TAggregateType>(aggregateType, 'EventDriven', getAggregateCollection),
+    async dropAll() { inMemoryDb[aggregateType] = {}; },
 
-    query: query<TEntityType, TEntity, TEvent>(entityType, 'EventDriven', getEntityCollection),
+    query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', getAggregateCollection),
   };
 }
 

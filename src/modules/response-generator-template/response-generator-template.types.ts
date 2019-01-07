@@ -1,4 +1,4 @@
-import { RootEntity } from '../../api-infrastructure/api-infrastructure.types';
+import { Aggregate } from '../../api-infrastructure/api-infrastructure.types';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface ResponseGeneratorTemplateData {
@@ -8,9 +8,9 @@ export interface ResponseGeneratorTemplateData {
   parameters: Parameter[];
 }
 
-export type ResponseGeneratorTemplateEntityType = 'response-generator-template';
+export type ResponseGeneratorTemplateAggregateType = 'response-generator-template';
 
-export type ResponseGeneratorTemplateEntity = ResponseGeneratorTemplateData & RootEntity;
+export type ResponseGeneratorTemplateAggregate = ResponseGeneratorTemplateData & Aggregate;
 
 export interface ResponseGeneratorTemplateDto extends ResponseGeneratorTemplateData {
   id: string;

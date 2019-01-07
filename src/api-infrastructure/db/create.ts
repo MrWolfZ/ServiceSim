@@ -1,47 +1,47 @@
 import { keys } from '../../util/util';
-import { EventDrivenRootEntityMetadata, RootEntity, RootEntityMetadata, VersionedRootEntityMetadata } from '../api-infrastructure.types';
+import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
 import { getMetadataOfType } from './util';
 
-export default function create<TEntityType extends string, TEntity extends RootEntity>(
-  entityType: TEntityType,
+export default function create<TAggregateType extends string, TAggregate extends Aggregate>(
+  aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  getEntityCollection: <TEntity>(entityType: string) => { [id: string]: (TEntity & { $metadata: any })[] },
+  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
 ) {
-  return async <TData extends Omit<TEntity, keyof RootEntity>>(
-    data: TData & Exact<Omit<TEntity, keyof RootEntity>, TData>,
-  ): Promise<TEntity> => {
-    const col = getEntityCollection<TEntity>(entityType);
+  return async <TData extends Omit<TAggregate, keyof Aggregate>>(
+    data: TData & Exact<Omit<TAggregate, keyof Aggregate>, TData>,
+  ): Promise<TAggregate> => {
+    const col = getAggregateCollection<TAggregate>(aggregateType);
 
     const epoch = Date.now();
 
-    const $rootEntityMetadata: RootEntityMetadata<TEntityType> = {
-      entityType,
+    const $aggregateMetadata: AggregateMetadata<TAggregateType> = {
+      aggregateType,
       createdOnEpoch: epoch,
       lastUpdatedOnEpoch: epoch,
     };
 
-    const $versionedRootEntityMetadata: VersionedRootEntityMetadata<TEntityType, TEntity> = {
-      ...$rootEntityMetadata,
+    const $versionedMetadata: VersionedAggregateMetadata<TAggregateType, TAggregate> = {
+      ...$aggregateMetadata,
       version: 1,
       isDeleted: false,
       changesSinceLastVersion: {},
     };
 
-    const $eventDrivenRootEntityMetadata: EventDrivenRootEntityMetadata<TEntityType, TEntity, any> = {
-      ...$versionedRootEntityMetadata,
+    const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, any> = {
+      ...$versionedMetadata,
       eventsSinceLastVersion: [],
     };
 
-    const id = `${entityType}/${keys(col).length + 1}`;
-    const $metadata = getMetadataOfType(metadataType, $rootEntityMetadata, $versionedRootEntityMetadata, $eventDrivenRootEntityMetadata);
+    const id = `${aggregateType}/${keys(col).length + 1}`;
+    const $metadata = getMetadataOfType(metadataType, $aggregateMetadata, $versionedMetadata, $eventDrivenMetadata);
 
-    const newEntity: TEntity & { $metadata: any } = {
+    const newAggregate: TAggregate & { $metadata: any } = {
       id,
       $metadata,
       ...data as any,
     };
 
-    col[id] = [newEntity];
-    return newEntity;
+    col[id] = [newAggregate];
+    return newAggregate;
   };
 }

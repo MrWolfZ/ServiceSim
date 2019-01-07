@@ -2,16 +2,16 @@ import { DomainEvent, DomainEventOfType } from './api-infrastructure.types';
 
 // TODO: make custom props exact
 export function createDomainEvent<
-  TEntityType extends string,
-  TEvent extends DomainEvent<TEntityType, TEvent['eventType']>,
+  TAggregateType extends string,
+  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>,
   TEventType extends string,
   >(
-    entityType: TEntityType,
+    aggregateType: TAggregateType,
     eventType: TEventType,
-    customProps: Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TEntityType, TEventType>, 'rootEntityId'>>,
+    customProps: Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregateType, TEventType>, 'aggregateId'>>,
 ): TEvent {
-  const domainEventProps: Omit<DomainEvent<TEntityType, TEventType>, 'rootEntityId'> = {
-    entityType,
+  const domainEventProps: Omit<DomainEvent<TAggregateType, TEventType>, 'aggregateId'> = {
+    aggregateType,
     eventType,
     occurredOnEpoch: Date.now(),
   };

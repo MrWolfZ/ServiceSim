@@ -7,10 +7,10 @@ import { getResponseGeneratorTemplatesByIdsAndVersions } from '../response-gener
 import {
   CreatePredicateNodeCommand as AddChildPredicateNodeCommand,
   DeletePredicateNodeCommand,
+  PredicateNodeAggregate,
+  PredicateNodeAggregateType,
   PredicateNodeDomainEvents,
   PredicateNodeDto,
-  PredicateNodeEntity,
-  PredicateNodeEntityType,
   ResponseGeneratorData,
   ResponseGeneratorDataWithTemplateSnapshot,
   RootNodeName,
@@ -19,17 +19,17 @@ import {
   UpdatePredicateNodeCommand,
 } from './predicate-node.types';
 
-const repo = DB.eventDrivenRepository<PredicateNodeEntityType, PredicateNodeEntity, PredicateNodeDomainEvents>('predicate-node', {
-  ChildPredicateNodeAdded: (entity, evt) => {
+const repo = DB.eventDrivenRepository<PredicateNodeAggregateType, PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {
+  ChildPredicateNodeAdded: (aggregate, evt) => {
     return {
-      ...entity,
-      childNodeIdsOrResponseGenerator: [...entity.childNodeIdsOrResponseGenerator as string[], evt.childNodeId],
+      ...aggregate,
+      childNodeIdsOrResponseGenerator: [...aggregate.childNodeIdsOrResponseGenerator as string[], evt.childNodeId],
     };
   },
 
-  ResponseGeneratorSet: (entity, evt) => {
+  ResponseGeneratorSet: (aggregate, evt) => {
     return {
-      ...entity,
+      ...aggregate,
       childNodeIdsOrResponseGenerator: {
         name: evt.responseGenerator.name,
         description: evt.responseGenerator.description,
@@ -172,7 +172,7 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
       'predicate-node',
       'ChildPredicateNodeAdded',
       {
-        rootEntityId: parentNode.id,
+        aggregateId: parentNode.id,
         childNodeId: newNode.id,
       },
     ),
@@ -234,7 +234,7 @@ export async function setPredicateNodeResponseGenerator(command: SetResponseGene
       'predicate-node',
       'ResponseGeneratorSet',
       {
-        rootEntityId: command.nodeId,
+        aggregateId: command.nodeId,
         responseGenerator: {
           name: command.name,
           description: command.description,

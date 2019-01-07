@@ -1,4 +1,4 @@
-import { DomainEvent, RootEntity } from '../../api-infrastructure/api-infrastructure.types';
+import { Aggregate, DomainEvent } from '../../api-infrastructure/api-infrastructure.types';
 import { PredicateTemplateData } from '../predicate-template/predicate-template.types';
 import { ResponseGeneratorTemplateData } from '../response-generator-template/response-generator-template.types';
 
@@ -21,17 +21,17 @@ export interface PredicateNodeData {
   childNodeIdsOrResponseGenerator: string[] | ResponseGeneratorData;
 }
 
-export type PredicateNodeEntityType = 'predicate-node';
-
 export type RootNodeName = 'ROOT';
 
-export type PredicateNodeEntity = PredicateNodeData & RootEntity;
+export type PredicateNodeAggregateType = 'predicate-node';
 
-export interface ChildPredicateNodeAdded extends DomainEvent<PredicateNodeEntityType, 'ChildPredicateNodeAdded'> {
+export type PredicateNodeAggregate = PredicateNodeData & Aggregate;
+
+export interface ChildPredicateNodeAdded extends DomainEvent<PredicateNodeAggregateType, 'ChildPredicateNodeAdded'> {
   childNodeId: string;
 }
 
-export interface ResponseGeneratorSet extends DomainEvent<PredicateNodeEntityType, 'ResponseGeneratorSet'> {
+export interface ResponseGeneratorSet extends DomainEvent<PredicateNodeAggregateType, 'ResponseGeneratorSet'> {
   responseGenerator: ResponseGeneratorData;
 }
 

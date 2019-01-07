@@ -1,22 +1,24 @@
-import { DomainEvent, EventDrivenRootEntityMetadata, RootEntity, RootEntityMetadata, VersionedRootEntityMetadata } from '../api-infrastructure.types';
+import { Aggregate, AggregateMetadata, DomainEvent, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
 
 import { assertNever } from '../../util/assert';
 
-export function getMetadataOfType<TEntityType extends string, TEntity extends RootEntity, TEvent extends DomainEvent<TEntityType, TEvent['eventType']>>(
+export function getMetadataOfType<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  $rootEntityMetadata: RootEntityMetadata<TEntityType>,
-  $versionedRootEntityMetadata: VersionedRootEntityMetadata<TEntityType, TEntity>,
-  $eventDrivenRootEntityMetadata: EventDrivenRootEntityMetadata<TEntityType, TEntity, TEvent>,
-): RootEntityMetadata<TEntityType> | VersionedRootEntityMetadata<TEntityType, TEntity> | EventDrivenRootEntityMetadata<TEntityType, TEntity, TEvent> {
+  $aggregateMetadata: AggregateMetadata<TAggregateType>,
+  $versionedMetadata: VersionedAggregateMetadata<TAggregateType, TAggregate>,
+  $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent>,
+): AggregateMetadata<TAggregateType>
+  | VersionedAggregateMetadata<TAggregateType, TAggregate>
+  | EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent> {
   switch (metadataType) {
     case 'Default':
-      return $rootEntityMetadata;
+      return $aggregateMetadata;
 
     case 'Versioned':
-      return $versionedRootEntityMetadata;
+      return $versionedMetadata;
 
     case 'EventDriven':
-      return $eventDrivenRootEntityMetadata;
+      return $eventDrivenMetadata;
 
     default:
       return assertNever(metadataType);

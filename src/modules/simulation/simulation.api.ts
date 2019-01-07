@@ -17,7 +17,7 @@ export const processSimulationRequest = async (req: Request, res: Response) => {
   const { invocationId, invocationVersion } = await createServiceInvocation(request);
 
   DB.getEventStream<InvocationResponseWasSet>(['InvocationResponseWasSet']).pipe(
-    filter(ev => ev.rootEntityId === invocationId),
+    filter(ev => ev.aggregateId === invocationId),
     take(1),
     timeout(60000),
   ).subscribe(ev => {

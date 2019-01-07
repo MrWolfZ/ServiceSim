@@ -2,135 +2,135 @@ import { Subject } from 'rxjs';
 import { assertNever } from '../../util/assert';
 import { failure } from '../../util/result-monad';
 import {
+  Aggregate,
+  AggregateMetadata,
   DomainEvent,
   DomainEventHandlerMap,
   DomainEventOfType,
-  EventDrivenRootEntityMetadata,
-  RootEntity,
-  RootEntityMetadata,
-  VersionedRootEntityMetadata,
+  EventDrivenAggregateMetadata,
+  VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
 import { getMetadataOfType } from './util';
 
-export default function patch<TEntityType extends string, TEntity extends RootEntity>(
-  entityType: TEntityType,
+export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
+  aggregateType: TAggregateType,
   metadataType: 'Default',
-  getEntityCollection: <TEntity>(entityType: string) => { [id: string]: (TEntity & { $metadata: any })[] },
+  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
 )
-  : <TData extends Omit<Partial<TEntity>, keyof RootEntity>>(
+  : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
     id: string,
-    data: TData & Exact<Omit<Partial<TEntity>, keyof RootEntity>, TData>,
+    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
   ) => Promise<void>;
 
-export default function patch<TEntityType extends string, TEntity extends RootEntity>(
-  entityType: TEntityType,
+export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
+  aggregateType: TAggregateType,
   metadataType: 'Versioned',
-  getEntityCollection: <TEntity>(entityType: string) => { [id: string]: (TEntity & { $metadata: any })[] },
+  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
 )
-  : <TData extends Omit<Partial<TEntity>, keyof RootEntity>>(
+  : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
     id: string,
     expectedVersion: number,
-    data: TData & Exact<Omit<Partial<TEntity>, keyof RootEntity>, TData>,
+    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
   ) => Promise<number>;
 
-export default function patch<TEntityType extends string, TEntity extends RootEntity, TEvent extends DomainEvent<TEntityType, TEvent['eventType']>>(
-  entityType: TEntityType,
+export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
+  aggregateType: TAggregateType,
   metadataType: 'EventDriven',
-  getEntityCollection: <TEntity>(entityType: string) => { [id: string]: (TEntity & { $metadata: any })[] },
-  eventHandlers: DomainEventHandlerMap<TEntityType, TEntity, TEvent>,
+  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject: Subject<DomainEvent<any, any>>,
 )
-  : <TData extends Omit<Partial<TEntity>, keyof RootEntity>>(
+  : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
     id: string,
     expectedVersion: number,
-    data: TData & Exact<Omit<Partial<TEntity>, keyof RootEntity>, TData>,
+    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
     ...events: TEvent[]
   ) => Promise<number>;
 
-export default function patch<TEntityType extends string, TEntity extends RootEntity, TEvent extends DomainEvent<TEntityType, TEvent['eventType']>>(
-  entityType: TEntityType,
+export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
+  aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  getEntityCollection: <TEntity>(entityType: string) => { [id: string]: (TEntity & { $metadata: any })[] },
-  eventHandlers?: DomainEventHandlerMap<TEntityType, TEntity, TEvent>,
+  getAggregateCollection: <TAggregate>(aggregateType: string) => { [id: string]: (TAggregate & { $metadata: any })[] },
+  eventHandlers?: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject?: Subject<TEvent>,
 ) {
-  return async <TData extends Omit<Partial<TEntity>, keyof RootEntity>>(
+  return async <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
     id: string,
     expectedVersionOrData: any,
-    data: TData & Exact<Omit<Partial<TEntity>, keyof RootEntity>, TData>,
+    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
     ...events: TEvent[]
   ): Promise<number | void> => {
-    const col = getEntityCollection<TEntity>(entityType);
+    const col = getAggregateCollection<TAggregate>(aggregateType);
 
     if (!col[id] || col[id].length === 0) {
-      throw failure(`patch failed: entity with id ${id} of type ${entityType} does not exist`);
+      throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not exist`);
     }
 
-    const latestEntity = col[id][col[id].length - 1];
+    const latestAggregate = col[id][col[id].length - 1];
 
     const expectedVersion = typeof expectedVersionOrData === 'number' ? expectedVersionOrData : -1;
-    const actualVersion = (latestEntity.$metadata as VersionedRootEntityMetadata<any, any>).version;
+    const actualVersion = (latestAggregate.$metadata as VersionedAggregateMetadata<any, any>).version;
 
     if (expectedVersion !== -1 && actualVersion !== expectedVersion) {
       // tslint:disable-next-line:max-line-length
-      throw failure(`patch failed: entity with id ${id} of type ${entityType} does not match the expected version (expected: ${expectedVersion}, actual: ${actualVersion})`);
+      throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not match the expected version (expected: ${expectedVersion}, actual: ${actualVersion})`);
     }
 
-    if ((latestEntity.$metadata as VersionedRootEntityMetadata<any, any>).isDeleted) {
-      throw failure(`patch failed: entity with id ${id} of type ${entityType} is deleted`);
+    if ((latestAggregate.$metadata as VersionedAggregateMetadata<any, any>).isDeleted) {
+      throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} is deleted`);
     }
 
     data = typeof expectedVersionOrData === 'number' ? data : expectedVersionOrData;
 
     const epoch = Date.now();
 
-    let updatedEntity: TEntity = {
-      ...latestEntity,
+    let updatedAggregate: TAggregate = {
+      ...latestAggregate,
       ...data,
     };
 
     if (metadataType === 'EventDriven') {
-      updatedEntity = events.reduce((e, evt) => {
+      updatedAggregate = events.reduce((e, evt) => {
         const eventHandler = eventHandlers![evt.eventType];
         return eventHandler(e, evt as DomainEventOfType<TEvent, typeof evt.eventType>);
-      }, updatedEntity);
+      }, updatedAggregate);
     }
 
     // TODO: create diff and update metadata with diff
 
-    const $rootEntityMetadata: RootEntityMetadata<TEntityType> = {
-      ...latestEntity.$metadata,
+    const $aggregateMetadata: AggregateMetadata<TAggregateType> = {
+      ...latestAggregate.$metadata,
       lastUpdatedOnEpoch: epoch,
     };
 
-    const $versionedRootEntityMetadata: VersionedRootEntityMetadata<TEntityType, TEntity> = {
-      ...latestEntity.$metadata,
-      ...$rootEntityMetadata,
+    const $versionedMetadata: VersionedAggregateMetadata<TAggregateType, TAggregate> = {
+      ...latestAggregate.$metadata,
+      ...$aggregateMetadata,
       version: actualVersion + 1,
       changesSinceLastVersion: {}, // TODO
     };
 
-    const $eventDrivenRootEntityMetadata: EventDrivenRootEntityMetadata<TEntityType, TEntity, TEvent> = {
-      ...latestEntity.$metadata,
-      ...$versionedRootEntityMetadata,
+    const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent> = {
+      ...latestAggregate.$metadata,
+      ...$versionedMetadata,
       eventsSinceLastVersion: events,
     };
 
-    const $metadata = getMetadataOfType(metadataType, $rootEntityMetadata, $versionedRootEntityMetadata, $eventDrivenRootEntityMetadata);
+    const $metadata = getMetadataOfType(metadataType, $aggregateMetadata, $versionedMetadata, $eventDrivenMetadata);
 
-    const updatedEntityWithMetadata: TEntity & { $metadata: any } = {
-      ...updatedEntity,
+    const updatedAggregateWithMetadata: TAggregate & { $metadata: any } = {
+      ...updatedAggregate,
       $metadata,
     };
 
     switch (metadataType) {
       case 'Default':
-        col[id] = [updatedEntityWithMetadata];
+        col[id] = [updatedAggregateWithMetadata];
         break;
 
       case 'Versioned':
       case 'EventDriven':
-        col[id].push(updatedEntityWithMetadata);
+        col[id].push(updatedAggregateWithMetadata);
         break;
 
       default:
@@ -140,6 +140,6 @@ export default function patch<TEntityType extends string, TEntity extends RootEn
 
     events.forEach(evt => allEventsSubject!.next(evt));
 
-    return $versionedRootEntityMetadata.version;
+    return $versionedMetadata.version;
   };
 }

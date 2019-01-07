@@ -1,40 +1,40 @@
-export interface RootEntity {
+export interface Aggregate {
   id: string;
 }
 
-export interface RootEntityMetadata<TEntityType extends string> {
-  entityType: TEntityType;
+export interface AggregateMetadata<TAggregateType extends string> {
+  aggregateType: TAggregateType;
   createdOnEpoch: number;
   lastUpdatedOnEpoch: number;
 }
 
-export interface VersionedRootEntityMetadata<TEntityType extends string, TEntity extends RootEntity> extends RootEntityMetadata<TEntityType> {
+export interface VersionedAggregateMetadata<TAggregateType extends string, TAggregate extends Aggregate> extends AggregateMetadata<TAggregateType> {
   version: number;
-  changesSinceLastVersion: Partial<Omit<TEntity, keyof RootEntity>>;
+  changesSinceLastVersion: Partial<Omit<TAggregate, keyof Aggregate>>;
   isDeleted: boolean;
 }
 
-export interface DomainEvent<TEntityType extends string, TEventType extends string> {
-  entityType: TEntityType;
+export interface DomainEvent<TAggregateType extends string, TEventType extends string> {
+  aggregateType: TAggregateType;
   eventType: TEventType;
-  rootEntityId: string;
+  aggregateId: string;
   occurredOnEpoch: number;
 }
 
-export interface EventDrivenRootEntityMetadata<
-  TEntityType extends string,
-  TEntity extends RootEntity,
-  TEvent extends DomainEvent<TEntityType, TEvent['eventType']>,
-  > extends VersionedRootEntityMetadata<TEntityType, TEntity> {
+export interface EventDrivenAggregateMetadata<
+  TAggregateType extends string,
+  TAggregate extends Aggregate,
+  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>,
+  > extends VersionedAggregateMetadata<TAggregateType, TAggregate> {
   eventsSinceLastVersion: TEvent[];
 }
 
 export type DomainEventOfType<TEvent, TEventType extends string> = TEvent extends DomainEvent<any, TEventType> ? TEvent : never;
 
 export type DomainEventHandlerMap<
-  TEntityType extends string,
-  TEntity extends RootEntity,
-  TEvent extends DomainEvent<TEntityType, TEvent['eventType']>,
+  TAggregateType extends string,
+  TAggregate extends Aggregate,
+  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>,
   > = {
-    [eventType in TEvent['eventType']]: (entity: TEntity, event: DomainEventOfType<TEvent, eventType>) => TEntity;
+    [eventType in TEvent['eventType']]: (aggregate: TAggregate, event: DomainEventOfType<TEvent, eventType>) => TAggregate;
   };
