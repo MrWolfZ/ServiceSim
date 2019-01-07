@@ -28,4 +28,7 @@ module.exports = {
     'vue.spec',
   ],
   testEnvironment: 'node',
+  setupFiles: [
+    '<rootDir>/node_modules/core-js/fn/array/flat-map.js',
+  ],
 };

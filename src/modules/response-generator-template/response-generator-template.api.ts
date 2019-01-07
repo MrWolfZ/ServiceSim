@@ -28,11 +28,7 @@ export async function getAllResponseGeneratorTemplates() {
 
 export async function getResponseGeneratorTemplatesByIdsAndVersions(idsAndVersions: { [templateId: string]: number[] }) {
   const templates = await Promise.all(
-    keys(idsAndVersions)
-      .reduce((agg, id) => [
-        ...agg,
-        ...idsAndVersions[id].map(v => repo.query.byIdAndVersion(id, v)),
-      ], [] as ReturnType<typeof repo.query.byIdAndVersion>[])
+    keys(idsAndVersions).flatMap(id => idsAndVersions[id].map(v => repo.query.byIdAndVersion(id, v)))
   );
 
   return templates.map<ResponseGeneratorTemplateDto>(t => ({

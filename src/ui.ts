@@ -21,6 +21,8 @@ import './modules/predicate-template/predicate-template.store';
 import './modules/predicate-tree/predicate-node.store';
 import App from './ui.vue';
 
+import 'core-js/fn/array/flat-map';
+
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
 // import 'core-js/es6/symbol';
 // import 'core-js/es6/object';
