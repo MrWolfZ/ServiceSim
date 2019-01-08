@@ -1,0 +1,25 @@
+trigger:
+- develop
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+variables:
+  imageName: 'ServiceSim:$(build.buildId)'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '8.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+    npm run build-full
+  displayName: 'npm install and build'
+
+- script: |
+    docker build -t $(docker.registry.url)/$(imageName) .
+    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
+    docker push $(docker.registry.url)/$(imageName)
+  displayName: 'build & publish docker image'
