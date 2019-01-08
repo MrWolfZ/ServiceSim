@@ -11,7 +11,7 @@ export interface ValidationConstraint<T> {
 }
 
 export type CommandValidationConstraints<TCommand> = {
-  [prop in keyof TCommand]?: ValidationConstraint<TCommand[prop]>;
+  [prop in keyof TCommand]: ValidationConstraint<TCommand[prop]>;
 };
 
 export type CommandValidator<TCommand> = CommandValidationFn<TCommand> | CommandValidationConstraints<TCommand>;

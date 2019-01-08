@@ -20,7 +20,7 @@ export default class App extends Vue {
 
     eventSource.onmessage = evt => {
       console.log(evt);
-      this.loadAllDataAsync();
+      return this.loadAllDataAsync();
     };
 
     eventSource.onerror = evt => {
@@ -29,7 +29,7 @@ export default class App extends Vue {
 
     eventSource.addEventListener('event', msg => {
       console.log(msg);
-      this.loadAllDataAsync();
+      return this.loadAllDataAsync();
     });
 
     // eventSource.close();

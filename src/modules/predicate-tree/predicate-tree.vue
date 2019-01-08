@@ -9,8 +9,8 @@ import PredicateNodeView from './predicate-node.vue';
 export default class PredicateTreePage extends Vue {
   private selectedNodeId: string | undefined = this.topLevelNodeIds[0];
 
-  created() {
-    predicateNodes.loadAllAsync();
+  async created() {
+    await predicateNodes.loadAllAsync();
   }
 
   private dialog() {

@@ -14,7 +14,7 @@ export function Emit(event?: string): MethodDecorator {
 
       const returnValue: any = original.apply(this, args);
 
-      Promise.resolve(returnValue).then(emit);
+      return Promise.resolve(returnValue).then(emit);
     };
   };
 }

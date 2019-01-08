@@ -9,8 +9,8 @@ import { PredicateTemplateData } from './predicate-template.types';
 export default class PredicateTemplatesPage extends Vue {
   private filterValue = '';
 
-  created() {
-    predicateTemplates.loadAllAsync();
+  async created() {
+    await predicateTemplates.loadAllAsync();
   }
 
   private dialog() {
@@ -36,16 +36,16 @@ export default class PredicateTemplatesPage extends Vue {
     return predicateTemplates.state.templatesById;
   }
 
-  private createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
+  private async createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
     if (!id) {
-      predicateTemplates.createAsync(data);
+      await predicateTemplates.createAsync(data);
     } else {
-      predicateTemplates.updateAsync({ templateId: id, data });
+      await predicateTemplates.updateAsync({ templateId: id, data });
     }
   }
 
-  private deleteTemplate(templateId: string) {
-    predicateTemplates.deleteAsync(templateId);
+  private async deleteTemplate(templateId: string) {
+    await predicateTemplates.deleteAsync(templateId);
   }
 
   render() {

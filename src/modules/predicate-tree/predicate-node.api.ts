@@ -185,6 +185,7 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
 
 // TODO: validate
 export const addChildPredicateNodeConstraints: CommandValidationConstraints<AddChildPredicateNodeCommand> = {
+  parentNodeId: {},
   name: {},
   description: {},
   templateInfoOrEvalFunctionBody: {},
