@@ -45,7 +45,7 @@ class DocumentCollectionImpl<TDocument> implements DocumentCollection<TDocument>
   async getByIdAndVersion(id: string, version: number) {
     const docs = inMemoryDb[this.documentType];
     const docVersions = docs[id];
-    return docVersions.length > 0 ? docVersions[version] : undefined;
+    return docVersions.length > 0 ? docVersions[version - 1] : undefined;
   }
 }
 

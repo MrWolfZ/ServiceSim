@@ -84,7 +84,7 @@ export function queryHandler<TParams = never, TResult = void>(
 }
 
 export function writeErrorResponse(res: Response, error: any) {
-  const isProduction = process.env.NODE_ENV !== 'production';
+  const isProduction = process.env.NODE_ENV === 'production';
 
   let statusCode = 500;
   let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];

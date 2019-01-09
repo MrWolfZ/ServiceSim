@@ -16,8 +16,6 @@ const repo = DB.versionedRepository<PredicateTemplateAggregateType, PredicateTem
 export async function getAllPredicateTemplates() {
   const allTemplates = await repo.query.all();
 
-  allTemplates[0].$metadata.changesSinceLastVersion;
-
   return allTemplates.map<PredicateTemplateDto>(t => ({
     id: t.id,
     version: t.$metadata.version,

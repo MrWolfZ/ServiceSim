@@ -21,7 +21,6 @@ import { logger } from './util/logger';
 
 const host = express();
 
-host.set('port', process.env.PORT || 3000);
 host.use(compression());
 host.use(cors());
 host.use(bodyParser.json());
@@ -50,8 +49,11 @@ api.initialize().then(sub => {
 
 host.use(errorHandler());
 
-const server = host.listen(host.get('port'), '0.0.0.0', () => {
-  logger.info(`App is running at http://localhost:${host.get('port')} in ${host.get('env')} mode`);
+const port = process.env.PORT as any || 3000;
+const ip = '0.0.0.0';
+
+const server = host.listen(port, ip, () => {
+  logger.info(`App is running at http://${ip}:${port} in ${host.get('env')} mode`);
   logger.info('Press CTRL-C to stop\n');
 });
 
