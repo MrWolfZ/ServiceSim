@@ -21,7 +21,7 @@ import { logger } from './util/logger';
 
 const host = express();
 
-host.set('port', process.env.PORT || 8080);
+host.set('port', process.env.PORT || 3000);
 host.use(compression());
 host.use(cors());
 host.use(bodyParser.json());
