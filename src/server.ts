@@ -50,7 +50,7 @@ api.initialize().then(sub => {
 
 host.use(errorHandler());
 
-const server = host.listen(host.get('port'), () => {
+const server = host.listen('0.0.0.0', 8080, () => {
   logger.info(`App is running at http://localhost:${host.get('port')} in ${host.get('env')} mode`);
   logger.info('Press CTRL-C to stop\n');
 });
