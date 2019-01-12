@@ -15,30 +15,30 @@ let adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
 function repository<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
 ) {
-  const col = adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
+  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'Default', col),
-    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Default', col),
-    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Default', col),
-    async dropAll() { await col.dropAll(); },
+    create: create<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
+    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
+    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
+    dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregateType, TAggregate>(aggregateType, 'Default', col),
+    query: query<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
   };
 }
 
 function versionedRepository<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
 ) {
-  const col = adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
+  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
-    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
-    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
-    async dropAll() { await col.dropAll(); },
+    create: create<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregateType, TAggregate>(aggregateType, 'Versioned', col),
+    query: query<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
   };
 }
 
@@ -46,15 +46,15 @@ function eventDrivenRepository<TAggregateType extends string, TAggregate extends
   aggregateType: TAggregateType,
   eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
 ) {
-  const col = adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
+  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', col),
-    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', col, eventHandlers, allEventsSubject),
-    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'EventDriven', col),
-    async dropAll() { await col.dropAll(); },
+    create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', collectionFactory),
+    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers, allEventsSubject),
+    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'EventDriven', collectionFactory),
+    dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', col),
+    query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory),
 
     createDomainEvent<
       TEventType extends TEvent['eventType'],

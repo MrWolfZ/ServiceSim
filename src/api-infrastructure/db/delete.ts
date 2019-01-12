@@ -11,21 +11,23 @@ import { getMetadataOfType } from './util';
 export default function delete$<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): (id: string) => Promise<void>;
 
 export default function delete$<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Versioned' | 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): (id: string, expectedVersion: number) => Promise<void>;
 
 export default function delete$<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ) {
   return async (id: string, expectedVersion = -1) => {
+    const col = collectionFactory();
+
     const latestAggregate = await col.getLatestVersionById(id);
 
     if (!latestAggregate) {

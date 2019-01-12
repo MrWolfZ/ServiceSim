@@ -10,7 +10,12 @@ export const DEFAULT_CONFIG: AppConfig = {
   hostnameToBind: 'localhost',
   port,
   sessionSecret: 'ashdfjhasdlkjfhalksdjhflak',
-  persistenceAdapter: 'FileSystem',
+  persistence: {
+    adapter: 'FileSystem',
+    adapterConfig: {
+      dataDir: `${process.cwd()}/dist/.data`,
+    },
+  },
 
   // UI
   uiApiBaseUrl: `http://localhost:${port}/ui-api`,

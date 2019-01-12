@@ -1,12 +1,16 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { bus, DB } from './api-infrastructure';
+import { bus, DB, logger } from './api-infrastructure';
+import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/adapters/file-system';
+import { inMemoryPersistenceAdapter } from './api-infrastructure/db/adapters/in-memory';
+import { CONFIG } from './config';
 import { adminApi } from './modules/admin/admin.api';
 import { predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
 import { ensureRootPredicateNodeExists } from './modules/predicate-tree/predicate-node.api';
 import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
+import { assertNever } from './util';
 
 declare module 'http' {
   interface ServerResponse {
@@ -40,7 +44,22 @@ uiApi.get('/events', (req, res) => {
 });
 
 export async function initialize() {
-  await DB.initialize({});
+  const persistenceAdapter = (() => {
+    switch (CONFIG.persistence.adapter) {
+      case 'InMemory':
+        logger.info('using in-memory persistence adapter');
+        return inMemoryPersistenceAdapter;
+
+      case 'FileSystem':
+        logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
+        return createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir);
+
+      default:
+        return assertNever(CONFIG.persistence.adapter);
+    }
+  })();
+
+  await DB.initialize({ adapter: persistenceAdapter });
 
   await ensureRootPredicateNodeExists();
 

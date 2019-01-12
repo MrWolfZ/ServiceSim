@@ -56,7 +56,9 @@ export function failure<TFailure>(value?: TFailure): Failure<TFailure> {
   };
 
   if (Error.captureStackTrace) {
-    Error.captureStackTrace(result, failure);
+    const stackHolder = { stack: '' };
+    Error.captureStackTrace(stackHolder, failure);
+    result.stackTrace = stackHolder.stack;
   } else {
     result.stackTrace = new Error().stack;
   }
@@ -73,7 +75,7 @@ export function unwrap<TSuccess>(result: TSuccess | Result<TSuccess, any>) {
     return result.success;
   }
 
-  throw new Error(`cannot unwrap a failure! payload: ${result.failure}`);
+  throw failure(`cannot unwrap a failure! payload: ${result.failure}`);
 }
 
 function hasProperty<T>(instance: T, propertyName: keyof T) {

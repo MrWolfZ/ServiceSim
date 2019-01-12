@@ -15,19 +15,19 @@ import { getMetadataOfType } from './util';
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): (id: string, diff: Diff<TAggregate>) => Promise<void>;
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Versioned',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): (id: string, expectedVersion: number, diff: Diff<TAggregate>) => Promise<number>;
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
   metadataType: 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject: Subject<DomainEvent<any, any>>,
 ): (id: string, expectedVersion: number, diff: Diff<TAggregate>, ...events: TEvent[]) => Promise<number>;
@@ -35,7 +35,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers?: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject?: Subject<TEvent>,
 ) {
@@ -45,6 +45,8 @@ export default function patch<TAggregateType extends string, TAggregate extends 
     diff: Diff<TAggregate>,
     ...events: TEvent[]
   ): Promise<number | void> => {
+    const col = collectionFactory();
+
     const latestAggregate = await col.getLatestVersionById(id);
 
     if (!latestAggregate) {

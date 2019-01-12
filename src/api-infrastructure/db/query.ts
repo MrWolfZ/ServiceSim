@@ -21,28 +21,30 @@ export interface VersionQueryOperations<
 export default function query<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): QueryOperations<TAggregateType, TAggregate, AggregateMetadata<TAggregateType>>;
 
 export default function query<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Versioned',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): VersionQueryOperations<TAggregateType, TAggregate, VersionedAggregateMetadata<TAggregateType, TAggregate>>;
 
 export default function query<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
   metadataType: 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): VersionQueryOperations<TAggregateType, TAggregate, EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent>>;
 
 export default function query<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
   _: 'Default' | 'Versioned' | 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ): VersionQueryOperations<TAggregateType, TAggregate, any> {
   return {
     async byId(id) {
+      const col = collectionFactory();
+
       const latestAggregate = await col.getLatestVersionById(id);
 
       if (!latestAggregate) {
@@ -57,6 +59,8 @@ export default function query<TAggregateType extends string, TAggregate extends 
     },
 
     async byIdAndVersion(id, version) {
+      const col = collectionFactory();
+
       const aggregate = await col.getByIdAndVersion(id, version);
 
       if (!aggregate) {
@@ -77,11 +81,15 @@ export default function query<TAggregateType extends string, TAggregate extends 
     },
 
     async all() {
+      const col = collectionFactory();
+
       return (await col.getAll())
         .filter(e => !(e.$metadata as VersionedAggregateMetadata<TAggregateType, TAggregate>).isDeleted);
     },
 
     async byProperties(props) {
+      const col = collectionFactory();
+
       const propNames = keys(props);
       return (await col.getAll())
         .filter(e => !(e.$metadata as VersionedAggregateMetadata<TAggregateType, TAggregate>).isDeleted)

@@ -6,7 +6,10 @@ export interface AppConfig {
   hostnameToBind: string;
   port: number;
   sessionSecret: string;
-  persistenceAdapter: 'InMemory' | 'FileSystem';
+  persistence: {
+    adapter: 'InMemory' | 'FileSystem';
+    adapterConfig: any;
+  };
 
   // UI
   uiApiBaseUrl: string;

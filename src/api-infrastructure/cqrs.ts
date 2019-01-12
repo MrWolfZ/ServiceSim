@@ -90,7 +90,6 @@ export function writeErrorResponse(res: Response, error: any) {
   let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];
   let stackTrace: string | undefined;
 
-  // TODO: only print stack trace if env var allows to
   if (isFailure<string | string[]>(error)) {
     statusCode = 400;
     messages = Array.isArray(error.failure) ? error.failure : [error.failure];

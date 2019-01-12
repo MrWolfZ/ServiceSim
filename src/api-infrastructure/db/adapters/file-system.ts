@@ -8,9 +8,9 @@ import { DocumentCollection, PersistenceAdapter } from './adapter';
 function createDocumentCollection<TDocument>(documentType: string, dataDirPath: string): DocumentCollection<TDocument> {
   const collectionDirPath = path.join(dataDirPath, documentType);
 
-  const normalizeId = (id: string) => id;
-  const createDocumentDirPath = (id: string) => path.join(collectionDirPath, normalizeId(id));
-  const createDocumentPath = (id: string, version = 1) => path.join(createDocumentDirPath(id), version.toString());
+  const stripIdPrefix = (id: string) => id.substring(id.lastIndexOf(`/`) + 1);
+  const createDocumentDirPath = (id: string) => path.join(collectionDirPath, stripIdPrefix(id));
+  const createDocumentPath = (id: string, version = 1) => path.join(createDocumentDirPath(id), `${version}.json`);
 
   const readDocument = async (docPath: string) => {
     const fileContent = await promisify(fs.readFile)(docPath);
@@ -28,18 +28,24 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
       throw failure(`could not find any file for document in path ${docDirPath}!`);
     }
 
-    return await readDocument(path.join(docDirPath, paths.length.toString()));
+    return await readDocument(path.join(docDirPath, `${paths.length}.json`));
   };
 
   return {
     async generateId() {
-      const paths = await promisify(fs.readdir)(collectionDirPath);
-      return `${documentType}/${paths.length + 1}`;
+      let id = 1;
+
+      if (await pathExists(collectionDirPath)) {
+        const paths = await promisify(fs.readdir)(collectionDirPath);
+        id = paths.length + 1;
+      }
+
+      return `${documentType}/${id}`;
     },
 
     async set(id: string, document: TDocument) {
       await ensureDirectoryExists(createDocumentDirPath(id));
-      await promisify(fs.writeFile)(createDocumentPath(id), JSON.stringify(document));
+      await promisify(fs.writeFile)(createDocumentPath(id), JSON.stringify(document, undefined, 2));
     },
 
     async addVersion(id: string, document: TDocument) {
@@ -47,24 +53,24 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
       await ensureDirectoryExists(documentDirPath);
       const files = await promisify(fs.readdir)(documentDirPath);
       const newVersion = files.length + 1;
-      await promisify(fs.writeFile)(createDocumentPath(id, newVersion), JSON.stringify(document));
+      await promisify(fs.writeFile)(createDocumentPath(id, newVersion), JSON.stringify(document, undefined, 2));
     },
 
     async delete(id: string) {
-      await promisify(fs.unlink)(createDocumentDirPath(id));
+      await deleteDir(createDocumentDirPath(id));
     },
 
     async dropAll() {
-      await promisify(fs.unlink)(collectionDirPath);
+      await deleteDir(collectionDirPath);
     },
 
     async getAll(): Promise<TDocument[]> {
-      if (!(await pathExists(collectionDirPath))) {
+      if (!await pathExists(collectionDirPath)) {
         return [];
       }
 
       const dirs = await promisify(fs.readdir)(collectionDirPath);
-      return await Promise.all(dirs.map(getLatestVersionById));
+      return await Promise.all(dirs.map(dir => path.join(collectionDirPath, dir)).map(getLatestVersionById));
     },
 
     async getLatestVersionById(id: string) {
@@ -91,15 +97,38 @@ export function createFileSystemPersistenceAdapter(dataDirPath: string): Persist
   };
 }
 
-async function ensureDirectoryExists(filePath: string) {
-  const dirname = path.dirname(filePath);
-
-  if (await pathExists(dirname)) {
-    return true;
+async function ensureDirectoryExists(dirPath: string) {
+  if (await pathExists(dirPath)) {
+    return;
   }
 
-  ensureDirectoryExists(dirname);
-  await promisify(fs.mkdir)(dirname);
+  await ensureDirectoryExists(path.dirname(dirPath));
+  await promisify(fs.mkdir)(dirPath);
+}
+
+async function deleteDir(dirPath: string) {
+  if (!dirPath || dirPath === '/') {
+    throw failure(`cannot delete dir ${dirPath}`);
+  }
+
+  if (!await pathExists(dirPath)) {
+    return;
+  }
+
+  const names = await promisify(fs.readdir)(dirPath);
+
+  for (const name of names) {
+    const curPath = path.join(dirPath, name);
+    const stat = await promisify(fs.lstat)(curPath);
+
+    if (stat.isDirectory()) {
+      await deleteDir(curPath);
+    } else {
+      await promisify(fs.unlink)(curPath);
+    }
+  }
+
+  await promisify(fs.rmdir)(dirPath);
 }
 
 async function pathExists(path: string) {

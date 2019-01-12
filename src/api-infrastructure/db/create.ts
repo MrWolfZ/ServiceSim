@@ -6,11 +6,13 @@ import { getMetadataOfType } from './util';
 export default function create<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  col: DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ) {
   return async <TData extends Omit<TAggregate, keyof Aggregate>>(
     data: TData & Exact<Omit<TAggregate, keyof Aggregate>, TData>,
   ): Promise<TAggregate> => {
+    const col = collectionFactory();
+
     const epoch = Date.now();
 
     const $aggregateMetadata: AggregateMetadata<TAggregateType> = {

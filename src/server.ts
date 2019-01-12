@@ -14,6 +14,7 @@ import 'core-js/fn/array/flat-map';
 
 import * as api from './api';
 import { CONFIG } from './config';
+import { isFailure } from './util';
 
 const host = express();
 
@@ -41,6 +42,23 @@ api.initialize().then(sub => {
   process.on('SIGTERM', () => {
     sub.unsubscribe();
   });
+}, error => {
+  const isProduction = CONFIG.environment === 'production';
+
+  let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];
+  let stackTrace: string | undefined;
+
+  if (isFailure<string | string[]>(error)) {
+    messages = Array.isArray(error.failure) ? error.failure : [error.failure];
+    stackTrace = error.stackTrace;
+  }
+
+  if (error instanceof Error) {
+    messages = [error.message];
+    stackTrace = error.stack;
+  }
+
+  logger.error(`an error occured during initialization\n${messages}\n${stackTrace}`);
 });
 
 host.use(errorHandler());
