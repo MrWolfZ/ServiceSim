@@ -13,6 +13,7 @@ import { logger, SESSION_SECRET } from './api-infrastructure';
 import 'core-js/fn/array/flat-map';
 
 import * as api from './api';
+import { CONFIG } from './config';
 
 const host = express();
 
@@ -44,11 +45,8 @@ api.initialize().then(sub => {
 
 host.use(errorHandler());
 
-const port = process.env.PORT as any || 3000;
-const ip = '0.0.0.0';
-
-const server = host.listen(port, ip, () => {
-  logger.info(`App is running at http://${ip}:${port} in ${host.get('env')} mode`);
+const server = host.listen(CONFIG.port, CONFIG.hostnameToBind, () => {
+  logger.info(`App is running at http://${CONFIG.hostnameToBind}:${CONFIG.port} in ${CONFIG.environment} mode`);
   logger.info('Press CTRL-C to stop\n');
 });
 

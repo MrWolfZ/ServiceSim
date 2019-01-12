@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
+import { CONFIG } from './config';
 import predicateTemplates from './modules/predicate-template/predicate-template.store';
 import predicateNodes from './modules/predicate-tree/predicate-node.store';
 import Navbar from './ui-infrastructure/navbar.vue';
@@ -16,7 +17,7 @@ export default class App extends Vue {
     await this.loadAllDataAsync();
     this.dataWasLoaded = true;
 
-    const eventSource = new EventSource(`${process.env.VUE_APP_UI_BASE_URL}/events`);
+    const eventSource = new EventSource(`${CONFIG.uiApiBaseUrl}/events`);
 
     eventSource.onmessage = evt => {
       console.log(evt);

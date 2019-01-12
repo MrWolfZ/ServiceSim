@@ -16,6 +16,7 @@ import Component from 'vue-class-component';
 import Router from 'vue-router';
 import Vuex from 'vuex';
 import { getStoreBuilder } from 'vuex-typex';
+import { CONFIG } from './config';
 import './modules/errors/errors.store';
 import './modules/predicate-template/predicate-template.store';
 import './modules/predicate-tree/predicate-node.store';
@@ -61,7 +62,7 @@ Vue.use(Vuex);
 
 Vue.config.productionTip = false;
 
-axios.defaults.baseURL = process.env.VUE_APP_UI_BASE_URL;
+axios.defaults.baseURL = CONFIG.uiApiBaseUrl;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 new Vue({

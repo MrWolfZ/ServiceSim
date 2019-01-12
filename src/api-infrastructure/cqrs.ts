@@ -1,5 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import validate from 'validate.js';
+import { CONFIG } from '../config';
 import { failure, isFailure, keys, Result, success } from '../util';
 
 export type CommandValidationFn<TCommand> = (command: TCommand) => Result<void, string[]> | Promise<Result<void, string[]>>;
@@ -83,7 +84,7 @@ export function queryHandler<TParams = never, TResult = void>(
 }
 
 export function writeErrorResponse(res: Response, error: any) {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = CONFIG.environment === 'production';
 
   let statusCode = 500;
   let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];

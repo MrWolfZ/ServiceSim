@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
+import { CONFIG } from '../config';
 import { logger } from './logging';
 
 if (fs.existsSync('.env')) {
@@ -7,7 +8,7 @@ if (fs.existsSync('.env')) {
   dotenv.config({ path: '.env' });
 }
 
-export const SESSION_SECRET = process.env.SESSION_SECRET;
+export const SESSION_SECRET = CONFIG.sessionSecret;
 
 if (!SESSION_SECRET) {
   logger.error('No client secret. Set SESSION_SECRET environment variable.');
