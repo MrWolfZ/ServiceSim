@@ -1,4 +1,5 @@
 export interface PersistenceAdapter {
+  initialize?: () => Promise<void>;
   getCollection<TDocument>(documentType: string): DocumentCollection<TDocument>;
 }
 

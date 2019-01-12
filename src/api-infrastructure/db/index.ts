@@ -10,7 +10,7 @@ import query from './query';
 
 const allEventsSubject = new Subject<DomainEvent<any, any>>();
 
-const adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
+let adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
 
 function repository<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
@@ -79,10 +79,14 @@ function eventDrivenRepository<TAggregateType extends string, TAggregate extends
 }
 
 export const DB = {
-  async initialize() {
-    // nothing to do
+  async initialize(options: { adapter?: PersistenceAdapter } = {}) {
+    if (options.adapter) {
+      adapter = options.adapter;
+    }
 
-    // TODO: initialize connection to data storage
+    if (adapter.initialize) {
+      await adapter.initialize();
+    }
   },
 
   repository,
