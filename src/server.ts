@@ -3,21 +3,16 @@ import errorHandler from 'errorhandler';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
 import expressValidator from 'express-validator';
 import lusca from 'lusca';
 import path from 'path';
-import { SESSION_SECRET } from './util/secrets';
+import { logger, SESSION_SECRET } from './api-infrastructure';
 
 import 'core-js/fn/array/flat-map';
 
-// Load environment variables from .env file, where API keys and passwords are configured
-dotenv.config({ path: '.env.example' });
-
 import * as api from './api';
-import { logger } from './util/logger';
 
 const host = express();
 

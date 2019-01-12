@@ -1,5 +1,4 @@
-import { failure } from '../../util/result-monad';
-import { keys } from '../../util/util';
+import { failure, keys } from '../../util';
 import { Aggregate, AggregateMetadata, DomainEvent, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
 import { DocumentCollection } from './adapters';
 

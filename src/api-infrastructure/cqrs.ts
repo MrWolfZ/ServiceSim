@@ -1,7 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import validate from 'validate.js';
-import { failure, isFailure, Result, success } from '../util/result-monad';
-import { keys } from '../util/util';
+import { failure, isFailure, keys, Result, success } from '../util';
 
 export type CommandValidationFn<TCommand> = (command: TCommand) => Result<void, string[]> | Promise<Result<void, string[]>>;
 

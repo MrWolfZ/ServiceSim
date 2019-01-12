@@ -1,6 +1,5 @@
 import { Subject } from 'rxjs';
-import { assertNever } from '../../util/assert';
-import { failure } from '../../util/result-monad';
+import { assertNever, failure } from '../../util';
 import {
   Aggregate,
   AggregateMetadata,

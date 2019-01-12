@@ -1,6 +1,5 @@
 import { DB } from '../../api-infrastructure';
-import { failure } from '../../util/result-monad';
-import { omit } from '../../util/util';
+import { failure, omit } from '../../util';
 import {
   CreateServiceInvocationCommand,
   ServiceInvocationAggregate,

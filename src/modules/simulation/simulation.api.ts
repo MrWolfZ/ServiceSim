@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
-import { DB } from '../../api-infrastructure';
-import { logger } from '../../util/logger';
+import { DB, logger } from '../../api-infrastructure';
 import { createServiceInvocation, setServiceInvocationResponse } from '../service-invocation/service-invocation.api';
 import { ServiceInvocationAggregateType, ServiceInvocationDomainEvents, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 import { getPredicateTree, PredicateNode, ResponseGeneratorFunction } from './predicate-tree.api';

@@ -1,6 +1,6 @@
 import { Aggregate, AggregateMetadata, DomainEvent, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
 
-import { assertNever } from '../../util/assert';
+import { assertNever } from '../../util';
 
 export function getMetadataOfType<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   metadataType: 'Default' | 'Versioned' | 'EventDriven',

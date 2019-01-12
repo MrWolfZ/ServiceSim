@@ -1,7 +1,6 @@
 import express from 'express';
 import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
-import { failure } from '../../util/result-monad';
-import { omit } from '../../util/util';
+import { failure, omit } from '../../util';
 import { getPredicateTemplatesByIdsAndVersions } from '../predicate-template/predicate-template.api';
 import { getResponseGeneratorTemplatesByIdsAndVersions } from '../response-generator-template/response-generator-template.api';
 import {
