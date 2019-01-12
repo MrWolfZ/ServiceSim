@@ -6,6 +6,7 @@
       "request": "attach",
       "name": "Attach by Process ID",
       "processId": "${command:PickProcess}",
+      "restart": true,
       "protocol": "inspector"
     },
     {
@@ -26,7 +27,10 @@
       "request": "launch",
       "name": "Jest All",
       "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["--runInBand", "--forceExit"],
+      "args": [
+        "--runInBand",
+        "--forceExit"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "windows": {
@@ -38,7 +42,10 @@
       "request": "launch",
       "name": "Jest Current File",
       "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["${relativeFile}", "--forceExit"],
+      "args": [
+        "${relativeFile}",
+        "--forceExit"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "windows": {
