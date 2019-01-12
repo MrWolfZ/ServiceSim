@@ -1,4 +1,5 @@
 import { Aggregate } from '../../api-infrastructure/api-infrastructure.types';
+import { Diff } from '../../util';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface ResponseGeneratorTemplateData {
@@ -21,9 +22,10 @@ export interface ResponseGeneratorTemplateState extends ResponseGeneratorTemplat
 
 export interface CreateResponseGeneratorTemplateCommand extends ResponseGeneratorTemplateData { }
 
-export interface UpdateResponseGeneratorTemplateCommand extends Partial<ResponseGeneratorTemplateData> {
+export interface UpdateResponseGeneratorTemplateCommand {
   templateId: string;
   unmodifiedTemplateVersion: number;
+  diff: Diff<ResponseGeneratorTemplateData>;
 }
 
 export interface DeleteResponseGeneratorTemplateCommand {

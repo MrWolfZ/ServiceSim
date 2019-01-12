@@ -1,4 +1,5 @@
 import { Aggregate } from '../../api-infrastructure/api-infrastructure.types';
+import { Diff } from '../../util';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface PredicateTemplateData {
@@ -23,9 +24,15 @@ export interface PredicateTemplateFormValue extends PredicateTemplateData { }
 
 export interface CreatePredicateTemplateCommand extends PredicateTemplateData { }
 
-export interface UpdatePredicateTemplateCommand extends Partial<PredicateTemplateData> {
+export interface CreatePredicateTemplateCommandResponse {
+  templateId: string;
+  templateVersion: number;
+}
+
+export interface UpdatePredicateTemplateCommand {
   templateId: string;
   unmodifiedTemplateVersion: number;
+  diff: Diff<PredicateTemplateData>;
 }
 
 export interface DeletePredicateTemplateCommand {

@@ -15,7 +15,7 @@ export class ModalDialog extends TsxComponent<ModalDialogProps> implements Modal
   @Emit()
   onAfterFadeOut() { }
 
-  private onAfterFadeoutTimer: NodeJS.Timer | undefined;
+  private onAfterFadeoutTimer: any;
 
   @Watch('isOpen')
   onIsOpenChanged(isOpen: boolean) {

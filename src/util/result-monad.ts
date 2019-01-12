@@ -40,6 +40,12 @@ export function isFailure<TFailure>(obj: any): obj is Failure<TFailure> {
   return !!obj && (obj as Failure).type === 'failure' && hasProperty(obj as Failure, 'failure');
 }
 
+declare global {
+  interface ErrorConstructor {
+    captureStackTrace(targetObject: Object, constructorOpt?: Function): void;
+  }
+}
+
 export function failure(): Failure;
 export function failure<TFailure>(value: TFailure): Failure<TFailure>;
 export function failure<TFailure>(value?: TFailure): Failure<TFailure> {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
-import { keys, omit } from '../../util';
+import { keys } from '../../util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
   CreateResponseGeneratorTemplateCommand,
@@ -62,7 +62,7 @@ export async function updateResponseGeneratorTemplate(command: UpdateResponseGen
   const newVersion = await repo.patch(
     command.templateId,
     command.unmodifiedTemplateVersion,
-    omit(command, 'templateId', 'unmodifiedTemplateVersion'),
+    command.diff,
   );
 
   return {
@@ -75,10 +75,7 @@ export async function updateResponseGeneratorTemplate(command: UpdateResponseGen
 export const updateResponseGeneratorTemplateConstraints: CommandValidationConstraints<UpdateResponseGeneratorTemplateCommand> = {
   templateId: {},
   unmodifiedTemplateVersion: {},
-  name: {},
-  description: {},
-  generatorFunctionBody: {},
-  parameters: {},
+  diff: {},
 };
 
 export async function deleteResponseGeneratorTemplate(command: DeleteResponseGeneratorTemplateCommand) {

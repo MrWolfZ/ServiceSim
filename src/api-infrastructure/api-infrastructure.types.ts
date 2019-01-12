@@ -1,3 +1,5 @@
+import { Diff } from '../util';
+
 export interface Aggregate {
   id: string;
 }
@@ -10,7 +12,7 @@ export interface AggregateMetadata<TAggregateType extends string> {
 
 export interface VersionedAggregateMetadata<TAggregateType extends string, TAggregate extends Aggregate> extends AggregateMetadata<TAggregateType> {
   version: number;
-  changesSinceLastVersion: Partial<Omit<TAggregate, keyof Aggregate>>;
+  changesSinceLastVersion: Diff<TAggregate>;
   isDeleted: boolean;
 }
 

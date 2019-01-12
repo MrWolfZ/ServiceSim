@@ -1,9 +1,10 @@
 import axios from 'axios';
-import uuid from 'uuid';
 import Vue from 'vue';
 import { getStoreBuilder } from 'vuex-typex';
+import { createDiff } from '../../util';
 import {
   CreatePredicateTemplateCommand,
+  CreatePredicateTemplateCommandResponse,
   DeletePredicateTemplateCommand,
   PredicateTemplateData,
   PredicateTemplateDto,
@@ -53,19 +54,19 @@ export async function loadAllAsync() {
 }
 
 export async function createAsync(_: any, data: PredicateTemplateData) {
-  const templateId = `predicateTemplate.${uuid()}`;
-  const template: PredicateTemplateState = {
-    id: templateId,
-    version: 1,
-    ...data,
-  };
-
   const command: CreatePredicateTemplateCommand = {
     ...data,
   };
 
+  const response = await axios.post<CreatePredicateTemplateCommandResponse>(`/predicate-templates/create`, command);
+
+  const template: PredicateTemplateState = {
+    id: response.data.templateId,
+    version: response.data.templateVersion,
+    ...data,
+  };
+
   predicateTemplates.addOrReplace(template);
-  await axios.post(`/predicate-templates/create`, command);
 }
 
 export async function updateAsync(_: any, args: { templateId: string; data: PredicateTemplateData }) {
@@ -78,8 +79,8 @@ export async function updateAsync(_: any, args: { templateId: string; data: Pred
 
   const command: UpdatePredicateTemplateCommand = {
     templateId: args.templateId,
-    ...args.data,
     unmodifiedTemplateVersion: originalTemplate.version,
+    diff: createDiff(originalTemplate, args.data),
   };
 
   predicateTemplates.addOrReplace(template);

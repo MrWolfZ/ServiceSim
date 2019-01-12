@@ -1,3 +1,4 @@
+import { Diff } from '../../util';
 import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
 import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
@@ -22,7 +23,7 @@ export default function create<TAggregateType extends string, TAggregate extends
       ...$aggregateMetadata,
       version: 1,
       isDeleted: false,
-      changesSinceLastVersion: {},
+      changesSinceLastVersion: {} as Diff<TAggregate>,
     };
 
     const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, any> = {

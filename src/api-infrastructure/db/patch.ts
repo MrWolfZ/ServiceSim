@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import { assertNever, failure } from '../../util';
+import { applyDiff, assertNever, createDiff, Diff, failure } from '../../util';
 import {
   Aggregate,
   AggregateMetadata,
@@ -16,22 +16,13 @@ export default function patch<TAggregateType extends string, TAggregate extends 
   aggregateType: TAggregateType,
   metadataType: 'Default',
   col: DocumentCollection<TAggregate & { $metadata: any }>,
-)
-  : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
-    id: string,
-    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
-  ) => Promise<void>;
+): (id: string, diff: Diff<TAggregate>) => Promise<void>;
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate>(
   aggregateType: TAggregateType,
   metadataType: 'Versioned',
   col: DocumentCollection<TAggregate & { $metadata: any }>,
-)
-  : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
-    id: string,
-    expectedVersion: number,
-    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
-  ) => Promise<number>;
+): (id: string, expectedVersion: number, diff: Diff<TAggregate>) => Promise<number>;
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
@@ -39,13 +30,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
   col: DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject: Subject<DomainEvent<any, any>>,
-)
-  : <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
-    id: string,
-    expectedVersion: number,
-    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
-    ...events: TEvent[]
-  ) => Promise<number>;
+): (id: string, expectedVersion: number, diff: Diff<TAggregate>, ...events: TEvent[]) => Promise<number>;
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
   aggregateType: TAggregateType,
@@ -54,10 +39,10 @@ export default function patch<TAggregateType extends string, TAggregate extends 
   eventHandlers?: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
   allEventsSubject?: Subject<TEvent>,
 ) {
-  return async <TData extends Omit<Partial<TAggregate>, keyof Aggregate>>(
+  return async (
     id: string,
-    expectedVersionOrData: any,
-    data: TData & Exact<Omit<Partial<TAggregate>, keyof Aggregate>, TData>,
+    expectedVersionOrDiff: any,
+    diff: Diff<TAggregate>,
     ...events: TEvent[]
   ): Promise<number | void> => {
     const latestAggregate = await col.getLatestVersionById(id);
@@ -66,7 +51,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not exist`);
     }
 
-    const expectedVersion = typeof expectedVersionOrData === 'number' ? expectedVersionOrData : -1;
+    const expectedVersion = typeof expectedVersionOrDiff === 'number' ? expectedVersionOrDiff : -1;
     const actualVersion = (latestAggregate.$metadata as VersionedAggregateMetadata<any, any>).version;
 
     if (expectedVersion !== -1 && actualVersion !== expectedVersion) {
@@ -78,14 +63,11 @@ export default function patch<TAggregateType extends string, TAggregate extends 
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} is deleted`);
     }
 
-    data = typeof expectedVersionOrData === 'number' ? data : expectedVersionOrData;
+    diff = typeof expectedVersionOrDiff === 'number' ? diff : expectedVersionOrDiff;
 
     const epoch = Date.now();
 
-    let updatedAggregate: TAggregate = {
-      ...latestAggregate,
-      ...data,
-    };
+    let updatedAggregate = applyDiff(latestAggregate, diff);
 
     if (metadataType === 'EventDriven') {
       updatedAggregate = events.reduce((e, evt) => {
@@ -94,7 +76,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
       }, updatedAggregate);
     }
 
-    // TODO: create diff and update metadata with diff
+    const finalDiff = createDiff(latestAggregate, updatedAggregate);
 
     const $aggregateMetadata: AggregateMetadata<TAggregateType> = {
       ...latestAggregate.$metadata,
@@ -105,7 +87,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
       ...latestAggregate.$metadata,
       ...$aggregateMetadata,
       version: actualVersion + 1,
-      changesSinceLastVersion: {}, // TODO
+      changesSinceLastVersion: finalDiff,
     };
 
     const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent> = {
