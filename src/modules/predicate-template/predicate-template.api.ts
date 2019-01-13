@@ -1,10 +1,9 @@
 import express from 'express';
 import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
 import { keys } from '../../util';
+import { createPredicateTemplate, createPredicateTemplateConstraints } from './commands';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
-  CreatePredicateTemplateCommand,
-  CreatePredicateTemplateCommandResponse,
   DeletePredicateTemplateCommand,
   PredicateTemplateAggregate,
   PredicateTemplateAggregateType,
@@ -41,23 +40,6 @@ export async function getPredicateTemplatesByIdsAndVersions(idsAndVersions: { [t
     parameters: t.parameters,
   }));
 }
-
-export async function createPredicateTemplate(command: CreatePredicateTemplateCommand): Promise<CreatePredicateTemplateCommandResponse> {
-  const template = await repo.create(command);
-
-  return {
-    templateId: template.id,
-    templateVersion: 1,
-  };
-}
-
-// TODO: validate
-export const createPredicateTemplateConstraints: CommandValidationConstraints<CreatePredicateTemplateCommand> = {
-  name: {},
-  description: {},
-  evalFunctionBody: {},
-  parameters: {},
-};
 
 export async function updatePredicateTemplate(command: UpdatePredicateTemplateCommand) {
   const newVersion = await repo.patch(
