@@ -1,15 +1,12 @@
 <script lang="tsx">
-import { Action, createFormGroupState, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
+import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
 import { Component } from 'vue-property-decorator';
-import { Emit, Form, ModalDialog, TsxComponent } from '../../ui-infrastructure';
+import { Form, ModalDialog, TsxComponent } from '../../ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form.vue';
 import PredicateTemplateForm from './predicate-template-form.vue';
-import { PredicateTemplateData, PredicateTemplateFormValue, PredicateTemplateState } from './predicate-template.types';
-
-export interface PredicateTemplateDialogProps {
-  onSubmit: (data: PredicateTemplateData, templateId?: string) => any;
-}
+import predicateTemplates from './predicate-template.store';
+import { PredicateTemplateData, PredicateTemplateFormValue } from './predicate-template.types';
 
 export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
   name: '',
@@ -33,8 +30,9 @@ function formReducer(state: FormGroupState<PredicateTemplateFormValue>, action: 
 }
 
 @Component({})
-export default class PredicateTemplateDialog extends TsxComponent<PredicateTemplateDialogProps> implements PredicateTemplateDialogProps {
+export default class PredicateTemplateDialog extends TsxComponent<{}> {
   private dialogIsOpen = false;
+  private isSaving = false;
   private templateId: string | undefined;
 
   private formState = createFormState();
@@ -42,30 +40,40 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
   openForNewTemplate() {
     this.templateId = undefined;
     this.dialogIsOpen = true;
+    this.isSaving = false;
     this.formState = createFormState();
   }
 
-  openForExistingTemplate(template: PredicateTemplateState) {
-    this.templateId = template.id;
+  openForExistingTemplate(templateId: string) {
+    this.templateId = templateId;
     this.dialogIsOpen = true;
-    const { id, version, ...rest } = template;
+    this.isSaving = false;
+    const { id, version, ...rest } = predicateTemplates.state.templatesById[templateId];
     this.formState = createFormState(rest);
   }
 
-  @Emit()
-  onSubmit(_1: PredicateTemplateData, _2?: string) { }
-
-  private submitDialog() {
+  private async submitDialog() {
     if (this.formState.isInvalid) {
       return;
     }
 
-    this.onSubmit({
+    this.isSaving = true;
+    this.formState = disable(this.formState);
+
+    await this.createOrUpdateTemplate({
       ...this.formState.value,
       parameters: this.formState.value.parameters.map(p => ({ ...p })),
     }, this.templateId);
 
     this.closeDialog();
+  }
+
+  private async createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
+    if (!id) {
+      await predicateTemplates.createAsync(data);
+    } else {
+      await predicateTemplates.updateAsync({ templateId: id, data });
+    }
   }
 
   private cancelDialog() {
@@ -92,13 +100,14 @@ export default class PredicateTemplateDialog extends TsxComponent<PredicateTempl
               class='button is-danger is-outlined'
               type='button'
               onClick={() => this.cancelDialog()}
+              disabled={this.isSaving}
             >
               Cancel
             </button>
             <button
-              class='button is-success'
+              class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
               onClick={() => this.submitDialog()}
-              disabled={this.formState.isInvalid && this.formState.isSubmitted}
+              disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
             >
               Save
             </button>

@@ -3,7 +3,6 @@ import { Component, Vue } from 'vue-property-decorator';
 import PredicateTemplateDialog from './predicate-template-dialog.vue';
 import PredicateTemplateTile from './predicate-template-tile.vue';
 import predicateTemplates from './predicate-template.store';
-import { PredicateTemplateData } from './predicate-template.types';
 
 @Component({})
 export default class PredicateTemplatesPage extends Vue {
@@ -30,18 +29,6 @@ export default class PredicateTemplatesPage extends Vue {
         || t.description.toUpperCase().includes(upperCaseFilterValue)
         || t.evalFunctionBody.toUpperCase().includes(upperCaseFilterValue)
     );
-  }
-
-  private get templatesById() {
-    return predicateTemplates.state.templatesById;
-  }
-
-  private async createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
-    if (!id) {
-      await predicateTemplates.createAsync(data);
-    } else {
-      await predicateTemplates.updateAsync({ templateId: id, data });
-    }
   }
 
   private async deleteTemplate(templateId: string) {
@@ -88,7 +75,7 @@ export default class PredicateTemplatesPage extends Vue {
                   <div key={template.id} class='column is-4-fullhd is-6-desktop is-12-tablet'>
                     <PredicateTemplateTile
                       templateId={template.id}
-                      onEdit={() => this.dialog().openForExistingTemplate(this.templatesById[template.id])}
+                      onEdit={() => this.dialog().openForExistingTemplate(template.id)}
                       onDelete={() => this.deleteTemplate(template.id)}
                     />
                   </div>
@@ -119,7 +106,7 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-        <PredicateTemplateDialog ref={this.dialog.name} onSubmit={(data, id) => this.createOrUpdateTemplate(data, id)} />
+        <PredicateTemplateDialog ref={this.dialog.name} />
       </div>
     );
   }

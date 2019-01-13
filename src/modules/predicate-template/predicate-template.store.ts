@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Vue from 'vue';
 import { getStoreBuilder } from 'vuex-typex';
-import { createDiff } from '../../util';
+import { createDiff, isEmpty } from '../../util';
 import {
   CreatePredicateTemplateCommand,
   CreatePredicateTemplateCommandResponse,
@@ -83,6 +83,10 @@ export async function updateAsync(_: any, args: { templateId: string; data: Pred
     diff: createDiff(originalTemplate, args.data),
   };
 
+  if (isEmpty(command.diff)) {
+    return;
+  }
+
   predicateTemplates.addOrReplace(template);
   await axios.post(`/predicate-templates/update`, command);
 }
@@ -100,7 +104,7 @@ export async function deleteAsync(_: any, templateId: string) {
 
 const state$ = b.state();
 const getAll$ = b.read(getAll);
-const predicateTemplates = {
+export const predicateTemplates = {
   get state() { return state$(); },
   get all() { return getAll$(); },
 

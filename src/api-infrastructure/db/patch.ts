@@ -1,4 +1,4 @@
-import { applyDiff, assertNever, createDiff, Diff, failure } from '../../util';
+import { applyDiff, assertNever, createDiff, Diff, failure, isEmpty } from '../../util';
 import {
   Aggregate,
   AggregateMetadata,
@@ -77,6 +77,10 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
     }
 
     const finalDiff = createDiff(latestAggregate, updatedAggregate);
+
+    if (isEmpty(finalDiff) && events.length === 0) {
+      return actualVersion;
+    }
 
     const $aggregateMetadata: AggregateMetadata<TAggregate['@type']> = {
       ...latestAggregate.$metadata,

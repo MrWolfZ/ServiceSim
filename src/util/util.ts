@@ -2,6 +2,10 @@ export function keys<T extends { [key: string]: any }, TKey extends keyof T = st
   return Object.keys(t) as TKey[];
 }
 
+export function isEmpty<T extends { [key: string]: any }>(t: T) {
+  return keys(t).length === 0;
+}
+
 export function copyProps<T>(target: T, props: Partial<T>) {
   keys(props).filter(key => Object.prototype.hasOwnProperty.call(target, key)).forEach(key => target[key] = props[key]!);
 }

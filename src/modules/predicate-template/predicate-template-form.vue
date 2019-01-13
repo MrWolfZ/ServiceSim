@@ -104,6 +104,7 @@ export default class PredicateTemplateForm extends TsxComponent<PredicateTemplat
                   class='button is-primary'
                   type='button'
                   onClick={() => this.addParameter()}
+                  disabled={this.formState.controls.parameters.isDisabled}
                 >
                   <span>Add Parameter</span>
                   <span class='icon is-small'>

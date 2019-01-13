@@ -123,6 +123,7 @@ export default class ParameterForm extends TsxComponent<ParameterFormProps> impl
           class='button is-danger'
           type='button'
           onClick={() => this.onRemove()}
+          disabled={this.formState.isDisabled}
         >
           <span>Remove</span>
           <span class='icon is-small'>
