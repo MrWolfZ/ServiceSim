@@ -19,7 +19,7 @@ export interface ServiceInvocationData {
 
 export type ServiceInvocationAggregateType = 'service-invocation';
 
-export type ServiceInvocationAggregate = ServiceInvocationData & Aggregate;
+export type ServiceInvocationAggregate = ServiceInvocationData & Aggregate<ServiceInvocationAggregateType>;
 
 export interface InvocationResponseWasSet extends DomainEvent<ServiceInvocationAggregateType, 'InvocationResponseWasSet'> {
   statusCode: number;

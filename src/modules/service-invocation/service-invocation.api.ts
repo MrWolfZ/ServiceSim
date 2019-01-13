@@ -3,12 +3,11 @@ import { failure, omit } from '../../util';
 import {
   CreateServiceInvocationCommand,
   ServiceInvocationAggregate,
-  ServiceInvocationAggregateType,
   ServiceInvocationDomainEvents,
   SetServiceResponseCommand,
 } from './service-invocation.types';
 
-const repo = DB.eventDrivenRepository<ServiceInvocationAggregateType, ServiceInvocationAggregate, ServiceInvocationDomainEvents>('service-invocation', {
+const repo = DB.eventDrivenRepository<ServiceInvocationAggregate, ServiceInvocationDomainEvents>('service-invocation', {
   InvocationResponseWasSet: (aggregate, evt) => {
     return {
       ...aggregate,

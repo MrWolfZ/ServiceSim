@@ -33,8 +33,7 @@ export const eventBus = {
     );
   },
 
-  // tslint:disable-next-line:max-line-length
-  getDataEventStream<TEvent extends DataEvent<TEvent['aggregateType'], TEvent['aggregate'], TEvent['eventType']> = DataEvent<TEvent['aggregateType'], TEvent['aggregate'], TEvent['eventType']>>(
+  getDataEventStream<TEvent extends DataEvent<TEvent['aggregate'], TEvent['eventType']> = DataEvent<TEvent['aggregate'], TEvent['eventType']>>(
     aggregateType: TEvent['aggregateType'],
   ): Observable<TEvent> {
     return allEventsSubject.pipe(

@@ -3,32 +3,32 @@ import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAg
 import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
-export default function create<TAggregateType extends string, TAggregate extends Aggregate>(
-  aggregateType: TAggregateType,
+export default function create<TAggregate extends Aggregate<TAggregate['@type']>>(
+  aggregateType: TAggregate['@type'],
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
   collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
 ) {
-  return async <TData extends Omit<TAggregate, keyof Aggregate>>(
-    data: TData & Exact<Omit<TAggregate, keyof Aggregate>, TData>,
+  return async <TData extends Omit<TAggregate, keyof Aggregate<TAggregate['@type']>>>(
+    data: TData & Exact<Omit<TAggregate, keyof Aggregate<TAggregate['@type']>>, TData>,
   ): Promise<TAggregate> => {
     const col = collectionFactory();
 
     const epoch = Date.now();
 
-    const $aggregateMetadata: AggregateMetadata<TAggregateType> = {
+    const $aggregateMetadata: AggregateMetadata<TAggregate['@type']> = {
       aggregateType,
       createdOnEpoch: epoch,
       lastUpdatedOnEpoch: epoch,
     };
 
-    const $versionedMetadata: VersionedAggregateMetadata<TAggregateType, TAggregate> = {
+    const $versionedMetadata: VersionedAggregateMetadata<TAggregate> = {
       ...$aggregateMetadata,
       version: 1,
       isDeleted: false,
       changesSinceLastVersion: {} as Diff<TAggregate>,
     };
 
-    const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, any> = {
+    const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregate, any> = {
       ...$versionedMetadata,
       eventsSinceLastVersion: [],
     };
@@ -36,9 +36,14 @@ export default function create<TAggregateType extends string, TAggregate extends
     const id = await col.generateId();
     const $metadata = getMetadataOfType(metadataType, $aggregateMetadata, $versionedMetadata, $eventDrivenMetadata);
 
-    const newAggregate: TAggregate & { $metadata: any } = {
+    const aggregateData: Aggregate<TAggregate['@type']> & { $metadata: any } = {
       id,
+      '@type': aggregateType,
       $metadata,
+    };
+
+    const newAggregate: TAggregate & { $metadata: any } = {
+      ...aggregateData,
       ...data as any,
     };
 

@@ -6,12 +6,11 @@ import {
   CreateResponseGeneratorTemplateCommand,
   DeleteResponseGeneratorTemplateCommand,
   ResponseGeneratorTemplateAggregate,
-  ResponseGeneratorTemplateAggregateType,
   ResponseGeneratorTemplateDto,
   UpdateResponseGeneratorTemplateCommand,
 } from './response-generator-template.types';
 
-const repo = DB.versionedRepository<ResponseGeneratorTemplateAggregateType, ResponseGeneratorTemplateAggregate>('response-generator-template');
+const repo = DB.versionedRepository<ResponseGeneratorTemplateAggregate>('response-generator-template');
 
 export async function getAllResponseGeneratorTemplates() {
   const allTemplates = await repo.query.all();

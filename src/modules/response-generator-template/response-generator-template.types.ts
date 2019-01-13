@@ -11,7 +11,7 @@ export interface ResponseGeneratorTemplateData {
 
 export type ResponseGeneratorTemplateAggregateType = 'response-generator-template';
 
-export type ResponseGeneratorTemplateAggregate = ResponseGeneratorTemplateData & Aggregate;
+export type ResponseGeneratorTemplateAggregate = ResponseGeneratorTemplateData & Aggregate<ResponseGeneratorTemplateAggregateType>;
 
 export interface ResponseGeneratorTemplateDto extends ResponseGeneratorTemplateData {
   id: string;

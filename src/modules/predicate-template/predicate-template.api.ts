@@ -6,12 +6,11 @@ import * as DEFAULT_TEMPLATES from './default-templates';
 import {
   DeletePredicateTemplateCommand,
   PredicateTemplateAggregate,
-  PredicateTemplateAggregateType,
   PredicateTemplateDto,
   UpdatePredicateTemplateCommand,
 } from './predicate-template.types';
 
-const repo = DB.versionedRepository<PredicateTemplateAggregateType, PredicateTemplateAggregate>('predicate-template');
+const repo = DB.versionedRepository<PredicateTemplateAggregate>('predicate-template');
 
 export async function getAllPredicateTemplates() {
   const allTemplates = await repo.query.all();

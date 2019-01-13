@@ -2,14 +2,14 @@ import { Aggregate, AggregateMetadata, DomainEvent, EventDrivenAggregateMetadata
 
 import { assertNever } from '../../util';
 
-export function getMetadataOfType<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
+export function getMetadataOfType<TAggregate extends Aggregate<TAggregate['@type']>, TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>>(
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  $aggregateMetadata: AggregateMetadata<TAggregateType>,
-  $versionedMetadata: VersionedAggregateMetadata<TAggregateType, TAggregate>,
-  $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent>,
-): AggregateMetadata<TAggregateType>
-  | VersionedAggregateMetadata<TAggregateType, TAggregate>
-  | EventDrivenAggregateMetadata<TAggregateType, TAggregate, TEvent> {
+  $aggregateMetadata: AggregateMetadata<TAggregate['@type']>,
+  $versionedMetadata: VersionedAggregateMetadata<TAggregate>,
+  $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregate, TEvent>,
+): AggregateMetadata<TAggregate['@type']>
+  | VersionedAggregateMetadata<TAggregate>
+  | EventDrivenAggregateMetadata<TAggregate, TEvent> {
   switch (metadataType) {
     case 'Default':
       return $aggregateMetadata;

@@ -9,59 +9,62 @@ import query from './query';
 
 let adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
 
-function repository<TAggregateType extends string, TAggregate extends Aggregate>(
-  aggregateType: TAggregateType,
+function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
+  aggregateType: TAggregate['@type'],
 ) {
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
-    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
-    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
+    create: create<TAggregate>(aggregateType, 'Default', collectionFactory),
+    patch: patch<TAggregate>(aggregateType, 'Default', collectionFactory),
+    delete: delete$<TAggregate>(aggregateType, 'Default', collectionFactory),
     dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregateType, TAggregate>(aggregateType, 'Default', collectionFactory),
+    query: query<TAggregate>(aggregateType, 'Default', collectionFactory),
   };
 }
 
-function versionedRepository<TAggregateType extends string, TAggregate extends Aggregate>(
-  aggregateType: TAggregateType,
+function versionedRepository<TAggregate extends Aggregate<TAggregate['@type']>>(
+  aggregateType: TAggregate['@type'],
 ) {
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
-    patch: patch<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
-    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    create: create<TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    patch: patch<TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    delete: delete$<TAggregate>(aggregateType, 'Versioned', collectionFactory),
     dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregateType, TAggregate>(aggregateType, 'Versioned', collectionFactory),
+    query: query<TAggregate>(aggregateType, 'Versioned', collectionFactory),
   };
 }
 
-function eventDrivenRepository<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
-  aggregateType: TAggregateType,
-  eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
+function eventDrivenRepository<
+  TAggregate extends Aggregate<TAggregate['@type']>,
+  TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
+  >(
+    aggregateType: TAggregate['@type'],
+    eventHandlers: DomainEventHandlerMap<TAggregate, TEvent>,
 ) {
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', collectionFactory),
-    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
-    delete: delete$<TAggregateType, TAggregate>(aggregateType, 'EventDriven', collectionFactory),
+    create: create<TAggregate>(aggregateType, 'EventDriven', collectionFactory),
+    patch: patch<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
+    delete: delete$<TAggregate>(aggregateType, 'EventDriven', collectionFactory),
     dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory),
+    query: query<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory),
 
     createDomainEvent<
       TEventType extends TEvent['eventType'],
-      TCustomProps extends Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregateType, TEventType>, 'aggregateId'>>,
+      TCustomProps extends Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>,
       >(
         eventType: TEventType,
         // tslint:disable-next-line:max-line-length
-        customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregateType, TEventType>, 'aggregateId'>>, TCustomProps>,
+        customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>, TCustomProps>,
     ): TEvent {
-      return eventBus.createDomainEvent(eventType, aggregateType, customProps);
+      return eventBus.createDomainEvent<TEvent, TCustomProps>(eventType, aggregateType, customProps);
     },
   };
 }

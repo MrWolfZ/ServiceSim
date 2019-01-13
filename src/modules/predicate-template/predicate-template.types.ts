@@ -11,7 +11,7 @@ export interface PredicateTemplateData {
 
 export type PredicateTemplateAggregateType = 'predicate-template';
 
-export type PredicateTemplateAggregate = PredicateTemplateData & Aggregate;
+export type PredicateTemplateAggregate = PredicateTemplateData & Aggregate<PredicateTemplateAggregateType>;
 
 export interface PredicateTemplateDto extends PredicateTemplateData {
   id: string;

@@ -7,7 +7,6 @@ import {
   CreatePredicateNodeCommand as AddChildPredicateNodeCommand,
   DeletePredicateNodeCommand,
   PredicateNodeAggregate,
-  PredicateNodeAggregateType,
   PredicateNodeDomainEvents,
   PredicateNodeDto,
   ResponseGeneratorData,
@@ -18,7 +17,7 @@ import {
   UpdatePredicateNodeCommand,
 } from './predicate-node.types';
 
-const repo = DB.eventDrivenRepository<PredicateNodeAggregateType, PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {
+const repo = DB.eventDrivenRepository<PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {
   ChildPredicateNodeAdded: (aggregate, evt) => {
     return {
       ...aggregate,

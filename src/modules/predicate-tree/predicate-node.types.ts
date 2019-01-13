@@ -25,7 +25,7 @@ export type RootNodeName = 'ROOT';
 
 export type PredicateNodeAggregateType = 'predicate-node';
 
-export type PredicateNodeAggregate = PredicateNodeData & Aggregate;
+export type PredicateNodeAggregate = PredicateNodeData & Aggregate<PredicateNodeAggregateType>;
 
 export interface ChildPredicateNodeAdded extends DomainEvent<PredicateNodeAggregateType, 'ChildPredicateNodeAdded'> {
   childNodeId: string;

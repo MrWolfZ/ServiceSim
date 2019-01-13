@@ -1,7 +1,8 @@
 import { Diff } from '../util';
 
-export interface Aggregate {
+export interface Aggregate<TAggregateType extends string> {
   id: string;
+  '@type': TAggregateType;
 }
 
 export interface AggregateMetadata<TAggregateType extends string> {
@@ -10,7 +11,8 @@ export interface AggregateMetadata<TAggregateType extends string> {
   lastUpdatedOnEpoch: number;
 }
 
-export interface VersionedAggregateMetadata<TAggregateType extends string, TAggregate extends Aggregate> extends AggregateMetadata<TAggregateType> {
+export interface VersionedAggregateMetadata<TAggregate extends Aggregate<TAggregate['@type']>>
+  extends AggregateMetadata<TAggregate['@type']> {
   version: number;
   changesSinceLastVersion: Diff<TAggregate>;
   isDeleted: boolean;
@@ -27,35 +29,32 @@ export interface DomainEvent<TAggregateType extends string, TEventType extends s
 }
 
 export interface DataEvent<
-  TAggregateType extends string,
-  TAggregate extends Aggregate,
+  TAggregate extends Aggregate<TAggregate['@type']>,
   TEventType extends 'Create' | 'Update' | 'Delete',
-  > extends DomainEvent<TAggregateType, TEventType> {
+  > extends DomainEvent<TAggregate['@type'], TEventType> {
   aggregate: TAggregate;
 }
 
-export interface CreateEvent<TAggregateType extends string, TAggregate extends Aggregate> extends DataEvent<TAggregateType, TAggregate, 'Create'> { }
+export interface CreateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Create'> { }
 
-export interface UpdateEvent<TAggregateType extends string, TAggregate extends Aggregate> extends DataEvent<TAggregateType, TAggregate, 'Update'> {
+export interface UpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Update'> {
   diff: Diff<TAggregate>;
 }
 
-export interface DeleteEvent<TAggregateType extends string, TAggregate extends Aggregate> extends DataEvent<TAggregateType, TAggregate, 'Delete'> { }
+export interface DeleteEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Delete'> { }
 
 export interface EventDrivenAggregateMetadata<
-  TAggregateType extends string,
-  TAggregate extends Aggregate,
-  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>,
-  > extends VersionedAggregateMetadata<TAggregateType, TAggregate> {
+  TAggregate extends Aggregate<TAggregate['@type']>,
+  TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
+  > extends VersionedAggregateMetadata<TAggregate> {
   eventsSinceLastVersion: TEvent[];
 }
 
 export type DomainEventOfType<TEvent, TEventType extends string> = TEvent extends DomainEvent<any, TEventType> ? TEvent : never;
 
 export type DomainEventHandlerMap<
-  TAggregateType extends string,
-  TAggregate extends Aggregate,
-  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>,
+  TAggregate extends Aggregate<TAggregate['@type']>,
+  TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
   > = {
     [eventType in TEvent['eventType']]: (aggregate: TAggregate, event: DomainEventOfType<TEvent, eventType>) => TAggregate;
   };
