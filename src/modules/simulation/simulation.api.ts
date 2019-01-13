@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
-import { DB, logger } from '../../api-infrastructure';
+import { eventBus, logger } from '../../api-infrastructure';
 import { createServiceInvocation, setServiceInvocationResponse } from '../service-invocation/service-invocation.api';
-import { ServiceInvocationAggregateType, ServiceInvocationDomainEvents, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
+import { ServiceInvocationDomainEvents, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 import { getPredicateTree, PredicateNode, ResponseGeneratorFunction } from './predicate-tree.api';
 
 export const processSimulationRequest = async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ export const processSimulationRequest = async (req: Request, res: Response) => {
 
   const { invocationId, invocationVersion } = await createServiceInvocation(request);
 
-  DB.getEventStream<ServiceInvocationAggregateType, ServiceInvocationDomainEvents>('service-invocation', 'InvocationResponseWasSet').pipe(
+  eventBus.getDomainEventStream<ServiceInvocationDomainEvents>('service-invocation', 'InvocationResponseWasSet').pipe(
     filter(ev => ev.aggregateId === invocationId),
     take(1),
     timeout(60000),

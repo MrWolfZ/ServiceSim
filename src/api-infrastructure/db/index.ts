@@ -1,14 +1,11 @@
-import { Observable, Subject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
 import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
+import { eventBus } from '../event-bus';
 import { PersistenceAdapter } from './adapters';
 import { inMemoryPersistenceAdapter } from './adapters/in-memory';
 import create from './create';
 import delete$ from './delete';
 import patch from './patch';
 import query from './query';
-
-const allEventsSubject = new Subject<DomainEvent<any, any>>();
 
 let adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
 
@@ -50,7 +47,7 @@ function eventDrivenRepository<TAggregateType extends string, TAggregate extends
 
   return {
     create: create<TAggregateType, TAggregate>(aggregateType, 'EventDriven', collectionFactory),
-    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers, allEventsSubject),
+    patch: patch<TAggregateType, TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
     delete: delete$<TAggregateType, TAggregate>(aggregateType, 'EventDriven', collectionFactory),
     dropAll: () => collectionFactory().dropAll(),
 
@@ -64,16 +61,7 @@ function eventDrivenRepository<TAggregateType extends string, TAggregate extends
         // tslint:disable-next-line:max-line-length
         customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregateType, TEventType>, 'aggregateId'>>, TCustomProps>,
     ): TEvent {
-      const domainEventProps: Omit<DomainEvent<TAggregateType, TEventType>, 'aggregateId'> = {
-        aggregateType,
-        eventType,
-        occurredOnEpoch: Date.now(),
-      };
-
-      return {
-        ...domainEventProps,
-        ...customProps as any,
-      };
+      return eventBus.createDomainEvent(eventType, aggregateType, customProps);
     },
   };
 }
@@ -92,19 +80,4 @@ export const DB = {
   repository,
   versionedRepository,
   eventDrivenRepository,
-
-  getEventStream,
 };
-
-function getEventStream<
-  TAggregateType extends string,
-  TEvent extends DomainEvent<TAggregateType, TEvent['eventType']> = DomainEvent<TAggregateType, TEvent['eventType']>,
-  >(
-    aggregateType: TAggregateType,
-    ...eventTypes: TEvent['eventType'][]
-  ): Observable<TEvent> {
-  return allEventsSubject.pipe(
-    filter(ev => ev.aggregateType === aggregateType && eventTypes.indexOf(ev.eventType as TEvent['eventType']) >= 0),
-    map(t => t as TEvent),
-  );
-}

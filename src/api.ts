@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { bus, DB, logger } from './api-infrastructure';
+import { DB, eventBus, logger } from './api-infrastructure';
 import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/adapters/file-system';
 import { inMemoryPersistenceAdapter } from './api-infrastructure/db/adapters/in-memory';
 import { CONFIG } from './config';
@@ -24,14 +24,14 @@ uiApi.use('/predicate-templates', predicateTemplatesApi);
 uiApi.use('/predicate-tree', predicateTreeApi);
 
 uiApi.get('/events', (req, res) => {
-  const unsubscribe = bus.subscribe(undefined, message => {
+  const sub = eventBus.getUnfilteredEventStream().subscribe(message => {
     res.write(`event: event\ndata: ${JSON.stringify(message)}\n\n`);
     res.flush();
   });
 
-  req.on('close', unsubscribe);
-  req.on('error', unsubscribe);
-  req.on('end', unsubscribe);
+  req.on('close', () => sub.unsubscribe());
+  req.on('error', () => sub.unsubscribe());
+  req.on('end', () => sub.unsubscribe());
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -39,7 +39,7 @@ uiApi.get('/events', (req, res) => {
     'Connection': 'keep-alive',
   });
 
-  res.write('retry: 10000\n\n');
+  res.write('retry: 2000\n\n');
   res.flush();
 });
 

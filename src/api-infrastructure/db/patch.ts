@@ -1,4 +1,3 @@
-import { Subject } from 'rxjs';
 import { applyDiff, assertNever, createDiff, Diff, failure } from '../../util';
 import {
   Aggregate,
@@ -9,6 +8,7 @@ import {
   EventDrivenAggregateMetadata,
   VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
+import { eventBus } from '../event-bus';
 import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
@@ -29,7 +29,6 @@ export default function patch<TAggregateType extends string, TAggregate extends 
   metadataType: 'EventDriven',
   collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
-  allEventsSubject: Subject<DomainEvent<any, any>>,
 ): (id: string, expectedVersion: number, diff: Diff<TAggregate>, ...events: TEvent[]) => Promise<number>;
 
 export default function patch<TAggregateType extends string, TAggregate extends Aggregate, TEvent extends DomainEvent<TAggregateType, TEvent['eventType']>>(
@@ -37,7 +36,6 @@ export default function patch<TAggregateType extends string, TAggregate extends 
   metadataType: 'Default' | 'Versioned' | 'EventDriven',
   collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers?: DomainEventHandlerMap<TAggregateType, TAggregate, TEvent>,
-  allEventsSubject?: Subject<TEvent>,
 ) {
   return async (
     id: string,
@@ -120,7 +118,7 @@ export default function patch<TAggregateType extends string, TAggregate extends 
         break;
     }
 
-    events.forEach(evt => allEventsSubject!.next(evt));
+    events.forEach(evt => eventBus.publish(evt));
 
     return $versionedMetadata.version;
   };

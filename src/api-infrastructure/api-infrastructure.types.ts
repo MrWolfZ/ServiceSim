@@ -16,12 +16,31 @@ export interface VersionedAggregateMetadata<TAggregateType extends string, TAggr
   isDeleted: boolean;
 }
 
-export interface DomainEvent<TAggregateType extends string, TEventType extends string> {
-  aggregateType: TAggregateType;
+export interface Event<TEventType extends string = string> {
   eventType: TEventType;
-  aggregateId: string;
   occurredOnEpoch: number;
 }
+
+export interface DomainEvent<TAggregateType extends string, TEventType extends string> extends Event<TEventType> {
+  aggregateType: TAggregateType;
+  aggregateId: string;
+}
+
+export interface DataEvent<
+  TAggregateType extends string,
+  TAggregate extends Aggregate,
+  TEventType extends 'Create' | 'Update' | 'Delete',
+  > extends DomainEvent<TAggregateType, TEventType> {
+  aggregate: TAggregate;
+}
+
+export interface CreateEvent<TAggregateType extends string, TAggregate extends Aggregate> extends DataEvent<TAggregateType, TAggregate, 'Create'> { }
+
+export interface UpdateEvent<TAggregateType extends string, TAggregate extends Aggregate> extends DataEvent<TAggregateType, TAggregate, 'Update'> {
+  diff: Diff<TAggregate>;
+}
+
+export interface DeleteEvent<TAggregateType extends string, TAggregate extends Aggregate> extends DataEvent<TAggregateType, TAggregate, 'Delete'> { }
 
 export interface EventDrivenAggregateMetadata<
   TAggregateType extends string,
