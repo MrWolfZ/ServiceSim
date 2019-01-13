@@ -44,7 +44,8 @@
   "nodemonConfig": {
     "ignore": [
       "dist/.data/**/*"
-    ]
+    ],
+    "delay": 250
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.1",
