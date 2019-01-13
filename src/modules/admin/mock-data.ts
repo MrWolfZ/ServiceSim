@@ -1,5 +1,5 @@
 import { ALL, PATH_PREFIX } from '../predicate-template/default-templates';
-import { getAllPredicateTemplates } from '../predicate-template/predicate-template.api';
+import { getAllPredicateTemplates } from '../predicate-template/queries/get-all-predicate-templates';
 import { addChildPredicateNode, getAllPredicateNodes, setPredicateNodeResponseGenerator } from '../predicate-tree/predicate-node.api';
 import { STATIC } from '../response-generator-template/default-templates';
 import { getAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';

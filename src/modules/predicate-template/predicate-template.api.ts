@@ -1,84 +1,10 @@
 import express from 'express';
-import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
-import { keys } from '../../util';
-import { createPredicateTemplate, createPredicateTemplateConstraints } from './commands';
-import * as DEFAULT_TEMPLATES from './default-templates';
-import {
-  DeletePredicateTemplateCommand,
-  PredicateTemplateAggregate,
-  PredicateTemplateDto,
-  UpdatePredicateTemplateCommand,
-} from './predicate-template.types';
-
-const repo = DB.versionedRepository<PredicateTemplateAggregate>('predicate-template');
-
-export async function getAllPredicateTemplates() {
-  const allTemplates = await repo.query.all();
-
-  return allTemplates.map<PredicateTemplateDto>(t => ({
-    id: t.id,
-    version: t.$metadata.version,
-    name: t.name,
-    description: t.description,
-    evalFunctionBody: t.evalFunctionBody,
-    parameters: t.parameters,
-  }));
-}
-
-export async function getPredicateTemplatesByIdsAndVersions(idsAndVersions: { [templateId: string]: number[] }) {
-  const templates = await Promise.all(
-    keys(idsAndVersions).flatMap(id => idsAndVersions[id].map(v => repo.query.byIdAndVersion(id, v)))
-  );
-
-  return templates.map<PredicateTemplateDto>(t => ({
-    id: t.id,
-    version: t.$metadata.version,
-    name: t.name,
-    description: t.description,
-    evalFunctionBody: t.evalFunctionBody,
-    parameters: t.parameters,
-  }));
-}
-
-export async function updatePredicateTemplate(command: UpdatePredicateTemplateCommand) {
-  const newVersion = await repo.patch(
-    command.templateId,
-    command.unmodifiedTemplateVersion,
-    command.diff,
-  );
-
-  return {
-    templateId: command.templateId,
-    templateVersion: newVersion,
-  };
-}
-
-// TODO: validate
-export const updatePredicateTemplateConstraints: CommandValidationConstraints<UpdatePredicateTemplateCommand> = {
-  templateId: {},
-  unmodifiedTemplateVersion: {},
-  diff: {},
-};
-
-export async function deletePredicateTemplate(command: DeletePredicateTemplateCommand) {
-  return await repo.delete(command.templateId, command.unmodifiedTemplateVersion);
-}
-
-// TODO: validate
-export const deletePredicateTemplateConstraints: CommandValidationConstraints<DeletePredicateTemplateCommand> = {
-  templateId: {},
-  unmodifiedTemplateVersion: {},
-};
-
-export async function dropAllPredicateTemplates() {
-  await repo.dropAll();
-}
-
-export async function createDefaultPredicateTemplates() {
-  for (const key of keys(DEFAULT_TEMPLATES)) {
-    await createPredicateTemplate(DEFAULT_TEMPLATES[key]);
-  }
-}
+import { commandHandler, queryHandler } from '../../api-infrastructure';
+import { createDefaultPredicateTemplates } from './commands/create-default-predicate-templates';
+import { createPredicateTemplate, createPredicateTemplateConstraints } from './commands/create-predicate-template';
+import { deletePredicateTemplate, deletePredicateTemplateConstraints } from './commands/delete-predicate-template';
+import { updatePredicateTemplate, updatePredicateTemplateConstraints } from './commands/update-predicate-template';
+import { getAllPredicateTemplates } from './queries/get-all-predicate-templates';
 
 export const predicateTemplatesApi = express.Router()
   .get('/', queryHandler(getAllPredicateTemplates))

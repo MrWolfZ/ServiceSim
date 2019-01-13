@@ -1,6 +1,7 @@
 import express from 'express';
 import { commandHandler, eventBus } from '../../api-infrastructure';
-import { createDefaultPredicateTemplates, dropAllPredicateTemplates } from '../predicate-template/predicate-template.api';
+import { createDefaultPredicateTemplates } from '../predicate-template/commands/create-default-predicate-templates';
+import { dropAllPredicateTemplates } from '../predicate-template/commands/drop-all-predicate-templates';
 import { dropAllPredicateNodes, ensureRootPredicateNodeExists } from '../predicate-tree/predicate-node.api';
 import { createDefaultResponseGeneratorTemplates, dropAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
 import { dropAllServiceInvocations } from '../service-invocation/service-invocation.api';
