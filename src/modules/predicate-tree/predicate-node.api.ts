@@ -53,8 +53,6 @@ export async function getAllPredicateNodes() {
       return agg;
     }, {} as { [templateId: string]: number[] });
 
-  const allReferencedPredicateTemplates = await getPredicateTemplatesByIdsAndVersions(allReferencedPredicateTemplateIdsAndVersions);
-
   const allReferencedResponseGeneratorTemplateIdsAndVersions = allNodes
     .filter(n => !Array.isArray(n.childNodeIdsOrResponseGenerator) && typeof n.templateInfoOrEvalFunctionBody !== 'string')
     .map(n => (n.childNodeIdsOrResponseGenerator as ResponseGeneratorData).templateInfoOrGeneratorFunctionBody as TemplateInfo)
@@ -68,7 +66,13 @@ export async function getAllPredicateNodes() {
       return agg;
     }, {} as { [templateId: string]: number[] });
 
-  const allReferencedResponseGeneratorTemplates = await getResponseGeneratorTemplatesByIdsAndVersions(allReferencedResponseGeneratorTemplateIdsAndVersions);
+  const [
+    allReferencedPredicateTemplates,
+    allReferencedResponseGeneratorTemplates,
+  ] = await Promise.all([
+    getPredicateTemplatesByIdsAndVersions(allReferencedPredicateTemplateIdsAndVersions),
+    getResponseGeneratorTemplatesByIdsAndVersions(allReferencedResponseGeneratorTemplateIdsAndVersions),
+  ]);
 
   return allNodes.map<PredicateNodeDto>(n => {
     let templateInfoOrEvalFunctionBody: PredicateNodeDto['templateInfoOrEvalFunctionBody'];
