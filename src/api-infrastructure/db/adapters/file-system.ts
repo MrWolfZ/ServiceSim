@@ -4,6 +4,15 @@ import { promisify } from 'util';
 import { failure } from '../../../util';
 import { DocumentCollection, PersistenceAdapter } from './adapter';
 
+const readFile = promisify(fs.readFile);
+const readdir = promisify(fs.readdir);
+const writeFile = promisify(fs.writeFile);
+const mkdir = promisify(fs.mkdir);
+const unlink = promisify(fs.unlink);
+const rmdir = promisify(fs.rmdir);
+const stat = promisify(fs.stat);
+const lstat = promisify(fs.lstat);
+
 // some of these methods have race conditions when reading, but that is okay since we expect eventual consistency
 function createDocumentCollection<TDocument>(documentType: string, dataDirPath: string): DocumentCollection<TDocument> {
   const collectionDirPath = path.join(dataDirPath, documentType);
@@ -14,7 +23,7 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
   const createDocumentPath = (id: string, version = 1) => path.join(createDocumentDirPath(id), fileNameForVersion(version));
 
   const readDocument = async (docPath: string) => {
-    const fileContent = await promisify(fs.readFile)(docPath);
+    const fileContent = await readFile(docPath);
     return JSON.parse(fileContent.toString()) as TDocument;
   };
 
@@ -23,7 +32,7 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
       throw failure(`could not find path ${docDirPath}!`);
     }
 
-    const paths = await promisify(fs.readdir)(docDirPath);
+    const paths = await readdir(docDirPath);
 
     if (paths.length === 0) {
       throw failure(`could not find any file for document in path ${docDirPath}!`);
@@ -37,7 +46,7 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
       let id = 1;
 
       if (await pathExists(collectionDirPath)) {
-        const paths = await promisify(fs.readdir)(collectionDirPath);
+        const paths = await readdir(collectionDirPath);
         id = paths.length + 1;
       }
 
@@ -46,15 +55,15 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
 
     async set(id: string, document: TDocument) {
       await ensureDirectoryExists(createDocumentDirPath(id));
-      await promisify(fs.writeFile)(createDocumentPath(id), JSON.stringify(document, undefined, 2));
+      await writeFile(createDocumentPath(id), JSON.stringify(document, undefined, 2));
     },
 
     async addVersion(id: string, document: TDocument) {
       const documentDirPath = createDocumentDirPath(id);
       await ensureDirectoryExists(documentDirPath);
-      const files = await promisify(fs.readdir)(documentDirPath);
+      const files = await readdir(documentDirPath);
       const newVersion = files.length + 1;
-      await promisify(fs.writeFile)(createDocumentPath(id, newVersion), JSON.stringify(document, undefined, 2));
+      await writeFile(createDocumentPath(id, newVersion), JSON.stringify(document, undefined, 2));
     },
 
     async delete(id: string) {
@@ -70,7 +79,7 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
         return [];
       }
 
-      const dirs = await promisify(fs.readdir)(collectionDirPath);
+      const dirs = await readdir(collectionDirPath);
       return await Promise.all(dirs.map(dir => path.join(collectionDirPath, dir)).map(getLatestVersionById));
     },
 
@@ -104,7 +113,7 @@ async function ensureDirectoryExists(dirPath: string) {
   }
 
   await ensureDirectoryExists(path.dirname(dirPath));
-  await promisify(fs.mkdir)(dirPath);
+  await mkdir(dirPath);
 }
 
 async function deleteDir(dirPath: string) {
@@ -116,25 +125,25 @@ async function deleteDir(dirPath: string) {
     return;
   }
 
-  const names = await promisify(fs.readdir)(dirPath);
+  const names = await readdir(dirPath);
 
   for (const name of names) {
     const curPath = path.join(dirPath, name);
-    const stat = await promisify(fs.lstat)(curPath);
+    const stat = await lstat(curPath);
 
     if (stat.isDirectory()) {
       await deleteDir(curPath);
     } else {
-      await promisify(fs.unlink)(curPath);
+      await unlink(curPath);
     }
   }
 
-  await promisify(fs.rmdir)(dirPath);
+  await rmdir(dirPath);
 }
 
 async function pathExists(path: string) {
   try {
-    await promisify(fs.stat)(path);
+    await stat(path);
     return true;
   } catch (err) {
     if (isErrorNotFound(err)) {
