@@ -8,9 +8,10 @@ import { DocumentCollection, PersistenceAdapter } from './adapter';
 function createDocumentCollection<TDocument>(documentType: string, dataDirPath: string): DocumentCollection<TDocument> {
   const collectionDirPath = path.join(dataDirPath, documentType);
 
+  const fileNameForVersion = (version: number) => `${version.toString().padStart(15, '0')}.json`;
   const stripIdPrefix = (id: string) => id.substring(id.lastIndexOf(`/`) + 1);
   const createDocumentDirPath = (id: string) => path.join(collectionDirPath, stripIdPrefix(id));
-  const createDocumentPath = (id: string, version = 1) => path.join(createDocumentDirPath(id), `${version}.json`);
+  const createDocumentPath = (id: string, version = 1) => path.join(createDocumentDirPath(id), fileNameForVersion(version));
 
   const readDocument = async (docPath: string) => {
     const fileContent = await promisify(fs.readFile)(docPath);
@@ -28,7 +29,7 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
       throw failure(`could not find any file for document in path ${docDirPath}!`);
     }
 
-    return await readDocument(path.join(docDirPath, `${paths.length}.json`));
+    return await readDocument(path.join(docDirPath, fileNameForVersion(paths.length)));
   };
 
   return {
