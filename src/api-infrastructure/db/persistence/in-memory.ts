@@ -1,6 +1,6 @@
 import { DocumentCollection, PersistenceAdapter } from './adapter';
 
-const inMemoryDb: { [documentType: string]: { [id: string]: any[] } } = {};
+let inMemoryDb: { [documentType: string]: { [id: string]: any[] } } = {};
 
 function createDocumentCollection<TDocument>(documentType: string): DocumentCollection<TDocument> {
   inMemoryDb[documentType] = inMemoryDb[documentType] || {};
@@ -52,5 +52,9 @@ function createDocumentCollection<TDocument>(documentType: string): DocumentColl
 export const inMemoryPersistenceAdapter: PersistenceAdapter = {
   getCollection<TDocument>(documentType: string) {
     return createDocumentCollection<TDocument>(documentType);
+  },
+
+  async drop() {
+    inMemoryDb = {};
   },
 };

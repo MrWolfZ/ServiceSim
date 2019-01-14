@@ -95,3 +95,7 @@ export function eventDrivenRepository<
     },
   };
 }
+
+export async function dropDB() {
+  await adapter.drop();
+}

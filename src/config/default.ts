@@ -10,10 +10,18 @@ export const DEFAULT_CONFIG: AppConfig = {
   hostnameToBind: 'localhost',
   port,
   sessionSecret: 'ashdfjhasdlkjfhalksdjhflak',
+
   persistence: {
     adapter: 'FileSystem',
     adapterConfig: {
       dataDir: `${process.cwd()}/dist/.data`,
+    },
+  },
+
+  eventPersistence: {
+    adapter: 'FileSystem',
+    adapterConfig: {
+      dataDir: `${process.cwd()}/dist/.events`,
     },
   },
 

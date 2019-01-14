@@ -104,6 +104,10 @@ export function createFileSystemPersistenceAdapter(dataDirPath: string): Persist
     getCollection<TDocument>(documentType: string) {
       return createDocumentCollection<TDocument>(documentType, dataDirPath);
     },
+
+    async drop() {
+      await deleteDir(dataDirPath);
+    },
   };
 }
 

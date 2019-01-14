@@ -8,6 +8,7 @@ if (['production'].includes(process.env.NODE_ENV!)) {
   envConfig = PRODUCTION_CONFIG;
 }
 
+// TODO: perform deep merge
 export const CONFIG: AppConfig = {
   ...DEFAULT_CONFIG,
   ...envConfig,

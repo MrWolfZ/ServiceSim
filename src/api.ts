@@ -12,7 +12,7 @@ import { predicateTemplatesApi } from './modules/predicate-template/predicate-te
 import { ensureRootPredicateNodeExists } from './modules/predicate-tree/predicate-node.api';
 import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
-import { assertNever, tuple } from './util';
+import { assertNever } from './util';
 
 declare module 'http' {
   interface ServerResponse {
@@ -46,21 +46,15 @@ uiApi.get('/events', (req, res) => {
 });
 
 export async function initialize() {
-  const [persistenceAdapter, eventLogPersistenceAdapter] = await (async () => {
+  const persistenceAdapter = (() => {
     switch (CONFIG.persistence.adapter) {
       case 'InMemory':
         logger.info('using in-memory persistence adapter');
-        return tuple([
-          inMemoryPersistenceAdapter,
-          inMemoryEventLogPersistenceAdapter,
-        ]);
+        return inMemoryPersistenceAdapter;
 
       case 'FileSystem':
         logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
-        return tuple([
-          createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir),
-          await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.persistence.adapterConfig.dataDir, '.events')),
-        ]);
+        return createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir);
 
       default:
         return assertNever(CONFIG.persistence.adapter);
@@ -68,6 +62,22 @@ export async function initialize() {
   })();
 
   await initializeDB({ adapter: persistenceAdapter });
+
+  const eventLogPersistenceAdapter = await (async () => {
+    switch (CONFIG.persistence.adapter) {
+      case 'InMemory':
+        logger.info('using in-memory persistence adapter');
+        return inMemoryEventLogPersistenceAdapter;
+
+      case 'FileSystem':
+        logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
+        return await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.eventPersistence.adapterConfig.dataDir));
+
+      default:
+        return assertNever(CONFIG.persistence.adapter);
+    }
+  })();
+
   await initializeEventLog({ adapter: eventLogPersistenceAdapter });
 
   await ensureRootPredicateNodeExists();

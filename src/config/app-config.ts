@@ -6,7 +6,13 @@ export interface AppConfig {
   hostnameToBind: string;
   port: number;
   sessionSecret: string;
+
   persistence: {
+    adapter: 'InMemory' | 'FileSystem';
+    adapterConfig: any;
+  };
+
+  eventPersistence: {
     adapter: 'InMemory' | 'FileSystem';
     adapterConfig: any;
   };
