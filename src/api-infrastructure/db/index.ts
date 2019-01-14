@@ -1,3 +1,4 @@
+import { failure } from '../../util';
 import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
 import { createDomainEvent } from '../event-log';
 import { PersistenceAdapter } from './adapters';
@@ -19,9 +20,21 @@ export async function initializeDB(options: { adapter?: PersistenceAdapter } = {
   }
 }
 
+function verifyAggregateType(aggregateType: string) {
+  if (!aggregateType) {
+    throw failure('aggregate type must be a non-empty string');
+  }
+
+  if (!/[a-zA-Z0-9-_]+/g.test(aggregateType)) {
+    throw failure(`aggregate type must only consist of alphanumeric characters, dashes, and underscores; got ${aggregateType}`);
+  }
+}
+
 export function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
+  verifyAggregateType(aggregateType);
+
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
@@ -37,6 +50,8 @@ export function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
 export function versionedRepository<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
+  verifyAggregateType(aggregateType);
+
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
@@ -56,6 +71,8 @@ export function eventDrivenRepository<
     aggregateType: TAggregate['@type'],
     eventHandlers: DomainEventHandlerMap<TAggregate, TEvent>,
 ) {
+  verifyAggregateType(aggregateType);
+
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {

@@ -1,16 +1,18 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { getUnfilteredLiveEventStream, initializeDB, logger } from './api-infrastructure';
+import { getUnfilteredLiveEventStream, initializeDB, initializeEventLog, logger } from './api-infrastructure';
 import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/adapters/file-system';
 import { inMemoryPersistenceAdapter } from './api-infrastructure/db/adapters/in-memory';
+import { createFileSystemEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/file-system';
+import { inMemoryEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/in-memory';
 import { CONFIG } from './config';
 import { adminApi } from './modules/admin/admin.api';
 import { predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
 import { ensureRootPredicateNodeExists } from './modules/predicate-tree/predicate-node.api';
 import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
-import { assertNever } from './util';
+import { assertNever, tuple } from './util';
 
 declare module 'http' {
   interface ServerResponse {
@@ -44,15 +46,21 @@ uiApi.get('/events', (req, res) => {
 });
 
 export async function initialize() {
-  const persistenceAdapter = (() => {
+  const [persistenceAdapter, eventLogPersistenceAdapter] = await (async () => {
     switch (CONFIG.persistence.adapter) {
       case 'InMemory':
         logger.info('using in-memory persistence adapter');
-        return inMemoryPersistenceAdapter;
+        return tuple([
+          inMemoryPersistenceAdapter,
+          inMemoryEventLogPersistenceAdapter,
+        ]);
 
       case 'FileSystem':
         logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
-        return createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir);
+        return tuple([
+          createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir),
+          await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.persistence.adapterConfig.dataDir, '.events')),
+        ]);
 
       default:
         return assertNever(CONFIG.persistence.adapter);
@@ -60,6 +68,7 @@ export async function initialize() {
   })();
 
   await initializeDB({ adapter: persistenceAdapter });
+  await initializeEventLog({ adapter: eventLogPersistenceAdapter });
 
   await ensureRootPredicateNodeExists();
 

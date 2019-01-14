@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, createEvent, publishEvents } from '../../api-infrastructure';
+import { commandHandler, createEvent, dropAllEvents, publishEvents } from '../../api-infrastructure';
 import { createDefaultPredicateTemplates } from '../predicate-template/commands/create-default-predicate-templates';
 import { dropAllPredicateTemplates } from '../predicate-template/commands/drop-all-predicate-templates';
 import { dropAllPredicateNodes, ensureRootPredicateNodeExists } from '../predicate-tree/predicate-node.api';
@@ -12,6 +12,7 @@ export async function resetToDefaultData() {
   await dropAllPredicateTemplates();
   await dropAllResponseGeneratorTemplates();
   await dropAllServiceInvocations();
+  await dropAllEvents();
 
   await createDefaultPredicateTemplates();
   await createDefaultResponseGeneratorTemplates();

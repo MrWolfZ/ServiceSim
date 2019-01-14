@@ -3,10 +3,10 @@ import { filter, map, publishReplay } from 'rxjs/operators';
 import { Diff } from '../../util';
 import { Aggregate, CreateEvent, DataEvent, DeleteEvent, DomainEvent, DomainEventOfType, Event, UpdateEvent } from '../api-infrastructure.types';
 import { EventLogPersistenceAdapter } from './persistence/adapter';
-import { InMemoryEventLogPersistenceAdapter } from './persistence/in-memory';
+import { inMemoryEventLogPersistenceAdapter } from './persistence/in-memory';
 
 const allEventsSubject = new Subject<[Event<any>, number]>();
-let adapter: EventLogPersistenceAdapter = new InMemoryEventLogPersistenceAdapter();
+let adapter: EventLogPersistenceAdapter = inMemoryEventLogPersistenceAdapter;
 
 export async function initializeEventLog(options: { adapter?: EventLogPersistenceAdapter } = {}) {
   if (options.adapter) {
@@ -75,6 +75,7 @@ export function getDomainAndDataEventStreamWithReplay<
   >(
     aggregateTypes: TEvent['aggregateType'][],
     eventTypes: TEvent['eventType'][],
+    allAfterSeqNr: number = 0,
 ): Observable<TEvent> {
   return Observable.create((obs: Observer<TEvent>) => {
     const subject = new Subject<TEvent>();
@@ -82,6 +83,7 @@ export function getDomainAndDataEventStreamWithReplay<
 
     const allEventsOfType = allEventsSubject.pipe(
       map(t => t as [TEvent, number]),
+      filter(([_, seqNr]) => seqNr > allAfterSeqNr),
       filter(([ev]) => eventTypes.indexOf(ev.eventType as TEvent['eventType']) >= 0),
       filter(([ev]) => aggregateTypes.indexOf(ev.aggregateType as TEvent['eventType']) >= 0),
     );
@@ -91,22 +93,21 @@ export function getDomainAndDataEventStreamWithReplay<
     const replaySub = replayObs.connect();
     let allEventsSub = new Subscription();
 
-    // TODO: pass aggregate types as well instead of filtering here
-    loadEvents<TEvent>(eventTypes).then(
-      ([events, highestIndex]) => {
-        for (const event of events.filter(ev => aggregateTypes.indexOf(ev.aggregateType as TEvent['eventType']) >= 0)) {
+    loadEvents<TEvent>(eventTypes, aggregateTypes, allAfterSeqNr).then(
+      ([events, highestSeqNr]) => {
+        for (const event of events) {
           subject.next(event);
         }
 
         replayObs.pipe(
-          filter(([_, idx]) => idx > highestIndex),
+          filter(([_, seqNr]) => seqNr > highestSeqNr),
           map(([ev]) => ev),
         ).subscribe(subject);
 
         replaySub.unsubscribe();
 
         allEventsSub = allEventsOfType.pipe(
-          filter(([_, idx]) => idx > highestIndex),
+          filter(([_, seqNr]) => seqNr > highestSeqNr),
           map(([ev]) => ev),
         ).subscribe(subject);
 
@@ -187,26 +188,25 @@ export function createDeleteDataEvent<TAggregate extends Aggregate<TAggregate['@
   };
 }
 
-// TODO: fix event index mess
-export async function persistEvents(
-  events: Event<any>[],
-): Promise<number[]> {
-  const eventCount = await adapter.getEventCount();
-
-  await adapter.persistEvents(
-    ...events.map((ev, idx) => ({
-      id: eventCount + idx + 1,
+export async function persistEvents(events: Event<any>[]): Promise<number[]> {
+  return await adapter.persistEvents(
+    events.map(ev => ({
       eventType: ev.eventType,
-      body: JSON.stringify(ev),
+      aggregateType: (ev as DomainEvent<any, any>).aggregateType,
+      body: ev,
     })),
   );
-
-  return events.map((_, idx) => eventCount + idx + 1);
 }
 
-export async function loadEvents<TEvent extends Event<any> = Event<any>>(
+export async function loadEvents<TEvent extends Event<any>>(
   eventTypes: string[],
+  aggregateTypes?: string[],
+  allAfterSeqNr?: number,
 ): Promise<[TEvent[], number]> {
-  const storedEvents = await adapter.loadEvents(...eventTypes);
-  return [storedEvents.map(se => JSON.parse(se.body)), storedEvents.reduce((l, ev) => Math.max(l, ev.id), 0)];
+  const storedEvents = await adapter.loadEvents(eventTypes, aggregateTypes, allAfterSeqNr);
+  return [storedEvents.map(se => se.body as TEvent), storedEvents.reduce((l, ev) => Math.max(l, ev.seqNr), 0)];
+}
+
+export async function dropAllEvents() {
+  await adapter.dropAll();
 }

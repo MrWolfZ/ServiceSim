@@ -1,12 +1,13 @@
 export interface StoredEvent {
-  id: number;
+  seqNr: number;
   eventType: string;
-  body: string;
+  aggregateType?: string;
+  body: any;
 }
 
 export interface EventLogPersistenceAdapter {
   initialize?: () => Promise<void>;
-  getEventCount(): Promise<number>;
-  persistEvents(...events: StoredEvent[]): Promise<void>;
-  loadEvents(...eventTypes: string[]): Promise<StoredEvent[]>;
+  persistEvents(eventsWithoutSeqNr: Omit<StoredEvent, 'seqNr'>[]): Promise<number[]>;
+  loadEvents(eventTypes: string[], aggregateTypes?: string[], allAfterSeqNr?: number): Promise<StoredEvent[]>;
+  dropAll(): Promise<void>;
 }

@@ -1,17 +1,24 @@
 import { EventLogPersistenceAdapter, StoredEvent } from './adapter';
 
-export class InMemoryEventLogPersistenceAdapter implements EventLogPersistenceAdapter {
-  private events: StoredEvent[] = [];
+let inMemoryEvents: StoredEvent[] = [];
 
-  async getEventCount(): Promise<number> {
-    return this.events.length;
-  }
+export const inMemoryEventLogPersistenceAdapter: EventLogPersistenceAdapter = {
+  async persistEvents(eventsWithoutSeqNr: Omit<StoredEvent, 'seqNr'>[]): Promise<number[]> {
+    return eventsWithoutSeqNr.map(e => {
+      const seqNr = inMemoryEvents.length + 1;
+      inMemoryEvents.push({ ...e, seqNr });
+      return seqNr;
+    });
+  },
 
-  async persistEvents(...events: StoredEvent[]): Promise<void> {
-    events.forEach(e => this.events.push(e));
-  }
+  async loadEvents(eventTypes: string[], aggregateTypes?: string[], allAfterSeqNr?: number): Promise<StoredEvent[]> {
+    return inMemoryEvents
+      .filter(e => eventTypes.indexOf(e.eventType) >= 0)
+      .filter(e => !aggregateTypes || aggregateTypes.indexOf(e.aggregateType || '') >= 0)
+      .filter(e => !allAfterSeqNr || e.seqNr > allAfterSeqNr);
+  },
 
-  async loadEvents(...eventTypes: string[]): Promise<StoredEvent[]> {
-    return this.events.filter(e => eventTypes.indexOf(e.eventType) >= 0);
-  }
-}
+  async dropAll() {
+    inMemoryEvents = [];
+  },
+};
