@@ -1,5 +1,6 @@
 import { assertNever, failure } from '../../util';
 import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
+import { createDeleteDataEvent, publishEvents } from '../event-log';
 import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
@@ -82,5 +83,7 @@ export default function delete$<TAggregate extends Aggregate<TAggregate['@type']
         assertNever(metadataType);
         break;
     }
+
+    await publishEvents(createDeleteDataEvent(aggregateType, id));
   };
 }
