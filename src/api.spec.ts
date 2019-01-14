@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import { Subscription } from 'rxjs';
 import request from 'supertest';
 import { api, initialize } from './api';
+import { CONFIG } from './config';
 
 describe('simulation', () => {
   let rootApp: Express;
@@ -11,7 +12,11 @@ describe('simulation', () => {
     rootApp = express();
     rootApp.use(api);
 
-    subscription = await initialize();
+    subscription = await initialize({
+      ...CONFIG,
+      persistence: { adapter: 'InMemory', adapterConfig: {} },
+      eventPersistence: { adapter: 'InMemory', adapterConfig: {} },
+    });
   });
 
   afterEach(() => {
