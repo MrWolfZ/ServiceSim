@@ -1,8 +1,8 @@
-import { DB } from '../../../api-infrastructure';
+import { versionedRepository } from '../../../api-infrastructure';
 import { keys } from '../../../util';
 import { PredicateTemplateAggregate, PredicateTemplateDto } from '../predicate-template.types';
 
-const repo = DB.versionedRepository<PredicateTemplateAggregate>('predicate-template');
+const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');
 
 export async function getPredicateTemplatesByIdsAndVersions(idsAndVersions: { [templateId: string]: number[] }) {
   const templates = await Promise.all(

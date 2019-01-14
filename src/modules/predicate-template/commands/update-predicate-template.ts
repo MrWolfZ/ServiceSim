@@ -1,7 +1,7 @@
-import { CommandValidationConstraints, DB } from '../../../api-infrastructure';
+import { CommandValidationConstraints, versionedRepository } from '../../../api-infrastructure';
 import { PredicateTemplateAggregate, UpdatePredicateTemplateCommand } from '../predicate-template.types';
 
-const repo = DB.versionedRepository<PredicateTemplateAggregate>('predicate-template');
+const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');
 
 export async function updatePredicateTemplate(command: UpdatePredicateTemplateCommand) {
   const newVersion = await repo.patch(

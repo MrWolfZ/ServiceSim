@@ -1,7 +1,7 @@
-import { DB } from '../../../api-infrastructure';
+import { versionedRepository } from '../../../api-infrastructure';
 import { PredicateTemplateAggregate, PredicateTemplateDto } from '../predicate-template.types';
 
-const repo = DB.versionedRepository<PredicateTemplateAggregate>('predicate-template');
+const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');
 
 export async function getAllPredicateTemplates() {
   const allTemplates = await repo.query.all();

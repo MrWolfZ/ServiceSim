@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, eventDrivenRepository, queryHandler } from '../../api-infrastructure';
 import { failure, omit } from '../../util';
 import { getPredicateTemplatesByIdsAndVersions } from '../predicate-template/queries/get-predicate-templates-by-ids-and-versions';
 import { getResponseGeneratorTemplatesByIdsAndVersions } from '../response-generator-template/response-generator-template.api';
@@ -17,7 +17,7 @@ import {
   UpdatePredicateNodeCommand,
 } from './predicate-node.types';
 
-const repo = DB.eventDrivenRepository<PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {
+const repo = eventDrivenRepository<PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {
   ChildPredicateNodeAdded: (aggregate, evt) => {
     return {
       ...aggregate,

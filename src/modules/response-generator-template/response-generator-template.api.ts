@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, CommandValidationConstraints, DB, queryHandler } from '../../api-infrastructure';
+import { commandHandler, CommandValidationConstraints, queryHandler, versionedRepository } from '../../api-infrastructure';
 import { keys } from '../../util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
@@ -10,7 +10,7 @@ import {
   UpdateResponseGeneratorTemplateCommand,
 } from './response-generator-template.types';
 
-const repo = DB.versionedRepository<ResponseGeneratorTemplateAggregate>('response-generator-template');
+const repo = versionedRepository<ResponseGeneratorTemplateAggregate>('response-generator-template');
 
 export async function getAllResponseGeneratorTemplates() {
   const allTemplates = await repo.query.all();

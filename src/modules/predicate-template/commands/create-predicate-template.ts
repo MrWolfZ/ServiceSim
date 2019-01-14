@@ -1,7 +1,7 @@
-import { CommandValidationConstraints, DB } from '../../../api-infrastructure';
+import { CommandValidationConstraints, versionedRepository } from '../../../api-infrastructure';
 import { CreatePredicateTemplateCommand, CreatePredicateTemplateCommandResponse, PredicateTemplateAggregate } from '../predicate-template.types';
 
-const repo = DB.versionedRepository<PredicateTemplateAggregate>('predicate-template');
+const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');
 
 export async function createPredicateTemplate(command: CreatePredicateTemplateCommand): Promise<CreatePredicateTemplateCommandResponse> {
   const template = await repo.create(command);

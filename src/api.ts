@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { DB, getUnfilteredLiveEventStream, logger } from './api-infrastructure';
+import { getUnfilteredLiveEventStream, initializeDB, logger } from './api-infrastructure';
 import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/adapters/file-system';
 import { inMemoryPersistenceAdapter } from './api-infrastructure/db/adapters/in-memory';
 import { CONFIG } from './config';
@@ -59,7 +59,7 @@ export async function initialize() {
     }
   })();
 
-  await DB.initialize({ adapter: persistenceAdapter });
+  await initializeDB({ adapter: persistenceAdapter });
 
   await ensureRootPredicateNodeExists();
 

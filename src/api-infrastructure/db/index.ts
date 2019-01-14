@@ -9,7 +9,17 @@ import query from './query';
 
 let adapter: PersistenceAdapter = inMemoryPersistenceAdapter;
 
-function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
+export async function initializeDB(options: { adapter?: PersistenceAdapter } = {}) {
+  if (options.adapter) {
+    adapter = options.adapter;
+  }
+
+  if (adapter.initialize) {
+    await adapter.initialize();
+  }
+}
+
+export function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
@@ -24,7 +34,7 @@ function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
   };
 }
 
-function versionedRepository<TAggregate extends Aggregate<TAggregate['@type']>>(
+export function versionedRepository<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
@@ -39,7 +49,7 @@ function versionedRepository<TAggregate extends Aggregate<TAggregate['@type']>>(
   };
 }
 
-function eventDrivenRepository<
+export function eventDrivenRepository<
   TAggregate extends Aggregate<TAggregate['@type']>,
   TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
   >(
@@ -68,19 +78,3 @@ function eventDrivenRepository<
     },
   };
 }
-
-export const DB = {
-  async initialize(options: { adapter?: PersistenceAdapter } = {}) {
-    if (options.adapter) {
-      adapter = options.adapter;
-    }
-
-    if (adapter.initialize) {
-      await adapter.initialize();
-    }
-  },
-
-  repository,
-  versionedRepository,
-  eventDrivenRepository,
-};

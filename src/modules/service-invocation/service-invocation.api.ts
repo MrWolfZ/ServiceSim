@@ -1,4 +1,4 @@
-import { DB } from '../../api-infrastructure';
+import { eventDrivenRepository } from '../../api-infrastructure';
 import { failure, omit } from '../../util';
 import {
   CreateServiceInvocationCommand,
@@ -7,7 +7,7 @@ import {
   SetServiceResponseCommand,
 } from './service-invocation.types';
 
-const repo = DB.eventDrivenRepository<ServiceInvocationAggregate, ServiceInvocationDomainEvents>('service-invocation', {
+const repo = eventDrivenRepository<ServiceInvocationAggregate, ServiceInvocationDomainEvents>('service-invocation', {
   InvocationResponseWasSet: (aggregate, evt) => {
     return {
       ...aggregate,
