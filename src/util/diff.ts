@@ -17,16 +17,19 @@ export type ArrayDiffOp<T> =
   ;
 
 export interface InsertArrayElementOp<T> {
+  type: 'insert';
   index: number;
   value: T;
 }
 
 export interface UpdateArrayElementOp<T> {
+  type: 'update';
   index: number;
   diff: Diff<T>;
 }
 
 export interface RemoveArrayElementOp {
+  type: 'removal';
   index: number;
 }
 
@@ -47,7 +50,7 @@ function createArrayDiff<T>(origArr: T[], updatedArr: T[]): ArrayDiffOp<T>[] {
 
   for (const [index, el] of origArr.entries()) {
     if (updatedArr.every(updatedEl => !deepEquals(el, updatedEl))) {
-      removals.push({ index });
+      removals.push({ type: 'removal', index });
     }
   }
 
@@ -58,10 +61,10 @@ function createArrayDiff<T>(origArr: T[], updatedArr: T[]): ArrayDiffOp<T>[] {
     if (origArr.every(origEl => !deepEquals(el, origEl))) {
       const removalOpIdx = removals.findIndex(op => op.index === index);
       if (removalOpIdx !== -1) {
-        updates.push({ index, diff: createDiff(origArr[index], el) });
+        updates.push({ type: 'update', index, diff: createDiff(origArr[index], el) });
         removals.splice(removalOpIdx, 1);
       } else {
-        inserts.push({ index, value: el });
+        inserts.push({ type: 'insert', index, value: el });
       }
     }
   }
@@ -95,9 +98,9 @@ export function applyDiff<T>(targetValue: T, diff: Diff<T>): T {
 }
 
 function applyArrayDiff<T>(targetArr: T[], ops: ArrayDiffOp<any>[]): T[] {
-  const isUpdateOp = <T>(op: ArrayDiffOp<T>): op is UpdateArrayElementOp<T> => !!(op as UpdateArrayElementOp<T>).diff;
-  const isInsertOp = <T>(op: ArrayDiffOp<T>): op is InsertArrayElementOp<T> => !!(op as InsertArrayElementOp<T>).value;
-  const isRemovalOp = <T>(op: ArrayDiffOp<T>): op is RemoveArrayElementOp => !isUpdateOp(op) && !isInsertOp(op);
+  const isUpdateOp = <T>(op: ArrayDiffOp<T>): op is UpdateArrayElementOp<T> => op.type === 'update';
+  const isInsertOp = <T>(op: ArrayDiffOp<T>): op is InsertArrayElementOp<T> => op.type === 'insert';
+  const isRemovalOp = <T>(op: ArrayDiffOp<T>): op is RemoveArrayElementOp => op.type === 'removal';
 
   const updates: UpdateArrayElementOp<T>[] = ops.filter(isUpdateOp);
   const removals: RemoveArrayElementOp[] = ops.filter(isRemovalOp);

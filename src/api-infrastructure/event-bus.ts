@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { DataEvent, DomainEvent, DomainEventOfType, Event } from './api-infrastructure.types';
+import { Aggregate, DataEvent, DomainEvent, DomainEventOfType, Event } from './api-infrastructure.types';
 
 const allEventsSubject = new Subject<Event<any>>();
 
@@ -33,8 +33,11 @@ export const eventBus = {
     );
   },
 
-  getDataEventStream<TEvent extends DataEvent<TEvent['aggregate'], TEvent['eventType']> = DataEvent<TEvent['aggregate'], TEvent['eventType']>>(
-    aggregateType: TEvent['aggregateType'],
+  getDataEventStream<
+    TAggregate extends Aggregate<TAggregate['@type']>,
+    TEvent extends DataEvent<TAggregate, TEvent['eventType']> = DataEvent<TAggregate, TEvent['eventType']>,
+    >(
+      aggregateType: TEvent['aggregateType'],
   ): Observable<TEvent> {
     return allEventsSubject.pipe(
       map(t => t as TEvent),

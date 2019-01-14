@@ -31,11 +31,11 @@ export interface DomainEvent<TAggregateType extends string, TEventType extends s
 export interface DataEvent<
   TAggregate extends Aggregate<TAggregate['@type']>,
   TEventType extends 'Create' | 'Update' | 'Delete',
-  > extends DomainEvent<TAggregate['@type'], TEventType> {
+  > extends DomainEvent<TAggregate['@type'], TEventType> { }
+
+export interface CreateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Create'> {
   aggregate: TAggregate;
 }
-
-export interface CreateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Create'> { }
 
 export interface UpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Update'> {
   diff: Diff<TAggregate>;
