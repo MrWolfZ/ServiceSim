@@ -15,3 +15,7 @@ export async function getAllPredicateTemplates() {
     parameters: t.parameters,
   }));
 }
+
+getAllPredicateTemplates.initialize = async () => {
+  // nothing to do
+};

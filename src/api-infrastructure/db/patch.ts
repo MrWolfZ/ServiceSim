@@ -123,7 +123,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
     }
 
     await publishEvents(...events);
-    await publishEvents(createUpdateDataEvent(aggregateType, id, diff));
+    await publishEvents(createUpdateDataEvent(aggregateType, id, finalDiff));
 
     return $versionedMetadata.version;
   };

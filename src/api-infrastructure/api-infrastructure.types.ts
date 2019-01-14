@@ -43,6 +43,12 @@ export interface UpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>> 
 
 export interface DeleteEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Delete'> { }
 
+export type DataEvents<TAggregate extends Aggregate<TAggregate['@type']>> =
+  | CreateEvent<TAggregate>
+  | UpdateEvent<TAggregate>
+  | DeleteEvent<TAggregate>
+  ;
+
 export interface EventDrivenAggregateMetadata<
   TAggregate extends Aggregate<TAggregate['@type']>,
   TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,

@@ -73,7 +73,7 @@ export async function createFileSystemEventLogPersistenceAdapter(eventsDataDirPa
           .filter(file => {
             const parsed = parseEventFilename(file);
             return eventTypes.indexOf(parsed.eventType) >= 0 &&
-              (!aggregateTypes || aggregateTypes.indexOf(parsed.aggregateType || '') >= 0) ||
+              (!aggregateTypes || aggregateTypes.indexOf(parsed.aggregateType || '') >= 0) &&
               (!allAfterSeqNr || parsed.seqNr > allAfterSeqNr);
           })
           .map(file => path.join(eventsDataDirPath, file))

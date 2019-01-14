@@ -8,7 +8,7 @@ import { createFileSystemEventLogPersistenceAdapter } from './api-infrastructure
 import { inMemoryEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/in-memory';
 import { CONFIG } from './config';
 import { adminApi } from './modules/admin/admin.api';
-import { predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
+import { initializePredicateTemplatesApi, predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
 import { ensureRootPredicateNodeExists } from './modules/predicate-tree/predicate-node.api';
 import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
@@ -66,11 +66,11 @@ export async function initialize() {
   const eventLogPersistenceAdapter = await (async () => {
     switch (CONFIG.persistence.adapter) {
       case 'InMemory':
-        logger.info('using in-memory persistence adapter');
+        logger.info('using in-memory event persistence adapter');
         return inMemoryEventLogPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
+        logger.info(`using file system event persistence adapter with data dir ${CONFIG.eventPersistence.adapterConfig.dataDir}`);
         return await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.eventPersistence.adapterConfig.dataDir));
 
       default:
@@ -82,7 +82,9 @@ export async function initialize() {
 
   await ensureRootPredicateNodeExists();
 
-  const subscriptions: Subscription[] = [];
+  const subscriptions = [
+    await initializePredicateTemplatesApi(),
+  ];
 
   return new Subscription(() => subscriptions.forEach(sub => sub.unsubscribe()));
 }

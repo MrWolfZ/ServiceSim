@@ -1,4 +1,4 @@
-import { ConnectableObservable, Observable, Observer, Subject, Subscription } from 'rxjs';
+import { ConnectableObservable, empty, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
 import { Diff } from '../../util';
 import { Aggregate, CreateEvent, DataEvent, DeleteEvent, DomainEvent, DomainEventOfType, Event, UpdateEvent } from '../api-infrastructure.types';
@@ -77,6 +77,10 @@ export function getDomainAndDataEventStreamWithReplay<
     eventTypes: TEvent['eventType'][],
     allAfterSeqNr: number = 0,
 ): Observable<TEvent> {
+  if (aggregateTypes.length === 0 || eventTypes.length === 0) {
+    return empty();
+  }
+
   return Observable.create((obs: Observer<TEvent>) => {
     const subject = new Subject<TEvent>();
     const sub = subject.subscribe(obs);
@@ -85,7 +89,7 @@ export function getDomainAndDataEventStreamWithReplay<
       map(t => t as [TEvent, number]),
       filter(([_, seqNr]) => seqNr > allAfterSeqNr),
       filter(([ev]) => eventTypes.indexOf(ev.eventType as TEvent['eventType']) >= 0),
-      filter(([ev]) => aggregateTypes.indexOf(ev.aggregateType as TEvent['eventType']) >= 0),
+      filter(([ev]) => aggregateTypes.indexOf(ev.aggregateType as TEvent['aggregateType']) >= 0),
     );
 
     const replayObs = allEventsOfType.pipe(publishReplay()) as ConnectableObservable<[TEvent, number]>;
@@ -201,10 +205,10 @@ export async function persistEvents(events: Event<any>[]): Promise<number[]> {
 export async function loadEvents<TEvent extends Event<any>>(
   eventTypes: string[],
   aggregateTypes?: string[],
-  allAfterSeqNr?: number,
+  allAfterSeqNr = 0,
 ): Promise<[TEvent[], number]> {
   const storedEvents = await adapter.loadEvents(eventTypes, aggregateTypes, allAfterSeqNr);
-  return [storedEvents.map(se => se.body as TEvent), storedEvents.reduce((l, ev) => Math.max(l, ev.seqNr), 0)];
+  return [storedEvents.map(se => se.body as TEvent), storedEvents.reduce((l, ev) => Math.max(l, ev.seqNr), allAfterSeqNr)];
 }
 
 export async function dropAllEvents() {
