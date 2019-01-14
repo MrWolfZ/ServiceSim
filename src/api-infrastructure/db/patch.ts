@@ -8,7 +8,7 @@ import {
   EventDrivenAggregateMetadata,
   VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
-import { eventBus } from '../event-bus';
+import { publishEvents } from '../event-log';
 import { DocumentCollection } from './adapters';
 import { getMetadataOfType } from './util';
 
@@ -122,7 +122,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
         break;
     }
 
-    events.forEach(evt => eventBus.publish(evt));
+    await publishEvents(...events);
 
     return $versionedMetadata.version;
   };

@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { DB, eventBus, logger } from './api-infrastructure';
+import { DB, getUnfilteredLiveEventStream, logger } from './api-infrastructure';
 import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/adapters/file-system';
 import { inMemoryPersistenceAdapter } from './api-infrastructure/db/adapters/in-memory';
 import { CONFIG } from './config';
@@ -24,7 +24,7 @@ uiApi.use('/predicate-templates', predicateTemplatesApi);
 uiApi.use('/predicate-tree', predicateTreeApi);
 
 uiApi.get('/events', (req, res) => {
-  const sub = eventBus.getUnfilteredEventStream().subscribe(message => {
+  const sub = getUnfilteredLiveEventStream().subscribe(message => {
     res.write(`event: event\ndata: ${JSON.stringify(message)}\n\n`);
     res.flush();
   });

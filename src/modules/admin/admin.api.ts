@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, eventBus } from '../../api-infrastructure';
+import { commandHandler, createEvent, publishEvents } from '../../api-infrastructure';
 import { createDefaultPredicateTemplates } from '../predicate-template/commands/create-default-predicate-templates';
 import { dropAllPredicateTemplates } from '../predicate-template/commands/drop-all-predicate-templates';
 import { dropAllPredicateNodes, ensureRootPredicateNodeExists } from '../predicate-tree/predicate-node.api';
@@ -19,7 +19,7 @@ export async function resetToDefaultData() {
 
   await setupMockData();
 
-  eventBus.publish(eventBus.createEvent('resetToDefaultDataAsync'));
+  publishEvents(createEvent('resetToDefaultDataAsync'));
 }
 
 export const adminApi = express.Router()

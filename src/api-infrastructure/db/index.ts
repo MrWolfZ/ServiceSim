@@ -1,5 +1,5 @@
 import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
-import { eventBus } from '../event-bus';
+import { createDomainEvent } from '../event-log';
 import { PersistenceAdapter } from './adapters';
 import { inMemoryPersistenceAdapter } from './adapters/in-memory';
 import create from './create';
@@ -64,7 +64,7 @@ function eventDrivenRepository<
         // tslint:disable-next-line:max-line-length
         customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>, TCustomProps>,
     ): TEvent {
-      return eventBus.createDomainEvent<TEvent, TCustomProps>(eventType, aggregateType, customProps);
+      return createDomainEvent<TEvent, TCustomProps>(eventType, aggregateType, customProps);
     },
   };
 }
