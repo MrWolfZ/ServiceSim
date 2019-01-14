@@ -1,11 +1,11 @@
 import { failure } from '../../util';
 import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
 import { createDomainEvent } from '../event-log';
-import { PersistenceAdapter } from './adapters';
-import { inMemoryPersistenceAdapter } from './adapters/in-memory';
 import create from './create';
 import delete$ from './delete';
 import patch from './patch';
+import { PersistenceAdapter } from './persistence/adapter';
+import { inMemoryPersistenceAdapter } from './persistence/in-memory';
 import query from './query';
 
 let adapter: PersistenceAdapter = inMemoryPersistenceAdapter;

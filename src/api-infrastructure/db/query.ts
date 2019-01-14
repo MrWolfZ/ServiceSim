@@ -1,6 +1,6 @@
 import { failure, keys } from '../../util';
 import { Aggregate, AggregateMetadata, DomainEvent, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
-import { DocumentCollection } from './adapters';
+import { DocumentCollection } from './persistence/adapter';
 
 export type AggregateWithMetadata<TAggregate, TMetadata> = TAggregate & { $metadata: TMetadata };
 

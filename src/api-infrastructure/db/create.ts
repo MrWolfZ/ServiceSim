@@ -1,7 +1,7 @@
 import { Diff } from '../../util';
 import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
 import { createCreateDataEvent, publishEvents } from '../event-log';
-import { DocumentCollection } from './adapters';
+import { DocumentCollection } from './persistence/adapter';
 import { getMetadataOfType } from './util';
 
 export default function create<TAggregate extends Aggregate<TAggregate['@type']>>(

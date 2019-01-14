@@ -9,7 +9,7 @@ import {
   VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
 import { createUpdateDataEvent, publishEvents } from '../event-log';
-import { DocumentCollection } from './adapters';
+import { DocumentCollection } from './persistence/adapter';
 import { getMetadataOfType } from './util';
 
 export default function patch<TAggregate extends Aggregate<TAggregate['@type']>>(
