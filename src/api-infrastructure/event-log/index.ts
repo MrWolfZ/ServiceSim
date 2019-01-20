@@ -1,7 +1,7 @@
 import { ConnectableObservable, EMPTY, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
 import { Diff } from '../../util';
-import { Aggregate, CreateEvent, DataEvent, DeleteEvent, DomainEvent, DomainEventOfType, Event, UpdateEvent } from '../api-infrastructure.types';
+import { Aggregate, AggregateMetadata, CreateEvent, DataEvent, DeleteEvent, DomainEvent, Event, EventOfType, UpdateEvent } from '../api-infrastructure.types';
 import { EventLogPersistenceAdapter } from './persistence/adapter';
 import { inMemoryEventLogPersistenceAdapter } from './persistence/in-memory';
 
@@ -58,7 +58,8 @@ export function getLiveDomainEventStream<TEvent extends DomainEvent<TEvent['aggr
 
 export function getLiveDataEventStream<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TEvent extends DataEvent<TAggregate, TEvent['eventType']>,
+  TEvent extends DataEvent<TAggregate, TMetadata, TEvent['eventType']>,
+  TMetadata extends AggregateMetadata<TAggregate['@type']> = any,
   >(
     aggregateType: TEvent['aggregateType'],
 ): Observable<TEvent> {
@@ -71,9 +72,9 @@ export function getLiveDataEventStream<
 
 export function getDomainAndDataEventStreamWithReplay<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TEvent extends DomainEvent<TEvent['aggregateType'], TEvent['eventType']>,
+  TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
   >(
-    aggregateTypes: TEvent['aggregateType'][],
+    aggregateTypes: TAggregate['@type'][],
     eventTypes: TEvent['eventType'][],
     allAfterSeqNr: number = 0,
 ): Observable<TEvent> {
@@ -137,12 +138,12 @@ export function createEvent<TEventType extends string = string>(eventType: TEven
 export function createDomainEvent<
   TEvent extends DomainEvent<TEvent['aggregateType'], TEvent['eventType']>,
   // tslint:disable-next-line:max-line-length
-  TCustomProps extends Omit<DomainEventOfType<TEvent, TEvent['eventType']>, Exclude<keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'>>,
+  TCustomProps extends Omit<EventOfType<TEvent, TEvent['eventType']>, Exclude<keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'>>,
   >(
     eventType: TEvent['eventType'],
     aggregateType: TEvent['aggregateType'],
     // tslint:disable-next-line:max-line-length
-    customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEvent['eventType']>, Exclude<keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'>>, TCustomProps>,
+    customProps: TCustomProps & Exact<Omit<EventOfType<TEvent, TEvent['eventType']>, Exclude<keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'>>, TCustomProps>,
 ): TEvent {
   const domainEventProps: Omit<DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'> = {
     eventType,
@@ -156,39 +157,47 @@ export function createDomainEvent<
   };
 }
 
-export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(aggregate: TAggregate): CreateEvent<TAggregate> {
+export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>(
+  aggregate: TAggregate,
+  metadata: TMetadata,
+): CreateEvent<TAggregate, TMetadata> {
   return {
     eventType: 'Create',
     aggregateType: aggregate['@type'],
     aggregateId: aggregate.id,
     occurredOnEpoch: Date.now(),
     aggregate,
+    metadata,
   };
 }
 
-export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
+export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   aggregateId: string,
   diff: Diff<TAggregate>,
-): UpdateEvent<TAggregate> {
+  metadata: TMetadata,
+): UpdateEvent<TAggregate, TMetadata> {
   return {
     eventType: 'Update',
     aggregateType,
     aggregateId,
     occurredOnEpoch: Date.now(),
     diff,
+    metadata,
   };
 }
 
-export function createDeleteDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
+export function createDeleteDataEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   aggregateId: string,
-): DeleteEvent<TAggregate> {
+  metadata: TMetadata,
+): DeleteEvent<TAggregate, TMetadata> {
   return {
     eventType: 'Delete',
     aggregateType,
     aggregateId,
     occurredOnEpoch: Date.now(),
+    metadata,
   };
 }
 

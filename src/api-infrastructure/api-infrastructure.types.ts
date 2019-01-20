@@ -30,23 +30,30 @@ export interface DomainEvent<TAggregateType extends string, TEventType extends s
 
 export interface DataEvent<
   TAggregate extends Aggregate<TAggregate['@type']>,
+  TMetadata extends AggregateMetadata<TAggregate['@type']>,
   TEventType extends 'Create' | 'Update' | 'Delete',
-  > extends DomainEvent<TAggregate['@type'], TEventType> { }
+  > extends DomainEvent<TAggregate['@type'], TEventType> {
+  metadata: TMetadata;
+}
 
-export interface CreateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Create'> {
+export interface CreateEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>
+  extends DataEvent<TAggregate, TMetadata, 'Create'> {
   aggregate: TAggregate;
 }
 
-export interface UpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Update'> {
+export interface UpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>
+  extends DataEvent<TAggregate, TMetadata, 'Update'> {
   diff: Diff<TAggregate>;
 }
 
-export interface DeleteEvent<TAggregate extends Aggregate<TAggregate['@type']>> extends DataEvent<TAggregate, 'Delete'> { }
+export interface DeleteEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>
+  extends DataEvent<TAggregate, TMetadata, 'Delete'> {
+}
 
-export type DataEvents<TAggregate extends Aggregate<TAggregate['@type']>> =
-  | CreateEvent<TAggregate>
-  | UpdateEvent<TAggregate>
-  | DeleteEvent<TAggregate>
+export type DataEvents<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>> =
+  | CreateEvent<TAggregate, TMetadata>
+  | UpdateEvent<TAggregate, TMetadata>
+  | DeleteEvent<TAggregate, TMetadata>
   ;
 
 export interface EventDrivenAggregateMetadata<
@@ -56,11 +63,11 @@ export interface EventDrivenAggregateMetadata<
   eventsSinceLastVersion: TEvent[];
 }
 
-export type DomainEventOfType<TEvent, TEventType extends string> = TEvent extends DomainEvent<any, TEventType> ? TEvent : never;
+export type EventOfType<TEvent, TEventType extends string> = TEvent extends Event<TEventType> ? TEvent : never;
 
 export type DomainEventHandlerMap<
   TAggregate extends Aggregate<TAggregate['@type']>,
   TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
   > = {
-    [eventType in TEvent['eventType']]: (aggregate: TAggregate, event: DomainEventOfType<TEvent, eventType>) => TAggregate;
+    [eventType in TEvent['eventType']]: (aggregate: TAggregate, event: EventOfType<TEvent, eventType>) => TAggregate;
   };

@@ -1,5 +1,5 @@
 import { failure } from '../../util';
-import { Aggregate, DomainEvent, DomainEventHandlerMap, DomainEventOfType } from '../api-infrastructure.types';
+import { Aggregate, DomainEvent, DomainEventHandlerMap, EventOfType } from '../api-infrastructure.types';
 import { createDomainEvent } from '../event-log';
 import create from './create';
 import delete$ from './delete';
@@ -85,11 +85,11 @@ export function eventDrivenRepository<
 
     createDomainEvent<
       TEventType extends TEvent['eventType'],
-      TCustomProps extends Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>,
+      TCustomProps extends Omit<EventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>,
       >(
         eventType: TEventType,
         // tslint:disable-next-line:max-line-length
-        customProps: TCustomProps & Exact<Omit<DomainEventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>, TCustomProps>,
+        customProps: TCustomProps & Exact<Omit<EventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>, TCustomProps>,
     ): TEvent {
       return createDomainEvent<TEvent, TCustomProps>(eventType, aggregateType, customProps);
     },

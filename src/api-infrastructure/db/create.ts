@@ -37,19 +37,23 @@ export default function create<TAggregate extends Aggregate<TAggregate['@type']>
     const id = await col.generateId();
     const $metadata = getMetadataOfType(metadataType, $aggregateMetadata, $versionedMetadata, $eventDrivenMetadata);
 
-    const aggregateData: Aggregate<TAggregate['@type']> & { $metadata: any } = {
+    const aggregateData: Aggregate<TAggregate['@type']> = {
       id,
       '@type': aggregateType,
-      $metadata,
     };
 
-    const newAggregate: TAggregate & { $metadata: any } = {
+    const newAggregate: TAggregate = {
       ...aggregateData,
       ...data as any,
     };
 
-    await col.addVersion(id, newAggregate);
-    await publishEvents(createCreateDataEvent(newAggregate));
+    const newAggregateWithMedata: TAggregate & { $metadata: any } = {
+      ...newAggregate,
+      $metadata,
+    };
+
+    await col.addVersion(id, newAggregateWithMedata);
+    await publishEvents(createCreateDataEvent(newAggregate, $metadata));
     return newAggregate;
   };
 }

@@ -1,8 +1,26 @@
-import { omit } from '../../../util';
+import { createDataEventHandler, createEventHandler, getDomainAndDataEventStreamWithReplay } from '../../../api-infrastructure';
+import { DataEvents, VersionedAggregateMetadata } from '../../../api-infrastructure/api-infrastructure.types';
+import { applyDiff, checkExactArray, createExactArray, omit } from '../../../util';
+import { PredicateTemplateAggregate } from '../../predicate-template/predicate-template.types';
 import { getPredicateTemplatesByIdsAndVersions } from '../../predicate-template/queries/get-predicate-templates-by-ids-and-versions';
 import { getResponseGeneratorTemplatesByIdsAndVersions } from '../../response-generator-template/response-generator-template.api';
+import { ResponseGeneratorTemplateAggregate } from '../../response-generator-template/response-generator-template.types';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { PredicateNodeDto, ResponseGeneratorData, ResponseGeneratorDataWithTemplateSnapshot, TemplateInfo } from '../predicate-node.types';
+import {
+  ChildPredicateNodeAdded,
+  PredicateNodeAggregate,
+  PredicateNodeDto,
+  ResponseGeneratorData,
+  ResponseGeneratorDataWithTemplateSnapshot,
+  ResponseGeneratorSet,
+  TemplateInfo,
+} from '../predicate-node.types';
+
+let response: PredicateNodeDto[] = [];
+
+export async function getAllPredicateNodes2() {
+  return response;
+}
 
 export async function getAllPredicateNodes() {
   const allNodes = await predicateNodeRepo.query.all();
@@ -97,3 +115,119 @@ export async function getAllPredicateNodes() {
     };
   });
 }
+
+type SubscribedAggregates =
+  | PredicateTemplateAggregate
+  | ResponseGeneratorTemplateAggregate
+  | PredicateNodeAggregate
+  ;
+
+type Metadata = VersionedAggregateMetadata<SubscribedAggregates>;
+
+type SubscribedDomainEvents =
+  | ChildPredicateNodeAdded
+  | ResponseGeneratorSet
+  ;
+
+type SubscribedEvents = | DataEvents<SubscribedAggregates, Metadata> | SubscribedDomainEvents;
+
+const aggregateTypes = createExactArray(
+  checkExactArray<SubscribedAggregates['@type']>()(
+    'predicate-node',
+    'predicate-template',
+    'response-generator-template',
+  )
+);
+
+const eventTypes = createExactArray(
+  checkExactArray<SubscribedEvents['eventType']>()(
+    'Create',
+    'Update',
+    'Delete',
+    'ChildPredicateNodeAdded',
+    'ResponseGeneratorSet',
+  )
+);
+
+getAllPredicateNodes.initialize = async () => {
+  response = [];
+  const predicateTemplatesById: { [templateId: string]: PredicateTemplateAggregate } = {};
+  const responseGeneratorTemplatesById: { [templateId: string]: ResponseGeneratorTemplateAggregate } = {};
+
+  const dataEventHandler = createDataEventHandler<SubscribedAggregates, Metadata>({
+    'predicate-template': {
+      Create: evt => predicateTemplatesById[evt.aggregateId] = evt.aggregate,
+      Update: evt => predicateTemplatesById[evt.aggregateId] = applyDiff(predicateTemplatesById[evt.aggregateId], evt.diff),
+      Delete: evt => { delete predicateTemplatesById[evt.aggregateId]; },
+    },
+    'response-generator-template': {
+      Create: evt => responseGeneratorTemplatesById[evt.aggregateId] = evt.aggregate,
+      Update: evt => responseGeneratorTemplatesById[evt.aggregateId] = applyDiff(responseGeneratorTemplatesById[evt.aggregateId], evt.diff),
+      Delete: evt => { delete responseGeneratorTemplatesById[evt.aggregateId]; },
+    },
+    'predicate-node': {
+      Create: evt => {
+        const templateInfoOrEvalFunctionBody: PredicateNodeDto['templateInfoOrEvalFunctionBody'] =
+          typeof evt.aggregate.templateInfoOrEvalFunctionBody === 'string'
+            ? evt.aggregate.templateInfoOrEvalFunctionBody
+            : {
+              ...evt.aggregate.templateInfoOrEvalFunctionBody,
+              templateDataSnapshot: omit(predicateTemplatesById[evt.aggregate.templateInfoOrEvalFunctionBody.templateId], '@type', 'id'),
+            };
+
+        response.push({
+          id: evt.aggregateId,
+          version: evt.metadata.version,
+          name: evt.aggregate.name,
+          description: evt.aggregate.description,
+          templateInfoOrEvalFunctionBody,
+          childNodeIdsOrResponseGenerator: [],
+        });
+      },
+
+      Update: evt => {
+        // only handle updates on simple properties; more complex updates are handled in the specific event handlers
+        const dto = response.find(dto => dto.id === evt.aggregateId)!;
+        dto.version = evt.metadata.version;
+        dto.name = evt.diff.name || dto.name;
+        dto.description = evt.diff.description || dto.description;
+
+        if (typeof evt.diff.templateInfoOrEvalFunctionBody === 'string') {
+          dto.templateInfoOrEvalFunctionBody = evt.diff.templateInfoOrEvalFunctionBody;
+        }
+      },
+
+      Delete: evt => {
+        response.splice(response.findIndex(dto => dto.id === evt.aggregateId), 1);
+      },
+    },
+  });
+
+  const domainEventHandler = createEventHandler<SubscribedDomainEvents>({
+    ChildPredicateNodeAdded: evt => {
+      const dto = response.find(dto => dto.id === evt.aggregateId)!;
+      (dto.childNodeIdsOrResponseGenerator as string[]).push(evt.childNodeId);
+    },
+
+    ResponseGeneratorSet: evt => {
+      const dto = response.find(dto => dto.id === evt.aggregateId)!;
+
+      const templateInfoOrGeneratorFunctionBody: ResponseGeneratorDataWithTemplateSnapshot['templateInfoOrGeneratorFunctionBody'] =
+        typeof evt.responseGenerator.templateInfoOrGeneratorFunctionBody === 'string'
+          ? evt.responseGenerator.templateInfoOrGeneratorFunctionBody
+          : {
+            ...evt.responseGenerator.templateInfoOrGeneratorFunctionBody,
+            templateDataSnapshot: omit(responseGeneratorTemplatesById[evt.responseGenerator.templateInfoOrGeneratorFunctionBody.templateId], '@type', 'id'),
+          };
+
+      dto.childNodeIdsOrResponseGenerator = {
+        name: evt.responseGenerator.name,
+        description: evt.responseGenerator.description,
+        templateInfoOrGeneratorFunctionBody,
+      };
+    },
+  });
+
+  return getDomainAndDataEventStreamWithReplay<SubscribedAggregates, SubscribedEvents>(aggregateTypes, eventTypes)
+    .subscribe(evt => dataEventHandler(evt) || domainEventHandler(evt));
+};

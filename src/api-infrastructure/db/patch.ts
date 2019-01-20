@@ -4,8 +4,8 @@ import {
   AggregateMetadata,
   DomainEvent,
   DomainEventHandlerMap,
-  DomainEventOfType,
   EventDrivenAggregateMetadata,
+  EventOfType,
   VersionedAggregateMetadata,
 } from '../api-infrastructure.types';
 import { createUpdateDataEvent, publishEvents } from '../event-log';
@@ -72,7 +72,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
     if (metadataType === 'EventDriven') {
       updatedAggregate = events.reduce((e, evt) => {
         const eventHandler = eventHandlers![evt.eventType];
-        return eventHandler(e, evt as DomainEventOfType<TEvent, typeof evt.eventType>);
+        return eventHandler(e, evt as EventOfType<TEvent, typeof evt.eventType>);
       }, updatedAggregate);
     }
 
@@ -123,7 +123,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
     }
 
     await publishEvents(...events);
-    await publishEvents(createUpdateDataEvent(aggregateType, id, finalDiff));
+    await publishEvents(createUpdateDataEvent(aggregateType, id, finalDiff, $metadata));
 
     return $versionedMetadata.version;
   };

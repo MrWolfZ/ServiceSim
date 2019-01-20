@@ -84,6 +84,6 @@ export default function delete$<TAggregate extends Aggregate<TAggregate['@type']
         break;
     }
 
-    await publishEvents(createDeleteDataEvent(aggregateType, id));
+    await publishEvents(createDeleteDataEvent(aggregateType, id, $metadata));
   };
 }

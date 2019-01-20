@@ -24,3 +24,13 @@ export function omit<T extends { [key: string]: any }, TKeys extends keyof T>(
 export function tuple<T extends [void] | {}>(arr: T): T {
   return arr;
 }
+
+export function checkExactArray<TExpected>() {
+  return <TActual extends TExpected = never>(...t: TActual[]): [TActual[], Exclude<TExpected, TActual>] => {
+    return [t, undefined!];
+  };
+}
+
+export function createExactArray<T>(checkResult: [T[], never]) {
+  return checkResult[0];
+}
