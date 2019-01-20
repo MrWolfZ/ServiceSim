@@ -77,7 +77,7 @@ export default function create<TAggregate extends Aggregate<TAggregate['@type']>
       ...customData as any,
     };
 
-    const eventsWithId: TEvent[] = (Array.isArray(dataOrEvents) ? dataOrEvents : []).map(evt => ({ ...evt as TEvent, aggregateId: id }));
+    const eventsWithId: TEvent[] = (Array.isArray(dataOrEvents) ? dataOrEvents : []).map(evt => ({ aggregateId: id, ...evt as TEvent }));
 
     if (metadataType === 'EventDriven') {
       newAggregate = eventsWithId.reduce((e, evt) => {

@@ -1,7 +1,7 @@
 import { ALL, PATH_PREFIX } from '../predicate-template/default-templates';
 import { getAllPredicateTemplates } from '../predicate-template/queries/get-all-predicate-templates';
 import { addChildPredicateNodeFromTemplate } from '../predicate-tree/commands/add-child-predicate-node-from-template';
-import { setPredicateNodeResponseGenerator } from '../predicate-tree/commands/set-predicate-node-response-generator';
+import { setPredicateNodeResponseGeneratorFromTemplate } from '../predicate-tree/commands/set-predicate-node-response-generator-from-template';
 import { getAllPredicateNodes } from '../predicate-tree/queries/get-all-predicate-nodes';
 import { STATIC } from '../response-generator-template/default-templates';
 import { getAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
@@ -42,12 +42,12 @@ export async function setupMockData() {
     },
   });
 
-  await setPredicateNodeResponseGenerator({
+  await setPredicateNodeResponseGeneratorFromTemplate({
     nodeId: childPredicateNode1Result.nodeId,
     unmodifiedNodeVersion: childPredicateNode1Result.nodeVersion,
     name: 'Static',
     description: '',
-    templateInfoOrGeneratorFunctionBody: {
+    templateInfo: {
       templateId: staticResponseGeneratorTemplate.id,
       templateVersion: staticResponseGeneratorTemplate.version,
       parameterValues: {
@@ -71,12 +71,12 @@ export async function setupMockData() {
     },
   });
 
-  await setPredicateNodeResponseGenerator({
+  await setPredicateNodeResponseGeneratorFromTemplate({
     nodeId: childPredicateNode2Result.nodeId,
     unmodifiedNodeVersion: childPredicateNode2Result.nodeVersion,
     name: 'Static',
     description: '',
-    templateInfoOrGeneratorFunctionBody: {
+    templateInfo: {
       templateId: staticResponseGeneratorTemplate.id,
       templateVersion: staticResponseGeneratorTemplate.version,
       parameterValues: {
@@ -98,12 +98,12 @@ export async function setupMockData() {
     },
   });
 
-  await setPredicateNodeResponseGenerator({
+  await setPredicateNodeResponseGeneratorFromTemplate({
     nodeId: topLevelPredicateNode2Result.nodeId,
     unmodifiedNodeVersion: topLevelPredicateNode2Result.nodeVersion,
     name: 'Status Code',
     description: '',
-    templateInfoOrGeneratorFunctionBody: {
+    templateInfo: {
       templateId: staticResponseGeneratorTemplate.id,
       templateVersion: staticResponseGeneratorTemplate.version,
       parameterValues: {

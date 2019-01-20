@@ -7,7 +7,14 @@ import {
   addChildPredicateNodeWithCustomFunctionBodyConstraints,
 } from './commands/add-child-predicate-node-with-custom-function-body';
 import { deletePredicateNode, deletePredicateNodeConstraints } from './commands/delete-predicate-node';
-import { setPredicateNodeResponseGenerator, setPredicateNodeResponseGeneratorConstraints } from './commands/set-predicate-node-response-generator';
+import {
+  setPredicateNodeResponseGeneratorFromTemplate,
+  setPredicateNodeResponseGeneratorFromTemplateConstraints,
+} from './commands/set-predicate-node-response-generator-from-template';
+import {
+  setPredicateNodeResponseGeneratorWithCustomBody,
+  setPredicateNodeResponseGeneratorWithCustomBodyConstraints,
+} from './commands/set-predicate-node-response-generator-with-custom-body';
 import { updatePredicateNode, updatePredicateNodeConstraints } from './commands/update-predicate-node';
 import { getAllPredicateNodes, getAllPredicateNodes2 } from './queries/get-all-predicate-nodes';
 
@@ -26,5 +33,6 @@ export const predicateNodeApi = express.Router()
   .post('/addChildNodeWithCustomFunctionBody', commandHandler(addChildPredicateNodeWithCustomFunctionBody, addChildPredicateNodeWithCustomFunctionBodyConstraints))
   .post('/addChildNodeFromTemplate', commandHandler(addChildPredicateNodeFromTemplate, addChildPredicateNodeFromTemplateConstraints))
   .post('/update', commandHandler(updatePredicateNode, updatePredicateNodeConstraints))
-  .post('/setResponseGenerator', commandHandler(setPredicateNodeResponseGenerator, setPredicateNodeResponseGeneratorConstraints))
+  .post('/setResponseGeneratorWithCustomBody', commandHandler(setPredicateNodeResponseGeneratorWithCustomBody, setPredicateNodeResponseGeneratorWithCustomBodyConstraints))
+  .post('/setResponseGeneratorFromTemplate', commandHandler(setPredicateNodeResponseGeneratorFromTemplate, setPredicateNodeResponseGeneratorFromTemplateConstraints))
   .post('/delete', commandHandler(deletePredicateNode, deletePredicateNodeConstraints));

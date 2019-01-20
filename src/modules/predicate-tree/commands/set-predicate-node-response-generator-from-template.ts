@@ -1,9 +1,9 @@
 import { CommandValidationConstraints } from '../../../api-infrastructure';
 import { failure } from '../../../util';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { SetResponseGeneratorCommand } from '../predicate-node.types';
+import { SetResponseGeneratorFromTemplateCommand } from '../predicate-node.types';
 
-export async function setPredicateNodeResponseGenerator(command: SetResponseGeneratorCommand) {
+export async function setPredicateNodeResponseGeneratorFromTemplate(command: SetResponseGeneratorFromTemplateCommand) {
   const node = await predicateNodeRepo.query.byId(command.nodeId);
 
   if (Array.isArray(node.childNodeIdsOrResponseGenerator) && node.childNodeIdsOrResponseGenerator.length > 0) {
@@ -15,13 +15,11 @@ export async function setPredicateNodeResponseGenerator(command: SetResponseGene
     command.unmodifiedNodeVersion,
     {},
     predicateNodeRepo.createDomainEvent(
-      'ResponseGeneratorSet',
+      'ResponseGeneratorSetFromTemplate',
       {
-        responseGenerator: {
-          name: command.name,
-          description: command.description,
-          templateInfoOrGeneratorFunctionBody: command.templateInfoOrGeneratorFunctionBody,
-        },
+        name: command.name,
+        description: command.description,
+        templateInfo: command.templateInfo,
       },
     ),
   );
@@ -33,10 +31,10 @@ export async function setPredicateNodeResponseGenerator(command: SetResponseGene
 }
 
 // TODO: validate
-export const setPredicateNodeResponseGeneratorConstraints: CommandValidationConstraints<SetResponseGeneratorCommand> = {
+export const setPredicateNodeResponseGeneratorFromTemplateConstraints: CommandValidationConstraints<SetResponseGeneratorFromTemplateCommand> = {
   nodeId: {},
   unmodifiedNodeVersion: {},
   name: {},
   description: {},
-  templateInfoOrGeneratorFunctionBody: {},
+  templateInfo: {},
 };

@@ -9,13 +9,24 @@ export const predicateNodeRepo = eventDrivenRepository<PredicateNodeAggregate, P
     };
   },
 
-  ResponseGeneratorSet: (aggregate, evt) => {
+  ResponseGeneratorSetWithCustomBody: (aggregate, evt) => {
     return {
       ...aggregate,
       childNodeIdsOrResponseGenerator: {
-        name: evt.responseGenerator.name,
-        description: evt.responseGenerator.description,
-        templateInfoOrGeneratorFunctionBody: evt.responseGenerator.templateInfoOrGeneratorFunctionBody,
+        name: evt.name,
+        description: evt.description,
+        templateInfoOrGeneratorFunctionBody: evt.generatorFunctionBody,
+      },
+    };
+  },
+
+  ResponseGeneratorSetFromTemplate: (aggregate, evt) => {
+    return {
+      ...aggregate,
+      childNodeIdsOrResponseGenerator: {
+        name: evt.name,
+        description: evt.description,
+        templateInfoOrGeneratorFunctionBody: evt.templateInfo,
       },
     };
   },

@@ -12,7 +12,8 @@ import {
   PredicateNodeDto,
   ResponseGeneratorData,
   ResponseGeneratorDataWithTemplateSnapshot,
-  ResponseGeneratorSet,
+  ResponseGeneratorSetFromTemplate,
+  ResponseGeneratorSetWithCustomBody,
   TemplateInfo,
 } from '../predicate-node.types';
 
@@ -126,7 +127,8 @@ type Metadata = VersionedAggregateMetadata<SubscribedAggregates>;
 
 type SubscribedDomainEvents =
   | ChildPredicateNodeAdded
-  | ResponseGeneratorSet
+  | ResponseGeneratorSetWithCustomBody
+  | ResponseGeneratorSetFromTemplate
   ;
 
 type SubscribedEvents = | DataEvents<SubscribedAggregates, Metadata> | SubscribedDomainEvents;
@@ -145,7 +147,8 @@ const eventTypes = createExactArray(
     'Update',
     'Delete',
     'ChildPredicateNodeAdded',
-    'ResponseGeneratorSet',
+    'ResponseGeneratorSetWithCustomBody',
+    'ResponseGeneratorSetFromTemplate',
   )
 );
 
@@ -226,29 +229,34 @@ getAllPredicateNodes.initialize = async () => {
       (dto.childNodeIdsOrResponseGenerator as string[]).push(evt.childNodeId);
     },
 
-    ResponseGeneratorSet: evt => {
+    ResponseGeneratorSetWithCustomBody: evt => {
       const dto = response.find(dto => dto.id === evt.aggregateId)!;
 
-      if (typeof evt.responseGenerator.templateInfoOrGeneratorFunctionBody === 'string') {
-        const functionBody = evt.responseGenerator.templateInfoOrGeneratorFunctionBody;
+      dto.childNodeIdsOrResponseGenerator = {
+        name: evt.name,
+        description: evt.description,
+        templateInfoOrGeneratorFunctionBody: evt.generatorFunctionBody,
+      };
+    },
 
-        dto.childNodeIdsOrResponseGenerator = {
-          name: evt.responseGenerator.name,
-          description: evt.responseGenerator.description,
-          templateInfoOrGeneratorFunctionBody: functionBody,
-        };
-      } else {
-        const templateInfo = evt.responseGenerator.templateInfoOrGeneratorFunctionBody;
+    ResponseGeneratorSetFromTemplate: evt => {
+      const dto = response.find(dto => dto.id === evt.aggregateId)!;
+      const templateInfo = evt.templateInfo;
+      const template = responseGeneratorTemplatesById[templateInfo.templateId];
 
-        dto.childNodeIdsOrResponseGenerator = {
-          name: evt.responseGenerator.name,
-          description: evt.responseGenerator.description,
-          templateInfoOrGeneratorFunctionBody: {
-            ...templateInfo,
-            templateDataSnapshot: omit(responseGeneratorTemplatesById[evt.responseGenerator.templateInfoOrGeneratorFunctionBody.templateId], '@type', 'id'),
+      dto.childNodeIdsOrResponseGenerator = {
+        name: evt.name,
+        description: evt.description,
+        templateInfoOrGeneratorFunctionBody: {
+          ...templateInfo,
+          templateDataSnapshot: {
+            name: template.name,
+            description: template.description,
+            generatorFunctionBody: template.generatorFunctionBody,
+            parameters: template.parameters,
           },
-        };
-      }
+        },
+      };
     },
   });
 

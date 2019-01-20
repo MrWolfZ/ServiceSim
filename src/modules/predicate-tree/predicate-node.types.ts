@@ -31,13 +31,22 @@ export interface ChildPredicateNodeAdded extends DomainEvent<PredicateNodeAggreg
   childNodeId: string;
 }
 
-export interface ResponseGeneratorSet extends DomainEvent<PredicateNodeAggregateType, 'ResponseGeneratorSet'> {
-  responseGenerator: ResponseGeneratorData;
+export interface ResponseGeneratorSetWithCustomBody extends DomainEvent<PredicateNodeAggregateType, 'ResponseGeneratorSetWithCustomBody'> {
+  name: string;
+  description: string;
+  generatorFunctionBody: string;
+}
+
+export interface ResponseGeneratorSetFromTemplate extends DomainEvent<PredicateNodeAggregateType, 'ResponseGeneratorSetFromTemplate'> {
+  name: string;
+  description: string;
+  templateInfo: TemplateInfo;
 }
 
 export type PredicateNodeDomainEvents =
   | ChildPredicateNodeAdded
-  | ResponseGeneratorSet
+  | ResponseGeneratorSetWithCustomBody
+  | ResponseGeneratorSetFromTemplate
   ;
 
 export interface PredicateTemplateInfoWithSnapshot extends TemplateInfo {
@@ -92,12 +101,20 @@ export interface UpdatePredicateNodeCommand {
   parameterValuesOrEvalFunctionBody: { [prop: string]: string | number | boolean } | string;
 }
 
-export interface SetResponseGeneratorCommand {
+export interface SetResponseGeneratorWithCustomBodyCommand {
   nodeId: string;
   unmodifiedNodeVersion: number;
   name: string;
   description: string;
-  templateInfoOrGeneratorFunctionBody: TemplateInfo | string;
+  generatorFunctionBody: string;
+}
+
+export interface SetResponseGeneratorFromTemplateCommand {
+  nodeId: string;
+  unmodifiedNodeVersion: number;
+  name: string;
+  description: string;
+  templateInfo: TemplateInfo;
 }
 
 export interface DeletePredicateNodeCommand {

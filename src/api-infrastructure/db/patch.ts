@@ -69,7 +69,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
 
     let updatedAggregate = applyDiff(latestAggregate, diff);
 
-    const eventsWithId: TEvent[] = events.map(evt => ({ ...evt as TEvent, aggregateId: id }));
+    const eventsWithId: TEvent[] = events.map(evt => ({ aggregateId: id, ...evt as TEvent }));
 
     if (metadataType === 'EventDriven') {
       updatedAggregate = eventsWithId.reduce((e, evt) => {
