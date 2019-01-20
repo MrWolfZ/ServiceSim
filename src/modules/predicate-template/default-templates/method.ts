@@ -2,7 +2,7 @@ import { PredicateTemplateData } from '../predicate-template.types';
 
 export const METHOD: PredicateTemplateData = {
   name: 'Method',
-  description: 'Predicates based on this template match all requests that have one of a specified list of methods.',
+  description: 'Match all requests that have one of a specified list of methods.',
   evalFunctionBody: 'return parameters["Allowed Methods"].split(",").map(m => m.trim().toUpperCase()).includes(request.method.toUpperCase());',
   parameters: [
     {

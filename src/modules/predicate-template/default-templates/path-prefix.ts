@@ -2,7 +2,7 @@ import { PredicateTemplateData } from '../predicate-template.types';
 
 export const PATH_PREFIX: PredicateTemplateData = {
   name: 'Path Prefix',
-  description: 'Predicates based on this template match all requests whose path starts with a provided string.',
+  description: 'Match all requests whose path starts with a provided string.',
   evalFunctionBody: 'return request.path.startsWith(parameters["Prefix"]);',
   parameters: [
     {

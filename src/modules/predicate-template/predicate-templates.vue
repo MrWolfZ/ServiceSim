@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
-import PredicateTemplateTile from './predicate-template-tile.vue';
+import PredicateTemplateRow from './predicate-template-row.vue';
 import predicateTemplates from './predicate-template.store';
 
 @Component({})
@@ -68,18 +68,30 @@ export default class PredicateTemplatesPage extends Vue {
                 </button>
               </div>
             </div>
-            <div class='columns is-multiline'>
-              {
-                this.filteredTemplates.map(template =>
-                  <div key={template.id} class='column is-4-fullhd is-6-desktop is-12-tablet'>
-                    <PredicateTemplateTile
-                      templateId={template.id}
-                      onEdit={() => this.navigateToEditPage(template.id)}
-                      onDelete={() => this.deleteTemplate(template.id)}
-                    />
-                  </div>
-                )
-              }
+
+            <div>
+              <table class='table' width='100%'>
+                <thead>
+                  <tr>
+                    <th width={200}>Name</th>
+                    <th>Description</th>
+                    <th width={200} />
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {
+                    this.filteredTemplates.map(template =>
+                      <PredicateTemplateRow
+                        key={template.id}
+                        templateId={template.id}
+                        onEdit={() => this.navigateToEditPage(template.id)}
+                        onDelete={() => this.deleteTemplate(template.id)}
+                      />
+                    )
+                  }
+                </tbody>
+              </table>
             </div>
 
             {this.filteredTemplates.length === 0 &&
