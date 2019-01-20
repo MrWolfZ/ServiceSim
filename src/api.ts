@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { getUnfilteredLiveEventStream, initializeDB, initializeEventLog, logger } from './api-infrastructure';
+import { getLiveEventStream, getUnfilteredLiveEventStream, initializeDB, initializeEventLog, logger } from './api-infrastructure';
 import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/persistence/file-system';
 import { inMemoryPersistenceAdapter } from './api-infrastructure/db/persistence/in-memory';
 import { createFileSystemEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/file-system';
@@ -83,11 +83,25 @@ export async function initialize(config = CONFIG) {
 
   await ensureRootPredicateNodeExists();
 
-  const subscriptions = [
-    await initializePredicateNodesApi(),
-  ];
+  async function initializeApis() {
+    const subscriptions = [
+      await initializePredicateNodesApi(),
+    ];
 
-  return new Subscription(() => subscriptions.forEach(sub => sub.unsubscribe()));
+    return new Subscription(() => subscriptions.forEach(sub => sub.unsubscribe()));
+  }
+
+  let apiSubscription = await initializeApis();
+
+  const resetSub = getLiveEventStream('resetToDefaultDataAsync').subscribe(async () => {
+    apiSubscription.unsubscribe();
+    apiSubscription = await initializeApis();
+  });
+
+  return new Subscription(() => {
+    apiSubscription.unsubscribe();
+    resetSub.unsubscribe();
+  });
 }
 
 export const api = express.Router();
