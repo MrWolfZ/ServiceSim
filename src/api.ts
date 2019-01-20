@@ -82,7 +82,9 @@ export async function initialize(config = CONFIG) {
 
   await ensureRootPredicateNodeExists();
 
-  return new Subscription(() => { });
+  return new Subscription(() => {
+    logger.info('shutting down...');
+  });
 }
 
 export const api = express.Router();
