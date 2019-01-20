@@ -5,10 +5,9 @@ import { PredicateNodeDto, ResponseGeneratorData, ResponseGeneratorDataWithTempl
 
 export async function getAllPredicateNodes() {
   const allNodes = await predicateNodeRepo.query.all();
-  const allReferencedPredicateTemplateIdsAndVersions = allNodes
-    .filter(n => typeof n.templateInfoOrEvalFunctionBody !== 'string')
-    .map(n => n.templateInfoOrEvalFunctionBody as TemplateInfo)
-    .reduce((agg, ti) => {
+
+  function getReferencedTemplateIdsAndVersions(templateInfos: TemplateInfo[]) {
+    return templateInfos.reduce((agg, ti) => {
       agg[ti.templateId] = agg[ti.templateId] || [];
 
       if (!agg[ti.templateId].includes(ti.templateVersion)) {
@@ -17,19 +16,19 @@ export async function getAllPredicateNodes() {
 
       return agg;
     }, {} as { [templateId: string]: number[] });
+  }
 
-  const allReferencedResponseGeneratorTemplateIdsAndVersions = allNodes
-    .filter(n => !Array.isArray(n.childNodeIdsOrResponseGenerator) && typeof n.templateInfoOrEvalFunctionBody !== 'string')
-    .map(n => (n.childNodeIdsOrResponseGenerator as ResponseGeneratorData).templateInfoOrGeneratorFunctionBody as TemplateInfo)
-    .reduce((agg, ti) => {
-      agg[ti.templateId] = agg[ti.templateId] || [];
+  const allReferencedPredicateTemplateIdsAndVersions = getReferencedTemplateIdsAndVersions(
+    allNodes
+      .filter(n => typeof n.templateInfoOrEvalFunctionBody !== 'string')
+      .map(n => n.templateInfoOrEvalFunctionBody as TemplateInfo)
+  );
 
-      if (!agg[ti.templateId].includes(ti.templateVersion)) {
-        agg[ti.templateId].push(ti.templateVersion);
-      }
-
-      return agg;
-    }, {} as { [templateId: string]: number[] });
+  const allReferencedResponseGeneratorTemplateIdsAndVersions = getReferencedTemplateIdsAndVersions(
+    allNodes
+      .filter(n => !Array.isArray(n.childNodeIdsOrResponseGenerator) && typeof n.templateInfoOrEvalFunctionBody !== 'string')
+      .map(n => (n.childNodeIdsOrResponseGenerator as ResponseGeneratorData).templateInfoOrGeneratorFunctionBody as TemplateInfo)
+  );
 
   const [
     allReferencedPredicateTemplates,
