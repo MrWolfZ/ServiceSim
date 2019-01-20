@@ -29,7 +29,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
   metadataType: 'EventDriven',
   collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
   eventHandlers: DomainEventHandlerMap<TAggregate, TEvent>,
-): (id: string, expectedVersion: number, diff: Diff<TAggregate>, ...events: TEvent[]) => Promise<number>;
+): (id: string, expectedVersion: number, diff: Diff<TAggregate>, ...events: (Omit<TEvent, 'aggregateId'>)[]) => Promise<number>;
 
 export default function patch<TAggregate extends Aggregate<TAggregate['@type']>, TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>>(
   aggregateType: TAggregate['@type'],
@@ -41,7 +41,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
     id: string,
     expectedVersionOrDiff: any,
     diff: Diff<TAggregate>,
-    ...events: TEvent[]
+    ...events: (Omit<TEvent, 'aggregateId'>)[]
   ): Promise<number | void> => {
     const col = collectionFactory();
 
@@ -69,8 +69,10 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
 
     let updatedAggregate = applyDiff(latestAggregate, diff);
 
+    const eventsWithId: TEvent[] = events.map(evt => ({ ...evt as TEvent, aggregateId: id }));
+
     if (metadataType === 'EventDriven') {
-      updatedAggregate = events.reduce((e, evt) => {
+      updatedAggregate = eventsWithId.reduce((e, evt) => {
         const eventHandler = eventHandlers![evt.eventType];
         return eventHandler(e, evt as EventOfType<TEvent, typeof evt.eventType>);
       }, updatedAggregate);
@@ -122,8 +124,8 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
         break;
     }
 
-    await publishEvents(...events);
     await publishEvents(createUpdateDataEvent(aggregateType, id, finalDiff, $metadata));
+    await publishEvents(...eventsWithId);
 
     return $versionedMetadata.version;
   };

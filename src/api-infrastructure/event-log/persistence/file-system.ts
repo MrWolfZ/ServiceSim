@@ -83,6 +83,7 @@ export async function createFileSystemEventLogPersistenceAdapter(eventsDataDirPa
 
     async dropAll() {
       await deleteDir(eventsDataDirPath);
+      currentSeqNr = 0;
     },
   };
 }

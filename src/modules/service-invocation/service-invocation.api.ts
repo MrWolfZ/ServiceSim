@@ -56,7 +56,6 @@ export async function setServiceInvocationResponse(command: SetServiceResponseCo
     repo.createDomainEvent(
       'InvocationResponseWasSet',
       {
-        aggregateId: command.invocationId,
         ...omit(command, 'invocationId', 'unmodifiedInvocationVersion'),
       },
     ),

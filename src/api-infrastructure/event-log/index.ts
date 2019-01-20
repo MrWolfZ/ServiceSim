@@ -30,6 +30,12 @@ export async function publishEvents<TEvent extends Event<TEvent['eventType']> = 
   }
 }
 
+export async function publishTransientEvents<TEvent extends Event<TEvent['eventType']> = Event<TEvent['eventType']>>(...events: TEvent[]) {
+  for (const event of events) {
+    allEventsSubject.next([event, -1]);
+  }
+}
+
 export function getUnfilteredLiveEventStream<TEventType extends string = string>(): Observable<Event<TEventType>> {
   return allEventsSubject.pipe(map(([ev]) => ev));
 }
@@ -138,13 +144,13 @@ export function createEvent<TEventType extends string = string>(eventType: TEven
 export function createDomainEvent<
   TEvent extends DomainEvent<TEvent['aggregateType'], TEvent['eventType']>,
   // tslint:disable-next-line:max-line-length
-  TCustomProps extends Omit<EventOfType<TEvent, TEvent['eventType']>, Exclude<keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'>>,
+  TCustomProps extends Omit<EventOfType<TEvent, TEvent['eventType']>, keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>>,
   >(
     eventType: TEvent['eventType'],
     aggregateType: TEvent['aggregateType'],
     // tslint:disable-next-line:max-line-length
-    customProps: TCustomProps & Exact<Omit<EventOfType<TEvent, TEvent['eventType']>, Exclude<keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'>>, TCustomProps>,
-): TEvent {
+    customProps: TCustomProps & Exact<Omit<EventOfType<TEvent, TEvent['eventType']>, keyof DomainEvent<TEvent['aggregateType'], TEvent['eventType']>>, TCustomProps>,
+): Omit<TEvent, 'aggregateId'> {
   const domainEventProps: Omit<DomainEvent<TEvent['aggregateType'], TEvent['eventType']>, 'aggregateId'> = {
     eventType,
     aggregateType,

@@ -76,7 +76,7 @@ export function eventDrivenRepository<
   const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
 
   return {
-    create: create<TAggregate>(aggregateType, 'EventDriven', collectionFactory),
+    create: create<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
     patch: patch<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
     delete: delete$<TAggregate>(aggregateType, 'EventDriven', collectionFactory),
     dropAll: () => collectionFactory().dropAll(),
@@ -85,12 +85,12 @@ export function eventDrivenRepository<
 
     createDomainEvent<
       TEventType extends TEvent['eventType'],
-      TCustomProps extends Omit<EventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>,
+      TCustomProps extends Omit<EventOfType<TEvent, TEventType>, keyof DomainEvent<TAggregate['@type'], TEventType>>,
       >(
         eventType: TEventType,
         // tslint:disable-next-line:max-line-length
-        customProps: TCustomProps & Exact<Omit<EventOfType<TEvent, TEventType>, Exclude<keyof DomainEvent<TAggregate['@type'], TEventType>, 'aggregateId'>>, TCustomProps>,
-    ): TEvent {
+        customProps: TCustomProps & Exact<Omit<EventOfType<TEvent, TEventType>, keyof DomainEvent<TAggregate['@type'], TEventType>>, TCustomProps>,
+    ): Omit<TEvent, 'aggregateId'> {
       return createDomainEvent<TEvent, TCustomProps>(eventType, aggregateType, customProps);
     },
   };

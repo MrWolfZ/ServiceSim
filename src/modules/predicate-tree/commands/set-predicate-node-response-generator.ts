@@ -17,7 +17,6 @@ export async function setPredicateNodeResponseGenerator(command: SetResponseGene
     predicateNodeRepo.createDomainEvent(
       'ResponseGeneratorSet',
       {
-        aggregateId: command.nodeId,
         responseGenerator: {
           name: command.name,
           description: command.description,

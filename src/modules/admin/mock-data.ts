@@ -1,6 +1,6 @@
 import { ALL, PATH_PREFIX } from '../predicate-template/default-templates';
 import { getAllPredicateTemplates } from '../predicate-template/queries/get-all-predicate-templates';
-import { addChildPredicateNode } from '../predicate-tree/commands/add-child-predicate-node';
+import { addChildPredicateNodeFromTemplate } from '../predicate-tree/commands/add-child-predicate-node-from-template';
 import { setPredicateNodeResponseGenerator } from '../predicate-tree/commands/set-predicate-node-response-generator';
 import { getAllPredicateNodes } from '../predicate-tree/queries/get-all-predicate-nodes';
 import { STATIC } from '../response-generator-template/default-templates';
@@ -16,11 +16,11 @@ export async function setupMockData() {
 
   const rootNode = (await getAllPredicateNodes())[0];
 
-  const topLevelPredicateNode1Result = await addChildPredicateNode({
+  const topLevelPredicateNode1Result = await addChildPredicateNodeFromTemplate({
     parentNodeId: rootNode.id,
     name: pathPrefixPredicateTemplate.name,
     description: '',
-    templateInfoOrEvalFunctionBody: {
+    templateInfo: {
       templateId: pathPrefixPredicateTemplate.id,
       templateVersion: pathPrefixPredicateTemplate.version,
       parameterValues: {
@@ -29,11 +29,11 @@ export async function setupMockData() {
     },
   });
 
-  const childPredicateNode1Result = await addChildPredicateNode({
+  const childPredicateNode1Result = await addChildPredicateNodeFromTemplate({
     parentNodeId: topLevelPredicateNode1Result.nodeId,
     name: pathPrefixPredicateTemplate.name,
     description: '',
-    templateInfoOrEvalFunctionBody: {
+    templateInfo: {
       templateId: pathPrefixPredicateTemplate.id,
       templateVersion: pathPrefixPredicateTemplate.version,
       parameterValues: {
@@ -58,11 +58,11 @@ export async function setupMockData() {
     },
   });
 
-  const childPredicateNode2Result = await addChildPredicateNode({
+  const childPredicateNode2Result = await addChildPredicateNodeFromTemplate({
     parentNodeId: topLevelPredicateNode1Result.nodeId,
     name: pathPrefixPredicateTemplate.name,
     description: '',
-    templateInfoOrEvalFunctionBody: {
+    templateInfo: {
       templateId: pathPrefixPredicateTemplate.id,
       templateVersion: pathPrefixPredicateTemplate.version,
       parameterValues: {
@@ -87,11 +87,11 @@ export async function setupMockData() {
     },
   });
 
-  const topLevelPredicateNode2Result = await addChildPredicateNode({
+  const topLevelPredicateNode2Result = await addChildPredicateNodeFromTemplate({
     parentNodeId: rootNode.id,
     name: allPredicateTemplate.name,
     description: '',
-    templateInfoOrEvalFunctionBody: {
+    templateInfo: {
       templateId: allPredicateTemplate.id,
       templateVersion: allPredicateTemplate.version,
       parameterValues: {},

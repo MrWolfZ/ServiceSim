@@ -1,9 +1,9 @@
 import { CommandValidationConstraints } from '../../../api-infrastructure';
-import { failure, omit } from '../../../util';
+import { failure } from '../../../util';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { AddChildPredicateNodeCommand } from '../predicate-node.types';
+import { AddChildPredicateNodeWithCustomFunctionBodyCommand } from '../predicate-node.types';
 
-export async function addChildPredicateNode(command: AddChildPredicateNodeCommand) {
+export async function addChildPredicateNodeWithCustomFunctionBody(command: AddChildPredicateNodeWithCustomFunctionBodyCommand) {
   const parentNode = await predicateNodeRepo.query.byId(command.parentNodeId);
 
   if (!Array.isArray(parentNode.childNodeIdsOrResponseGenerator)) {
@@ -11,7 +11,9 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
   }
 
   const newNode = await predicateNodeRepo.create({
-    ...omit(command, 'parentNodeId'),
+    name: command.name,
+    description: command.description,
+    templateInfoOrEvalFunctionBody: command.evalFunctionBody,
     childNodeIdsOrResponseGenerator: [],
   });
 
@@ -22,7 +24,6 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
     predicateNodeRepo.createDomainEvent(
       'ChildPredicateNodeAdded',
       {
-        aggregateId: parentNode.id,
         childNodeId: newNode.id,
       },
     ),
@@ -35,9 +36,10 @@ export async function addChildPredicateNode(command: AddChildPredicateNodeComman
 }
 
 // TODO: validate
-export const addChildPredicateNodeConstraints: CommandValidationConstraints<AddChildPredicateNodeCommand> = {
+// tslint:disable-next-line:max-line-length
+export const addChildPredicateNodeWithCustomFunctionBodyConstraints: CommandValidationConstraints<AddChildPredicateNodeWithCustomFunctionBodyCommand> = {
   parentNodeId: {},
   name: {},
   description: {},
-  templateInfoOrEvalFunctionBody: {},
+  evalFunctionBody: {},
 };

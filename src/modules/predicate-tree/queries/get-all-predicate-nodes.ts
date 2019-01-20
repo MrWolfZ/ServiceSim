@@ -160,27 +160,44 @@ getAllPredicateNodes.initialize = async () => {
       Update: evt => predicateTemplatesById[evt.aggregateId] = applyDiff(predicateTemplatesById[evt.aggregateId], evt.diff),
       Delete: evt => { delete predicateTemplatesById[evt.aggregateId]; },
     },
+
     'response-generator-template': {
       Create: evt => responseGeneratorTemplatesById[evt.aggregateId] = evt.aggregate,
       Update: evt => responseGeneratorTemplatesById[evt.aggregateId] = applyDiff(responseGeneratorTemplatesById[evt.aggregateId], evt.diff),
       Delete: evt => { delete responseGeneratorTemplatesById[evt.aggregateId]; },
     },
+
     'predicate-node': {
       Create: evt => {
-        const templateInfoOrEvalFunctionBody: PredicateNodeDto['templateInfoOrEvalFunctionBody'] =
-          typeof evt.aggregate.templateInfoOrEvalFunctionBody === 'string'
-            ? evt.aggregate.templateInfoOrEvalFunctionBody
-            : {
-              ...evt.aggregate.templateInfoOrEvalFunctionBody,
-              templateDataSnapshot: omit(predicateTemplatesById[evt.aggregate.templateInfoOrEvalFunctionBody.templateId], '@type', 'id'),
-            };
+        if (typeof evt.aggregate.templateInfoOrEvalFunctionBody === 'string') {
+          response.push({
+            id: evt.aggregateId,
+            version: 1,
+            name: evt.aggregate.name,
+            description: evt.aggregate.description,
+            templateInfoOrEvalFunctionBody: evt.aggregate.templateInfoOrEvalFunctionBody,
+            childNodeIdsOrResponseGenerator: [],
+          });
+
+          return;
+        }
+
+        const template = predicateTemplatesById[evt.aggregate.templateInfoOrEvalFunctionBody.templateId];
 
         response.push({
           id: evt.aggregateId,
-          version: evt.metadata.version,
+          version: 1,
           name: evt.aggregate.name,
           description: evt.aggregate.description,
-          templateInfoOrEvalFunctionBody,
+          templateInfoOrEvalFunctionBody: {
+            ...evt.aggregate.templateInfoOrEvalFunctionBody,
+            templateDataSnapshot: {
+              name: template.name,
+              description: template.description,
+              evalFunctionBody: template.evalFunctionBody,
+              parameters: template.parameters,
+            },
+          },
           childNodeIdsOrResponseGenerator: [],
         });
       },
@@ -212,19 +229,26 @@ getAllPredicateNodes.initialize = async () => {
     ResponseGeneratorSet: evt => {
       const dto = response.find(dto => dto.id === evt.aggregateId)!;
 
-      const templateInfoOrGeneratorFunctionBody: ResponseGeneratorDataWithTemplateSnapshot['templateInfoOrGeneratorFunctionBody'] =
-        typeof evt.responseGenerator.templateInfoOrGeneratorFunctionBody === 'string'
-          ? evt.responseGenerator.templateInfoOrGeneratorFunctionBody
-          : {
-            ...evt.responseGenerator.templateInfoOrGeneratorFunctionBody,
-            templateDataSnapshot: omit(responseGeneratorTemplatesById[evt.responseGenerator.templateInfoOrGeneratorFunctionBody.templateId], '@type', 'id'),
-          };
+      if (typeof evt.responseGenerator.templateInfoOrGeneratorFunctionBody === 'string') {
+        const functionBody = evt.responseGenerator.templateInfoOrGeneratorFunctionBody;
 
-      dto.childNodeIdsOrResponseGenerator = {
-        name: evt.responseGenerator.name,
-        description: evt.responseGenerator.description,
-        templateInfoOrGeneratorFunctionBody,
-      };
+        dto.childNodeIdsOrResponseGenerator = {
+          name: evt.responseGenerator.name,
+          description: evt.responseGenerator.description,
+          templateInfoOrGeneratorFunctionBody: functionBody,
+        };
+      } else {
+        const templateInfo = evt.responseGenerator.templateInfoOrGeneratorFunctionBody;
+
+        dto.childNodeIdsOrResponseGenerator = {
+          name: evt.responseGenerator.name,
+          description: evt.responseGenerator.description,
+          templateInfoOrGeneratorFunctionBody: {
+            ...templateInfo,
+            templateDataSnapshot: omit(responseGeneratorTemplatesById[evt.responseGenerator.templateInfoOrGeneratorFunctionBody.templateId], '@type', 'id'),
+          },
+        };
+      }
     },
   });
 

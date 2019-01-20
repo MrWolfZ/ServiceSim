@@ -70,8 +70,18 @@ export interface PredicateNodeFormValue {
   };
 }
 
-export interface AddChildPredicateNodeCommand extends Omit<PredicateNodeData, 'childNodeIdsOrResponseGenerator'> {
+export interface AddChildPredicateNodeWithCustomFunctionBodyCommand {
   parentNodeId: string;
+  name: string;
+  description: string;
+  evalFunctionBody: string;
+}
+
+export interface AddChildPredicateNodeFromTemplateCommand {
+  parentNodeId: string;
+  name: string;
+  description: string;
+  templateInfo: TemplateInfo;
 }
 
 export interface UpdatePredicateNodeCommand {
