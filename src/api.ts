@@ -9,7 +9,7 @@ import { inMemoryEventLogPersistenceAdapter } from './api-infrastructure/event-l
 import { CONFIG } from './config';
 import { adminApi } from './modules/admin/admin.api';
 import { initializePredicateTemplatesApi, predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
-import { ensureRootPredicateNodeExists } from './modules/predicate-tree/predicate-node.api';
+import { ensureRootPredicateNodeExists } from './modules/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
 import { assertNever } from './util';

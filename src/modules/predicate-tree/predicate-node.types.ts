@@ -70,7 +70,7 @@ export interface PredicateNodeFormValue {
   };
 }
 
-export interface CreatePredicateNodeCommand extends Omit<PredicateNodeData, 'childNodeIdsOrResponseGenerator'> {
+export interface AddChildPredicateNodeCommand extends Omit<PredicateNodeData, 'childNodeIdsOrResponseGenerator'> {
   parentNodeId: string;
 }
 

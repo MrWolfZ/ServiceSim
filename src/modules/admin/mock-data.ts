@@ -1,6 +1,8 @@
 import { ALL, PATH_PREFIX } from '../predicate-template/default-templates';
 import { getAllPredicateTemplates } from '../predicate-template/queries/get-all-predicate-templates';
-import { addChildPredicateNode, getAllPredicateNodes, setPredicateNodeResponseGenerator } from '../predicate-tree/predicate-node.api';
+import { addChildPredicateNode } from '../predicate-tree/commands/add-child-predicate-node';
+import { setPredicateNodeResponseGenerator } from '../predicate-tree/commands/set-predicate-node-response-generator';
+import { getAllPredicateNodes } from '../predicate-tree/queries/get-all-predicate-nodes';
 import { STATIC } from '../response-generator-template/default-templates';
 import { getAllResponseGeneratorTemplates } from '../response-generator-template/response-generator-template.api';
 
