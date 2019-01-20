@@ -1,4 +1,4 @@
-import { ConnectableObservable, empty, Observable, Observer, Subject, Subscription } from 'rxjs';
+import { ConnectableObservable, EMPTY, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
 import { Diff } from '../../util';
 import { Aggregate, CreateEvent, DataEvent, DeleteEvent, DomainEvent, DomainEventOfType, Event, UpdateEvent } from '../api-infrastructure.types';
@@ -78,7 +78,7 @@ export function getDomainAndDataEventStreamWithReplay<
     allAfterSeqNr: number = 0,
 ): Observable<TEvent> {
   if (aggregateTypes.length === 0 || eventTypes.length === 0) {
-    return empty();
+    return EMPTY;
   }
 
   return Observable.create((obs: Observer<TEvent>) => {

@@ -15,7 +15,7 @@ export async function resetToDefaultData() {
 
   await setupMockData();
 
-  publishEvents(createEvent('resetToDefaultDataAsync'));
+  await publishEvents(createEvent('resetToDefaultDataAsync'));
 }
 
 export const adminApi = express.Router()
