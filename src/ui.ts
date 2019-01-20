@@ -81,6 +81,11 @@ new Vue({
         component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-templates.vue'),
       },
       {
+        path: '/predicate-templates/:id',
+        name: 'predicate-template',
+        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-template.vue'),
+      },
+      {
         path: '/admin',
         name: 'admin',
         component: () => import(/* webpackChunkName: "admin" */ './modules/admin/admin.vue'),

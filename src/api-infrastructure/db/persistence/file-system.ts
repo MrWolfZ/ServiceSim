@@ -50,7 +50,7 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
         id = paths.length + 1;
       }
 
-      return `${documentType}/${id}`;
+      return `${documentType}-${id}`;
     },
 
     async set(id: string, document: TDocument) {

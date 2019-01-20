@@ -7,7 +7,7 @@ function createDocumentCollection<TDocument>(documentType: string): DocumentColl
 
   return {
     async generateId() {
-      return `${documentType}/${Object.keys(inMemoryDb[documentType]).length + 1}`;
+      return `${documentType}-${Object.keys(inMemoryDb[documentType]).length + 1}`;
     },
 
     async set(id: string, document: TDocument) {

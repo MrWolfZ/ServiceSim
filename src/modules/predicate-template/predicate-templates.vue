@@ -1,6 +1,5 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
-import PredicateTemplateDialog from './predicate-template-dialog.vue';
 import PredicateTemplateTile from './predicate-template-tile.vue';
 import predicateTemplates from './predicate-template.store';
 
@@ -10,10 +9,6 @@ export default class PredicateTemplatesPage extends Vue {
 
   async created() {
     await predicateTemplates.loadAllAsync();
-  }
-
-  private dialog() {
-    return this.$refs[this.dialog.name] as PredicateTemplateDialog;
   }
 
   private get templates() {
@@ -33,6 +28,10 @@ export default class PredicateTemplatesPage extends Vue {
 
   private async deleteTemplate(templateId: string) {
     await predicateTemplates.deleteAsync(templateId);
+  }
+
+  private navigateToEditPage(templateId: string) {
+    this.$router.push(`/predicate-templates/${templateId}`);
   }
 
   render() {
@@ -60,7 +59,7 @@ export default class PredicateTemplatesPage extends Vue {
               <div class='level-right'>
                 <button
                   class='button is-primary'
-                  onClick={() => this.dialog().openForNewTemplate()}
+                  onClick={() => this.navigateToEditPage('new')}
                 >
                   <span>Create new template</span>
                   <span class='icon is-small'>
@@ -75,7 +74,7 @@ export default class PredicateTemplatesPage extends Vue {
                   <div key={template.id} class='column is-4-fullhd is-6-desktop is-12-tablet'>
                     <PredicateTemplateTile
                       templateId={template.id}
-                      onEdit={() => this.dialog().openForExistingTemplate(template.id)}
+                      onEdit={() => this.navigateToEditPage(template.id)}
                       onDelete={() => this.deleteTemplate(template.id)}
                     />
                   </div>
@@ -96,7 +95,7 @@ export default class PredicateTemplatesPage extends Vue {
             { /* TODO: add button to create default predicate templates */}
             <button
               class='button is-primary'
-              onClick={() => this.dialog().openForNewTemplate()}
+              onClick={() => this.navigateToEditPage('new')}
             >
               <span>Create new template</span>
               <span class='icon is-small'>
@@ -106,7 +105,6 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-        <PredicateTemplateDialog ref={this.dialog.name} />
       </div>
     );
   }

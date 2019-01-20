@@ -2,7 +2,8 @@
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
 import { Component } from 'vue-property-decorator';
-import { Form, ModalDialog, TsxComponent } from '../../ui-infrastructure';
+import { Route } from 'vue-router';
+import { Form, TsxComponent } from '../../ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form.vue';
 import PredicateTemplateForm from './predicate-template-form.vue';
 import predicateTemplates from './predicate-template.store';
@@ -30,26 +31,30 @@ function formReducer(state: FormGroupState<PredicateTemplateFormValue>, action: 
 }
 
 @Component({})
-export default class PredicateTemplateDialog extends TsxComponent<{}> {
-  private dialogIsOpen = false;
+export default class PredicateTemplatePage extends TsxComponent<{}> {
   private isSaving = false;
-  private templateId: string | undefined;
+  private templateId: string | null = null;
 
   private formState = createFormState();
 
-  openForNewTemplate() {
-    this.templateId = undefined;
-    this.dialogIsOpen = true;
-    this.isSaving = false;
-    this.formState = createFormState();
+  mounted() {
+    this.initialize(this.$route.params.id);
   }
 
-  openForExistingTemplate(templateId: string) {
-    this.templateId = templateId;
-    this.dialogIsOpen = true;
+  beforeRouteUpdate(to: Route, _: Route, next: () => void) {
+    this.initialize(to.params.id);
+    next();
+  }
+
+  initialize(templateId: string | null | undefined) {
+    this.templateId = templateId && templateId !== 'new' ? templateId : null;
     this.isSaving = false;
-    const { id, version, ...rest } = predicateTemplates.state.templatesById[templateId];
-    this.formState = createFormState(rest);
+    this.formState = createFormState();
+
+    if (this.templateId) {
+      const { id, version, ...rest } = predicateTemplates.state.templatesById[this.templateId];
+      this.formState = createFormState(rest);
+    }
   }
 
   private async submitDialog() {
@@ -63,9 +68,10 @@ export default class PredicateTemplateDialog extends TsxComponent<{}> {
     await this.createOrUpdateTemplate({
       ...this.formState.value,
       parameters: this.formState.value.parameters.map(p => ({ ...p })),
-    }, this.templateId);
+    }, this.templateId || undefined);
 
-    this.closeDialog();
+    this.isSaving = false;
+    this.navigateToList();
   }
 
   private async createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
@@ -76,45 +82,41 @@ export default class PredicateTemplateDialog extends TsxComponent<{}> {
     }
   }
 
-  private cancelDialog() {
-    this.closeDialog();
-  }
-
-  private closeDialog() {
-    this.dialogIsOpen = false;
+  private navigateToList() {
+    this.$router.push('/predicate-templates');
   }
 
   render() {
     return (
-      <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
-        <ModalDialog isOpen={this.dialogIsOpen} onAfterFadeOut={() => this.formState = createFormState()}>
+      <div class='page'>
+        <h1 class='title'>
+          {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
+        </h1>
 
-          <span slot='header'>
-            {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
-          </span>
-
+        <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
           <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
+        </Form>
 
-          <div slot='footer' class='buttons'>
-            <button
-              class='button is-danger is-outlined'
-              type='button'
-              onClick={() => this.cancelDialog()}
-              disabled={this.isSaving}
-            >
-              Cancel
-            </button>
-            <button
-              class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
-              onClick={() => this.submitDialog()}
-              disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
-            >
-              Save
-            </button>
-          </div>
+        <div class='buttons'>
+          <button
+            class='button is-danger is-outlined'
+            type='button'
+            onClick={() => this.navigateToList()}
+            disabled={this.isSaving}
+          >
+            Cancel
+          </button>
 
-        </ModalDialog>
-      </Form>
+          <button
+            class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
+            onClick={() => this.submitDialog()}
+            disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
+          >
+            Save
+          </button>
+        </div>
+
+      </div>
     );
   }
 }
