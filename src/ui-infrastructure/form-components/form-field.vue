@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { FormControlState } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
-import ExpansionContainer from '../expansion-container.vue';
+import ExpansionContainer from '../expansion-container';
 import { TsxComponent } from '../tsx-component';
 
 export interface FormFieldProps {
