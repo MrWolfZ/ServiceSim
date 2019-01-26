@@ -26,6 +26,8 @@ uiApi.use('/predicate-templates', predicateTemplatesApi);
 uiApi.use('/predicate-tree', predicateTreeApi);
 
 uiApi.get('/events', (req, res) => {
+  req.setTimeout(60 * 60 * 1_000, () => void 0);
+
   const sub = getUnfilteredLiveEventStream().subscribe(message => {
     res.write(`event: event\ndata: ${JSON.stringify(message)}\n\n`);
     res.flush();
