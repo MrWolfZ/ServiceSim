@@ -95,26 +95,26 @@ export default class PredicateTemplatePage extends TsxComponent<{}> {
 
         <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
           <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
+
+          <div class='buttons'>
+            <button
+              class='button is-danger is-outlined'
+              type='button'
+              onClick={() => this.navigateToList()}
+              disabled={this.isSaving}
+            >
+              Cancel
+            </button>
+
+            <button
+              class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
+              onClick={() => this.submitDialog()}
+              disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
+            >
+              Save
+            </button>
+          </div>
         </Form>
-
-        <div class='buttons'>
-          <button
-            class='button is-danger is-outlined'
-            type='button'
-            onClick={() => this.navigateToList()}
-            disabled={this.isSaving}
-          >
-            Cancel
-          </button>
-
-          <button
-            class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
-            onClick={() => this.submitDialog()}
-            disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
-          >
-            Save
-          </button>
-        </div>
 
       </div>
     );
