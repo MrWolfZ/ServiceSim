@@ -95,4 +95,16 @@ body {
 .is-borderless {
   border: 0 !important;
 }
+
+// override normal sized radio control size
+// to ensure the dot is properly centered
+.is-checkradio[type='radio'] {
+  + label::before,
+  + label:before,
+  + label::after,
+  + label:after {
+    width: 24px;
+    height: 24px;
+  }
+}
 </style>
