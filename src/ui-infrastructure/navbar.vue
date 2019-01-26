@@ -38,7 +38,7 @@ export default class Navbar extends Vue {
             <div class='navbar-start'>
 
               <router-link
-                to='predicate-tree'
+                to={{ name: 'predicate-tree' }}
                 class='navbar-item has-text-white'
                 onClick={() => this.closeMenu()}
               >
@@ -46,7 +46,7 @@ export default class Navbar extends Vue {
               </router-link>
 
               <router-link
-                to='predicate-templates'
+                to={{ name: 'predicate-templates' }}
                 class='navbar-item has-text-white'
                 onClick={() => this.closeMenu()}
               >
@@ -54,7 +54,7 @@ export default class Navbar extends Vue {
               </router-link>
 
               <router-link
-                to='response-generator-templates'
+                to={{ name: 'response-generator-templates' }}
                 class='navbar-item has-text-white'
                 onClick={() => this.closeMenu()}
               >
@@ -62,7 +62,7 @@ export default class Navbar extends Vue {
               </router-link>
 
               <router-link
-                to='admin'
+                to={{ name: 'admin' }}
                 class='navbar-item has-text-white'
                 onClick={() => this.closeMenu()}
               >
