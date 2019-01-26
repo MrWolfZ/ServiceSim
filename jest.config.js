@@ -1,4 +1,16 @@
 module.exports = {
+  globals: {
+    'ts-jest': {
+      babelConfig: {
+        presets: [
+          '@vue/babel-preset-jsx',
+        ],
+        plugins: [
+          '@babel/plugin-syntax-dynamic-import',
+        ],
+      },
+    },
+  },
   roots: [
     '<rootDir>',
     '<rootDir>/src',
@@ -7,12 +19,10 @@ module.exports = {
     'js',
     'jsx',
     'json',
-    'vue',
     'ts',
     'tsx',
   ],
   transform: {
-    '^.+\\.vue$': 'vue-jest',
     '^.+\\.tsx?$': 'ts-jest',
     '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
     '^.+\\.jsx?$': 'babel-jest',
@@ -21,13 +31,11 @@ module.exports = {
     'jest-serializer-vue',
   ],
   testMatch: [
-    '**/src/**/*.spec.(ts|js)',
+    '**/*.spec.(ts|js)',
   ],
   testPathIgnorePatterns: [
-    '/src/ui/',
     'vue.spec',
   ],
-  testEnvironment: 'node',
   setupFiles: [
     '<rootDir>/node_modules/core-js/fn/array/flat-map.js',
   ],

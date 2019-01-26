@@ -12,7 +12,7 @@ export interface PureComponentContext {
 
 // partly inspired by https://codeburst.io/save-the-zombies-how-to-add-state-and-lifecycle-methods-to-stateless-react-components-1a996513866d
 export function pure<TProps = {}>(def: (props: TProps, context: PureComponentContext) => JSX.Element) {
-  const name = (def.name || 'Component').replace(/Def$/g, '');
+  const name = (def.name || 'PureComponent').replace(/Def$/g, '');
   return Component({ functional: true } as any as ComponentOptions<TsxComponent<TProps>>)(
     class extends TsxComponent<TProps> {
       // @ts-ignore
@@ -65,7 +65,7 @@ export function stateful<TState, TProps = {}>(
   initialState: TState,
   lifecycleHooks: LifecycleHooks<TState> = {},
 ) {
-  const name = (def.name || 'Component').replace(/Def$/g, '');
+  const name = (def.name || 'StatefulComponent').replace(/Def$/g, '');
   return Component({})(
     class extends TsxComponent<TProps> {
       private state: TState = initialState;

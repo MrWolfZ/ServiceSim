@@ -114,6 +114,7 @@
     "@vue/test-utils": "^1.0.0-beta.20",
     "axios-mock-adapter": "^1.15.0",
     "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
     "bulma": "^0.7.1",
     "bulma-checkradio": "^2.1.0",
     "bulma-tooltip": "^2.0.1",
