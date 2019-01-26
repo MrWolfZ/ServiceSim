@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { Action, FormControlState, FormControlValueTypes, isBoxed, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
+import { FormEvent } from 'react';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
@@ -30,7 +31,7 @@ export class Select extends TsxComponent<SelectProps> implements SelectProps {
     return !isBoxed(this.options[key]) && optionsValue !== undefined ? optionsValue : this.options[key];
   }
 
-  private onChange(e: Event) {
+  private onChange(e: FormEvent) {
     const key = (e.target as HTMLSelectElement).value;
     this.onAction(new SetValueAction(this.controlState.id, this.getValue(key)));
 
@@ -47,11 +48,11 @@ export class Select extends TsxComponent<SelectProps> implements SelectProps {
 
   render() {
     return (
-      <div class='select'>
+      <div className='select'>
 
         <select
-          class='is-borderless'
-          onChange={(e: Event) => this.onChange(e)}
+          className='is-borderless'
+          onChange={(e: FormEvent) => this.onChange(e)}
           onBlur={() => this.onBlur()}
           disabled={this.controlState.isDisabled}
         >

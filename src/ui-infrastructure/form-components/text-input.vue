@@ -1,8 +1,10 @@
 <script lang="tsx">
-import { Action, FormControlState, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
+import { Action, FormControlState } from 'pure-forms';
+import ReactDom from 'react-dom';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit } from '../decorators';
 import { TsxComponent } from '../tsx-component';
+import { TextInputReact } from './text-input-react';
 
 export interface TextInputProps {
   placeholder?: string;
@@ -11,7 +13,6 @@ export interface TextInputProps {
   onAction: (action: Action) => any;
 }
 
-// TODO: focus handling
 @Component({})
 export class TextInput extends TsxComponent<TextInputProps> implements TextInputProps {
   @Prop() placeholder: string | undefined;
@@ -21,46 +22,19 @@ export class TextInput extends TsxComponent<TextInputProps> implements TextInput
   @Emit()
   onAction(_: Action) { }
 
-  private onInput(e: Event) {
-    const value = (e.target as HTMLInputElement | HTMLTextAreaElement).value;
-    this.onAction(new SetValueAction(this.controlState.id, value));
-
-    if (this.controlState.isPristine) {
-      this.onAction(new MarkAsDirtyAction(this.controlState.id));
-    }
-  }
-
-  private onBlur() {
-    if (this.controlState.isUntouched) {
-      this.onAction(new MarkAsTouchedAction(this.controlState.id));
-    }
-  }
-
   render() {
-    if (this.rows && this.rows > 1) {
-      return (
-        <textarea
-          class='textarea'
-          rows={this.rows}
-          placeholder={this.placeholder}
-          value={this.controlState.value}
-          onInput={(e: Event) => this.onInput(e)}
-          onBlur={() => this.onBlur()}
-          disabled={this.controlState.isDisabled}
-        />
-      );
-    }
+    return <div />;
+  }
 
-    return (
-      <input
-        class='input'
-        type='text'
+  mounted() {
+    ReactDom.render(
+      <TextInputReact
         placeholder={this.placeholder}
-        value={this.controlState.value}
-        onInput={(e: Event) => this.onInput(e)}
-        onBlur={() => this.onBlur()}
-        disabled={this.controlState.isDisabled}
-      />
+        rows={this.rows}
+        controlState={this.controlState}
+        onAction={a => this.onAction(a)}
+      />,
+      this.$el,
     );
   }
 }

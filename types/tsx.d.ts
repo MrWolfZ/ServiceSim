@@ -15,6 +15,12 @@ declare global {
 declare module 'vue/types/vue' {
   interface Vue {
     vueTsxProps: Readonly<{ ref?: string; id?: string; class?: string; key?: any }>;
+    context: any;
+    setState: any;
+    forceUpdate: any;
+    props: any;
+    state: any;
+    refs: any;
   }
 }
 
