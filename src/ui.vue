@@ -3,7 +3,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { CONFIG } from './config';
 import predicateTemplates from './modules/predicate-template/predicate-template.store';
 import predicateNodes from './modules/predicate-tree/predicate-node.store';
-import Navbar from './ui-infrastructure/navbar.vue';
+import Navbar from './ui-infrastructure/navbar';
 
 @Component({
   components: {

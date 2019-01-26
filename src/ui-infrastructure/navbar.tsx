@@ -1,4 +1,3 @@
-<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component({})
@@ -77,7 +76,3 @@ export default class Navbar extends Vue {
     );
   }
 }
-</script>
-
-<style scoped lang='scss'>
-</style>
