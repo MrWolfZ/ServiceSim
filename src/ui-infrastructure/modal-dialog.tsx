@@ -1,6 +1,6 @@
-<script lang="tsx">
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Emit } from './decorators';
+import './modal-dialog.scss';
 import { TsxComponent } from './tsx-component';
 
 export interface ModalDialogProps {
@@ -29,8 +29,15 @@ export class ModalDialog extends TsxComponent<ModalDialogProps> implements Modal
   }
 
   render() {
+    const style = {
+      display: 'flex',
+      opacity: this.isOpen ? 1 : 0,
+      pointerEvents: this.isOpen ? 'inherit' : 'none',
+      transition: 'all ease 200ms',
+    };
+
     return (
-      <div class={`modal ${this.isOpen ? `is-active` : ``}`}>
+      <div class={`modal ${this.isOpen ? `is-open` : ``}`} style={style}>
         <div class='modal-background' />
 
         <div class='modal-card'>
@@ -61,26 +68,3 @@ export class ModalDialog extends TsxComponent<ModalDialogProps> implements Modal
 }
 
 export default ModalDialog;
-</script>
-
-<style lang="scss">
-@import 'variables';
-
-.modal {
-  display: flex;
-  opacity: 0;
-  pointer-events: none;
-  transition: all ease 200ms;
-
-  &.is-active {
-    opacity: 1;
-    pointer-events: inherit;
-  }
-}
-
-.modal-card-head,
-.modal-card-foot,
-.modal-card-body {
-  background-color: $body-background-color;
-}
-</style>

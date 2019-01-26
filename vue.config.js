@@ -68,6 +68,16 @@ module.exports = {
         return options;
       });
 
+    config.module
+      .rule('scss')
+      .oneOf('normal')
+      .use('sass-loader')
+      .loader('sass-loader')
+      .tap(options => {
+        options.includePaths = ['src/ui-styles'];
+        return options;
+      });
+
     config.plugin('html')
       .tap(args => {
         args[0].template = path.join(__dirname, 'src/index.html');
