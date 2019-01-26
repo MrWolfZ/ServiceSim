@@ -1,6 +1,6 @@
 export * from './form.vue';
 export * from './form-field.vue';
-export * from './number-input.vue';
+export * from './number-input';
 export * from './radio-input.vue';
 export * from './text-input';
 export * from './select.vue';
