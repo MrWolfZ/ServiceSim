@@ -83,7 +83,7 @@ new Vue({
       {
         path: '/predicate-templates/:id',
         name: 'predicate-template',
-        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-template.vue'),
+        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-template'),
       },
       {
         path: '/response-generator-templates',

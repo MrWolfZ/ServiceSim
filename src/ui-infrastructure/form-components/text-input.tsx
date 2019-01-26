@@ -6,12 +6,13 @@ export interface TextInputProps {
   rows?: number;
   controlState: FormControlState<string>;
   isCode?: boolean;
+  styleOverride?: any;
   onAction: (action: Action) => any;
 }
 
 // TODO: focus handling
-const TextInputDef = ({ placeholder, rows, controlState, isCode, onAction }: TextInputProps) => {
-  const style = { border: 0 } as any;
+const TextInputDef = ({ placeholder, rows, controlState, isCode, onAction, styleOverride }: TextInputProps) => {
+  const style = { ...styleOverride, border: 0 };
 
   if (isCode) {
     style.fontFamily = '\'Inconsolata\', \'Consolas\', \'Monaco\', monospace';

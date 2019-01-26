@@ -1,11 +1,10 @@
-<script lang="tsx">
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
 import { Component } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import { Form, TsxComponent } from '../../ui-infrastructure';
-import { validateParameterForm } from '../parameter/parameter-form.vue';
-import PredicateTemplateForm from './predicate-template-form.vue';
+import { validateParameterForm } from '../parameter/parameter-form';
+import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';
 import { PredicateTemplateData, PredicateTemplateFormValue } from './predicate-template.types';
 
@@ -96,9 +95,10 @@ export default class PredicateTemplatePage extends TsxComponent<{}> {
         <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
           <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
 
-          <div class='buttons'>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
             <button
               class='button is-danger is-outlined'
+              style={{ transitionDuration: 0 }}
               type='button'
               onClick={() => this.navigateToList()}
               disabled={this.isSaving}
@@ -108,6 +108,7 @@ export default class PredicateTemplatePage extends TsxComponent<{}> {
 
             <button
               class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
+              style={{ transitionDuration: 0 }}
               onClick={() => this.submitDialog()}
               disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
             >
@@ -120,16 +121,3 @@ export default class PredicateTemplatePage extends TsxComponent<{}> {
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-.buttons {
-  display: flex;
-  justify-content: flex-end;
-  flex: 1;
-}
-
-.button {
-  transition-duration: 0ms;
-}
-</style>
