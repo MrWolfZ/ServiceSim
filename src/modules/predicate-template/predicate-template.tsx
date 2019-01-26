@@ -1,6 +1,6 @@
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
-import { Form, State, stateful, StatefulComponentContext } from '../../ui-infrastructure';
+import { Form, stateful, StatefulComponentContext } from '../../ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';
@@ -40,18 +40,20 @@ const initialState: PredicateTemplatePageState = {
 };
 
 export const PredicateTemplatePageDef = (
-  { isSaving, templateId, formState, patch }: State<PredicateTemplatePageState>,
+  state: PredicateTemplatePageState,
   _: {},
   { router }: StatefulComponentContext,
 ) => {
+  const { templateId, isSaving, formState } = state;
+
   return (
     <div class='page'>
       <h1 class='title'>
         {!templateId ? `Create new predicate template` : `Edit predicate template`}
       </h1>
 
-      <Form formState={formState} onAction={a => patch({ formState: formReducer(formState, a) })}>
-        <PredicateTemplateForm formState={formState} onAction={a => patch({ formState: formReducer(formState, a) })} />
+      <Form formState={formState} onAction={onFormAction}>
+        <PredicateTemplateForm formState={formState} onAction={onFormAction} />
 
         <div class='buttons' style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
           <button
@@ -78,21 +80,21 @@ export const PredicateTemplatePageDef = (
     </div>
   );
 
+  function onFormAction(action: Action) {
+    state.formState = formReducer(state.formState, action);
+  }
+
   async function submitDialog() {
     if (formState.isInvalid) {
       return;
     }
 
-    formState = disable(formState);
+    state.formState = disable(formState);
+    state.isSaving = true;
 
-    patch({ isSaving: true, formState });
+    await createOrUpdateTemplate(formState.value, templateId || undefined);
 
-    await createOrUpdateTemplate({
-      ...formState.value,
-      parameters: formState.value.parameters.map(p => ({ ...p })),
-    }, templateId || undefined);
-
-    patch({ isSaving: false });
+    state.isSaving = false;
 
     navigateToList();
   }
@@ -106,21 +108,19 @@ export const PredicateTemplatePageDef = (
   }
 
   function navigateToList() {
-    router.push('/predicate-templates');
+    router.push({ name: 'predicate-templates' });
   }
 };
 
-function initialize({ isSaving, formState, patch }: State<PredicateTemplatePageState>, templateId: string | null | undefined) {
-  templateId = templateId && templateId !== 'new' ? templateId : null;
-  isSaving = false;
-  formState = createFormState();
+function initialize(state: PredicateTemplatePageState, templateId: string | null | undefined) {
+  state.templateId = templateId = templateId && templateId !== 'new' ? templateId : null;
+  state.isSaving = false;
+  state.formState = createFormState();
 
   if (templateId) {
     const { id, version, ...rest } = predicateTemplates.state.templatesById[templateId];
-    formState = createFormState(rest);
+    state.formState = createFormState(rest);
   }
-
-  patch({ isSaving, formState });
 }
 
 export const PredicateTemplatePage = stateful(PredicateTemplatePageDef, initialState, {

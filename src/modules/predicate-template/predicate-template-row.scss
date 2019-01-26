@@ -1,0 +1,15 @@
+@import 'variables';
+@import '~bulma/sass/utilities/mixins';
+
+@include from($desktop) {
+  .predicate-template-row {
+    .buttons {
+      opacity: 0;
+      transition: opacity ease 200ms;
+    }
+
+    &:hover .buttons {
+      opacity: 1;
+    }
+  }
+}

@@ -1,14 +1,15 @@
 import { CommandValidationConstraints } from '../../../api-infrastructure';
-import { omit } from '../../../util';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { UpdatePredicateNodeCommand } from '../predicate-node.types';
 
 export async function updatePredicateNode(command: UpdatePredicateNodeCommand) {
+  const { nodeId, unmodifiedNodeVersion, parameterValuesOrEvalFunctionBody, ...data } = command;
+
   const newVersion = await predicateNodeRepo.patch(
     command.nodeId,
     command.unmodifiedNodeVersion,
     {
-      ...omit(command, 'nodeId', 'unmodifiedNodeVersion', 'parameterValuesOrEvalFunctionBody'),
+      ...data,
       templateInfoOrEvalFunctionBody:
         typeof command.parameterValuesOrEvalFunctionBody === 'string'
           ? command.parameterValuesOrEvalFunctionBody

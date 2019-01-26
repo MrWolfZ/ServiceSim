@@ -1,5 +1,5 @@
 import { eventDrivenRepository } from '../../api-infrastructure';
-import { failure, omit } from '../../util';
+import { failure } from '../../util';
 import {
   CreateServiceInvocationCommand,
   ServiceInvocationAggregate,
@@ -49,16 +49,13 @@ export async function setServiceInvocationResponse(command: SetServiceResponseCo
     throw failure(`Cannot set response for service invocation ${invocation.id} since it already has a response!`);
   }
 
+  const { invocationId, unmodifiedInvocationVersion, ...eventData } = command;
+
   const newVersion = await repo.patch(
     command.invocationId,
     command.unmodifiedInvocationVersion,
     {},
-    repo.createDomainEvent(
-      'InvocationResponseWasSet',
-      {
-        ...omit(command, 'invocationId', 'unmodifiedInvocationVersion'),
-      },
-    ),
+    repo.createDomainEvent('InvocationResponseWasSet', eventData),
   );
 
   return {

@@ -52,16 +52,14 @@ export interface StatefulComponentContext extends PureComponentContext {
   router: VueRouter;
 }
 
-export type State<TState> = TState & { patch: (p: Partial<TState>) => void };
-
 export interface LifecycleHooks<TState> {
-  created?(state: State<TState>, context: StatefulComponentContext): void;
-  mounted?(state: State<TState>, context: StatefulComponentContext): void;
-  beforeRouteUpdate?(state: State<TState>, to: Route, from: Route, next: () => void, context: StatefulComponentContext): void;
+  created?(state: TState, context: StatefulComponentContext): void;
+  mounted?(state: TState, context: StatefulComponentContext): void;
+  beforeRouteUpdate?(state: TState, to: Route, from: Route, next: () => void, context: StatefulComponentContext): void;
 }
 
 export function stateful<TState, TProps = {}>(
-  def: (state: State<TState>, props: TProps, context: StatefulComponentContext) => JSX.Element,
+  def: (state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element,
   initialState: TState,
   lifecycleHooks: LifecycleHooks<TState> = {},
 ) {
@@ -69,11 +67,6 @@ export function stateful<TState, TProps = {}>(
   return Component({})(
     class extends TsxComponent<TProps> {
       private state: TState = initialState;
-
-      get patchableState(): State<TState> {
-        // tslint:disable-next-line:prefer-object-spread
-        return { ...this.state, patch: p => Object.assign(this.state, p) };
-      }
 
       get context(): StatefulComponentContext {
         return {
@@ -89,15 +82,15 @@ export function stateful<TState, TProps = {}>(
       }
 
       created() {
-        lifecycleHooks.created && lifecycleHooks.created(this.patchableState, this.context);
+        lifecycleHooks.created && lifecycleHooks.created(this.state, this.context);
       }
 
       mounted() {
-        lifecycleHooks.mounted && lifecycleHooks.mounted(this.patchableState, this.context);
+        lifecycleHooks.mounted && lifecycleHooks.mounted(this.state, this.context);
       }
 
       beforeRouteUpdate(to: Route, from: Route, next: () => void) {
-        lifecycleHooks.beforeRouteUpdate && lifecycleHooks.beforeRouteUpdate(this.patchableState, to, from, next, this.context);
+        lifecycleHooks.beforeRouteUpdate && lifecycleHooks.beforeRouteUpdate(this.state, to, from, next, this.context);
       }
 
       render(h: CreateElement) {
@@ -116,11 +109,11 @@ export function stateful<TState, TProps = {}>(
         });
 
         const render = options.render!.bind(undefined) as
-          any as (h: CreateElement, state: State<TState>, props: TProps, context: StatefulComponentContext) => JSX.Element;
+          any as (h: CreateElement, state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element;
 
         const props = { ...this.$props, ...eventHandlers } as any;
 
-        return render(h, this.patchableState, props, this.context);
+        return render(h, this.state, props, this.context);
       }
     }
   );

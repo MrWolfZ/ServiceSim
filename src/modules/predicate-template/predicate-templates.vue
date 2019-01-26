@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
-import PredicateTemplateRow from './predicate-template-row.vue';
+import { PredicateTemplateRow } from './predicate-template-row';
 import predicateTemplates from './predicate-template.store';
 
 @Component({})
