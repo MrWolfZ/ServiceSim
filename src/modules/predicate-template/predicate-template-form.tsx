@@ -63,7 +63,7 @@ const PredicateTemplateFormDef = ({ formState, onAction }: PredicateTemplateForm
               formState.controls.parameters.controls.map((form, idx) =>
                 <ParameterForm
                   key={idx}
-                  class='tile is-12 is-child box parameter'
+                  className='tile is-12 is-child box parameter'
                   formState={form}
                   onAction={onAction}
                   onRemove={() => removeParameter(idx)}
@@ -71,24 +71,23 @@ const PredicateTemplateFormDef = ({ formState, onAction }: PredicateTemplateForm
               )
             }
 
-            <div class='tile is-12 is-child'>
-              <button
-                class='button is-primary'
-                type='button'
-                onClick={addParameter}
-                disabled={formState.controls.parameters.isDisabled}
-              >
-                <span>Add Parameter</span>
-                <span class='icon is-small'>
-                  <fa-icon icon='plus' />
-                </span>
-              </button>
-            </div>
-
           </div>
         </div>
 
       </ExpansionContainer>
+
+      <button
+        class='button is-primary'
+        style={{ marginTop: '1.5rem' }}
+        type='button'
+        onClick={addParameter}
+        disabled={formState.controls.parameters.isDisabled}
+      >
+        <span>Add Parameter</span>
+        <span class='icon is-small'>
+          <fa-icon icon='plus' />
+        </span>
+      </button>
 
     </div>
   );

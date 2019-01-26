@@ -5,6 +5,7 @@ import { ParameterFormValue } from './parameter.types';
 
 export interface ParameterFormProps {
   formState: FormGroupState<ParameterFormValue>;
+  className?: string;
   onAction: (action: Action) => any;
   onRemove: () => any;
 }
@@ -29,9 +30,9 @@ export const validateParameterForm = updateGroup<ParameterFormValue>({
   },
 });
 
-const ParameterFormDef = ({ formState, onAction, onRemove }: ParameterFormProps) => {
+const ParameterFormDef = ({ formState, className, onAction, onRemove }: ParameterFormProps) => {
   return (
-    <div>
+    <div class={className}>
 
       <FormField
         label='Parameter Name'

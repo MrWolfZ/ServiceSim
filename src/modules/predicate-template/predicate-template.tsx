@@ -1,8 +1,6 @@
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
-import { Component } from 'vue-property-decorator';
-import { Route } from 'vue-router';
-import { Form, TsxComponent } from '../../ui-infrastructure';
+import { Form, State, stateful, StatefulComponentContext } from '../../ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';
@@ -29,51 +27,77 @@ function formReducer(state: FormGroupState<PredicateTemplateFormValue>, action: 
   return Object.freeze(validatePredicateTemplateForm(formStateReducer(state, action)));
 }
 
-@Component({})
-export default class PredicateTemplatePage extends TsxComponent<{}> {
-  private isSaving = false;
-  private templateId: string | null = null;
+interface PredicateTemplatePageState {
+  isSaving: boolean;
+  templateId: string | null;
+  formState: FormGroupState<PredicateTemplateFormValue>;
+}
 
-  private formState = createFormState();
+const initialState: PredicateTemplatePageState = {
+  isSaving: false,
+  templateId: null,
+  formState: createFormState(),
+};
 
-  mounted() {
-    this.initialize(this.$route.params.id);
-  }
+export const PredicateTemplatePageDef = (
+  { isSaving, templateId, formState, patch }: State<PredicateTemplatePageState>,
+  _: {},
+  { router }: StatefulComponentContext,
+) => {
+  return (
+    <div class='page'>
+      <h1 class='title'>
+        {!templateId ? `Create new predicate template` : `Edit predicate template`}
+      </h1>
 
-  beforeRouteUpdate(to: Route, _: Route, next: () => void) {
-    this.initialize(to.params.id);
-    next();
-  }
+      <Form formState={formState} onAction={a => patch({ formState: formReducer(formState, a) })}>
+        <PredicateTemplateForm formState={formState} onAction={a => patch({ formState: formReducer(formState, a) })} />
 
-  initialize(templateId: string | null | undefined) {
-    this.templateId = templateId && templateId !== 'new' ? templateId : null;
-    this.isSaving = false;
-    this.formState = createFormState();
+        <div class='buttons' style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
+          <button
+            class='button is-danger is-outlined'
+            style={{ transitionDuration: 0 }}
+            type='button'
+            onClick={navigateToList}
+            disabled={isSaving}
+          >
+            Cancel
+          </button>
 
-    if (this.templateId) {
-      const { id, version, ...rest } = predicateTemplates.state.templatesById[this.templateId];
-      this.formState = createFormState(rest);
-    }
-  }
+          <button
+            class={`button is-success ${isSaving ? 'is-loading' : ''}`}
+            style={{ transitionDuration: 0 }}
+            onClick={submitDialog}
+            disabled={isSaving || (formState.isInvalid && formState.isSubmitted)}
+          >
+            Save
+          </button>
+        </div>
+      </Form>
 
-  private async submitDialog() {
-    if (this.formState.isInvalid) {
+    </div>
+  );
+
+  async function submitDialog() {
+    if (formState.isInvalid) {
       return;
     }
 
-    this.isSaving = true;
-    this.formState = disable(this.formState);
+    formState = disable(formState);
 
-    await this.createOrUpdateTemplate({
-      ...this.formState.value,
-      parameters: this.formState.value.parameters.map(p => ({ ...p })),
-    }, this.templateId || undefined);
+    patch({ isSaving: true, formState });
 
-    this.isSaving = false;
-    this.navigateToList();
+    await createOrUpdateTemplate({
+      ...formState.value,
+      parameters: formState.value.parameters.map(p => ({ ...p })),
+    }, templateId || undefined);
+
+    patch({ isSaving: false });
+
+    navigateToList();
   }
 
-  private async createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
+  async function createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
     if (!id) {
       await predicateTemplates.createAsync(data);
     } else {
@@ -81,43 +105,31 @@ export default class PredicateTemplatePage extends TsxComponent<{}> {
     }
   }
 
-  private navigateToList() {
-    this.$router.push('/predicate-templates');
+  function navigateToList() {
+    router.push('/predicate-templates');
+  }
+};
+
+function initialize({ isSaving, formState, patch }: State<PredicateTemplatePageState>, templateId: string | null | undefined) {
+  templateId = templateId && templateId !== 'new' ? templateId : null;
+  isSaving = false;
+  formState = createFormState();
+
+  if (templateId) {
+    const { id, version, ...rest } = predicateTemplates.state.templatesById[templateId];
+    formState = createFormState(rest);
   }
 
-  render() {
-    return (
-      <div class='page'>
-        <h1 class='title'>
-          {!this.templateId ? `Create new predicate template` : `Edit predicate template`}
-        </h1>
-
-        <Form formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)}>
-          <PredicateTemplateForm formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
-            <button
-              class='button is-danger is-outlined'
-              style={{ transitionDuration: 0 }}
-              type='button'
-              onClick={() => this.navigateToList()}
-              disabled={this.isSaving}
-            >
-              Cancel
-            </button>
-
-            <button
-              class={`button is-success ${this.isSaving ? 'is-loading' : ''}`}
-              style={{ transitionDuration: 0 }}
-              onClick={() => this.submitDialog()}
-              disabled={this.isSaving || (this.formState.isInvalid && this.formState.isSubmitted)}
-            >
-              Save
-            </button>
-          </div>
-        </Form>
-
-      </div>
-    );
-  }
+  patch({ isSaving, formState });
 }
+
+export const PredicateTemplatePage = stateful(PredicateTemplatePageDef, initialState, {
+  mounted: (state, { route }) => initialize(state, route.params.id),
+
+  beforeRouteUpdate: (state, to, _, next) => {
+    initialize(state, to.params.id);
+    next();
+  },
+});
+
+export default PredicateTemplatePage;

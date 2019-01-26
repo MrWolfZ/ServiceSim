@@ -1,7 +1,6 @@
 import { FormControlState } from 'pure-forms';
-import { RenderContext } from 'vue';
 import { ExpansionContainer } from '../expansion-container';
-import { pure } from '../tsx';
+import { pure, PureComponentContext } from '../tsx';
 
 export interface FormFieldProps {
   label?: string;
@@ -14,7 +13,7 @@ export interface FormFieldProps {
 
 const FormFieldDef = (
   { label, tooltip, tooltipIcon, controlState, errorMessageFactory, errorMessages }: FormFieldProps,
-  context: RenderContext<FormFieldProps>,
+  { slots }: PureComponentContext,
 ) => {
   const errorNames = Object.keys(controlState.errors);
   const errorsAreShown = controlState.isInvalid && (controlState.isSubmitted || controlState.isTouched);
@@ -35,7 +34,7 @@ const FormFieldDef = (
       }
 
       <div class='control'>
-        {context.slots().default}
+        {slots.default}
         <ExpansionContainer isExpanded={errorsAreShown}>
           {
             errorNames.map(name =>

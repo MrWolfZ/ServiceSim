@@ -1,16 +1,15 @@
 import { Action, FormGroupState, MarkAsSubmittedAction } from 'pure-forms';
-import { RenderContext } from 'vue';
-import { pure } from '../tsx';
+import { pure, PureComponentContext } from '../tsx';
 
 export interface FormProps {
   formState: FormGroupState<any>;
   onAction: (action: Action) => any;
 }
 
-const FormDef = ({ formState, onAction }: FormProps, context: RenderContext<FormProps>) => {
+const FormDef = ({ formState, onAction }: FormProps, { slots }: PureComponentContext) => {
   return (
     <form novalidate='novalidate' onSubmit={onSubmit}>
-      {context.slots().default}
+      {slots.default}
     </form>
   );
 
