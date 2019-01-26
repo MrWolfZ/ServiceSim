@@ -1,5 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import smoothReflow from 'vue-smooth-reflow';
+import './expansion-container.scss';
 import { TsxComponent } from './tsx-component';
 
 @Component({

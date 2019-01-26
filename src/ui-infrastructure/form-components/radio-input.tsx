@@ -1,5 +1,6 @@
 import { Action, FormControlState, FormControlValueTypes, isBoxed, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
 import { pure } from '../tsx';
+import './radio-input.scss';
 
 export interface RadioInputProps {
   options: { [key: string]: { label?: string; value: FormControlValueTypes } | FormControlValueTypes };
