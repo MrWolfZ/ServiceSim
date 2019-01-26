@@ -105,6 +105,8 @@
     "@types/supertest": "^2.0.4",
     "@types/uuid": "^3.4.3",
     "@types/winston": "^2.3.9",
+    "@vue/babel-helper-vue-jsx-merge-props": "^1.0.0-beta.2",
+    "@vue/babel-preset-jsx": "^1.0.0-beta.2",
     "@vue/cli-plugin-babel": "^3.2.0",
     "@vue/cli-plugin-typescript": "^3.2.0",
     "@vue/cli-plugin-unit-jest": "^3.2.0",
