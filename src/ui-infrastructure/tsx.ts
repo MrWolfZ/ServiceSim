@@ -4,7 +4,7 @@ import { keys } from '../util';
 import { TsxComponent } from './tsx-component';
 
 // partly inspired by https://codeburst.io/save-the-zombies-how-to-add-state-and-lifecycle-methods-to-stateless-react-components-1a996513866d
-export function pure<TProps>(def: (props: TProps) => JSX.Element) {
+export function pure<TProps>(def: (props: TProps, context: RenderContext<TProps>) => JSX.Element) {
   const name = (def.name || 'Component').replace(/Def$/g, '');
   return Component({ functional: true } as any as ComponentOptions<TsxComponent<TProps>>)(
     class extends TsxComponent<TProps> {
@@ -28,8 +28,9 @@ export function pure<TProps>(def: (props: TProps) => JSX.Element) {
           eventHandlers[normalizedName] = handler;
         });
 
+        const render = options.render!.bind(undefined) as any;
         const props = { ...context.props, ...eventHandlers } as any;
-        return options.render!.bind(undefined)(h, props);
+        return render(h, props, context);
       }
     }
   );

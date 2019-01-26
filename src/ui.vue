@@ -107,4 +107,22 @@ body {
     height: 24px;
   }
 }
+
+.expansion-container {
+  overflow: hidden;
+  transition: opacity 200ms ease;
+
+  &.is-collapsed {
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  &.is-expanded {
+    opacity: 1;
+  }
+}
 </style>
