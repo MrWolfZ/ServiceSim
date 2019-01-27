@@ -10,9 +10,10 @@ variables:
   buildEnvImageName: 'service-sim:build'
 
 steps:
-- script: |
-    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker pull $(docker.registry.url)/$(buildEnvImageName) || true
+- script: docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
+  displayName: 'docker login'
+
+- script: docker pull $(docker.registry.url)/$(buildEnvImageName) || true
   displayName: 'docker pull build'
 
 - script: >
@@ -23,14 +24,10 @@ steps:
     .
   displayName: 'docker build build'
 
-- script: |
-    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker push $(docker.registry.url)/$(buildEnvImageName)
+- script: docker push $(docker.registry.url)/$(buildEnvImageName)
   displayName: 'docker publish build'
 
-- script: |
-    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker pull $(docker.registry.url)/$(latestImageName) || true
+- script: docker pull $(docker.registry.url)/$(latestImageName) || true
   displayName: 'docker pull latest dist'
 
 - script: >
@@ -43,7 +40,6 @@ steps:
   displayName: 'docker build dist'
 
 - script: |
-    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker push $(docker.registry.url)/$(imageName)
     docker push $(docker.registry.url)/$(latestImageName)
   displayName: 'docker publish dist'
