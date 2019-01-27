@@ -1,17 +1,13 @@
-<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
-import PredicateNodeDetails from './predicate-node-details.vue';
-import PredicateNodeDialog from './predicate-node-dialog.vue';
+import { PredicateNodeView } from './predicate-node';
+import { PredicateNodeDetails } from './predicate-node-details';
+import { PredicateNodeDialog } from './predicate-node-dialog';
 import predicateNodes from './predicate-node.store';
-import PredicateNodeView from './predicate-node.vue';
+import './predicate-tree.scss';
 
 @Component({})
 export default class PredicateTreePage extends Vue {
   private selectedNodeId: string | undefined = this.topLevelNodeIds[0];
-
-  async created() {
-    await predicateNodes.loadAllAsync();
-  }
 
   private dialog() {
     return this.$refs[this.dialog.name] as PredicateNodeDialog;
@@ -47,7 +43,7 @@ export default class PredicateTreePage extends Vue {
 
   render() {
     return (
-      <div class='page'>
+      <div class='page predicate-tree-page'>
         <div class='columns'>
           <div class='column is-12-tablet is-6-desktop is-8-widescreen tree-column'>
             <h1 class='title'>
@@ -110,55 +106,3 @@ export default class PredicateTreePage extends Vue {
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-@import 'variables';
-@import '~bulma/sass/utilities/mixins';
-
-.page {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.columns {
-  height: 100%;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.column {
-  height: 100%;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  transition: all ease 200ms;
-
-  &.tree-column {
-    display: flex;
-    flex-direction: column;
-  }
-
-  @include until($desktop) {
-    &.details-column {
-      width: 0%;
-      padding: 0;
-      overflow: hidden;
-    }
-  }
-}
-
-.nodes {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 1rem;
-}
-
-.node:last-child >>> .box {
-  margin-bottom: 0;
-}
-
-.node-details {
-  display: block;
-  min-width: 400px;
-}
-</style>

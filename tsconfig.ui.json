@@ -21,7 +21,7 @@
     ]
   },
   "files": [
-    "src/ui.ts"
+    "src/ui-main.ts"
   ],
   "include": [
     "src/**/*.vue",

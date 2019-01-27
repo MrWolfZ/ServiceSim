@@ -1,4 +1,3 @@
-<script lang="tsx">
 import { Action, FormControlState, FormGroupState } from 'pure-forms';
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit, FormField, NumberInput, RadioInput, TextInput, TsxComponent } from '../../ui-infrastructure';
@@ -12,7 +11,7 @@ export interface PredicateNodeFormProps {
 }
 
 @Component({})
-export default class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> implements PredicateNodeFormProps {
+export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> implements PredicateNodeFormProps {
   @Prop() formState: FormGroupState<PredicateNodeFormValue>;
   @Prop() parameters: Parameter[] | undefined;
 
@@ -50,7 +49,7 @@ export default class PredicateNodeForm extends TsxComponent<PredicateNodeFormPro
         >
           <TextInput
             placeholder='Name'
-            class='name-input'
+            styleOverride={{ fontSize: '120%', fontWeight: 'bold' }}
             controlState={this.formState.controls.name}
             onAction={a => this.onAction(a)}
           />
@@ -131,11 +130,3 @@ export default class PredicateNodeForm extends TsxComponent<PredicateNodeFormPro
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-.name-input {
-  font-size: 120%;
-  font-weight: bold;
-}
-</style>

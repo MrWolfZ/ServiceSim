@@ -1,6 +1,5 @@
-<script lang="tsx">
 import { Component, Prop } from 'vue-property-decorator';
-import { Emit, TsxComponent } from '../../ui-infrastructure';
+import { Emit, PrimaryButton, TsxComponent } from '../../ui-infrastructure';
 import predicateNodes from './predicate-node.store';
 
 export interface PredicateNodeDetailsProps {
@@ -15,7 +14,7 @@ export interface PredicateNodeDetailsProps {
 }
 
 @Component({})
-export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDetailsProps> implements PredicateNodeDetailsProps {
+export class PredicateNodeDetails extends TsxComponent<PredicateNodeDetailsProps> implements PredicateNodeDetailsProps {
   @Prop() nodeId: string;
 
   @Emit()
@@ -84,8 +83,14 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
   }
 
   render() {
+    // TODO: fix scrolling
+    // >.box {
+    //   overflow-y: auto;
+    //   overflow-x: hidden;
+    // }
+
     return (
-      <div class='node-details'>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <h1 class='title'>
           Predicate Node
         </h1>
@@ -158,10 +163,16 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
               }
 
               {
-                this.parameterNames.map(name =>
-                  <div key={name} class='parameter'>
+                this.parameterNames.map((name, idx) =>
+                  <div
+                    key={name}
+                    style={{
+                      display: 'flex',
+                      marginBottom: idx === this.parameterNames.length - 1 ? '0.75rem' : 0,
+                    }}
+                  >
 
-                    <label class='label'>
+                    <label class='label' style={{ marginBottom: 0, marginRight: '0.25rem' }}>
                       {name}:
                     </label>
 
@@ -213,16 +224,12 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
                 )
               }
 
-              <button
-                class='button is-primary'
-                type='button'
+              <PrimaryButton
+                label='Add Child Node'
+                icon='plus'
                 onClick={() => this.onAddChildNode()}
-              >
-                <span>Add Child Node</span>
-                <span class='icon is-small'>
-                  <fa-icon icon='plus' />
-                </span>
-              </button>
+                styleOverride={this.childNodeIds.length > 0 ? { marginTop: '1em' } : {}}
+              />
 
             </div>
           }
@@ -329,10 +336,16 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
                 }
 
                 {
-                  this.responseGeneratorParameterNames.map(name =>
-                    <div key={name} class='parameter'>
+                  this.responseGeneratorParameterNames.map((name, idx) =>
+                    <div
+                      key={name}
+                      style={{
+                        display: 'flex',
+                        marginBottom: idx === this.responseGeneratorParameterNames.length - 1 ? '0.75rem' : 0,
+                      }}
+                    >
 
-                      <label class='label'>
+                      <label class='label' style={{ marginBottom: 0, marginRight: '0.25rem' }}>
                         {name}:
                       </label>
 
@@ -365,47 +378,3 @@ export default class PredicateNodeDetails extends TsxComponent<PredicateNodeDeta
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-@import 'variables';
-
-.node-details {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  // TODO: fix scrolling
-  // >.box {
-  //   overflow-y: auto;
-  //   overflow-x: hidden;
-  // }
-}
-
-.group {
-  &:not(:last-child) {
-    margin-bottom: 1rem;
-  }
-}
-
-.parameter {
-  display: flex;
-
-  + .button {
-    margin-top: 1em;
-  }
-}
-
-.child-node + .button {
-  margin-top: 1em;
-}
-
-.label {
-  margin-bottom: 0;
-  margin-right: 0.25rem;
-}
-
-.button {
-  transition: none;
-}
-</style>

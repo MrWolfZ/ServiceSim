@@ -1,10 +1,9 @@
-<script lang="tsx">
 import { Action, createFormGroupState, FormGroupState, formStateReducer, updateGroup, validate } from 'pure-forms';
 import { minLength, required } from 'pure-forms/validation';
 import { Component } from 'vue-property-decorator';
-import { Emit, Form, ModalDialog, TsxComponent } from '../../ui-infrastructure';
+import { CancelButton, Emit, Form, ModalDialog, SaveButton, TsxComponent } from '../../ui-infrastructure';
 import { Parameter } from '../parameter/parameter.types';
-import PredicateNodeForm from './predicate-node-form.vue';
+import { PredicateNodeForm } from './predicate-node-form';
 import { PredicateNodeFormValue, PredicateNodeState } from './predicate-node.types';
 
 export interface PredicateNodeDialogProps {
@@ -32,7 +31,7 @@ function formReducer(state: FormGroupState<PredicateNodeFormValue>, action: Acti
 }
 
 @Component({})
-export default class PredicateNodeDialog extends TsxComponent<PredicateNodeDialogProps> implements PredicateNodeDialogProps {
+export class PredicateNodeDialog extends TsxComponent<PredicateNodeDialogProps> implements PredicateNodeDialogProps {
   private dialogIsOpen = false;
   private nodeId: string | undefined = undefined;
   private parameters: Parameter[] | undefined = undefined;
@@ -106,21 +105,15 @@ export default class PredicateNodeDialog extends TsxComponent<PredicateNodeDialo
 
           <PredicateNodeForm parameters={this.parameters} formState={this.formState} onAction={a => this.formState = formReducer(this.formState, a)} />
 
-          <div slot='footer' class='buttons'>
-            <button
-              class='button is-danger is-outlined'
-              type='button'
+          <div slot='footer' class='buttons' style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
+            <CancelButton
               onClick={() => this.cancelDialog()}
-            >
-              Cancel
-            </button>
-            <button
-              class='button is-success'
+            />
+
+            <SaveButton
               onClick={() => this.submitDialog()}
-              disabled={this.formState.isInvalid && this.formState.isSubmitted}
-            >
-              Save
-            </button>
+              isDisabled={this.formState.isInvalid && this.formState.isSubmitted}
+            />
           </div>
 
         </ModalDialog>
@@ -128,16 +121,3 @@ export default class PredicateNodeDialog extends TsxComponent<PredicateNodeDialo
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-.buttons {
-  display: flex;
-  justify-content: flex-end;
-  flex: 1;
-}
-
-.button {
-  transition-duration: 0ms;
-}
-</style>

@@ -20,7 +20,7 @@ import { CONFIG } from './config';
 import './modules/errors/errors.store';
 import './modules/predicate-template/predicate-template.store';
 import './modules/predicate-tree/predicate-node.store';
-import App from './ui.vue';
+import { App } from './ui';
 
 import 'core-js/fn/array/flat-map';
 
@@ -73,7 +73,7 @@ new Vue({
       {
         path: '/predicate-tree',
         name: 'predicate-tree',
-        component: () => import(/* webpackChunkName: "predicate-tree" */ './modules/predicate-tree/predicate-tree.vue'),
+        component: () => import(/* webpackChunkName: "predicate-tree" */ './modules/predicate-tree/predicate-tree'),
       },
       {
         path: '/predicate-templates',

@@ -1,6 +1,6 @@
-<script lang="tsx">
 import { Component, Prop } from 'vue-property-decorator';
 import { Emit, ExpansionContainer, TsxComponent } from '../../ui-infrastructure';
+import './predicate-node.scss';
 import predicateNodes from './predicate-node.store';
 
 export interface PredicateNodeViewProps {
@@ -10,7 +10,7 @@ export interface PredicateNodeViewProps {
 }
 
 @Component({})
-export default class PredicateNodeView extends TsxComponent<PredicateNodeViewProps> implements PredicateNodeViewProps {
+export class PredicateNodeView extends TsxComponent<PredicateNodeViewProps> implements PredicateNodeViewProps {
   @Prop() nodeId: string;
   @Prop() selectedNodeId: string;
 
@@ -51,12 +51,26 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
 
   render() {
     return (
-      <div class='node'>
-        <div class={`box ${this.nodeId === this.selectedNodeId ? `is-selected` : ``}`} onClick={() => this.onSelect(this.node.id)}>
+      // isDisabled => opacity: 0.3
+      <div class='node' style={{}}>
+        <div
+          class={`box ${this.nodeId === this.selectedNodeId ? `is-selected` : ``}`}
+          onClick={() => this.onSelect(this.node.id)}
+          style={{
+            padding: '0.75rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative',
+            border: '0.125rem solid transparent',
+            transition: 'border-color ease 200ms',
+            margin: 0,
+          }}
+        >
 
-          <div class='predicate'>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
 
-            <div class='name-spacer'>
+            <div style={{ display: 'flex', alignItems: 'center', minWidth: '120px', marginRight: '2em' }}>
               <div
                 class={`icon expansion-toggle-trigger ${this.childNodeIds.length === 0 ? `is-disabled` : ``} ${this.isExpanded ? `is-expanded` : ``}`}
                 onClick={(e: Event) => { this.isExpanded = !this.isExpanded; e.stopPropagation(); }}
@@ -88,9 +102,9 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
           </div>
 
           {this.responseGenerator &&
-            <div class='response-generator'>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
 
-              <div class='name-spacer'>
+              <div style={{ display: 'flex', alignItems: 'center', minWidth: '120px', marginRight: '2em' }}>
                 <div class='icon'>
                   <fa-icon icon='arrow-left' />
                 </div>
@@ -142,107 +156,3 @@ export default class PredicateNodeView extends TsxComponent<PredicateNodeViewPro
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-@import 'variables';
-
-.node {
-  display: block;
-
-  &.is-disabled {
-    opacity: 0.3;
-  }
-
-  + .node {
-    margin-top: 1.5rem;
-  }
-}
-
-.box {
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  border: 0.125rem solid transparent;
-  transition: border-color ease 200ms;
-  margin: 0;
-
-  &.is-selected {
-    border-color: rgba($link, 0.5);
-  }
-}
-
-.predicate,
-.response-generator {
-  display: flex;
-  align-items: center;
-}
-
-.name-spacer {
-  display: flex;
-  align-items: center;
-  min-width: 120px;
-  margin-right: 2em;
-}
-
-.description {
-  margin-right: 2em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.name {
-  white-space: nowrap;
-  margin-left: 0.2em;
-}
-
-.parameter-preview {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  > .parameter {
-    margin-right: 1em;
-
-    > .label {
-      display: inline-block;
-      margin-bottom: 0;
-      margin-right: 0.25rem;
-    }
-  }
-}
-
-.child-nodes {
-  padding-left: 2.5em;
-  border-left: 1px solid $grey-dark;
-
-  > .node:first-child {
-    margin-top: 1.5rem;
-  }
-}
-
-.expansion-toggle-trigger {
-  cursor: pointer;
-
-  &.is-expanded > .expansion-toggle-icon {
-    transform: rotate(90deg);
-  }
-
-  &.is-disabled {
-    cursor: inherit;
-
-    > .expansion-toggle-icon {
-      opacity: 0;
-    }
-  }
-}
-
-.expansion-toggle-icon {
-  user-select: none;
-  transition: transform ease 200ms;
-}
-</style>

@@ -1,0 +1,48 @@
+@import 'variables';
+@import '~bulma/sass/utilities/mixins';
+
+.predicate-tree-page {
+  padding-top: 0;
+  padding-bottom: 0;
+
+  .columns {
+    height: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .column {
+    height: 100%;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    transition: all ease 200ms;
+
+    &.tree-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @include until($desktop) {
+      &.details-column {
+        width: 0%;
+        padding: 0;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .nodes {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 1rem;
+  }
+
+  .node:last-child >>> .box {
+    margin-bottom: 0;
+  }
+
+  .node-details {
+    display: block;
+    min-width: 400px;
+  }
+}

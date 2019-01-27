@@ -5,7 +5,7 @@ module.exports = {
   outputDir: 'dist/ui',
   configureWebpack: {
     entry: {
-      app: './src/ui.ts'
+      app: './src/ui-main.ts'
     },
     performance: {
       maxEntrypointSize: 512000,
