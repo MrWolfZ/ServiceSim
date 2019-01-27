@@ -7,26 +7,26 @@ pool:
 variables:
   imageName: 'service-sim:$(build.buildNumber)'
   latestImageName: 'service-sim:$(build.buildNumber)'
-  buildEnvImageName: 'service-sim:build-env'
+  buildEnvImageName: 'service-sim:build'
 
 steps:
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker pull $(docker.registry.url)/$(buildEnvImageName) || true
-  displayName: 'docker pull build-env'
+  displayName: 'docker pull build'
 
 - script: >
     docker build
-    --target build-env
+    --target build
     -t $(docker.registry.url)/$(buildEnvImageName)
     --cache-from $(docker.registry.url)/$(buildEnvImageName)
     .
-  displayName: 'docker build build-env'
+  displayName: 'docker build build'
 
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker push $(docker.registry.url)/$(buildEnvImageName)
-  displayName: 'docker publish build-env'
+  displayName: 'docker publish build'
 
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
