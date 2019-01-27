@@ -6,21 +6,32 @@ pool:
 
 variables:
   imageName: 'service-sim:$(build.buildNumber)'
+  latestImageName: 'service-sim:$(build.buildNumber)'
+  buildEnvImageName: 'service-sim:build-env'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '8.x'
-  displayName: 'Install Node.js'
-
-- script: npm install
-  displayName: 'npm install'
-
-- script: npm run build-full
-  displayName: 'npm run build-full'
+- script: |
+    docker pull $(docker.registry.url)/$(buildEnvImageName)
+    >
+    docker build
+    --target build-env
+    -t $(docker.registry.url)/$(buildEnvImageName)
+    --cache-from $(docker.registry.url)/$(buildEnvImageName) .
+  displayName: 'docker build build-env'
 
 - script: |
-    docker build -t $(docker.registry.url)/$(imageName) .
+    docker pull $(docker.registry.url)/$(latestImageName)
+    >
+    docker build
+    -t $(docker.registry.url)/$(imageName)
+    -t $(docker.registry.url)/$(latestImageName)
+    --cache-from $(docker.registry.url)/$(buildEnvImageName)
+    --cache-from $(docker.registry.url)/$(latestImageName) .
+  displayName: 'docker build'
+
+- script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker push $(docker.registry.url)/$(imageName)
-  displayName: 'build & publish docker image'
+    docker push $(docker.registry.url)/$(latestImageName)
+    docker push $(docker.registry.url)/$(buildEnvImageName)
+  displayName: 'docker publish'
