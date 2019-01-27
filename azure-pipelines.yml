@@ -31,7 +31,7 @@ steps:
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker pull $(docker.registry.url)/$(latestImageName) || true
-  displayName: 'docker pull latest'
+  displayName: 'docker pull latest dist'
 
 - script: >
     docker build
@@ -40,10 +40,10 @@ steps:
     --cache-from $(docker.registry.url)/$(buildEnvImageName)
     --cache-from $(docker.registry.url)/$(latestImageName)
     .
-  displayName: 'docker build'
+  displayName: 'docker build dist'
 
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker push $(docker.registry.url)/$(imageName)
     docker push $(docker.registry.url)/$(latestImageName)
-  displayName: 'docker publish'
+  displayName: 'docker publish dist'
