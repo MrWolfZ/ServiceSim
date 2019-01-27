@@ -17,9 +17,6 @@ import Router from 'vue-router';
 import Vuex from 'vuex';
 import { getStoreBuilder } from 'vuex-typex';
 import { CONFIG } from './config';
-import './modules/errors/errors.store';
-import './modules/predicate-template/predicate-template.store';
-import './modules/predicate-tree/predicate-node.store';
 import { App } from './ui';
 
 import 'core-js/fn/array/flat-map';
@@ -73,22 +70,22 @@ new Vue({
       {
         path: '/predicate-tree',
         name: 'predicate-tree',
-        component: () => import(/* webpackChunkName: "predicate-tree" */ './modules/predicate-tree/predicate-tree'),
+        component: () => import(/* webpackChunkName: "predicate-tree" */ './modules/development/predicate-tree/predicate-tree'),
       },
       {
         path: '/predicate-templates',
         name: 'predicate-templates',
-        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-templates'),
+        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/development/predicate-template/predicate-templates'),
       },
       {
         path: '/predicate-templates/:id',
         name: 'predicate-template',
-        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-template'),
+        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/development/predicate-template/predicate-template'),
       },
       {
         path: '/response-generator-templates',
         name: 'response-generator-templates',
-        component: () => import(/* webpackChunkName: "response-generator-template" */ './modules/predicate-template/predicate-templates'),
+        component: () => import(/* webpackChunkName: "response-generator-template" */ './modules/development/predicate-template/predicate-templates'),
       },
       {
         path: '/admin',

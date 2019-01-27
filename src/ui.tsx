@@ -1,7 +1,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { CONFIG } from './config';
-import predicateTemplates from './modules/predicate-template/predicate-template.store';
-import predicateNodes from './modules/predicate-tree/predicate-node.store';
+import predicateTemplates from './modules/development/predicate-template/predicate-template.store';
+import predicateNodes from './modules/development/predicate-tree/predicate-node.store';
 import { Navbar } from './ui-infrastructure/navbar';
 import './ui.scss';
 

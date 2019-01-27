@@ -8,9 +8,9 @@ import { createFileSystemEventLogPersistenceAdapter } from './api-infrastructure
 import { inMemoryEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/in-memory';
 import { CONFIG } from './config';
 import { adminApi } from './modules/admin/admin.api';
-import { predicateTemplatesApi } from './modules/predicate-template/predicate-template.api';
-import { ensureRootPredicateNodeExists } from './modules/predicate-tree/commands/ensure-root-predicate-node-exists';
-import { predicateTreeApi } from './modules/predicate-tree/predicate-tree.api';
+import { predicateTemplatesApi } from './modules/development/predicate-template/predicate-template.api';
+import { ensureRootPredicateNodeExists } from './modules/development/predicate-tree/commands/ensure-root-predicate-node-exists';
+import { predicateTreeApi } from './modules/development/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
 import { assertNever } from './util';
 

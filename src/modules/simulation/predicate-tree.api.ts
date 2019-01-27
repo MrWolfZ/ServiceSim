@@ -1,5 +1,5 @@
-import { PredicateNodeDto, RootNodeName } from '../predicate-tree/predicate-node.types';
-import { getAllPredicateNodes } from '../predicate-tree/queries/get-all-predicate-nodes';
+import { PredicateNodeDto, RootNodeName } from '../development/predicate-tree/predicate-node.types';
+import { getAllPredicateNodes } from '../development/predicate-tree/queries/get-all-predicate-nodes';
 import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 
 export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
