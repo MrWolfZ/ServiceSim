@@ -1,4 +1,4 @@
-import { versionedRepository } from '../../../../api-infrastructure';
+import { versionedRepository } from 'src/api-infrastructure';
 import { PredicateTemplateAggregate, PredicateTemplateDto } from '../predicate-template.types';
 
 const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');

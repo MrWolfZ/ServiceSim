@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { DangerButton } from 'src/ui-infrastructure';
 import { Component, Vue } from 'vue-property-decorator';
-import { DangerButton } from '../../ui-infrastructure';
 
 @Component({})
 export default class AdminPage extends Vue {

@@ -1,4 +1,4 @@
-import { failure } from '../../util';
+import { failure } from 'src/util';
 import { Aggregate, DomainEvent, DomainEventHandlerMap, EventOfType } from '../api-infrastructure.types';
 import { createDomainEvent } from '../event-log';
 import create from './create';

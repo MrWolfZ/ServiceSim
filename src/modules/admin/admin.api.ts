@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, createEvent, dropAllEvents, dropDB, publishTransientEvents } from '../../api-infrastructure';
+import { commandHandler, createEvent, dropAllEvents, dropDB, publishTransientEvents } from 'src/api-infrastructure';
 import { createDefaultPredicateTemplates } from '../development/predicate-template/commands/create-default-predicate-templates';
 import { ensureRootPredicateNodeExists } from '../development/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { createDefaultResponseGeneratorTemplates } from '../development/response-generator-template/response-generator-template.api';

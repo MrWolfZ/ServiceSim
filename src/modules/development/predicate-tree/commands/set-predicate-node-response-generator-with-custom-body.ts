@@ -1,5 +1,5 @@
-import { CommandValidationConstraints } from '../../../../api-infrastructure';
-import { failure } from '../../../../util';
+import { CommandValidationConstraints } from 'src/api-infrastructure';
+import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { SetResponseGeneratorWithCustomBodyCommand } from '../predicate-node.types';
 

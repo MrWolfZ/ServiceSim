@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, queryHandler } from '../../../api-infrastructure';
+import { commandHandler, queryHandler } from 'src/api-infrastructure';
 import { createDefaultPredicateTemplates } from './commands/create-default-predicate-templates';
 import { createPredicateTemplate, createPredicateTemplateConstraints } from './commands/create-predicate-template';
 import { deletePredicateTemplate, deletePredicateTemplateConstraints } from './commands/delete-predicate-template';

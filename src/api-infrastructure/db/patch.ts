@@ -1,4 +1,4 @@
-import { applyDiff, createDiff, Diff, failure, isEmpty } from '../../util';
+import { applyDiff, createDiff, Diff, failure, isEmpty } from 'src/util';
 import { Aggregate, AggregateMetadata, AggregateWithMetadata, DomainEvent, DomainEventHandlerMap, EventOfType } from '../api-infrastructure.types';
 import { createUpdateDataEvent, publishEvents } from '../event-log';
 import { DocumentCollection } from './persistence/adapter';

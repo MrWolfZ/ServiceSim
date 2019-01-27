@@ -1,5 +1,5 @@
-import { eventDrivenRepository } from '../../api-infrastructure';
-import { failure } from '../../util';
+import { eventDrivenRepository } from 'src/api-infrastructure';
+import { failure } from 'src/util';
 import {
   CreateServiceInvocationCommand,
   ServiceInvocationAggregate,

@@ -1,4 +1,4 @@
-import { keys } from '../../../../util';
+import { keys } from 'src/util';
 import * as DEFAULT_TEMPLATES from '../default-templates';
 import { createPredicateTemplate } from './create-predicate-template';
 

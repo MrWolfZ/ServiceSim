@@ -1,4 +1,4 @@
-import { Diff, failure } from '../../util';
+import { Diff, failure } from 'src/util';
 import { Aggregate, AggregateMetadata, AggregateWithMetadata } from '../api-infrastructure.types';
 import { createDeleteDataEvent, publishEvents } from '../event-log';
 import { DocumentCollection } from './persistence/adapter';

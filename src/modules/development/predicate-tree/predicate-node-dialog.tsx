@@ -1,7 +1,7 @@
 import { Action, createFormGroupState, FormGroupState, formStateReducer, updateGroup, validate } from 'pure-forms';
 import { minLength, required } from 'pure-forms/validation';
+import { CancelButton, Emit, Form, ModalDialog, SaveButton, TsxComponent } from 'src/ui-infrastructure';
 import { Component } from 'vue-property-decorator';
-import { CancelButton, Emit, Form, ModalDialog, SaveButton, TsxComponent } from '../../../ui-infrastructure';
 import { Parameter } from '../parameter/parameter.types';
 import { PredicateNodeForm } from './predicate-node-form';
 import { PredicateNodeFormValue, PredicateNodeState } from './predicate-node.types';

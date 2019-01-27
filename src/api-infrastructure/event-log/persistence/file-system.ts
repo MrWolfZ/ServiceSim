@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { failure } from 'src/util';
 import { promisify } from 'util';
-import { failure } from '../../../util';
 import { EventLogPersistenceAdapter, StoredEvent } from './adapter';
 
 const readFile = promisify(fs.readFile);

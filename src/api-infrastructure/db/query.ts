@@ -1,4 +1,4 @@
-import { failure, keys } from '../../util';
+import { failure, keys } from 'src/util';
 import { Aggregate, AggregateMetadata, AggregateWithMetadata, DomainEvent } from '../api-infrastructure.types';
 import { DocumentCollection } from './persistence/adapter';
 

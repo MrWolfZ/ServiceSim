@@ -1,6 +1,6 @@
 import express from 'express';
-import { commandHandler, CommandValidationConstraints, queryHandler, versionedRepository } from '../../../api-infrastructure';
-import { keys } from '../../../util';
+import { commandHandler, CommandValidationConstraints, queryHandler, versionedRepository } from 'src/api-infrastructure';
+import { keys } from 'src/util';
 import * as DEFAULT_TEMPLATES from './default-templates';
 import {
   CreateResponseGeneratorTemplateCommand,

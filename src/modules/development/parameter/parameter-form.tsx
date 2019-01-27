@@ -1,6 +1,6 @@
 import { Action, FormControlState, FormGroupState, setValue, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
-import { FormField, NumberInput, pure, RadioInput, Select, TextInput } from '../../../ui-infrastructure';
+import { FormField, NumberInput, pure, RadioInput, Select, TextInput } from 'src/ui-infrastructure';
 import { ParameterFormValue } from './parameter.types';
 
 export interface ParameterFormProps {

@@ -1,7 +1,7 @@
 import axios from 'axios';
+import { createDiff, isEmpty } from 'src/util';
 import Vue from 'vue';
 import { getStoreBuilder } from 'vuex-typex';
-import { createDiff, isEmpty } from '../../../util';
 import {
   CreatePredicateTemplateCommand,
   CreatePredicateTemplateCommandResponse,

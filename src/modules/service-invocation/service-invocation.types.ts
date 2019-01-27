@@ -1,4 +1,4 @@
-import { Aggregate, DomainEvent } from '../../api-infrastructure/api-infrastructure.types';
+import { Aggregate, DomainEvent } from 'src/api-infrastructure/api-infrastructure.types';
 
 export interface ServiceRequest {
   path: string;

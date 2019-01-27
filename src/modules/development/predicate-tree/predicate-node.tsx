@@ -1,5 +1,5 @@
+import { Emit, ExpansionContainer, TsxComponent } from 'src/ui-infrastructure';
 import { Component, Prop } from 'vue-property-decorator';
-import { Emit, ExpansionContainer, TsxComponent } from '../../../ui-infrastructure';
 import './predicate-node.scss';
 import predicateNodes from './predicate-node.store';
 

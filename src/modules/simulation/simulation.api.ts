@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
-import { getLiveDomainEventStream, logger } from '../../api-infrastructure';
+import { getLiveDomainEventStream, logger } from 'src/api-infrastructure';
 import { createServiceInvocation, setServiceInvocationResponse } from '../service-invocation/service-invocation.api';
 import { ServiceInvocationDomainEvents, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 import { getPredicateTree, PredicateNode, ResponseGeneratorFunction } from './predicate-tree.api';

@@ -1,6 +1,6 @@
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
-import { CancelButton, Form, page, SaveButton, StatefulComponentContext } from '../../../ui-infrastructure';
+import { CancelButton, Form, page, SaveButton, StatefulComponentContext } from 'src/ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';

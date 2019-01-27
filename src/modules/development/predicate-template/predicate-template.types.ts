@@ -1,5 +1,5 @@
-import { Aggregate } from '../../../api-infrastructure/api-infrastructure.types';
-import { Diff } from '../../../util';
+import { Aggregate } from 'src/api-infrastructure/api-infrastructure.types';
+import { Diff } from 'src/util';
 import { Parameter } from '../parameter/parameter.types';
 
 export interface PredicateTemplateData {

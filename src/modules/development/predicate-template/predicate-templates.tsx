@@ -1,5 +1,5 @@
+import { PrimaryButton } from 'src/ui-infrastructure';
 import { Component, Vue } from 'vue-property-decorator';
-import { PrimaryButton } from '../../../ui-infrastructure';
 import { PredicateTemplateRow } from './predicate-template-row';
 import predicateTemplates from './predicate-template.store';
 

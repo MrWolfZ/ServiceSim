@@ -1,6 +1,6 @@
 import { ConnectableObservable, EMPTY, Observable, Observer, Subject, Subscription } from 'rxjs';
 import { filter, map, publishReplay } from 'rxjs/operators';
-import { Diff } from '../../util';
+import { Diff } from 'src/util';
 import { Aggregate, AggregateMetadata, CreateEvent, DataEvent, DeleteEvent, DomainEvent, Event, EventOfType, UpdateEvent } from '../api-infrastructure.types';
 import { EventLogPersistenceAdapter } from './persistence/adapter';
 import { inMemoryEventLogPersistenceAdapter } from './persistence/in-memory';
