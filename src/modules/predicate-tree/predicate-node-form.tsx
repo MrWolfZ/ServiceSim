@@ -40,6 +40,8 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
   }
 
   render() {
+    const onAction = (a: Action) => this.onAction(a);
+
     return (
       <div>
 
@@ -51,7 +53,7 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
             placeholder='Name'
             styleOverride={{ fontSize: '120%', fontWeight: 'bold' }}
             controlState={this.formState.controls.name}
-            onAction={a => this.onAction(a)}
+            onAction={onAction}
           />
         </FormField>
 
@@ -63,7 +65,7 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
             rows={3}
             placeholder='Description'
             controlState={this.formState.controls.description}
-            onAction={a => this.onAction(a)}
+            onAction={onAction}
           />
         </FormField>
 
@@ -77,7 +79,7 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
               class='code'
               rows={5}
               controlState={this.formState.controls.evalFunctionBody}
-              onAction={a => this.onAction(a)}
+              onAction={onAction}
             />
           </FormField>
         }
@@ -100,14 +102,14 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
                   {this.getParameterValueType(name) === 'string' &&
                     <TextInput
                       controlState={this.getParameterControlState(name)}
-                      onAction={a => this.onAction(a)}
+                      onAction={onAction}
                     />
                   }
 
                   {this.getParameterValueType(name) === 'number' &&
                     <NumberInput
                       controlState={this.getParameterControlState(name)}
-                      onAction={a => this.onAction(a)}
+                      onAction={onAction}
                     />
                   }
 
@@ -115,7 +117,7 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
                     <RadioInput
                       options={{ True: true, False: false }}
                       controlState={this.getParameterControlState(name)}
-                      onAction={a => this.onAction(a)}
+                      onAction={onAction}
                     />
                   }
 
