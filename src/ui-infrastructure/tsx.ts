@@ -1,4 +1,4 @@
-import { ComponentOptions, CreateElement, FunctionalComponentOptions, RenderContext } from 'Vue';
+import { ComponentOptions, CreateElement, FunctionalComponentOptions, RenderContext } from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueRouter, { Route } from 'vue-router';
 import { keys } from '../util';
