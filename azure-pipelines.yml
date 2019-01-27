@@ -12,24 +12,26 @@ variables:
 steps:
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker pull $(docker.registry.url)/$(buildEnvImageName)
+    docker pull $(docker.registry.url)/$(buildEnvImageName) || true
     '
     docker build
     --target build-env
     -t $(docker.registry.url)/$(buildEnvImageName)
-    --cache-from $(docker.registry.url)/$(buildEnvImageName) .
+    --cache-from $(docker.registry.url)/$(buildEnvImageName)
+    .
     '
   displayName: 'docker build build-env'
 
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker pull $(docker.registry.url)/$(latestImageName)
+    docker pull $(docker.registry.url)/$(latestImageName) || true
     '
     docker build
     -t $(docker.registry.url)/$(imageName)
     -t $(docker.registry.url)/$(latestImageName)
     --cache-from $(docker.registry.url)/$(buildEnvImageName)
-    --cache-from $(docker.registry.url)/$(latestImageName) .
+    --cache-from $(docker.registry.url)/$(latestImageName)
+    .
     '
   displayName: 'docker build'
 
