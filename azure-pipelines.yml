@@ -12,7 +12,7 @@ variables:
 steps:
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker pull $(docker.registry.url)/$(buildEnvImageName)
+    docker pull $(docker.registry.url)/$(buildEnvImageName) || true
   displayName: 'docker pull build-env'
 
 - script: >
@@ -25,7 +25,7 @@ steps:
 
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
-    docker pull $(docker.registry.url)/$(latestImageName)
+    docker pull $(docker.registry.url)/$(latestImageName) || true
   displayName: 'docker pull latest'
 
 - script: >
