@@ -25,6 +25,11 @@ steps:
 
 - script: |
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
+    docker push $(docker.registry.url)/$(buildEnvImageName)
+  displayName: 'docker publish build-env'
+
+- script: |
+    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker pull $(docker.registry.url)/$(latestImageName) || true
   displayName: 'docker pull latest'
 
@@ -41,5 +46,4 @@ steps:
     docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker push $(docker.registry.url)/$(imageName)
     docker push $(docker.registry.url)/$(latestImageName)
-    docker push $(docker.registry.url)/$(buildEnvImageName)
   displayName: 'docker publish'
