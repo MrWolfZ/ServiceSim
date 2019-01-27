@@ -11,6 +11,7 @@ variables:
 
 steps:
 - script: |
+    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker pull $(docker.registry.url)/$(buildEnvImageName)
     >
     docker build
@@ -20,6 +21,7 @@ steps:
   displayName: 'docker build build-env'
 
 - script: |
+    docker login -u $(docker.registry.userName) -p $(docker.registry.password) $(docker.registry.url)
     docker pull $(docker.registry.url)/$(latestImageName)
     >
     docker build
