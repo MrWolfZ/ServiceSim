@@ -1,13 +1,13 @@
 FROM node:8 as build-env
 WORKDIR /usr/build
-COPY ./package*.json .
+COPY ./package*.json ./
 RUN npm install
-COPY . .
+COPY ./ ./
 RUN npm run build-full
 
 FROM node:8
 WORKDIR /usr/src/app
-COPY ./package*.json .
+COPY ./package*.json ./
 RUN npm install --only=production
 COPY --from=build-env ./dist ./dist
 
