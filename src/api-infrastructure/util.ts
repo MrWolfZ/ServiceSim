@@ -1,4 +1,4 @@
-import { Aggregate, AggregateMetadata, DataEvent, DataEvents, DomainEvent, Event, EventOfType } from './api-infrastructure.types';
+import { Aggregate, DataEvent, DataEvents, DomainEvent, Event, EventOfType } from './api-infrastructure.types';
 
 export type EventHandlerMap<TEvent extends Event<TEvent['eventType']>> = {
   [eventType in TEvent['eventType']]: (event: EventOfType<TEvent, eventType>) => any;
@@ -21,29 +21,26 @@ export type DataEventOfType<
   TAggregate,
   TAggregateType extends string,
   TEvent,
-  TEventType extends DataEvents<any, TMetadata>['eventType'],
-  TMetadata extends AggregateMetadata<TAggregateType>,
+  TEventType extends DataEvents<any>['eventType'],
   > =
   TAggregate extends Aggregate<TAggregateType>
-  ? TEvent extends DataEvent<any, any, TEventType> ? EventOfType<DataEvents<TAggregate, TMetadata>, TEventType> : never
+  ? TEvent extends DataEvent<any, TEventType> ? EventOfType<DataEvents<TAggregate>, TEventType> : never
   : never;
 
 export type DataEventHandlerMap<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TEvent extends DataEvent<TAggregate, TMetadata, DataEvents<TAggregate, TMetadata>['eventType']>,
-  TMetadata extends AggregateMetadata<TAggregate['@type']>,
+  TEvent extends DataEvent<TAggregate, DataEvents<TAggregate>['eventType']>,
   > = {
     [aggregateType in TAggregate['@type']]: {
-      [eventType in DataEvents<TAggregate, TMetadata>['eventType']]: (event: DataEventOfType<TAggregate, aggregateType, TEvent, eventType, TMetadata>) => any;
+      [eventType in DataEvents<TAggregate>['eventType']]: (event: DataEventOfType<TAggregate, aggregateType, TEvent, eventType>) => any;
     };
   };
 
 export function createDataEventHandler<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TMetadata extends AggregateMetadata<TAggregate['@type']>,
-  TEvent extends DataEvent<TAggregate, TMetadata, DataEvents<TAggregate, TMetadata>['eventType']> = DataEvents<TAggregate, TMetadata>,
+  TEvent extends DataEvent<TAggregate, DataEvents<TAggregate>['eventType']> = DataEvents<TAggregate>,
   >(
-    handlers: DataEventHandlerMap<TAggregate, TEvent, TMetadata>,
+    handlers: DataEventHandlerMap<TAggregate, TEvent>,
 ) {
   return (evt: Event<any>) => {
     const aggregateType = (evt as DomainEvent<TAggregate['@type'], TEvent['eventType']>).aggregateType;

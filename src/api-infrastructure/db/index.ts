@@ -33,35 +33,13 @@ function verifyAggregateType(aggregateType: string) {
 export function repository<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
-  verifyAggregateType(aggregateType);
-
-  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
-
-  return {
-    create: create<TAggregate>(aggregateType, 'Default', collectionFactory),
-    patch: patch<TAggregate>(aggregateType, 'Default', collectionFactory),
-    delete: delete$<TAggregate>(aggregateType, 'Default', collectionFactory),
-    dropAll: () => collectionFactory().dropAll(),
-
-    query: query<TAggregate>(aggregateType, 'Default', collectionFactory),
-  };
+  return anyRepository<TAggregate, never>(aggregateType, false, {});
 }
 
 export function versionedRepository<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
-  verifyAggregateType(aggregateType);
-
-  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
-
-  return {
-    create: create<TAggregate>(aggregateType, 'Versioned', collectionFactory),
-    patch: patch<TAggregate>(aggregateType, 'Versioned', collectionFactory),
-    delete: delete$<TAggregate>(aggregateType, 'Versioned', collectionFactory),
-    dropAll: () => collectionFactory().dropAll(),
-
-    query: query<TAggregate>(aggregateType, 'Versioned', collectionFactory),
-  };
+  return anyRepository<TAggregate, never>(aggregateType, true, {});
 }
 
 export function eventDrivenRepository<
@@ -71,17 +49,31 @@ export function eventDrivenRepository<
     aggregateType: TAggregate['@type'],
     eventHandlers: DomainEventHandlerMap<TAggregate, TEvent>,
 ) {
+  return anyRepository<TAggregate, TEvent>(aggregateType, true, eventHandlers);
+}
+
+export function anyRepository<
+  TAggregate extends Aggregate<TAggregate['@type']>,
+  TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>,
+  >(
+    aggregateType: TAggregate['@type'],
+    keepRevisions: boolean,
+    eventHandlers: DomainEventHandlerMap<TAggregate, TEvent>,
+) {
   verifyAggregateType(aggregateType);
 
-  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>(aggregateType);
+  const collectionFactory = () => adapter.getCollection<TAggregate & { $metadata: any }>({
+    documentType: aggregateType,
+    keepRevisions,
+  });
 
   return {
-    create: create<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
-    patch: patch<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory, eventHandlers),
-    delete: delete$<TAggregate>(aggregateType, 'EventDriven', collectionFactory),
+    create: create<TAggregate, TEvent>(aggregateType, collectionFactory),
+    patch: patch<TAggregate, TEvent>(aggregateType, collectionFactory, eventHandlers),
+    delete: delete$<TAggregate>(aggregateType, collectionFactory),
     dropAll: () => collectionFactory().dropAll(),
 
-    query: query<TAggregate, TEvent>(aggregateType, 'EventDriven', collectionFactory),
+    query: query<TAggregate, TEvent>(aggregateType, collectionFactory),
 
     createDomainEvent<
       TEventType extends TEvent['eventType'],

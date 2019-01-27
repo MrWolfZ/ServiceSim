@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 import { failure } from '../../../util';
-import { DocumentCollection, PersistenceAdapter } from './adapter';
+import { Document, DocumentCollection, DocumentCollectionOptions, PersistenceAdapter } from './adapter';
 
 const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
@@ -14,7 +14,9 @@ const stat = promisify(fs.stat);
 const lstat = promisify(fs.lstat);
 
 // some of these methods have race conditions when reading, but that is okay since we expect eventual consistency
-function createDocumentCollection<TDocument>(documentType: string, dataDirPath: string): DocumentCollection<TDocument> {
+function createDocumentCollection<TDocument extends Document>(options: DocumentCollectionOptions, dataDirPath: string): DocumentCollection<TDocument> {
+  const { documentType, keepRevisions } = options;
+
   const collectionDirPath = path.join(dataDirPath, documentType);
 
   const fileNameForVersion = (version: number) => `${version.toString().padStart(15, '0')}.json`;
@@ -41,6 +43,14 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
     return await readDocument(path.join(docDirPath, fileNameForVersion(paths.length)));
   };
 
+  async function addVersion(document: TDocument) {
+    const documentDirPath = createDocumentDirPath(document.id);
+    await ensureDirectoryExists(documentDirPath);
+    const files = await readdir(documentDirPath);
+    const newVersion = files.length + 1;
+    await writeFile(createDocumentPath(document.id, newVersion), JSON.stringify(document, undefined, 2));
+  }
+
   return {
     async generateId() {
       let id = 1;
@@ -53,21 +63,21 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
       return `${documentType}-${id}`;
     },
 
-    async set(id: string, document: TDocument) {
-      await ensureDirectoryExists(createDocumentDirPath(id));
-      await writeFile(createDocumentPath(id), JSON.stringify(document, undefined, 2));
+    async upsert(document: TDocument) {
+      if (keepRevisions) {
+        await addVersion(document);
+      } else {
+        await ensureDirectoryExists(createDocumentDirPath(document.id));
+        await writeFile(createDocumentPath(document.id), JSON.stringify(document, undefined, 2));
+      }
     },
 
-    async addVersion(id: string, document: TDocument) {
-      const documentDirPath = createDocumentDirPath(id);
-      await ensureDirectoryExists(documentDirPath);
-      const files = await readdir(documentDirPath);
-      const newVersion = files.length + 1;
-      await writeFile(createDocumentPath(id, newVersion), JSON.stringify(document, undefined, 2));
-    },
-
-    async delete(id: string) {
-      await deleteDir(createDocumentDirPath(id));
+    async delete(document: TDocument) {
+      if (keepRevisions) {
+        await addVersion(document);
+      } else {
+        await deleteDir(createDocumentDirPath(document.id));
+      }
     },
 
     async dropAll() {
@@ -101,8 +111,8 @@ function createDocumentCollection<TDocument>(documentType: string, dataDirPath: 
 
 export function createFileSystemPersistenceAdapter(dataDirPath: string): PersistenceAdapter {
   return {
-    getCollection<TDocument>(documentType: string) {
-      return createDocumentCollection<TDocument>(documentType, dataDirPath);
+    getCollection<TDocument extends Document>(options: DocumentCollectionOptions) {
+      return createDocumentCollection<TDocument>(options, dataDirPath);
     },
 
     async drop() {

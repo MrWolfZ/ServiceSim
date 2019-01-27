@@ -1,48 +1,25 @@
 import { failure, keys } from '../../util';
-import { Aggregate, AggregateMetadata, DomainEvent, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
+import { Aggregate, AggregateMetadata, AggregateWithMetadata, DomainEvent } from '../api-infrastructure.types';
 import { DocumentCollection } from './persistence/adapter';
-
-export type AggregateWithMetadata<TAggregate, TMetadata> = TAggregate & { $metadata: TMetadata };
 
 export interface QueryOperations<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TMetadata extends AggregateMetadata<TAggregate['@type']>,
   > {
-  byId(id: string): Promise<AggregateWithMetadata<TAggregate, TMetadata>>;
-  all(): Promise<AggregateWithMetadata<TAggregate, TMetadata>[]>;
-  byProperties(props: Partial<TAggregate>): Promise<AggregateWithMetadata<TAggregate, TMetadata>[]>;
+  byId(id: string): Promise<AggregateWithMetadata<TAggregate>>;
+  all(): Promise<AggregateWithMetadata<TAggregate>[]>;
+  byProperties(props: Partial<TAggregate>): Promise<AggregateWithMetadata<TAggregate>[]>;
 }
 
 export interface VersionQueryOperations<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TMetadata extends VersionedAggregateMetadata<TAggregate>,
-  > extends QueryOperations<TAggregate, TMetadata> {
-  byIdAndVersion(id: string, version: number): Promise<AggregateWithMetadata<TAggregate, TMetadata>>;
+  > extends QueryOperations<TAggregate> {
+  byIdAndVersion(id: string, version: number): Promise<AggregateWithMetadata<TAggregate>>;
 }
 
-export default function query<TAggregate extends Aggregate<TAggregate['@type']>>(
-  aggregateType: TAggregate['@type'],
-  metadataType: 'Default',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
-): QueryOperations<TAggregate, AggregateMetadata<TAggregate['@type']>>;
-
-export default function query<TAggregate extends Aggregate<TAggregate['@type']>>(
-  aggregateType: TAggregate['@type'],
-  metadataType: 'Versioned',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
-): VersionQueryOperations<TAggregate, VersionedAggregateMetadata<TAggregate>>;
-
 export default function query<TAggregate extends Aggregate<TAggregate['@type']>, TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>>(
   aggregateType: TAggregate['@type'],
-  metadataType: 'EventDriven',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
-): VersionQueryOperations<TAggregate, EventDrivenAggregateMetadata<TAggregate, TEvent>>;
-
-export default function query<TAggregate extends Aggregate<TAggregate['@type']>, TEvent extends DomainEvent<TAggregate['@type'], TEvent['eventType']>>(
-  aggregateType: TAggregate['@type'],
-  _: 'Default' | 'Versioned' | 'EventDriven',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
-): VersionQueryOperations<TAggregate, any> {
+  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: AggregateMetadata<TAggregate> }>,
+): VersionQueryOperations<TAggregate> {
   return {
     async byId(id) {
       const col = collectionFactory();
@@ -53,7 +30,7 @@ export default function query<TAggregate extends Aggregate<TAggregate['@type']>,
         throw failure(`byIdAsync failed: aggregate with id ${id} of type ${aggregateType} does not exist`);
       }
 
-      if ((latestAggregate.$metadata as VersionedAggregateMetadata<TAggregate>).isDeleted) {
+      if (latestAggregate.$metadata.isDeleted) {
         throw failure(`byIdAsync failed: aggregate with id ${id} of type ${aggregateType} is deleted`);
       }
 
@@ -75,7 +52,7 @@ export default function query<TAggregate extends Aggregate<TAggregate['@type']>,
         throw failure(`byIdAndVersionAsync failed: aggregate with id ${id} of type ${aggregateType} does not have version ${version}`);
       }
 
-      if ((aggregate.$metadata as VersionedAggregateMetadata<TAggregate>).isDeleted) {
+      if (aggregate.$metadata.isDeleted) {
         throw failure(`byIdAndVersionAsync failed: aggregate with id ${id} of type ${aggregateType} is deleted`);
       }
 
@@ -86,7 +63,7 @@ export default function query<TAggregate extends Aggregate<TAggregate['@type']>,
       const col = collectionFactory();
 
       return (await col.getAll())
-        .filter(e => !(e.$metadata as VersionedAggregateMetadata<TAggregate>).isDeleted);
+        .filter(e => !e.$metadata.isDeleted);
     },
 
     async byProperties(props) {
@@ -94,7 +71,7 @@ export default function query<TAggregate extends Aggregate<TAggregate['@type']>,
 
       const propNames = keys(props);
       return (await col.getAll())
-        .filter(e => !(e.$metadata as VersionedAggregateMetadata<TAggregate>).isDeleted)
+        .filter(e => !e.$metadata.isDeleted)
         .filter(e => propNames.every(p => e[p] === props[p]));
     },
   };

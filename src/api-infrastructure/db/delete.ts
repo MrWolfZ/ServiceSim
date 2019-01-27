@@ -1,27 +1,13 @@
-import { assertNever, failure } from '../../util';
-import { Aggregate, AggregateMetadata, EventDrivenAggregateMetadata, VersionedAggregateMetadata } from '../api-infrastructure.types';
+import { Diff, failure } from '../../util';
+import { Aggregate, AggregateMetadata, AggregateWithMetadata } from '../api-infrastructure.types';
 import { createDeleteDataEvent, publishEvents } from '../event-log';
 import { DocumentCollection } from './persistence/adapter';
-import { getMetadataOfType } from './util';
 
 export default function delete$<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
-  metadataType: 'Default',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
-): (id: string) => Promise<void>;
-
-export default function delete$<TAggregate extends Aggregate<TAggregate['@type']>>(
-  aggregateType: TAggregate['@type'],
-  metadataType: 'Versioned' | 'EventDriven',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
-): (id: string, expectedVersion: number) => Promise<void>;
-
-export default function delete$<TAggregate extends Aggregate<TAggregate['@type']>>(
-  aggregateType: TAggregate['@type'],
-  metadataType: 'Default' | 'Versioned' | 'EventDriven',
-  collectionFactory: () => DocumentCollection<TAggregate & { $metadata: any }>,
+  collectionFactory: () => DocumentCollection<AggregateWithMetadata<TAggregate>>,
 ) {
-  return async (id: string, expectedVersion = -1) => {
+  return async (id: string, expectedVersion: number) => {
     const col = collectionFactory();
 
     const latestAggregate = await col.getLatestVersionById(id);
@@ -30,59 +16,34 @@ export default function delete$<TAggregate extends Aggregate<TAggregate['@type']
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not exist`);
     }
 
-    const actualVersion = (latestAggregate.$metadata as VersionedAggregateMetadata<any>).version;
+    const actualVersion = latestAggregate.$metadata.version;
 
     if (expectedVersion !== -1 && actualVersion !== expectedVersion) {
       // tslint:disable-next-line:max-line-length
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} does not match the expected version (expected: ${expectedVersion}, actual: ${actualVersion})`);
     }
 
-    if ((latestAggregate.$metadata as VersionedAggregateMetadata<any>).isDeleted) {
+    if (latestAggregate.$metadata.isDeleted) {
       throw failure(`patch failed: aggregate with id ${id} of type ${aggregateType} is deleted`);
     }
 
     const epoch = Date.now();
 
-    const $aggregateMetadata: AggregateMetadata<TAggregate['@type']> = {
+    const $metadata: AggregateMetadata<TAggregate> = {
       ...latestAggregate.$metadata,
       lastUpdatedOnEpoch: epoch,
-    };
-
-    const $versionedMetadata: VersionedAggregateMetadata<TAggregate> = {
-      ...latestAggregate.$metadata,
-      ...$aggregateMetadata,
       version: actualVersion + 1,
-      changesSinceLastVersion: {},
+      changesSinceLastVersion: {} as Diff<TAggregate>,
       isDeleted: true,
-    };
-
-    const $eventDrivenMetadata: EventDrivenAggregateMetadata<TAggregate, any> = {
-      ...latestAggregate.$metadata,
-      ...$versionedMetadata,
       eventsSinceLastVersion: [],
     };
 
-    const $metadata = getMetadataOfType(metadataType, $aggregateMetadata, $versionedMetadata, $eventDrivenMetadata);
-
-    const updatedAggregate = {
+    const updatedAggregate: AggregateWithMetadata<TAggregate> = {
       ...latestAggregate,
       $metadata,
     };
 
-    switch (metadataType) {
-      case 'Default':
-        await col.delete(id);
-        break;
-
-      case 'Versioned':
-      case 'EventDriven':
-        await col.addVersion(id, updatedAggregate);
-        break;
-
-      default:
-        assertNever(metadataType);
-        break;
-    }
+    await col.delete(updatedAggregate);
 
     await publishEvents(createDeleteDataEvent(aggregateType, id, $metadata));
   };

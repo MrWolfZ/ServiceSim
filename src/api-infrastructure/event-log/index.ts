@@ -64,8 +64,7 @@ export function getLiveDomainEventStream<TEvent extends DomainEvent<TEvent['aggr
 
 export function getLiveDataEventStream<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TEvent extends DataEvent<TAggregate, TMetadata, TEvent['eventType']>,
-  TMetadata extends AggregateMetadata<TAggregate['@type']> = any,
+  TEvent extends DataEvent<TAggregate, TEvent['eventType']>,
   >(
     aggregateType: TEvent['aggregateType'],
 ): Observable<TEvent> {
@@ -163,10 +162,10 @@ export function createDomainEvent<
   };
 }
 
-export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>(
+export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregate: TAggregate,
-  metadata: TMetadata,
-): CreateEvent<TAggregate, TMetadata> {
+  metadata: AggregateMetadata<TAggregate>,
+): CreateEvent<TAggregate> {
   return {
     eventType: 'Create',
     aggregateType: aggregate['@type'],
@@ -177,12 +176,12 @@ export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@
   };
 }
 
-export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>(
+export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   aggregateId: string,
   diff: Diff<TAggregate>,
-  metadata: TMetadata,
-): UpdateEvent<TAggregate, TMetadata> {
+  metadata: AggregateMetadata<TAggregate>,
+): UpdateEvent<TAggregate> {
   return {
     eventType: 'Update',
     aggregateType,
@@ -193,11 +192,11 @@ export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@
   };
 }
 
-export function createDeleteDataEvent<TAggregate extends Aggregate<TAggregate['@type']>, TMetadata extends AggregateMetadata<TAggregate['@type']>>(
+export function createDeleteDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   aggregateId: string,
-  metadata: TMetadata,
-): DeleteEvent<TAggregate, TMetadata> {
+  metadata: AggregateMetadata<TAggregate>,
+): DeleteEvent<TAggregate> {
   return {
     eventType: 'Delete',
     aggregateType,

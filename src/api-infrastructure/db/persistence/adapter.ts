@@ -1,15 +1,23 @@
+export interface DocumentCollectionOptions {
+  documentType: string;
+  keepRevisions: boolean;
+}
+
+export interface Document {
+  id: string;
+}
+
 export interface PersistenceAdapter {
   initialize?: () => Promise<void>;
-  getCollection<TDocument>(documentType: string): DocumentCollection<TDocument>;
+  getCollection<TDocument extends Document>(options: DocumentCollectionOptions): DocumentCollection<TDocument>;
   drop(): Promise<void>;
 }
 
-export interface DocumentCollection<TDocument> {
+export interface DocumentCollection<TDocument extends Document> {
   generateId(): Promise<string>;
 
-  set(id: string, document: TDocument): Promise<void>;
-  addVersion(id: string, document: TDocument): Promise<void>;
-  delete(id: string): Promise<void>;
+  upsert(document: TDocument): Promise<void>;
+  delete(document: TDocument): Promise<void>;
   dropAll(): Promise<void>;
 
   getAll(): Promise<TDocument[]>;

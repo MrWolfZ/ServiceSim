@@ -1,8 +1,10 @@
-import { DocumentCollection, PersistenceAdapter } from './adapter';
+import { Document, DocumentCollection, DocumentCollectionOptions, PersistenceAdapter } from './adapter';
 
 let inMemoryDb: { [documentType: string]: { [id: string]: any[] } } = {};
 
-function createDocumentCollection<TDocument>(documentType: string): DocumentCollection<TDocument> {
+function createDocumentCollection<TDocument extends Document>(options: DocumentCollectionOptions): DocumentCollection<TDocument> {
+  const { documentType, keepRevisions } = options;
+
   inMemoryDb[documentType] = inMemoryDb[documentType] || {};
 
   return {
@@ -10,17 +12,22 @@ function createDocumentCollection<TDocument>(documentType: string): DocumentColl
       return `${documentType}-${Object.keys(inMemoryDb[documentType]).length + 1}`;
     },
 
-    async set(id: string, document: TDocument) {
-      inMemoryDb[documentType][id] = [document];
+    async upsert(document: TDocument) {
+      if (keepRevisions) {
+        inMemoryDb[documentType][document.id] = inMemoryDb[documentType][document.id] || [];
+        inMemoryDb[documentType][document.id].push(document);
+      } else {
+        inMemoryDb[documentType][document.id] = [document];
+      }
     },
 
-    async addVersion(id: string, document: TDocument) {
-      inMemoryDb[documentType][id] = inMemoryDb[documentType][id] || [];
-      inMemoryDb[documentType][id].push(document);
-    },
-
-    async delete(id: string) {
-      delete inMemoryDb[documentType][id];
+    async delete(document: TDocument) {
+      if (keepRevisions) {
+        inMemoryDb[documentType][document.id] = inMemoryDb[documentType][document.id] || [];
+        inMemoryDb[documentType][document.id].push(document);
+      } else {
+        delete inMemoryDb[documentType][document.id];
+      }
     },
 
     async dropAll() {
@@ -50,8 +57,8 @@ function createDocumentCollection<TDocument>(documentType: string): DocumentColl
 }
 
 export const inMemoryPersistenceAdapter: PersistenceAdapter = {
-  getCollection<TDocument>(documentType: string) {
-    return createDocumentCollection<TDocument>(documentType);
+  getCollection<TDocument extends Document>(options: DocumentCollectionOptions) {
+    return createDocumentCollection<TDocument>(options);
   },
 
   async drop() {
