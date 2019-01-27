@@ -6,7 +6,7 @@ pool:
 
 variables:
   imageName: 'service-sim:$(build.buildNumber)'
-  latestImageName: 'service-sim:$(build.buildNumber)'
+  latestImageName: 'service-sim:latest'
   buildEnvImageName: 'service-sim:build'
 
 steps:
