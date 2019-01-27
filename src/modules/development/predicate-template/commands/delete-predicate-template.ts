@@ -1,4 +1,4 @@
-import { CommandValidationConstraints, versionedRepository } from '../../../../api-infrastructure';
+import { CommandValidationConstraints, versionedRepository } from 'src/api-infrastructure';
 import { DeletePredicateTemplateCommand, PredicateTemplateAggregate } from '../predicate-template.types';
 
 const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');

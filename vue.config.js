@@ -7,6 +7,11 @@ module.exports = {
     entry: {
       app: './src/ui-main.ts'
     },
+    resolve: {
+      alias: {
+        src: path.resolve(__dirname, './src'),
+      },
+    },
     performance: {
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
