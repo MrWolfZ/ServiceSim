@@ -1,15 +1,11 @@
-<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
+import { PrimaryButton } from '../../ui-infrastructure';
 import { PredicateTemplateRow } from './predicate-template-row';
 import predicateTemplates from './predicate-template.store';
 
 @Component({})
 export default class PredicateTemplatesPage extends Vue {
   private filterValue = '';
-
-  async created() {
-    await predicateTemplates.loadAllAsync();
-  }
 
   private get templates() {
     return predicateTemplates.all;
@@ -48,7 +44,7 @@ export default class PredicateTemplatesPage extends Vue {
                 <div class='field'>
                   <p class='control'>
                     <input
-                      class='input filter'
+                      class='input'
                       placeholder='Filter...'
                       value={this.filterValue}
                       onInput={(e: Event) => this.filterValue = (e.target as HTMLInputElement).value}
@@ -56,16 +52,13 @@ export default class PredicateTemplatesPage extends Vue {
                   </p>
                 </div>
               </div>
+
               <div class='level-right'>
-                <button
-                  class='button is-primary'
+                <PrimaryButton
+                  label='Create new template'
+                  icon='plus'
                   onClick={() => this.navigateToEditPage('new')}
-                >
-                  <span>Create new template</span>
-                  <span class='icon is-small'>
-                    <fa-icon icon='plus' />
-                  </span>
-                </button>
+                />
               </div>
             </div>
 
@@ -84,7 +77,7 @@ export default class PredicateTemplatesPage extends Vue {
                     this.filteredTemplates.map(template =>
                       <PredicateTemplateRow
                         key={template.id}
-                        templateId={template.id}
+                        template={predicateTemplates.state.templatesById[template.id]}
                         onEdit={() => this.navigateToEditPage(template.id)}
                         onDelete={() => this.deleteTemplate(template.id)}
                       />
@@ -104,16 +97,14 @@ export default class PredicateTemplatesPage extends Vue {
           <div>
             <p>There are no predicate templates yet.</p>
             <br />
+
             { /* TODO: add button to create default predicate templates */}
-            <button
-              class='button is-primary'
+
+            <PrimaryButton
+              label='Create new template'
+              icon='plus'
               onClick={() => this.navigateToEditPage('new')}
-            >
-              <span>Create new template</span>
-              <span class='icon is-small'>
-                <fa-icon icon='plus' />
-              </span>
-            </button>
+            />
           </div>
         }
 
@@ -121,7 +112,3 @@ export default class PredicateTemplatesPage extends Vue {
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-</style>

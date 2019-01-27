@@ -1,6 +1,6 @@
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
-import { Form, stateful, StatefulComponentContext } from '../../ui-infrastructure';
+import { CancelButton, Form, page, SaveButton, StatefulComponentContext } from '../../ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';
@@ -41,7 +41,6 @@ const initialState: PredicateTemplatePageState = {
 
 export const PredicateTemplatePageDef = (
   state: PredicateTemplatePageState,
-  _: {},
   { router }: StatefulComponentContext,
 ) => {
   const { templateId, isSaving, formState } = state;
@@ -56,24 +55,16 @@ export const PredicateTemplatePageDef = (
         <PredicateTemplateForm formState={formState} onAction={onFormAction} />
 
         <div class='buttons' style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
-          <button
-            class='button is-danger is-outlined'
-            style={{ transitionDuration: 0 }}
-            type='button'
+          <CancelButton
             onClick={navigateToList}
-            disabled={isSaving}
-          >
-            Cancel
-          </button>
+            isDisabled={isSaving}
+          />
 
-          <button
-            class={`button is-success ${isSaving ? 'is-loading' : ''}`}
-            style={{ transitionDuration: 0 }}
+          <SaveButton
             onClick={submitDialog}
-            disabled={isSaving || (formState.isInvalid && formState.isSubmitted)}
-          >
-            Save
-          </button>
+            isDisabled={isSaving || (formState.isInvalid && formState.isSubmitted)}
+            isSaving={isSaving}
+          />
         </div>
       </Form>
 
@@ -123,7 +114,7 @@ function initialize(state: PredicateTemplatePageState, templateId: string | null
   }
 }
 
-export const PredicateTemplatePage = stateful(PredicateTemplatePageDef, initialState, {
+export const PredicateTemplatePage = page(PredicateTemplatePageDef, initialState, {
   mounted: (state, { route }) => initialize(state, route.params.id),
 
   beforeRouteUpdate: (state, to, _, next) => {

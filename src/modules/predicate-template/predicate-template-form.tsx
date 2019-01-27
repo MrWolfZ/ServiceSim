@@ -1,5 +1,5 @@
 import { Action, AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'pure-forms';
-import { ExpansionContainer, FormField, pure, TextInput } from '../../ui-infrastructure';
+import { ExpansionContainer, FormField, PrimaryButton, pure, TextInput } from '../../ui-infrastructure';
 import { ParameterForm } from '../parameter/parameter-form';
 import { ParameterFormValue } from '../parameter/parameter.types';
 import { PredicateTemplateFormValue } from './predicate-template.types';
@@ -76,18 +76,13 @@ const PredicateTemplateFormDef = ({ formState, onAction }: PredicateTemplateForm
 
       </ExpansionContainer>
 
-      <button
-        class='button is-primary'
-        style={{ marginTop: '1.5rem' }}
-        type='button'
+      <PrimaryButton
+        label='Add Parameter'
+        icon='plus'
         onClick={addParameter}
-        disabled={formState.controls.parameters.isDisabled}
-      >
-        <span>Add Parameter</span>
-        <span class='icon is-small'>
-          <fa-icon icon='plus' />
-        </span>
-      </button>
+        isDisabled={formState.controls.parameters.isDisabled}
+        styleOverride={{ marginTop: '1.5rem' }}
+      />
 
     </div>
   );

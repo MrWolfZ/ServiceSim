@@ -108,13 +108,20 @@ export function stateful<TState, TProps = {}>(
           eventHandlers[normalizedName] = handler;
         });
 
-        const render = options.render!.bind(undefined) as
-          any as (h: CreateElement, state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element;
+        const render = options.render!.bind(undefined) as any as (...args: any[]) => JSX.Element;
 
         const props = { ...this.$props, ...eventHandlers } as any;
 
-        return render(h, this.state, props, this.context);
+        return render.length === 4 ? render(h, this.state, props, this.context) : render(h, this.state, this.context);
       }
     }
   );
+}
+
+export function page<TState>(
+  def: (state: TState, context: StatefulComponentContext) => JSX.Element,
+  initialState: TState,
+  lifecycleHooks: LifecycleHooks<TState> = {},
+) {
+  return stateful(def, initialState, lifecycleHooks);
 }

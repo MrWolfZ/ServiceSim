@@ -1,6 +1,6 @@
-<script lang="tsx">
 import axios from 'axios';
 import { Component, Vue } from 'vue-property-decorator';
+import { DangerButton } from '../../ui-infrastructure';
 
 @Component({})
 export default class AdminPage extends Vue {
@@ -12,27 +12,19 @@ export default class AdminPage extends Vue {
     return (
       <div class='page'>
         <div class='columns'>
-          <div class='column is-12-tablet is-6-desktop is-8-widescreen tree-column'>
+          <div class='column'>
             <h1 class='title'>
               Admin
             </h1>
 
-            <button
-              class='button is-danger'
+            <DangerButton
+              label='Reset to default data'
+              icon='exclamation'
               onClick={() => this.sendResetToDefaultDataAsync()}
-            >
-              <span>Reset to default data</span>
-              <span class='icon is-small'>
-                <fa-icon icon='exclamation' />
-              </span>
-            </button>
+            />
           </div>
         </div>
       </div>
     );
   }
 }
-</script>
-
-<style scoped lang="scss">
-</style>

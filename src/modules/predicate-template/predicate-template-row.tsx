@@ -1,16 +1,14 @@
-import { pure } from '../../ui-infrastructure';
+import { DangerButton, PrimaryButton, pure } from '../../ui-infrastructure';
 import './predicate-template-row.scss';
-import predicateTemplates from './predicate-template.store';
+import { PredicateTemplateState } from './predicate-template.types';
 
 export interface PredicateTemplateRowProps {
-  templateId: string;
+  template: PredicateTemplateState;
   onEdit: () => any;
   onDelete: () => any;
 }
 
-export const PredicateTemplateRowDef = ({ templateId, onEdit, onDelete }: PredicateTemplateRowProps) => {
-  const template = predicateTemplates.state.templatesById[templateId];
-
+export const PredicateTemplateRowDef = ({ template, onEdit, onDelete }: PredicateTemplateRowProps) => {
   return (
     <tr class='predicate-template-row'>
       <td>
@@ -23,26 +21,17 @@ export const PredicateTemplateRowDef = ({ templateId, onEdit, onDelete }: Predic
 
       <td>
         <div class='buttons is-marginless'>
-          <button
-            class='button is-danger'
-            type='button'
+          <DangerButton
+            label='Delete'
+            icon='times'
             onClick={onDelete}
-          >
-            <span>Delete</span>
-            <span class='icon is-small'>
-              <fa-icon icon='times' />
-            </span>
-          </button>
-          <button
-            class='button is-primary'
-            type='button'
+          />
+
+          <PrimaryButton
+            label='Edit'
+            icon='edit'
             onClick={onEdit}
-          >
-            <span>Edit</span>
-            <span class='icon is-small'>
-              <fa-icon icon='edit' />
-            </span>
-          </button>
+          />
         </div>
       </td>
 

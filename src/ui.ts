@@ -78,7 +78,7 @@ new Vue({
       {
         path: '/predicate-templates',
         name: 'predicate-templates',
-        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-templates.vue'),
+        component: () => import(/* webpackChunkName: "predicate-template" */ './modules/predicate-template/predicate-templates'),
       },
       {
         path: '/predicate-templates/:id',
@@ -88,12 +88,12 @@ new Vue({
       {
         path: '/response-generator-templates',
         name: 'response-generator-templates',
-        component: () => import(/* webpackChunkName: "response-generator-template" */ './modules/predicate-template/predicate-templates.vue'),
+        component: () => import(/* webpackChunkName: "response-generator-template" */ './modules/predicate-template/predicate-templates'),
       },
       {
         path: '/admin',
         name: 'admin',
-        component: () => import(/* webpackChunkName: "admin" */ './modules/admin/admin.vue'),
+        component: () => import(/* webpackChunkName: "admin" */ './modules/admin/admin'),
       },
       {
         path: '/',
