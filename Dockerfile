@@ -2,11 +2,11 @@ FROM node:8 as build
 WORKDIR /usr/build
 COPY ./package*.json ./
 RUN npm install --color false
-COPY ./src/ ./src/
-COPY ./types/ ./types/
-COPY ./*.config.js ./
 COPY ./tsconfig*.json ./
 COPY ./tslint.json ./tslint.json
+COPY ./*.config.js ./
+COPY ./types/ ./types/
+COPY ./src/ ./src/
 RUN npm run build-full --color false
 
 FROM node:8
