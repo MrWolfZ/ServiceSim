@@ -2,10 +2,12 @@ import { AppConfig } from './app-config';
 
 const port = process.env.PORT as any || 3000;
 
+const isBrowser = new Function('try {return this===window;}catch(e){ return false;}');
+
 export const DEFAULT_CONFIG: AppConfig = {
   // shared
   environment: 'development',
-  platform: (() => { try { return !!window; } catch { return false; } })() ? 'browser' : 'node',
+  platform: isBrowser() ? 'browser' : 'node',
 
   // backend
   hostnameToBind: 'localhost',
