@@ -1,18 +1,21 @@
-import express from 'express';
+import express, { Response } from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { getUnfilteredLiveEventStream, initializeDB, initializeEventLog, logger } from './api-infrastructure';
-import { createFileSystemPersistenceAdapter } from './api-infrastructure/db/persistence/file-system';
-import { inMemoryPersistenceAdapter } from './api-infrastructure/db/persistence/in-memory';
-import { createFileSystemEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/file-system';
-import { inMemoryEventLogPersistenceAdapter } from './api-infrastructure/event-log/persistence/in-memory';
-import { CONFIG } from './config';
-import { adminApi } from './modules/admin/admin.api';
-import { predicateTemplatesApi } from './modules/development/predicate-template/predicate-template.api';
-import { ensureRootPredicateNodeExists } from './modules/development/predicate-tree/commands/ensure-root-predicate-node-exists';
-import { predicateTreeApi } from './modules/development/predicate-tree/predicate-tree.api';
-import { simulationApi } from './modules/simulation/simulation.api';
-import { assertNever } from './util';
+import { ensureRootPredicateNodeExists } from './application/predicate-tree/commands/ensure-root-predicate-node-exists';
+import { registerHandlers } from './application/register-handlers';
+import { processSimulationRequest } from './application/simulation/commands/process-simulation-request';
+import { ServiceRequest } from './domain/service-invocation';
+import { query, registerUniversalEventHandler, send } from './infrastructure/bus';
+import { CONFIG } from './infrastructure/config';
+import { initializeDB } from './infrastructure/db';
+import { initializeEventLog } from './infrastructure/event-log';
+import { logger } from './infrastructure/logging';
+import { createFileSystemPersistenceAdapter } from './persistence/db/file-system';
+import { inMemoryPersistenceAdapter } from './persistence/db/in-memory';
+import { createFileSystemEventLogPersistenceAdapter } from './persistence/event-log/file-system';
+import { inMemoryEventLogPersistenceAdapter } from './persistence/event-log/in-memory';
+import { nullEventLogPersistenceAdapter } from './persistence/event-log/null';
+import { assertNever, isFailure } from './util';
 
 declare module 'http' {
   interface ServerResponse {
@@ -21,21 +24,35 @@ declare module 'http' {
 }
 
 export const uiApi = express.Router();
-uiApi.use('/admin', adminApi);
-uiApi.use('/predicate-templates', predicateTemplatesApi);
-uiApi.use('/predicate-tree', predicateTreeApi);
+uiApi.post('/command', async (req, res) => {
+  try {
+    const result = await send(req.body);
+    res.status(result ? 200 : 204).send(result);
+  } catch (error) {
+    writeErrorResponse(res, error);
+  }
+});
+
+uiApi.post('/query', async (req, res) => {
+  try {
+    const result = await query(req.body);
+    res.status(result ? 200 : 204).send(result);
+  } catch (error) {
+    writeErrorResponse(res, error);
+  }
+});
 
 uiApi.get('/events', (req, res) => {
   req.setTimeout(60 * 60 * 1_000, () => void 0);
 
-  const sub = getUnfilteredLiveEventStream().subscribe(message => {
+  const dispose = registerUniversalEventHandler(message => {
     res.write(`event: event\ndata: ${JSON.stringify(message)}\n\n`);
     res.flush();
   });
 
-  req.on('close', () => sub.unsubscribe());
-  req.on('error', () => sub.unsubscribe());
-  req.on('end', () => sub.unsubscribe());
+  req.on('close', dispose);
+  req.on('error', dispose);
+  req.on('end', dispose);
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -47,42 +64,48 @@ uiApi.get('/events', (req, res) => {
   res.flush();
 });
 
-export async function initialize(config = CONFIG) {
+export async function initialize() {
   const persistenceAdapter = (() => {
-    switch (config.persistence.adapter) {
+    switch (CONFIG.persistence.adapter) {
       case 'InMemory':
         logger.info('using in-memory persistence adapter');
         return inMemoryPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system persistence adapter with data dir ${config.persistence.adapterConfig.dataDir}`);
-        return createFileSystemPersistenceAdapter(config.persistence.adapterConfig.dataDir);
+        logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
+        return createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir);
 
       default:
-        return assertNever(config.persistence.adapter);
+        return assertNever(CONFIG.persistence.adapter);
     }
   })();
 
   await initializeDB({ adapter: persistenceAdapter });
 
   const eventLogPersistenceAdapter = await (async () => {
-    switch (config.persistence.adapter) {
+    switch (CONFIG.eventPersistence.adapter) {
+      case 'Null':
+        logger.info('using null event persistence adapter');
+        return nullEventLogPersistenceAdapter;
+
       case 'InMemory':
         logger.info('using in-memory event persistence adapter');
         return inMemoryEventLogPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system event persistence adapter with data dir ${config.eventPersistence.adapterConfig.dataDir}`);
-        return await createFileSystemEventLogPersistenceAdapter(path.join(config.eventPersistence.adapterConfig.dataDir));
+        logger.info(`using file system event persistence adapter with data dir ${CONFIG.eventPersistence.adapterConfig.dataDir}`);
+        return await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.eventPersistence.adapterConfig.dataDir));
 
       default:
-        return assertNever(config.persistence.adapter);
+        return assertNever(CONFIG.eventPersistence.adapter);
     }
   })();
 
   await initializeEventLog({ adapter: eventLogPersistenceAdapter });
 
-  await ensureRootPredicateNodeExists();
+  registerHandlers();
+
+  await ensureRootPredicateNodeExists({});
 
   return new Subscription(() => {
     logger.info('shutting down...');
@@ -90,7 +113,22 @@ export async function initialize(config = CONFIG) {
 }
 
 export const api = express.Router();
-api.use('/simulation', simulationApi);
+
+api.use('/simulation', async (req, res) => {
+  const request: ServiceRequest = {
+    path: req.path,
+    body: req.body,
+  };
+
+  try {
+    const timeoutInMillis = CONFIG.environment === 'development' ? 5000 : 60000;
+    const { response } = await processSimulationRequest({ request, timeoutInMillis });
+    res.status(response.statusCode).contentType(response.contentType).send(response.body);
+  } catch (error) {
+    writeErrorResponse(res, error);
+  }
+});
+
 api.use('/ui-api', uiApi);
 api.use((req, res, next) => req.accepts('text/html') && !req.xhr ? res.sendFile(path.join(__dirname, 'ui', 'index.html')) : next());
 
@@ -101,3 +139,37 @@ api.use((err: any, _: express.Request, res: express.Response, next: express.Next
 
   return res.status(err.status || 500).render('500');
 });
+
+export interface ErrorResponsePayload {
+  messages: string[];
+  stackTrace?: string;
+}
+
+export function writeErrorResponse(res: Response, error: any) {
+  const isProduction = CONFIG.environment === 'production';
+
+  let statusCode = 500;
+  let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];
+  let stackTrace: string | undefined;
+
+  if (isFailure<string | string[]>(error)) {
+    statusCode = 400;
+    messages = Array.isArray(error.failure) ? error.failure : [error.failure];
+    stackTrace = error.stackTrace;
+  }
+
+  if (error instanceof Error) {
+    messages = [error.message];
+    stackTrace = error.stack;
+  }
+
+  const payload: ErrorResponsePayload = {
+    messages,
+  };
+
+  if (!isProduction) {
+    payload.stackTrace = stackTrace;
+  }
+
+  res.status(statusCode).send(payload);
+}

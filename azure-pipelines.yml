@@ -1,11 +1,15 @@
 trigger:
-- develop
+  branches:
+    include:
+    - master
+    - develop
+    - feature/*
 
 pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  imageName: 'service-sim:$(build.buildNumber)'
+  imageName: 'service-sim:$(build.buildNumber)-$(build.sourceBranchName)'
   latestImageName: 'service-sim:latest'
   buildEnvImageName: 'service-sim:build'
 

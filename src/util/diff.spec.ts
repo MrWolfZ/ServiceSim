@@ -1,4 +1,5 @@
-import { applyDiff, createDiff, Diff } from './diff';
+import { Diff } from 'src/domain/infrastructure/diff';
+import { applyDiff, createDiff } from './diff';
 
 describe(createDiff.name, () => {
 

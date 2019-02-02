@@ -10,12 +10,13 @@ import session from 'express-session';
 import expressValidator from 'express-validator';
 import lusca from 'lusca';
 import path from 'path';
-import { logger, SESSION_SECRET } from './api-infrastructure';
 
 import 'core-js/fn/array/flat-map';
 
 import * as api from './api';
-import { CONFIG } from './config';
+import { CONFIG } from './infrastructure/config';
+import { logger } from './infrastructure/logging';
+import { SESSION_SECRET } from './infrastructure/secrets';
 import { isFailure } from './util';
 
 const host = express();

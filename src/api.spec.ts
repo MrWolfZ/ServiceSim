@@ -2,7 +2,7 @@ import express, { Express } from 'express';
 import { Subscription } from 'rxjs';
 import request from 'supertest';
 import { api, initialize } from './api';
-import { CONFIG } from './config';
+import { CONFIG } from './infrastructure/config';
 
 describe('simulation', () => {
   let rootApp: Express;
