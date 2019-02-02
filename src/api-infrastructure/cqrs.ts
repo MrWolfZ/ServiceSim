@@ -1,29 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
-import validate from 'validate.js';
-import { CONFIG } from '../config';
-import { failure, isFailure, keys, Result, success } from '../util';
-
-export type CommandValidationFn<TCommand> = (command: TCommand) => Result<void, string[]> | Promise<Result<void, string[]>>;
-
-export interface ValidationConstraint<T> {
-  presence?: boolean;
-  exclusion?: { within: T[]; message?: string };
-}
-
-export type CommandValidationConstraints<TCommand> = {
-  [prop in keyof TCommand]: ValidationConstraint<TCommand[prop]>;
-};
-
-export type CommandValidator<TCommand> = CommandValidationFn<TCommand> | CommandValidationConstraints<TCommand>;
-
-export function evaluateCommandValidationConstraints<TCommand>(
-  constraints: CommandValidationConstraints<TCommand>,
-  command: TCommand,
-): Result<void, string[]> {
-  const messages: string[] = validate(command, constraints, { format: 'flat' }) || [];
-  keys(command).filter(key => !constraints[key]).forEach(key => messages.push(`${key} is not a valid property on this type of command`));
-  return messages.length > 0 ? failure(messages) : success();
-}
+import { CONFIG } from 'src/infrastructure/config';
+import { CommandValidationConstraints, CommandValidationFn, evaluateCommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { isFailure } from '../util';
 
 export interface ErrorResponsePayload {
   messages: string[];

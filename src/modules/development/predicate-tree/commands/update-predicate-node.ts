@@ -1,4 +1,4 @@
-import { CommandValidationConstraints } from 'src/api-infrastructure';
+import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { UpdatePredicateNodeCommand } from '../predicate-node.types';
 

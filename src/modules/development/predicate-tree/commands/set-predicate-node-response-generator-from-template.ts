@@ -1,4 +1,4 @@
-import { CommandValidationConstraints } from 'src/api-infrastructure';
+import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { SetResponseGeneratorFromTemplateCommand } from '../predicate-node.types';
@@ -16,6 +16,7 @@ export async function setPredicateNodeResponseGeneratorFromTemplate(command: Set
     {},
     predicateNodeRepo.createDomainEvent(
       'ResponseGeneratorSetFromTemplate',
+      command.nodeId,
       {
         name: command.name,
         description: command.description,

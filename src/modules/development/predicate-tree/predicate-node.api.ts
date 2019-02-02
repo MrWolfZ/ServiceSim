@@ -1,5 +1,5 @@
 import express from 'express';
-import { commandHandler, queryHandler } from 'src/api-infrastructure';
+import { commandHandler, queryHandler } from 'src/api-infrastructure/cqrs';
 import { addChildPredicateNodeFromTemplate, addChildPredicateNodeFromTemplateConstraints } from './commands/add-child-predicate-node-from-template';
 import {
   addChildPredicateNodeWithCustomFunctionBody,

@@ -1,4 +1,4 @@
-import { eventDrivenRepository } from 'src/api-infrastructure';
+import { eventDrivenRepository } from 'src/infrastructure/db';
 import { PredicateNodeAggregate, PredicateNodeDomainEvents } from './predicate-node.types';
 
 export const predicateNodeRepo = eventDrivenRepository<PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {

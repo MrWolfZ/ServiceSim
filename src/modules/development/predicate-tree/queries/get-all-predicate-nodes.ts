@@ -1,4 +1,4 @@
-import { getPredicateTemplatesByIdsAndVersions } from '../../predicate-template/queries/get-predicate-templates-by-ids-and-versions';
+import { getPredicateTemplatesByIdsAndVersions } from 'src/application/predicate-template/queries/get-predicate-templates-by-ids-and-versions';
 import { getResponseGeneratorTemplatesByIdsAndVersions } from '../../response-generator-template/response-generator-template.api';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { PredicateNodeDto, ResponseGeneratorData, ResponseGeneratorDataWithTemplateSnapshot, TemplateInfo } from '../predicate-node.types';
@@ -34,7 +34,7 @@ export async function getAllPredicateNodes() {
     allReferencedPredicateTemplates,
     allReferencedResponseGeneratorTemplates,
   ] = await Promise.all([
-    getPredicateTemplatesByIdsAndVersions(allReferencedPredicateTemplateIdsAndVersions),
+    getPredicateTemplatesByIdsAndVersions({ idsAndVersions: allReferencedPredicateTemplateIdsAndVersions }),
     getResponseGeneratorTemplatesByIdsAndVersions(allReferencedResponseGeneratorTemplateIdsAndVersions),
   ]);
 

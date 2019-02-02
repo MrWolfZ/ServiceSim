@@ -1,6 +1,6 @@
-import { Aggregate } from 'src/api-infrastructure/api-infrastructure.types';
-import { Diff } from 'src/util';
-import { Parameter } from '../parameter/parameter.types';
+import { Aggregate } from 'src/domain/infrastructure/ddd';
+import { Diff } from 'src/domain/infrastructure/diff';
+import { Parameter } from 'src/domain/parameter';
 
 export interface ResponseGeneratorTemplateData {
   name: string;

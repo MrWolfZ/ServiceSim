@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { createFormGroupState } from 'pure-forms';
-import { ParameterForm, ParameterFormProps } from './parameter-form';
-import { ParameterFormValue } from './parameter.types';
+import { ParameterForm, ParameterFormProps, ParameterFormValue } from './parameter-form';
 
 describe(ParameterForm.name, () => {
   const defaultProps: ParameterFormProps = {

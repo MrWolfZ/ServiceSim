@@ -1,4 +1,4 @@
-import { eventDrivenRepository } from 'src/api-infrastructure';
+import { eventDrivenRepository } from 'src/infrastructure/db';
 import { failure } from 'src/util';
 import {
   CreateServiceInvocationCommand,
@@ -55,7 +55,7 @@ export async function setServiceInvocationResponse(command: SetServiceResponseCo
     command.invocationId,
     command.unmodifiedInvocationVersion,
     {},
-    repo.createDomainEvent('InvocationResponseWasSet', eventData),
+    repo.createDomainEvent('InvocationResponseWasSet', command.invocationId, eventData),
   );
 
   return {

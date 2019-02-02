@@ -1,5 +1,5 @@
-import { Aggregate, DomainEvent } from 'src/api-infrastructure/api-infrastructure.types';
-import { PredicateTemplateData } from '../predicate-template/predicate-template.types';
+import { Aggregate, DomainEvent } from 'src/domain/infrastructure/ddd';
+import { PredicateTemplateData } from 'src/domain/predicate-template';
 import { ResponseGeneratorTemplateData } from '../response-generator-template/response-generator-template.types';
 
 export interface TemplateInfo {

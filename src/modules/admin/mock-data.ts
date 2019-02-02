@@ -1,5 +1,5 @@
-import { ALL, PATH_PREFIX } from '../development/predicate-template/default-templates';
-import { getAllPredicateTemplates } from '../development/predicate-template/queries/get-all-predicate-templates';
+import { ALL, PATH_PREFIX } from 'src/application/predicate-template/default-templates';
+import { getAllPredicateTemplates } from 'src/application/predicate-template/queries/get-all-predicate-templates';
 import { addChildPredicateNodeFromTemplate } from '../development/predicate-tree/commands/add-child-predicate-node-from-template';
 import { setPredicateNodeResponseGeneratorFromTemplate } from '../development/predicate-tree/commands/set-predicate-node-response-generator-from-template';
 import { getAllPredicateNodes } from '../development/predicate-tree/queries/get-all-predicate-nodes';
@@ -7,7 +7,7 @@ import { STATIC } from '../development/response-generator-template/default-templ
 import { getAllResponseGeneratorTemplates } from '../development/response-generator-template/response-generator-template.api';
 
 export async function setupMockData() {
-  const allTemplates = await getAllPredicateTemplates();
+  const allTemplates = await getAllPredicateTemplates({});
   const pathPrefixPredicateTemplate = allTemplates.find(t => t.name === PATH_PREFIX.name)!;
   const allPredicateTemplate = allTemplates.find(t => t.name === ALL.name)!;
 

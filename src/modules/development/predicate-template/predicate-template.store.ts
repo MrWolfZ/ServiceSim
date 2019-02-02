@@ -12,6 +12,8 @@ import {
   UpdatePredicateTemplateCommand,
 } from './predicate-template.types';
 
+export interface PredicateTemplateState extends PredicateTemplateDto { }
+
 export interface PredicateTemplatesState {
   templateIds: string[];
   templatesById: { [templateId: string]: PredicateTemplateState };

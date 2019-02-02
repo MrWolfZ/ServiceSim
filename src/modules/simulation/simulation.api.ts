@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import { filter, take, timeout } from 'rxjs/operators';
-import { getLiveDomainEventStream, logger } from 'src/api-infrastructure';
+import { registerEventHandler } from 'src/infrastructure/bus';
+import { logger } from 'src/infrastructure/logging';
+import { createObservable } from 'src/util/observable';
 import { createServiceInvocation, setServiceInvocationResponse } from '../service-invocation/service-invocation.api';
 import { ServiceInvocationDomainEvents, ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 import { getPredicateTree, PredicateNode, ResponseGeneratorFunction } from './predicate-tree.api';
@@ -15,17 +17,18 @@ export const processSimulationRequest = async (req: Request, res: Response) => {
 
   const { invocationId, invocationVersion } = await createServiceInvocation(request);
 
-  getLiveDomainEventStream<ServiceInvocationDomainEvents>('service-invocation', 'InvocationResponseWasSet').pipe(
-    filter(ev => ev.aggregateId === invocationId),
-    take(1),
-    timeout(60000),
-  ).subscribe(ev => {
-    res.status(ev.statusCode).contentType(ev.contentType).send(ev.body);
-  }, err => {
-    res.status(500).send({
-      content: JSON.stringify(err),
+  createObservable<ServiceInvocationDomainEvents>(obs => registerEventHandler('InvocationResponseWasSet', obs.next))
+    .pipe(
+      filter(ev => ev.aggregateId === invocationId),
+      take(1),
+      timeout(60000),
+    ).subscribe(ev => {
+      res.status(ev.statusCode).contentType(ev.contentType).send(ev.body);
+    }, err => {
+      res.status(500).send({
+        content: JSON.stringify(err),
+      });
     });
-  });
 
   let response: ServiceResponse = {
     statusCode: 404,

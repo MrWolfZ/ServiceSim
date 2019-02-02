@@ -1,4 +1,4 @@
-import { CommandValidationConstraints } from 'src/api-infrastructure';
+import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { AddChildPredicateNodeFromTemplateCommand } from '../predicate-node.types';
@@ -23,6 +23,7 @@ export async function addChildPredicateNodeFromTemplate(command: AddChildPredica
     {},
     predicateNodeRepo.createDomainEvent(
       'ChildPredicateNodeAdded',
+      parentNode.id,
       {
         childNodeId: newNode.id,
       },
