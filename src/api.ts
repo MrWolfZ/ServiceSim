@@ -1,15 +1,15 @@
 import express, { Response } from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
-import { ErrorResponsePayload } from './api-infrastructure/cqrs';
 import { ensureRootPredicateNodeExists } from './application/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { registerHandlers } from './application/register-handlers';
+import { processSimulationRequest } from './application/simulation/commands/process-simulation-request';
+import { ServiceRequest } from './domain/service-invocation';
 import { query, registerUniversalEventHandler, send } from './infrastructure/bus';
 import { CONFIG } from './infrastructure/config';
 import { initializeDB } from './infrastructure/db';
 import { initializeEventLog } from './infrastructure/event-log';
 import { logger } from './infrastructure/logging';
-import { simulationApi } from './modules/simulation/simulation.api';
 import { createFileSystemPersistenceAdapter } from './persistence/db/file-system';
 import { inMemoryPersistenceAdapter } from './persistence/db/in-memory';
 import { createFileSystemEventLogPersistenceAdapter } from './persistence/event-log/file-system';
@@ -64,26 +64,26 @@ uiApi.get('/events', (req, res) => {
   res.flush();
 });
 
-export async function initialize(config = CONFIG) {
+export async function initialize() {
   const persistenceAdapter = (() => {
-    switch (config.persistence.adapter) {
+    switch (CONFIG.persistence.adapter) {
       case 'InMemory':
         logger.info('using in-memory persistence adapter');
         return inMemoryPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system persistence adapter with data dir ${config.persistence.adapterConfig.dataDir}`);
-        return createFileSystemPersistenceAdapter(config.persistence.adapterConfig.dataDir);
+        logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
+        return createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir);
 
       default:
-        return assertNever(config.persistence.adapter);
+        return assertNever(CONFIG.persistence.adapter);
     }
   })();
 
   await initializeDB({ adapter: persistenceAdapter });
 
   const eventLogPersistenceAdapter = await (async () => {
-    switch (config.eventPersistence.adapter) {
+    switch (CONFIG.eventPersistence.adapter) {
       case 'Null':
         logger.info('using null event persistence adapter');
         return nullEventLogPersistenceAdapter;
@@ -93,11 +93,11 @@ export async function initialize(config = CONFIG) {
         return inMemoryEventLogPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system event persistence adapter with data dir ${config.eventPersistence.adapterConfig.dataDir}`);
-        return await createFileSystemEventLogPersistenceAdapter(path.join(config.eventPersistence.adapterConfig.dataDir));
+        logger.info(`using file system event persistence adapter with data dir ${CONFIG.eventPersistence.adapterConfig.dataDir}`);
+        return await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.eventPersistence.adapterConfig.dataDir));
 
       default:
-        return assertNever(config.eventPersistence.adapter);
+        return assertNever(CONFIG.eventPersistence.adapter);
     }
   })();
 
@@ -113,7 +113,22 @@ export async function initialize(config = CONFIG) {
 }
 
 export const api = express.Router();
-api.use('/simulation', simulationApi);
+
+api.use('/simulation', async (req, res) => {
+  const request: ServiceRequest = {
+    path: req.path,
+    body: req.body,
+  };
+
+  try {
+    const timeoutInMillis = CONFIG.environment === 'development' ? 5000 : 60000;
+    const { response } = await processSimulationRequest({ request, timeoutInMillis });
+    res.status(response.statusCode).contentType(response.contentType).send(response.body);
+  } catch (error) {
+    writeErrorResponse(res, error);
+  }
+});
+
 api.use('/ui-api', uiApi);
 api.use((req, res, next) => req.accepts('text/html') && !req.xhr ? res.sendFile(path.join(__dirname, 'ui', 'index.html')) : next());
 
@@ -124,6 +139,11 @@ api.use((err: any, _: express.Request, res: express.Response, next: express.Next
 
   return res.status(err.status || 500).render('500');
 });
+
+export interface ErrorResponsePayload {
+  messages: string[];
+  stackTrace?: string;
+}
 
 export function writeErrorResponse(res: Response, error: any) {
   const isProduction = CONFIG.environment === 'production';

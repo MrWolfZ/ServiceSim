@@ -1,3 +1,4 @@
+import { logger } from 'src/infrastructure/logging';
 import { Component, Vue } from 'vue-property-decorator';
 import { PredicateNodeView } from './predicate-node';
 import { PredicateNodeDetails } from './predicate-node-details';
@@ -22,23 +23,23 @@ export default class PredicateTreePage extends Vue {
   }
 
   private deleteNode(nodeId: string) {
-    console.log('delete', nodeId);
+    logger.info('delete', nodeId);
   }
 
   private addChildNode(nodeId: string) {
-    console.log('add child node', nodeId);
+    logger.info('add child node', nodeId);
   }
 
   private setResponseGenerator(nodeId: string) {
-    console.log('set response generator', nodeId);
+    logger.info('set response generator', nodeId);
   }
 
   private editResponseGenerator(nodeId: string) {
-    console.log('edit response generator', nodeId);
+    logger.info('edit response generator', nodeId);
   }
 
   private removeResponseGenerator(nodeId: string) {
-    console.log('remove response generator', nodeId);
+    logger.info('remove response generator', nodeId);
   }
 
   render() {

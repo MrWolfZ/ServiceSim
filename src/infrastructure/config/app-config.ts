@@ -1,6 +1,7 @@
 export interface AppConfig {
   // shared
   environment: 'development' | 'production';
+  platform: 'node' | 'browser';
 
   // backend
   hostnameToBind: string;

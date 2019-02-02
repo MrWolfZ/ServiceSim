@@ -57,13 +57,13 @@ export async function send<TCommand extends Command<TCommand['commandType'], TCo
 
   return await executeChain(command, chain);
 
-  async function executeChain(cmd: TCommand, chain: CommandInterceptor[]): Promise<NonNullable<TCommand['@return']>> {
+  async function executeChain(cmd: TCommand, chain: CommandInterceptor[]): Promise<NonUndefined<TCommand['@return']>> {
     const [first, ...rest] = chain;
     return await first(cmd, c => executeChain(c, rest));
   }
 }
 
-export async function sendMany<TCommand extends Command<TCommand['commandType'], NonNullable<TCommand['@return']>>>(...commands: TCommand[]) {
+export async function sendMany<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(...commands: TCommand[]) {
   return await Promise.all(commands.map(send));
 }
 
@@ -80,13 +80,13 @@ export async function query<TQuery extends Query<TQuery['queryType'], TQuery['@r
 
   return await executeChain(query, chain);
 
-  async function executeChain(query: TQuery, chain: QueryInterceptor[]): Promise<NonNullable<TQuery['@return']>> {
+  async function executeChain(query: TQuery, chain: QueryInterceptor[]): Promise<NonUndefined<TQuery['@return']>> {
     const [first, ...rest] = chain;
     return await first(query, q => executeChain(q, rest));
   }
 }
 
-export async function queryMany<TQuery extends Query<TQuery['queryType'], NonNullable<TQuery['@return']>>>(...queries: TQuery[]) {
+export async function queryMany<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(...queries: TQuery[]) {
   return await Promise.all(queries.map(query));
 }
 
@@ -100,7 +100,7 @@ export async function publish<TEvent extends Event<TEvent['eventType']> = Event<
   }
 }
 
-export function registerCommandHandler<TCommand extends Command<TCommand['commandType'], NonNullable<TCommand['@return']>>>(
+export function registerCommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   commandType: TCommand['commandType'],
   handler: CommandHandler<TCommand>,
   ...validators: CommandValidator<TCommand>[]
@@ -119,7 +119,7 @@ export function registerCommandHandler<TCommand extends Command<TCommand['comman
   };
 }
 
-export function registerQueryHandler<TQuery extends Query<TQuery['queryType'], NonNullable<TQuery['@return']>>>(
+export function registerQueryHandler<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
   queryType: TQuery['queryType'],
   handler: QueryHandler<TQuery>,
 ) {

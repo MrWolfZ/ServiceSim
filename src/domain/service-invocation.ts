@@ -30,14 +30,3 @@ export interface InvocationResponseWasSet extends DomainEvent<ServiceInvocationA
 export type ServiceInvocationDomainEvents =
   | InvocationResponseWasSet
   ;
-
-export interface ServiceInvocationDto extends ServiceInvocationData { }
-
-export interface ServiceInvocationState extends ServiceInvocationDto { }
-
-export interface CreateServiceInvocationCommand extends ServiceRequest { }
-
-export interface SetServiceResponseCommand extends ServiceResponse {
-  invocationId: string;
-  unmodifiedInvocationVersion: number;
-}

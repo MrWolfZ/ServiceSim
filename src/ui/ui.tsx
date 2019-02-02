@@ -1,3 +1,4 @@
+import { logger } from 'src/infrastructure/logging';
 import { Component, Vue } from 'vue-property-decorator';
 import { CONFIG } from '../infrastructure/config';
 import predicateTemplates from './modules/predicate-template/predicate-template.store';
@@ -16,16 +17,16 @@ export class App extends Vue {
     const eventSource = new EventSource(`${CONFIG.uiApiBaseUrl}/events`);
 
     eventSource.onmessage = evt => {
-      console.log(evt);
+      logger.info(evt.data);
       return this.loadAllDataAsync();
     };
 
     eventSource.onerror = evt => {
-      console.log(evt);
+      logger.info(evt.data);
     };
 
     eventSource.addEventListener('event', msg => {
-      console.log(msg);
+      logger.info((msg as MessageEvent).data);
       return this.loadAllDataAsync();
     });
 

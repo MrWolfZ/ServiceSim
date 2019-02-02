@@ -1,3 +1,5 @@
+import { CONFIG } from '../infrastructure/config';
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faArrowLeft,
@@ -17,11 +19,10 @@ import Router from 'vue-router';
 import Vuex from 'vuex';
 import { getStoreBuilder } from 'vuex-typex';
 import { registerHandlers } from '../application/register-handlers';
-import { CONFIG } from '../infrastructure/config';
+import { registerCommandInterceptor, registerQueryInterceptor } from '../infrastructure/bus';
 import { App } from './ui';
 
 import 'core-js/fn/array/flat-map';
-import { registerCommandInterceptor, registerQueryInterceptor } from '../infrastructure/bus';
 
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
 // import 'core-js/es6/symbol';
@@ -67,12 +68,12 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 registerHandlers();
 
 registerCommandInterceptor(async command => {
-  const response = await axios.post<NonNullable<typeof command['@return']>>(`/command`, command);
+  const response = await axios.post<NonUndefined<typeof command['@return']>>(`/command`, command);
   return response.data;
 });
 
 registerQueryInterceptor(async query => {
-  const response = await axios.post<NonNullable<typeof query['@return']>>(`/query`, query);
+  const response = await axios.post<NonUndefined<typeof query['@return']>>(`/query`, query);
   return response.data;
 });
 

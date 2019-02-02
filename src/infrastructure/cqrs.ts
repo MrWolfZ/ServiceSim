@@ -3,10 +3,10 @@ import { failure, keys, Result, success } from 'src/util';
 import validate from 'validate.js';
 
 export type CommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> =
-  (command: TCommand) => NonNullable<TCommand['@return']> | Promise<NonNullable<TCommand['@return']>>;
+  (command: TCommand) => NonUndefined<TCommand['@return']> | Promise<NonUndefined<TCommand['@return']>>;
 
 export type QueryHandler<TQuery extends Query<TQuery['queryType'], TQuery['@return']>> =
-  (query: TQuery) => NonNullable<TQuery['@return']> | Promise<NonNullable<TQuery['@return']>>;
+  (query: TQuery) => NonUndefined<TQuery['@return']> | Promise<NonUndefined<TQuery['@return']>>;
 
 export type CommandValidationFn<TCommand> = (command: TCommand) => Result<void, string[]> | Promise<Result<void, string[]>>;
 
@@ -36,10 +36,10 @@ export function evaluateCommandValidationConstraints<TCommand>(
 
 export type CommandInterceptor = <TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   command: TCommand,
-  next: (command: TCommand) => Promise<NonNullable<TCommand['@return']>>,
-) => Promise<NonNullable<TCommand['@return']>>;
+  next: (command: TCommand) => Promise<NonUndefined<TCommand['@return']>>,
+) => Promise<NonUndefined<TCommand['@return']>>;
 
 export type QueryInterceptor = <TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
   query: TQuery,
-  next: (query: TQuery) => Promise<NonNullable<TQuery['@return']>>,
-) => Promise<NonNullable<TQuery['@return']>>;
+  next: (query: TQuery) => Promise<NonUndefined<TQuery['@return']>>,
+) => Promise<NonUndefined<TQuery['@return']>>;

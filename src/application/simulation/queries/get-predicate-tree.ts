@@ -1,6 +1,7 @@
+import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { getAllPredicateNodes, PredicateNodeDto } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
 import { RootNodeName } from 'src/domain/predicate-tree';
-import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
+import { ServiceRequest, ServiceResponse } from 'src/domain/service-invocation';
 
 export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
 
@@ -13,12 +14,16 @@ export interface PredicateNode {
 export type PredicateEvaluationFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => boolean;
 export type ResponseGeneratorGenerateFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => ServiceResponse;
 
-export async function getPredicateTree() {
+export type GetPredicateTreeQueryType = 'get-predicate-tree';
+
+export interface GetPredicateTreeQuery extends Query<GetPredicateTreeQueryType, PredicateNode | null> { }
+
+export async function getPredicateTreeHandler(_: GetPredicateTreeQuery): Promise<PredicateNode | null> {
   const allNodes = await getAllPredicateNodes({});
 
   const rootNodeName: RootNodeName = 'ROOT';
   const rootNode = allNodes.find(n => n.name === rootNodeName);
-  return rootNode && await buildNode(rootNode.id, allNodes);
+  return rootNode ? await buildNode(rootNode.id, allNodes) : null;
 }
 
 export async function buildNode(nodeId: string, allNodes: PredicateNodeDto[]): Promise<PredicateNode> {
@@ -62,3 +67,5 @@ export async function buildNode(nodeId: string, allNodes: PredicateNodeDto[]): P
     childNodesOrResponseGenerator,
   };
 }
+
+export const getPredicateTree = createQueryFn<GetPredicateTreeQuery>('get-predicate-tree');

@@ -1,18 +1,38 @@
-import winston from 'winston';
+import 'setimmediate';
+import winston, { format } from 'winston';
 import { CONFIG } from './config';
 
 export const logger = winston.createLogger({
   level: 'debug',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'debug.log', level: 'debug' }),
-  ],
+  format: format.combine(
+    format.timestamp(),
+    format.json()
+  ),
 });
 
-if (CONFIG.environment !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
-  }));
-
-  logger.debug('Logging initialized at debug level');
+if (CONFIG.platform === 'node') {
+  logger.add(
+    new winston.transports.File({
+      filename: 'debug.log',
+    }),
+  );
 }
+
+if (CONFIG.environment !== 'production') {
+  const myFormat = format.printf(arg => {
+    const { level, message, timestamp } = arg;
+    return CONFIG.platform === 'node' ? `${timestamp} ${level}: ${message}` : `${level}: ${message}`;
+  });
+
+  logger.add(
+    new winston.transports.Console({
+      format: format.combine(
+        format.timestamp(),
+        format.splat(),
+        myFormat,
+      ),
+    }),
+  );
+}
+
+logger.debug('Logging initialized at debug level');
