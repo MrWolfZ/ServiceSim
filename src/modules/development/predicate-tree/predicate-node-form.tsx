@@ -1,7 +1,7 @@
 import { Action, FormControlState, FormGroupState } from 'pure-forms';
+import { Parameter } from 'src/domain/parameter';
 import { Emit, FormField, NumberInput, RadioInput, TextInput, TsxComponent } from 'src/ui-infrastructure';
 import { Component, Prop } from 'vue-property-decorator';
-import { Parameter } from '../parameter/parameter.types';
 import { PredicateNodeFormValue } from './predicate-node.types';
 
 export interface PredicateNodeFormProps {

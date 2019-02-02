@@ -1,6 +1,6 @@
 import { Aggregate, DomainEvent } from 'src/domain/infrastructure/ddd';
 import { PredicateTemplateData } from 'src/domain/predicate-template';
-import { ResponseGeneratorTemplateData } from '../response-generator-template/response-generator-template.types';
+import { ResponseGeneratorTemplateData } from 'src/domain/response-generator-template';
 
 export interface TemplateInfo {
   templateId: string;

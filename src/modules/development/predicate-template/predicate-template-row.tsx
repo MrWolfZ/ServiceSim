@@ -1,6 +1,6 @@
 import { DangerButton, PrimaryButton, pure } from 'src/ui-infrastructure';
 import './predicate-template-row.scss';
-import { PredicateTemplateState } from './predicate-template.types';
+import { PredicateTemplateState } from './predicate-template.store';
 
 export interface PredicateTemplateRowProps {
   template: PredicateTemplateState;

@@ -26,6 +26,20 @@ export function evaluateCommandValidationConstraints<TCommand>(
   command: TCommand,
 ): Result<void, string[]> {
   const messages: string[] = validate(command, constraints, { format: 'flat' }) || [];
-  keys(command).filter(key => !(constraints as any)[key]).forEach(key => messages.push(`${key} is not a valid property on this type of command`));
+  keys(command)
+    .filter(key => key !== 'commandType' && key !== 'occurredOnEpoch')
+    .filter(key => !(constraints as any)[key])
+    .forEach(key => messages.push(`${key} is not a valid property on this type of command`));
+
   return messages.length > 0 ? failure(messages) : success();
 }
+
+export type CommandInterceptor = <TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
+  command: TCommand,
+  next: (command: TCommand) => Promise<NonNullable<TCommand['@return']>>,
+) => Promise<NonNullable<TCommand['@return']>>;
+
+export type QueryInterceptor = <TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
+  query: TQuery,
+  next: (query: TQuery) => Promise<NonNullable<TQuery['@return']>>,
+) => Promise<NonNullable<TQuery['@return']>>;

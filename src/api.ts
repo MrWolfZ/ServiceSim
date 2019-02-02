@@ -8,7 +8,6 @@ import { CONFIG } from './infrastructure/config';
 import { initializeDB } from './infrastructure/db';
 import { initializeEventLog } from './infrastructure/event-log';
 import { logger } from './infrastructure/logging';
-import { adminApi } from './modules/admin/admin.api';
 import { ensureRootPredicateNodeExists } from './modules/development/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { predicateTreeApi } from './modules/development/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
@@ -26,7 +25,6 @@ declare module 'http' {
 }
 
 export const uiApi = express.Router();
-uiApi.use('/admin', adminApi);
 uiApi.use('/predicate-tree', predicateTreeApi);
 
 uiApi.post('/command', async (req, res) => {

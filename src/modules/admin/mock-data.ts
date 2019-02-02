@@ -1,17 +1,17 @@
 import { ALL, PATH_PREFIX } from 'src/application/predicate-template/default-templates';
 import { getAllPredicateTemplates } from 'src/application/predicate-template/queries/get-all-predicate-templates';
+import { STATIC } from 'src/application/response-generator-template/default-templates';
+import { getAllResponseGeneratorTemplates } from 'src/application/response-generator-template/queries/get-all-response-generator-templates';
 import { addChildPredicateNodeFromTemplate } from '../development/predicate-tree/commands/add-child-predicate-node-from-template';
 import { setPredicateNodeResponseGeneratorFromTemplate } from '../development/predicate-tree/commands/set-predicate-node-response-generator-from-template';
 import { getAllPredicateNodes } from '../development/predicate-tree/queries/get-all-predicate-nodes';
-import { STATIC } from '../development/response-generator-template/default-templates';
-import { getAllResponseGeneratorTemplates } from '../development/response-generator-template/response-generator-template.api';
 
 export async function setupMockData() {
   const allTemplates = await getAllPredicateTemplates({});
   const pathPrefixPredicateTemplate = allTemplates.find(t => t.name === PATH_PREFIX.name)!;
   const allPredicateTemplate = allTemplates.find(t => t.name === ALL.name)!;
 
-  const allResponseGeneratorTemplates = await getAllResponseGeneratorTemplates();
+  const allResponseGeneratorTemplates = await getAllResponseGeneratorTemplates({});
   const staticResponseGeneratorTemplate = allResponseGeneratorTemplates.find(t => t.name === STATIC.name)!;
 
   const rootNode = (await getAllPredicateNodes())[0];

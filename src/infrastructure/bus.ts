@@ -1,32 +1,24 @@
 import { Command, Query } from 'src/application/infrastructure/cqrs';
 import { Event } from 'src/domain/infrastructure/ddd';
 import { failure, isFailure } from 'src/util';
-import { CommandHandler, CommandValidator, evaluateCommandValidationConstraints, QueryHandler } from './cqrs';
+import { CommandHandler, CommandInterceptor, CommandValidator, evaluateCommandValidationConstraints, QueryHandler, QueryInterceptor } from './cqrs';
 
 interface CommandHandlerDefinition<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> {
   handler: CommandHandler<TCommand>;
   validators: CommandValidator<TCommand>[];
 }
 
-interface CommandHandlerMap {
-  [commandType: string]: CommandHandlerDefinition<any>;
-}
+const commandHandlers: { [commandType: string]: CommandHandlerDefinition<any> } = {};
 
-const commandHandlers: CommandHandlerMap = {};
+const commandInterceptors: CommandInterceptor[] = [];
 
-interface QueryHandlerMap {
-  [queryType: string]: QueryHandler<any>;
-}
+const queryHandlers: { [queryType: string]: QueryHandler<any> } = {};
 
-const queryHandlers: QueryHandlerMap = {};
+const queryInterceptors: QueryInterceptor[] = [];
 
 export type EventHandler<TEvent extends Event<TEvent['eventType']>> = (event: TEvent) => void | Promise<void>;
 
-interface EventHandlerMap {
-  [eventType: string]: EventHandler<any>[];
-}
-
-const eventHandlers: EventHandlerMap = {};
+const eventHandlers: { [eventType: string]: EventHandler<any>[] } = {};
 
 const universalEventHandlers: EventHandler<any>[] = [];
 
@@ -59,7 +51,16 @@ export async function send<TCommand extends Command<TCommand['commandType'], TCo
     throw failure(validationMessages);
   }
 
-  return await handlerDef.handler(command);
+  const handlerInterceptor: CommandInterceptor = async cmd => await handlerDef.handler(cmd as any as TCommand) as any;
+
+  const chain = [...commandInterceptors, handlerInterceptor];
+
+  return await executeChain(command, chain);
+
+  async function executeChain(cmd: TCommand, chain: CommandInterceptor[]): Promise<NonNullable<TCommand['@return']>> {
+    const [first, ...rest] = chain;
+    return await first(cmd, c => executeChain(c, rest));
+  }
 }
 
 export async function sendMany<TCommand extends Command<TCommand['commandType'], NonNullable<TCommand['@return']>>>(...commands: TCommand[]) {
@@ -73,7 +74,16 @@ export async function query<TQuery extends Query<TQuery['queryType'], TQuery['@r
     throw failure(`there is no query handler registered for query type ${query.queryType}!`);
   }
 
-  return await handler(query);
+  const handlerInterceptor: QueryInterceptor = async q => await handler(q as any as TQuery) as any;
+
+  const chain = [...queryInterceptors, handlerInterceptor];
+
+  return await executeChain(query, chain);
+
+  async function executeChain(query: TQuery, chain: QueryInterceptor[]): Promise<NonNullable<TQuery['@return']>> {
+    const [first, ...rest] = chain;
+    return await first(query, q => executeChain(q, rest));
+  }
 }
 
 export async function queryMany<TQuery extends Query<TQuery['queryType'], NonNullable<TQuery['@return']>>>(...queries: TQuery[]) {
@@ -141,5 +151,25 @@ export function registerUniversalEventHandler(handler: EventHandler<Event<any>>)
 
   return () => {
     universalEventHandlers.splice(universalEventHandlers.indexOf(handler), 1);
+  };
+}
+
+export function registerCommandInterceptor(
+  interceptor: CommandInterceptor,
+) {
+  commandInterceptors.push(interceptor);
+
+  return () => {
+    commandInterceptors.splice(commandInterceptors.indexOf(interceptor), 1);
+  };
+}
+
+export function registerQueryInterceptor(
+  interceptor: QueryInterceptor,
+) {
+  queryInterceptors.push(interceptor);
+
+  return () => {
+    queryInterceptors.splice(queryInterceptors.indexOf(interceptor), 1);
   };
 }

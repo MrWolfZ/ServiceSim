@@ -1,16 +1,11 @@
-import axios from 'axios';
+import { createPredicateTemplate } from 'src/application/predicate-template/commands/create-predicate-template';
+import { deletePredicateTemplate } from 'src/application/predicate-template/commands/delete-predicate-template';
+import { updatePredicateTemplate } from 'src/application/predicate-template/commands/update-predicate-template';
+import { getAllPredicateTemplates, PredicateTemplateDto } from 'src/application/predicate-template/queries/get-all-predicate-templates';
+import { PredicateTemplateData } from 'src/domain/predicate-template';
 import { createDiff, isEmpty } from 'src/util';
 import Vue from 'vue';
 import { getStoreBuilder } from 'vuex-typex';
-import {
-  CreatePredicateTemplateCommand,
-  CreatePredicateTemplateCommandResponse,
-  DeletePredicateTemplateCommand,
-  PredicateTemplateData,
-  PredicateTemplateDto,
-  PredicateTemplateState,
-  UpdatePredicateTemplateCommand,
-} from './predicate-template.types';
 
 export interface PredicateTemplateState extends PredicateTemplateDto { }
 
@@ -51,20 +46,16 @@ export function reset(state: PredicateTemplatesState) {
 }
 
 export async function loadAllAsync() {
-  const response = await axios.get<PredicateTemplateDto[]>(`/predicate-templates`);
-  predicateTemplates.addAll(response.data);
+  const response = await getAllPredicateTemplates({});
+  predicateTemplates.addAll(response);
 }
 
 export async function createAsync(_: any, data: PredicateTemplateData) {
-  const command: CreatePredicateTemplateCommand = {
-    ...data,
-  };
-
-  const response = await axios.post<CreatePredicateTemplateCommandResponse>(`/predicate-templates/create`, command);
+  const response = await createPredicateTemplate(data);
 
   const template: PredicateTemplateState = {
-    id: response.data.templateId,
-    version: response.data.templateVersion,
+    id: response.templateId,
+    version: response.templateVersion,
     ...data,
   };
 
@@ -73,35 +64,35 @@ export async function createAsync(_: any, data: PredicateTemplateData) {
 
 export async function updateAsync(_: any, args: { templateId: string; data: PredicateTemplateData }) {
   const originalTemplate = predicateTemplates.state.templatesById[args.templateId];
-  const template: PredicateTemplateState = {
-    ...predicateTemplates.state.templatesById[args.templateId],
-    version: originalTemplate.version + 1,
-    ...args.data,
-  };
 
-  const command: UpdatePredicateTemplateCommand = {
-    templateId: args.templateId,
-    unmodifiedTemplateVersion: originalTemplate.version,
-    diff: createDiff(originalTemplate, args.data),
-  };
+  const diff = createDiff(originalTemplate, args.data);
 
-  if (isEmpty(command.diff)) {
+  if (isEmpty(diff)) {
     return;
   }
 
+  const response = await updatePredicateTemplate({
+    templateId: args.templateId,
+    unmodifiedTemplateVersion: originalTemplate.version,
+    diff,
+  });
+
+  const template: PredicateTemplateState = {
+    ...originalTemplate,
+    version: response.templateVersion,
+    ...args.data,
+  };
+
   predicateTemplates.addOrReplace(template);
-  await axios.post(`/predicate-templates/update`, command);
 }
 
 export async function deleteAsync(_: any, templateId: string) {
-  predicateTemplates.delete(templateId);
-
-  const command: DeletePredicateTemplateCommand = {
+  await deletePredicateTemplate({
     templateId,
     unmodifiedTemplateVersion: 1,
-  };
+  });
 
-  await axios.post(`/predicate-templates/delete`, command);
+  predicateTemplates.delete(templateId);
 }
 
 const state$ = b.state();

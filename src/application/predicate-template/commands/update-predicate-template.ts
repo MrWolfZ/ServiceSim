@@ -1,4 +1,4 @@
-import { Command } from 'src/application/infrastructure/cqrs';
+import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { Diff } from 'src/domain/infrastructure/diff';
 import { PredicateTemplateAggregate, PredicateTemplateData } from 'src/domain/predicate-template';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
@@ -19,7 +19,7 @@ export interface UpdatePredicateTemplateCommandResponse {
 
 const repo = versionedRepository<PredicateTemplateAggregate>('predicate-template');
 
-export async function updatePredicateTemplate(command: UpdatePredicateTemplateCommand) {
+export async function updatePredicateTemplateHandler(command: UpdatePredicateTemplateCommand) {
   const newVersion = await repo.patch(
     command.templateId,
     command.unmodifiedTemplateVersion,
@@ -31,6 +31,8 @@ export async function updatePredicateTemplate(command: UpdatePredicateTemplateCo
     templateVersion: newVersion,
   };
 }
+
+export const updatePredicateTemplate = createCommandFn<UpdatePredicateTemplateCommand>('update-predicate-template');
 
 // TODO: validate
 export const updatePredicateTemplateConstraints: CommandValidationConstraints<UpdatePredicateTemplateCommand> = {

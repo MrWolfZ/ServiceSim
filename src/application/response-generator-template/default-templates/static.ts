@@ -1,4 +1,4 @@
-import { ResponseGeneratorTemplateData } from '../response-generator-template.types';
+import { ResponseGeneratorTemplateData } from 'src/domain/response-generator-template';
 
 export const STATIC: ResponseGeneratorTemplateData = {
   name: 'Static',

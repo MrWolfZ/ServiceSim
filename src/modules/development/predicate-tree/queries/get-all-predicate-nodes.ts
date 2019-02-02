@@ -1,5 +1,6 @@
 import { getPredicateTemplatesByIdsAndVersions } from 'src/application/predicate-template/queries/get-predicate-templates-by-ids-and-versions';
-import { getResponseGeneratorTemplatesByIdsAndVersions } from '../../response-generator-template/response-generator-template.api';
+// tslint:disable-next-line:max-line-length
+import { getResponseGeneratorTemplatesByIdsAndVersions } from 'src/application/response-generator-template/queries/get-response-generator-templates-by-ids-and-versions';
 import { predicateNodeRepo } from '../predicate-node.repo';
 import { PredicateNodeDto, ResponseGeneratorData, ResponseGeneratorDataWithTemplateSnapshot, TemplateInfo } from '../predicate-node.types';
 
@@ -35,7 +36,7 @@ export async function getAllPredicateNodes() {
     allReferencedResponseGeneratorTemplates,
   ] = await Promise.all([
     getPredicateTemplatesByIdsAndVersions({ idsAndVersions: allReferencedPredicateTemplateIdsAndVersions }),
-    getResponseGeneratorTemplatesByIdsAndVersions(allReferencedResponseGeneratorTemplateIdsAndVersions),
+    getResponseGeneratorTemplatesByIdsAndVersions({ idsAndVersions: allReferencedResponseGeneratorTemplateIdsAndVersions }),
   ]);
 
   return allNodes.map<PredicateNodeDto>(n => {

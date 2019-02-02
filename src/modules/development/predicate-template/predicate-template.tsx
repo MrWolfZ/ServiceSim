@@ -1,10 +1,12 @@
 import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
+import { PredicateTemplateData } from 'src/domain/predicate-template';
 import { CancelButton, Form, page, SaveButton, StatefulComponentContext } from 'src/ui-infrastructure';
 import { validateParameterForm } from '../parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';
-import { PredicateTemplateData, PredicateTemplateFormValue } from './predicate-template.types';
+
+export type PredicateTemplateFormValue = PredicateTemplateData;
 
 export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
   name: '',

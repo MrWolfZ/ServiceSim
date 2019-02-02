@@ -1,5 +1,5 @@
 import { Component, Vue } from 'vue-property-decorator';
-import { CONFIG } from './config';
+import { CONFIG } from './infrastructure/config';
 import predicateTemplates from './modules/development/predicate-template/predicate-template.store';
 import predicateNodes from './modules/development/predicate-tree/predicate-node.store';
 import { Navbar } from './ui-infrastructure/navbar';

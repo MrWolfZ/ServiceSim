@@ -1,8 +1,7 @@
 import { Action, AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'pure-forms';
 import { ExpansionContainer, FormField, PrimaryButton, pure, TextInput } from 'src/ui-infrastructure';
-import { ParameterForm } from '../parameter/parameter-form';
-import { ParameterFormValue } from '../parameter/parameter.types';
-import { PredicateTemplateFormValue } from './predicate-template.types';
+import { ParameterForm, ParameterFormValue } from '../parameter/parameter-form';
+import { PredicateTemplateFormValue } from './predicate-template';
 
 export interface PredicateTemplateFormProps {
   formState: FormGroupState<PredicateTemplateFormValue>;
