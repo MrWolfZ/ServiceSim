@@ -5,7 +5,7 @@ module.exports = {
   outputDir: 'dist/ui',
   configureWebpack: {
     entry: {
-      app: './src/ui-main.ts'
+      app: './src/ui/ui-main.ts'
     },
     resolve: {
       alias: {
@@ -18,7 +18,7 @@ module.exports = {
     },
     plugins: [
       new CopyWebpackPlugin([{
-        from: path.join(__dirname, 'src/assets'),
+        from: path.join(__dirname, 'src/ui/assets'),
         to: path.join(__dirname, 'dist/ui/assets'),
         toType: 'dir',
       }]),
@@ -59,7 +59,7 @@ module.exports = {
       .use('sass-loader')
       .loader('sass-loader')
       .tap(options => {
-        options.includePaths = ['src/ui-styles'];
+        options.includePaths = ['src/ui/styles'];
         return options;
       });
 
@@ -69,7 +69,7 @@ module.exports = {
       .use('sass-loader')
       .loader('sass-loader')
       .tap(options => {
-        options.includePaths = ['src/ui-styles'];
+        options.includePaths = ['src/ui/styles'];
         return options;
       });
 
@@ -79,13 +79,13 @@ module.exports = {
       .use('sass-loader')
       .loader('sass-loader')
       .tap(options => {
-        options.includePaths = ['src/ui-styles'];
+        options.includePaths = ['src/ui/styles'];
         return options;
       });
 
     config.plugin('html')
       .tap(args => {
-        args[0].template = path.join(__dirname, 'src/index.html');
+        args[0].template = path.join(__dirname, 'src/ui/index.html');
         return args;
       });
   }

@@ -21,11 +21,10 @@
     ]
   },
   "files": [
-    "src/ui-main.ts"
+    "src/ui/ui-main.ts"
   ],
   "include": [
-    "src/**/*.vue",
-    "src/ui-infrastructure/**/*",
+    "src/ui/**/*",
     "src/**/*.types.ts",
     "src/**/*.store.ts",
     "src/util/**/*",
