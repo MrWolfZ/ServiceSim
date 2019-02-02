@@ -1,9 +1,26 @@
+import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { AddChildPredicateNodeWithCustomFunctionBodyCommand } from '../predicate-node.types';
 
-export async function addChildPredicateNodeWithCustomFunctionBody(command: AddChildPredicateNodeWithCustomFunctionBodyCommand) {
+export type AddChildPredicateNodeWithCustomFunctionBodyCommandType = 'add-child-predicate-node-with-custom-function-body';
+
+export interface AddChildPredicateNodeWithCustomFunctionBodyCommand
+  extends Command<AddChildPredicateNodeWithCustomFunctionBodyCommandType, AddChildPredicateNodeWithCustomFunctionBodyCommandResponse> {
+  parentNodeId: string;
+  name: string;
+  description: string;
+  evalFunctionBody: string;
+}
+
+export interface AddChildPredicateNodeWithCustomFunctionBodyCommandResponse {
+  nodeId: string;
+  nodeVersion: number;
+}
+
+export async function addChildPredicateNodeWithCustomFunctionBodyHandler(
+  command: AddChildPredicateNodeWithCustomFunctionBodyCommand,
+): Promise<AddChildPredicateNodeWithCustomFunctionBodyCommandResponse> {
   const parentNode = await predicateNodeRepo.query.byId(command.parentNodeId);
 
   if (!Array.isArray(parentNode.childNodeIdsOrResponseGenerator)) {
@@ -35,6 +52,9 @@ export async function addChildPredicateNodeWithCustomFunctionBody(command: AddCh
     nodeVersion: 1,
   };
 }
+
+export const addChildPredicateNodeWithCustomFunctionBody =
+  createCommandFn<AddChildPredicateNodeWithCustomFunctionBodyCommand>('add-child-predicate-node-with-custom-function-body');
 
 // TODO: validate
 // tslint:disable-next-line:max-line-length

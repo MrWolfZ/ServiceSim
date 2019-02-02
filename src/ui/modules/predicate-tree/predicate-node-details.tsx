@@ -1,6 +1,7 @@
+import { Emit } from 'src/ui/infrastructure/decorators';
 import { TsxComponent } from 'src/ui/infrastructure/tsx-component';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import predicateNodes from './predicate-node.store';
 
 export interface PredicateNodeDetailsProps {

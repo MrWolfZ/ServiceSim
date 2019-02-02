@@ -1,13 +1,14 @@
 import { Action, createFormGroupState, FormGroupState, formStateReducer, updateGroup, validate } from 'pure-forms';
 import { minLength, required } from 'pure-forms/validation';
 import { Parameter } from 'src/domain/parameter';
-import { PredicateNodeFormValue, PredicateNodeState } from 'src/modules/development/predicate-tree/predicate-node.types';
+import { Emit } from 'src/ui/infrastructure/decorators';
 import { TsxComponent } from 'src/ui/infrastructure/tsx-component';
 import { CancelButton, SaveButton } from 'src/ui/shared/common-components/button';
 import { Form } from 'src/ui/shared/form-components/form';
 import { ModalDialog } from 'src/ui/shared/modal-dialog';
-import { Component, Emit } from 'vue-property-decorator';
-import { PredicateNodeForm } from './predicate-node-form';
+import { Component } from 'vue-property-decorator';
+import { PredicateNodeForm, PredicateNodeFormValue } from './predicate-node-form';
+import { PredicateNodeState } from './predicate-node.store';
 
 export interface PredicateNodeDialogProps {
   onSubmit: (data: PredicateNodeFormValue, nodeId?: string) => any;

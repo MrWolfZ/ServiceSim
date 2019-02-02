@@ -1,5 +1,5 @@
+import { PredicateNodeAggregate, PredicateNodeDomainEvents } from 'src/domain/predicate-tree';
 import { eventDrivenRepository } from 'src/infrastructure/db';
-import { PredicateNodeAggregate, PredicateNodeDomainEvents } from './predicate-node.types';
 
 export const predicateNodeRepo = eventDrivenRepository<PredicateNodeAggregate, PredicateNodeDomainEvents>('predicate-node', {
   ChildPredicateNodeAdded: (aggregate, evt) => {

@@ -1,6 +1,8 @@
-import axios from 'axios';
-import { PredicateNodeDto, PredicateNodeState, RootNodeName } from 'src/modules/development/predicate-tree/predicate-node.types';
+import { getAllPredicateNodes, PredicateNodeDto } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
+import { RootNodeName } from 'src/domain/predicate-tree';
 import { getStoreBuilder } from 'vuex-typex';
+
+export interface PredicateNodeState extends PredicateNodeDto { }
 
 export interface PredicateNodesState {
   nodesById: { [templateId: string]: PredicateNodeState };
@@ -39,8 +41,8 @@ export function reset(state: PredicateNodesState) {
 }
 
 export async function loadAllAsync() {
-  const response = await axios.get<PredicateNodeDto[]>(`/predicate-tree/nodes`);
-  predicateNodes.addAll(response.data);
+  const response = await getAllPredicateNodes({});
+  predicateNodes.addAll(response);
 }
 
 const state$ = b.state();

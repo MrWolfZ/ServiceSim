@@ -1,8 +1,24 @@
+import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { UpdatePredicateNodeCommand } from '../predicate-node.types';
 
-export async function updatePredicateNode(command: UpdatePredicateNodeCommand) {
+export type UpdatePredicateNodeCommandType = 'update-predicate-node';
+
+export interface UpdatePredicateNodeCommand
+  extends Command<UpdatePredicateNodeCommandType, UpdatePredicateNodeCommandResponse> {
+  nodeId: string;
+  unmodifiedNodeVersion: number;
+  name?: string;
+  description?: string;
+  parameterValuesOrEvalFunctionBody: { [prop: string]: string | number | boolean } | string;
+}
+
+export interface UpdatePredicateNodeCommandResponse {
+  nodeId: string;
+  nodeVersion: number;
+}
+
+export async function updatePredicateNodeHandler(command: UpdatePredicateNodeCommand): Promise<UpdatePredicateNodeCommandResponse> {
   const { nodeId, unmodifiedNodeVersion, parameterValuesOrEvalFunctionBody, ...data } = command;
 
   const newVersion = await predicateNodeRepo.patch(
@@ -22,6 +38,8 @@ export async function updatePredicateNode(command: UpdatePredicateNodeCommand) {
     nodeVersion: newVersion,
   };
 }
+
+export const updatePredicateNode = createCommandFn<UpdatePredicateNodeCommand>('update-predicate-node');
 
 // TODO: validate
 export const updatePredicateNodeConstraints: CommandValidationConstraints<UpdatePredicateNodeCommand> = {

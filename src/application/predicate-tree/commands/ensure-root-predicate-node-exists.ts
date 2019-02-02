@@ -1,7 +1,12 @@
+import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
+import { RootNodeName } from 'src/domain/predicate-tree';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { RootNodeName } from '../predicate-node.types';
 
-export async function ensureRootPredicateNodeExists() {
+export type EnsureRootPredicateNodeExistsCommandType = 'ensure-root-predicate-node-exists';
+
+export interface EnsureRootPredicateNodeExistsCommand extends Command<EnsureRootPredicateNodeExistsCommandType, { nodeId: string }> { }
+
+export async function ensureRootPredicateNodeExistsHandler(_: EnsureRootPredicateNodeExistsCommand) {
   const rootNodeName: RootNodeName = 'ROOT';
 
   const rootNodes = (await predicateNodeRepo.query.byProperties({ name: rootNodeName }));
@@ -23,3 +28,5 @@ export async function ensureRootPredicateNodeExists() {
     nodeId: rootNode.id,
   };
 }
+
+export const ensureRootPredicateNodeExists = createCommandFn<EnsureRootPredicateNodeExistsCommand>('ensure-root-predicate-node-exists');

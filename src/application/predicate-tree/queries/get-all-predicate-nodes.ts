@@ -1,10 +1,28 @@
+import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { getPredicateTemplatesByIdsAndVersions } from 'src/application/predicate-template/queries/get-predicate-templates-by-ids-and-versions';
 // tslint:disable-next-line:max-line-length
 import { getResponseGeneratorTemplatesByIdsAndVersions } from 'src/application/response-generator-template/queries/get-response-generator-templates-by-ids-and-versions';
+import {
+  PredicateNodeData,
+  PredicateTemplateInfoWithSnapshot,
+  ResponseGeneratorData,
+  ResponseGeneratorDataWithTemplateSnapshot,
+  TemplateInfo,
+} from 'src/domain/predicate-tree';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { PredicateNodeDto, ResponseGeneratorData, ResponseGeneratorDataWithTemplateSnapshot, TemplateInfo } from '../predicate-node.types';
 
-export async function getAllPredicateNodes() {
+export type GetAllPredicateNodesQueryType = 'get-all-predicate-nodes';
+
+export interface GetAllPredicateNodesQuery extends Query<GetAllPredicateNodesQueryType, PredicateNodeDto[]> { }
+
+export interface PredicateNodeDto extends PredicateNodeData {
+  id: string;
+  version: number;
+  templateInfoOrEvalFunctionBody: PredicateTemplateInfoWithSnapshot | string;
+  childNodeIdsOrResponseGenerator: string[] | ResponseGeneratorDataWithTemplateSnapshot;
+}
+
+export async function getAllPredicateNodesHandler(_: GetAllPredicateNodesQuery) {
   const allNodes = await predicateNodeRepo.query.all();
 
   function getReferencedTemplateIdsAndVersions(templateInfos: TemplateInfo[]) {
@@ -106,3 +124,5 @@ export async function getAllPredicateNodes() {
     };
   });
 }
+
+export const getAllPredicateNodes = createQueryFn<GetAllPredicateNodesQuery>('get-all-predicate-nodes');

@@ -1,11 +1,10 @@
 import { ALL, PATH_PREFIX } from 'src/application/predicate-template/default-templates';
 import { getAllPredicateTemplates } from 'src/application/predicate-template/queries/get-all-predicate-templates';
+import { addChildPredicateNodeFromTemplate } from 'src/application/predicate-tree/commands/add-child-predicate-node-from-template';
+import { setPredicateNodeResponseGeneratorFromTemplate } from 'src/application/predicate-tree/commands/set-predicate-node-response-generator-from-template';
+import { getAllPredicateNodes } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
 import { STATIC } from 'src/application/response-generator-template/default-templates';
 import { getAllResponseGeneratorTemplates } from 'src/application/response-generator-template/queries/get-all-response-generator-templates';
-import { addChildPredicateNodeFromTemplate } from 'src/modules/development/predicate-tree/commands/add-child-predicate-node-from-template';
-// tslint:disable-next-line:max-line-length
-import { setPredicateNodeResponseGeneratorFromTemplate } from 'src/modules/development/predicate-tree/commands/set-predicate-node-response-generator-from-template';
-import { getAllPredicateNodes } from 'src/modules/development/predicate-tree/queries/get-all-predicate-nodes';
 
 export async function setupMockData() {
   const allTemplates = await getAllPredicateTemplates({});
@@ -15,7 +14,7 @@ export async function setupMockData() {
   const allResponseGeneratorTemplates = await getAllResponseGeneratorTemplates({});
   const staticResponseGeneratorTemplate = allResponseGeneratorTemplates.find(t => t.name === STATIC.name)!;
 
-  const rootNode = (await getAllPredicateNodes())[0];
+  const rootNode = (await getAllPredicateNodes({}))[0];
 
   const topLevelPredicateNode1Result = await addChildPredicateNodeFromTemplate({
     parentNodeId: rootNode.id,

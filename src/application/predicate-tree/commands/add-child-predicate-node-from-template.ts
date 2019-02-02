@@ -1,9 +1,27 @@
+import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
+import { TemplateInfo } from 'src/domain/predicate-tree';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { AddChildPredicateNodeFromTemplateCommand } from '../predicate-node.types';
 
-export async function addChildPredicateNodeFromTemplate(command: AddChildPredicateNodeFromTemplateCommand) {
+export type AddChildPredicateNodeFromTemplateCommandType = 'add-child-predicate-node-from-template';
+
+export interface AddChildPredicateNodeFromTemplateCommand
+  extends Command<AddChildPredicateNodeFromTemplateCommandType, AddChildPredicateNodeFromTemplateCommandResponse> {
+  parentNodeId: string;
+  name: string;
+  description: string;
+  templateInfo: TemplateInfo;
+}
+
+export interface AddChildPredicateNodeFromTemplateCommandResponse {
+  nodeId: string;
+  nodeVersion: number;
+}
+
+export async function addChildPredicateNodeFromTemplateHandler(
+  command: AddChildPredicateNodeFromTemplateCommand,
+): Promise<AddChildPredicateNodeFromTemplateCommandResponse> {
   const parentNode = await predicateNodeRepo.query.byId(command.parentNodeId);
 
   if (!Array.isArray(parentNode.childNodeIdsOrResponseGenerator)) {
@@ -35,6 +53,8 @@ export async function addChildPredicateNodeFromTemplate(command: AddChildPredica
     nodeVersion: 1,
   };
 }
+
+export const addChildPredicateNodeFromTemplate = createCommandFn<AddChildPredicateNodeFromTemplateCommand>('add-child-predicate-node-from-template');
 
 // TODO: validate
 // tslint:disable-next-line:max-line-length

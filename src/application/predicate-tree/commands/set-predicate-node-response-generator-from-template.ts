@@ -1,9 +1,28 @@
+import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
+import { TemplateInfo } from 'src/domain/predicate-tree';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
-import { SetResponseGeneratorFromTemplateCommand } from '../predicate-node.types';
 
-export async function setPredicateNodeResponseGeneratorFromTemplate(command: SetResponseGeneratorFromTemplateCommand) {
+export type SetResponseGeneratorFromTemplateCommandType = 'set-response-generator-from-template';
+
+export interface SetResponseGeneratorFromTemplateCommand
+  extends Command<SetResponseGeneratorFromTemplateCommandType, SetResponseGeneratorFromTemplateCommandResponse> {
+  nodeId: string;
+  unmodifiedNodeVersion: number;
+  name: string;
+  description: string;
+  templateInfo: TemplateInfo;
+}
+
+export interface SetResponseGeneratorFromTemplateCommandResponse {
+  nodeId: string;
+  nodeVersion: number;
+}
+
+export async function setPredicateNodeResponseGeneratorFromTemplateHandler(
+  command: SetResponseGeneratorFromTemplateCommand,
+): Promise<SetResponseGeneratorFromTemplateCommandResponse> {
   const node = await predicateNodeRepo.query.byId(command.nodeId);
 
   if (Array.isArray(node.childNodeIdsOrResponseGenerator) && node.childNodeIdsOrResponseGenerator.length > 0) {
@@ -30,6 +49,8 @@ export async function setPredicateNodeResponseGeneratorFromTemplate(command: Set
     nodeVersion: newVersion,
   };
 }
+
+export const setPredicateNodeResponseGeneratorFromTemplate = createCommandFn<SetResponseGeneratorFromTemplateCommand>('set-response-generator-from-template');
 
 // TODO: validate
 export const setPredicateNodeResponseGeneratorFromTemplateConstraints: CommandValidationConstraints<SetResponseGeneratorFromTemplateCommand> = {

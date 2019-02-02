@@ -1,6 +1,7 @@
+import { Emit } from 'src/ui/infrastructure/decorators';
 import { TsxComponent } from 'src/ui/infrastructure/tsx-component';
 import { ExpansionContainer } from 'src/ui/shared/expansion-container';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import './predicate-node.scss';
 import predicateNodes from './predicate-node.store';
 

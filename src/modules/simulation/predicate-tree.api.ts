@@ -1,5 +1,5 @@
-import { PredicateNodeDto, RootNodeName } from '../development/predicate-tree/predicate-node.types';
-import { getAllPredicateNodes } from '../development/predicate-tree/queries/get-all-predicate-nodes';
+import { getAllPredicateNodes, PredicateNodeDto } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
+import { RootNodeName } from 'src/domain/predicate-tree';
 import { ServiceRequest, ServiceResponse } from '../service-invocation/service-invocation.types';
 
 export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
@@ -14,7 +14,7 @@ export type PredicateEvaluationFunction = (request: ServiceRequest, parameters: 
 export type ResponseGeneratorGenerateFunction = (request: ServiceRequest, parameters: { [prop: string]: any }) => ServiceResponse;
 
 export async function getPredicateTree() {
-  const allNodes = await getAllPredicateNodes();
+  const allNodes = await getAllPredicateNodes({});
 
   const rootNodeName: RootNodeName = 'ROOT';
   const rootNode = allNodes.find(n => n.name === rootNodeName);

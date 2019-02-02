@@ -1,12 +1,21 @@
 import { Action, FormControlState, FormGroupState } from 'pure-forms';
 import { Parameter } from 'src/domain/parameter';
-import { PredicateNodeFormValue } from 'src/modules/development/predicate-tree/predicate-node.types';
+import { Emit } from 'src/ui/infrastructure/decorators';
 import { TsxComponent } from 'src/ui/infrastructure/tsx-component';
 import { FormField } from 'src/ui/shared/form-components/form-field';
 import { NumberInput } from 'src/ui/shared/form-components/number-input';
 import { RadioInput } from 'src/ui/shared/form-components/radio-input';
 import { TextInput } from 'src/ui/shared/form-components/text-input';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
+
+export interface PredicateNodeFormValue {
+  name: string;
+  description: string;
+  evalFunctionBody: string;
+  parameterValues: {
+    [param: string]: string | boolean | number;
+  };
+}
 
 export interface PredicateNodeFormProps {
   formState: FormGroupState<PredicateNodeFormValue>;

@@ -2,14 +2,13 @@ import express, { Response } from 'express';
 import path from 'path';
 import { Subscription } from 'rxjs';
 import { ErrorResponsePayload } from './api-infrastructure/cqrs';
+import { ensureRootPredicateNodeExists } from './application/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { registerHandlers } from './application/register-handlers';
 import { query, registerUniversalEventHandler, send } from './infrastructure/bus';
 import { CONFIG } from './infrastructure/config';
 import { initializeDB } from './infrastructure/db';
 import { initializeEventLog } from './infrastructure/event-log';
 import { logger } from './infrastructure/logging';
-import { ensureRootPredicateNodeExists } from './modules/development/predicate-tree/commands/ensure-root-predicate-node-exists';
-import { predicateTreeApi } from './modules/development/predicate-tree/predicate-tree.api';
 import { simulationApi } from './modules/simulation/simulation.api';
 import { createFileSystemPersistenceAdapter } from './persistence/db/file-system';
 import { inMemoryPersistenceAdapter } from './persistence/db/in-memory';
@@ -25,8 +24,6 @@ declare module 'http' {
 }
 
 export const uiApi = express.Router();
-uiApi.use('/predicate-tree', predicateTreeApi);
-
 uiApi.post('/command', async (req, res) => {
   try {
     const result = await send(req.body);
@@ -106,9 +103,9 @@ export async function initialize(config = CONFIG) {
 
   await initializeEventLog({ adapter: eventLogPersistenceAdapter });
 
-  await ensureRootPredicateNodeExists();
-
   registerHandlers();
+
+  await ensureRootPredicateNodeExists({});
 
   return new Subscription(() => {
     logger.info('shutting down...');
