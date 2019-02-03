@@ -2,6 +2,7 @@ import { keys } from 'src/util/util';
 import { ComponentOptions, CreateElement, FunctionalComponentOptions, RenderContext } from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueRouter, { Route } from 'vue-router';
+import { RecordPropsDefinition } from 'vue/types/options';
 import { TsxComponent } from './tsx-component';
 
 export interface PureComponentContext {
@@ -52,19 +53,20 @@ export interface StatefulComponentContext extends PureComponentContext {
   router: VueRouter;
 }
 
-export interface LifecycleHooks<TState> {
-  created?(state: TState, context: StatefulComponentContext): void;
-  mounted?(state: TState, context: StatefulComponentContext): void;
+export interface LifecycleHooks<TState, TProps> {
+  created?(state: TState, props: TProps, context: StatefulComponentContext): void;
+  mounted?(state: TState, props: TProps, context: StatefulComponentContext): void;
   beforeRouteUpdate?(state: TState, to: Route, from: Route, next: () => void, context: StatefulComponentContext): void;
 }
 
 export function stateful<TState, TProps = {}>(
   def: (state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element,
   initialState: TState,
-  lifecycleHooks: LifecycleHooks<TState> = {},
+  propsDef: RecordPropsDefinition<TProps>,
+  lifecycleHooks: LifecycleHooks<TState, TProps> = {},
 ) {
   const name = (def.name || 'StatefulComponent').replace(/Def$/g, '');
-  return Component({})(
+  return Component({ props: propsDef })(
     class extends TsxComponent<TProps> {
       private state: TState = { ...initialState };
 
@@ -81,22 +83,7 @@ export function stateful<TState, TProps = {}>(
         return name;
       }
 
-      created() {
-        lifecycleHooks.created && lifecycleHooks.created(this.state, this.context);
-      }
-
-      mounted() {
-        lifecycleHooks.mounted && lifecycleHooks.mounted(this.state, this.context);
-      }
-
-      beforeRouteUpdate(to: Route, from: Route, next: () => void) {
-        lifecycleHooks.beforeRouteUpdate && lifecycleHooks.beforeRouteUpdate(this.state, to, from, next, this.context);
-      }
-
-      render(h: CreateElement) {
-        // babel plugin will transpile method to function component definition
-        const options = def as any as FunctionalComponentOptions<TProps>;
-
+      get props(): TProps {
         const eventHandlers: { [name: string]: Function } = {};
         keys(this.$listeners).forEach(name => {
           const normalizedName = `on${name.replace(/^on/g, '').replace(/^(.)/, v => v.toUpperCase())}`;
@@ -108,11 +95,30 @@ export function stateful<TState, TProps = {}>(
           eventHandlers[normalizedName] = handler;
         });
 
+        return {
+          ...this.$props,
+          ...eventHandlers as any,
+        };
+      }
+
+      created() {
+        lifecycleHooks.created && lifecycleHooks.created(this.state, this.props, this.context);
+      }
+
+      mounted() {
+        lifecycleHooks.mounted && lifecycleHooks.mounted(this.state, this.props, this.context);
+      }
+
+      beforeRouteUpdate(to: Route, from: Route, next: () => void) {
+        lifecycleHooks.beforeRouteUpdate && lifecycleHooks.beforeRouteUpdate(this.state, to, from, next, this.context);
+      }
+
+      render(h: CreateElement) {
+        // babel plugin will transpile method to function component definition
+        const options = def as any as FunctionalComponentOptions<TProps>;
+
         const render = options.render!.bind(undefined) as any as (...args: any[]) => JSX.Element;
-
-        const props = { ...this.$props, ...eventHandlers } as any;
-
-        return render.length === 4 ? render(h, this.state, props, this.context) : render(h, this.state, this.context);
+        return render.length === 4 ? render(h, this.state, this.props, this.context) : render(h, this.state, this.context);
       }
     }
   );
@@ -121,7 +127,7 @@ export function stateful<TState, TProps = {}>(
 export function page<TState>(
   def: (state: TState, context: StatefulComponentContext) => JSX.Element,
   initialState: TState,
-  lifecycleHooks: LifecycleHooks<TState> = {},
+  lifecycleHooks: LifecycleHooks<TState, {}> = {},
 ) {
-  return stateful(def, initialState, lifecycleHooks);
+  return stateful(def as any, initialState, {}, lifecycleHooks);
 }

@@ -130,7 +130,7 @@ function initialize(state: PredicateTemplatePageState, templateId: string | null
 }
 
 export const PredicateTemplatePage = page(PredicateTemplatePageDef, initialState, {
-  created: (state, { route }) => initialize(state, route.params.id),
+  created: (state, _, { route }) => initialize(state, route.params.id),
 
   beforeRouteUpdate: (state, to, _, next) => {
     initialize(state, to.params.id);

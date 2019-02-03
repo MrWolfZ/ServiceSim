@@ -1,5 +1,5 @@
 import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
-import { RootNodeName } from 'src/domain/predicate-tree';
+import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
 import { predicateNodeRepo } from '../predicate-node.repo';
 
 export type EnsureRootPredicateNodeExistsCommandType = 'ensure-root-predicate-node-exists';
@@ -7,9 +7,7 @@ export type EnsureRootPredicateNodeExistsCommandType = 'ensure-root-predicate-no
 export interface EnsureRootPredicateNodeExistsCommand extends Command<EnsureRootPredicateNodeExistsCommandType, { nodeId: string }> { }
 
 export async function ensureRootPredicateNodeExistsHandler(_: EnsureRootPredicateNodeExistsCommand) {
-  const rootNodeName: RootNodeName = 'ROOT';
-
-  const rootNodes = (await predicateNodeRepo.query.byProperties({ name: rootNodeName }));
+  const rootNodes = (await predicateNodeRepo.query.byProperties({ name: ROOT_NODE_NAME }));
 
   if (rootNodes.length > 0) {
     return {
@@ -18,8 +16,8 @@ export async function ensureRootPredicateNodeExistsHandler(_: EnsureRootPredicat
   }
 
   const rootNode = await predicateNodeRepo.create({
-    name: rootNodeName,
-    description: 'Root node of the predicate tree. This node should never be exposed to the user directly.',
+    name: ROOT_NODE_NAME,
+    description: 'Root node of the predicate tree. All requests pass through this node unconditionally.',
     templateInfoOrEvalFunctionBody: 'return true;',
     childNodeIdsOrResponseGenerator: [],
   });

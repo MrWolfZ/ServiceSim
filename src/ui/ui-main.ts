@@ -7,6 +7,7 @@ import {
   faChevronRight,
   faEdit,
   faExclamation,
+  faExpand,
   faInfoCircle,
   faPlus,
   faTimes,
@@ -48,6 +49,7 @@ library.add(faInfoCircle);
 library.add(faPlus);
 library.add(faTimes);
 library.add(faExclamation);
+library.add(faExpand);
 
 Vue.component('fa-icon', FontAwesomeIcon as any);
 Vue.use(Router);
@@ -89,7 +91,7 @@ new Vue({
       },
       ...prefixWith('/development', [
         {
-          path: '/predicate-tree',
+          path: '/predicate-tree/:focusedNodeId?',
           name: 'predicate-tree',
           component: () => import(/* webpackChunkName: "development-predicate-tree" */ './modules/predicate-tree/predicate-tree'),
         },

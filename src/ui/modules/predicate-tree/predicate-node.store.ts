@@ -1,8 +1,10 @@
 import { getAllPredicateNodes, PredicateNodeDto } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
-import { RootNodeName } from 'src/domain/predicate-tree';
+import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
 import { getStoreBuilder } from 'vuex-typex';
 
-export interface PredicateNodeState extends PredicateNodeDto { }
+export interface PredicateNodeState extends PredicateNodeDto {
+  parentNodeId: string | undefined;
+}
 
 export interface PredicateNodesState {
   nodesById: { [templateId: string]: PredicateNodeState };
@@ -19,12 +21,16 @@ export function getAll(state: PredicateNodesState) {
 }
 
 export function getRootNode(state: PredicateNodesState) {
-  const rootNodeName: RootNodeName = 'ROOT';
-  return state.nodeIds.map(id => state.nodesById[id]).find(n => n.name === rootNodeName);
+  return state.nodeIds.map(id => state.nodesById[id]).find(n => n.name === ROOT_NODE_NAME)!;
 }
 
-export function addAll(state: PredicateNodesState, nodes: PredicateNodeState[]) {
-  nodes.forEach(n => addOrReplace(state, n));
+export function addAll(state: PredicateNodesState, nodes: PredicateNodeDto[]) {
+  const childIdToParentId = {} as { [childNodeId: string]: string };
+  nodes
+    .filter(n => Array.isArray(n.childNodeIdsOrResponseGenerator))
+    .forEach(n => (n.childNodeIdsOrResponseGenerator as string[]).forEach(childId => childIdToParentId[childId] = n.id));
+
+  nodes.forEach(n => addOrReplace(state, { ...n, parentNodeId: childIdToParentId[n.id] }));
 }
 
 export function addOrReplace(state: PredicateNodesState, node: PredicateNodeState) {
@@ -42,6 +48,7 @@ export function reset(state: PredicateNodesState) {
 
 export async function loadAllAsync() {
   const response = await getAllPredicateNodes({});
+
   predicateNodes.addAll(response);
 }
 

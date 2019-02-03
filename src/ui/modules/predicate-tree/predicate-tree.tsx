@@ -1,109 +1,85 @@
-import { logger } from 'src/infrastructure/logging';
-import { Component, Vue } from 'vue-property-decorator';
+import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
+import { page, StatefulComponentContext } from 'src/ui/infrastructure/tsx';
+import { PrimaryButton } from 'src/ui/shared/common-components/button';
 import { PredicateNodeView } from './predicate-node';
-import { PredicateNodeDetails } from './predicate-node-details';
-import { PredicateNodeDialog } from './predicate-node-dialog';
 import predicateNodes from './predicate-node.store';
-import './predicate-tree.scss';
 
-@Component({})
-export default class PredicateTreePage extends Vue {
-  private selectedNodeId: string | undefined = this.topLevelNodeIds[0];
-
-  private dialog() {
-    return this.$refs[this.dialog.name] as PredicateNodeDialog;
-  }
-
-  get rootNode() {
-    return predicateNodes.rootNode;
-  }
-
-  get topLevelNodeIds() {
-    return this.rootNode ? this.rootNode.childNodeIdsOrResponseGenerator as string[] : [];
-  }
-
-  private deleteNode(nodeId: string) {
-    logger.info('delete', nodeId);
-  }
-
-  private addChildNode(nodeId: string) {
-    logger.info('add child node', nodeId);
-  }
-
-  private setResponseGenerator(nodeId: string) {
-    logger.info('set response generator', nodeId);
-  }
-
-  private editResponseGenerator(nodeId: string) {
-    logger.info('edit response generator', nodeId);
-  }
-
-  private removeResponseGenerator(nodeId: string) {
-    logger.info('remove response generator', nodeId);
-  }
-
-  render() {
-    return (
-      <div class='page predicate-tree-page'>
-        <div class='columns'>
-          <div class='column is-12-tablet is-6-desktop is-8-widescreen tree-column'>
-            <h1 class='title'>
-              Predicate Tree
-            </h1>
-
-            {this.topLevelNodeIds.length > 0 &&
-              <div class='nodes'>
-                {
-                  this.topLevelNodeIds.map(id =>
-                    <PredicateNodeView
-                      class='node'
-                      key={id}
-                      nodeId={id}
-                      selectedNodeId={this.selectedNodeId!}
-                      onSelect={nodeId => this.selectedNodeId = nodeId}
-                    />
-                  )
-                }
-              </div>
-            }
-
-            {this.topLevelNodeIds.length === 0 &&
-              <div>
-                <p>There are no predicate nodes yet.</p>
-                <br />
-                <button
-                  class='button is-primary'
-                  onClick={() => this.dialog().openForNewNode()}
-                >
-                  <span>Create new node</span>
-                  <span class='icon is-small'>
-                    <fa-icon icon='plus' />
-                  </span>
-                </button>
-              </div>
-            }
-          </div>
-
-          { /* TODO build open and close mechanism for small devices */}
-          <div class='column is-12-tablet is-6-desktop is-4-widescreen details-column'>
-            {this.selectedNodeId &&
-              <PredicateNodeDetails
-                class='node-details'
-                nodeId={this.selectedNodeId}
-                onEdit={() => this.dialog().openForExistingNode(predicateNodes.state.nodesById[this.selectedNodeId!])}
-                onDelete={() => this.deleteNode(this.selectedNodeId!)}
-                onAddChildNode={() => this.addChildNode(this.selectedNodeId!)}
-                onSetResponseGenerator={() => this.setResponseGenerator(this.selectedNodeId!)}
-                onEditResponseGenerator={() => this.editResponseGenerator(this.selectedNodeId!)}
-                onRemoveResponseGenerator={() => this.removeResponseGenerator(this.selectedNodeId!)}
-                onSelectChildNode={nodeId => this.selectedNodeId = nodeId}
-              />
-            }
-          </div>
-        </div>
-
-        <PredicateNodeDialog ref={this.dialog.name} onSubmit={() => void 0} />
-      </div>
-    );
-  }
+interface PredicateTreePageState {
+  focusedNodeId: string | undefined;
 }
+
+const initialState: PredicateTreePageState = {
+  focusedNodeId: undefined,
+};
+
+export const PredicateTreePageDef = (
+  state: PredicateTreePageState,
+  { router }: StatefulComponentContext,
+) => {
+  const { focusedNodeId } = state;
+
+  const focusedNode = focusedNodeId ? predicateNodes.state.nodesById[focusedNodeId] : predicateNodes.rootNode;
+
+  const parentNodeChain: { id: string; name: string }[] = [];
+
+  let parentNodeId = focusedNode.parentNodeId;
+  while (!!parentNodeId) {
+    const parentNode = predicateNodes.state.nodesById[parentNodeId];
+    parentNodeId = parentNode.parentNodeId;
+
+    parentNodeChain.unshift({ id: parentNode.id, name: parentNode.name });
+  }
+
+  return (
+    <div class='page flex-column'>
+      <h1 class='title'>
+        Predicate Tree
+      </h1>
+
+      <nav class='breadcrumb' aria-label='breadcrumbs'>
+        <ul>
+          {
+            parentNodeChain.map(({ id, name }) =>
+              <li key={id}>
+                <router-link to={{ name: 'predicate-tree', params: { focusedNodeId: name === ROOT_NODE_NAME ? undefined : id } }}>{name}</router-link>
+              </li>
+            )
+          }
+          <li class='is-active'><a href='#' aria-current='page'>{focusedNode.name}</a></li>
+        </ul>
+      </nav>
+
+      <div class='flex-fill'>
+        <PredicateNodeView
+          class='node'
+          nodeId={focusedNode.id}
+          isFocused={true}
+        />
+      </div>
+
+      {false &&
+        <div>
+          <p>There are no predicate nodes yet.</p>
+          <br />
+
+          <PrimaryButton
+            label='Create new node'
+            icon='plus'
+            onClick={() => router.push({ name: 'TODO' })}
+          />
+        </div>
+      }
+    </div>
+  );
+};
+
+export const PredicateTreePage = page(PredicateTreePageDef, initialState, {
+  created: (state, _, { route }) => state.focusedNodeId = route.params.focusedNodeId,
+
+  beforeRouteUpdate: (state, to, _, next) => {
+    state.focusedNodeId = to.params.focusedNodeId;
+    next();
+  },
+});
+
+export default PredicateTreePage;

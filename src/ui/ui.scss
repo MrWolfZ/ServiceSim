@@ -34,3 +34,32 @@ body {
 .is-borderless {
   border: 0 !important;
 }
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-fill {
+  flex: 1;
+  overflow: auto;
+}
+
+.flex-center {
+  &.flex-row {
+    align-items: center;
+  }
+
+  &.flex-column {
+    justify-content: center;
+  }
+}
+
+.breadcrumb a {
+  transition: padding 0ms ease;
+}

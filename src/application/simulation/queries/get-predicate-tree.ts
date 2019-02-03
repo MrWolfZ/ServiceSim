@@ -1,6 +1,6 @@
 import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { getAllPredicateNodes, PredicateNodeDto } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
-import { RootNodeName } from 'src/domain/predicate-tree';
+import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
 import { ServiceRequest, ServiceResponse } from 'src/domain/service-invocation';
 
 export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
@@ -21,8 +21,7 @@ export interface GetPredicateTreeQuery extends Query<GetPredicateTreeQueryType, 
 export async function getPredicateTreeHandler(_: GetPredicateTreeQuery): Promise<PredicateNode | null> {
   const allNodes = await getAllPredicateNodes({});
 
-  const rootNodeName: RootNodeName = 'ROOT';
-  const rootNode = allNodes.find(n => n.name === rootNodeName);
+  const rootNode = allNodes.find(n => n.name === ROOT_NODE_NAME);
   return rootNode ? await buildNode(rootNode.id, allNodes) : null;
 }
 

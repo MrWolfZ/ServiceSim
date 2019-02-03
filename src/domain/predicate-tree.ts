@@ -21,7 +21,7 @@ export interface PredicateNodeData {
   childNodeIdsOrResponseGenerator: string[] | ResponseGeneratorData;
 }
 
-export type RootNodeName = 'ROOT';
+export const ROOT_NODE_NAME = 'Root';
 
 export type PredicateNodeAggregateType = 'predicate-node';
 
