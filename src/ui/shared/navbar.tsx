@@ -19,9 +19,9 @@ export class Navbar extends Vue {
         role='navigation'
         aria-label='main navigation'
       >
-        <div class='container is-fluid'>
+        <div class='container'>
 
-          <div class='navbar-brand'>
+          <div class='navbar-brand' style={{ marginLeft: 0 }}>
             <a
               role='button'
               class={`navbar-burger has-text-white ${this.menuIsOpen ? `is-active` : ``}`}
@@ -36,51 +36,47 @@ export class Navbar extends Vue {
           <div class={`navbar-menu ${this.menuIsOpen ? `is-active` : ``}`}>
             <div class='navbar-start'>
 
+              <router-link
+                to={{ name: 'predicate-tree' }}
+                class='navbar-item has-text-white'
+                onClick={() => this.closeMenu()}
+              >
+                Runtime
+              </router-link>
+
               <div class='navbar-item has-dropdown is-hoverable'>
                 <a class='navbar-link'>
                   Development
                 </a>
 
                 <div class='navbar-dropdown'>
-                  <a class='navbar-item'>
-                    About
-                  </a>
-                  <a class='navbar-item'>
-                    Jobs
-                  </a>
-                  <a class='navbar-item'>
-                    Contact
-                  </a>
-                  <hr class='navbar-divider' />
-                  <a class='navbar-item'>
-                    Report an issue
-                  </a>
+
+                  <router-link
+                    to={{ name: 'predicate-tree' }}
+                    class='navbar-item has-text-white'
+                    onClick={() => this.closeMenu()}
+                  >
+                    Predicate Tree
+                  </router-link>
+
+                  <router-link
+                    to={{ name: 'predicate-templates' }}
+                    class='navbar-item has-text-white'
+                    onClick={() => this.closeMenu()}
+                  >
+                    Predicate Templates
+                  </router-link>
+
+                  <router-link
+                    to={{ name: 'response-generator-templates' }}
+                    class='navbar-item has-text-white'
+                    onClick={() => this.closeMenu()}
+                  >
+                    Response Generator Templates
+                  </router-link>
+
                 </div>
               </div>
-
-              <router-link
-                to={{ name: 'predicate-tree' }}
-                class='navbar-item has-text-white'
-                onClick={() => this.closeMenu()}
-              >
-                Predicate Tree
-              </router-link>
-
-              <router-link
-                to={{ name: 'predicate-templates' }}
-                class='navbar-item has-text-white'
-                onClick={() => this.closeMenu()}
-              >
-                Predicate Templates
-              </router-link>
-
-              <router-link
-                to={{ name: 'response-generator-templates' }}
-                class='navbar-item has-text-white'
-                onClick={() => this.closeMenu()}
-              >
-                Response Generator Templates
-              </router-link>
 
               <router-link
                 to={{ name: 'admin' }}

@@ -18,9 +18,10 @@ body {
 }
 
 .page {
+  @extend .container;
   height: 100%;
   display: block;
-  padding: 2rem;
+  padding: 2rem 0;
   overflow-y: auto;
   overflow-x: hidden;
 }
