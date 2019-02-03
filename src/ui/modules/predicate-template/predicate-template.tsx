@@ -3,6 +3,7 @@ import { required } from 'pure-forms/validation';
 import { PredicateTemplateData } from 'src/domain/predicate-template';
 import { page, StatefulComponentContext } from 'src/ui/infrastructure/tsx';
 import { CancelButton, SaveButton } from 'src/ui/shared/common-components/button';
+import { Page } from 'src/ui/shared/common-components/page';
 import { Form } from 'src/ui/shared/form-components/form';
 import { validateParameterForm } from 'src/ui/shared/parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
@@ -53,15 +54,11 @@ export const PredicateTemplatePageDef = (
   const { templateId, isSaving, formState } = state;
 
   return (
-    <div class='page'>
-      <h1 class='title'>
-        {!templateId ? `Create new predicate template` : `Edit predicate template`}
-      </h1>
-
+    <Page title={!templateId ? `Create new predicate template` : `Edit predicate template`}>
       <Form formState={formState} onAction={onFormAction}>
         <PredicateTemplateForm formState={formState} onAction={onFormAction} />
 
-        <div class='buttons' style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
+        <div class='buttons flex-row flex-end'>
           <CancelButton
             onClick={navigateToList}
             isDisabled={isSaving}
@@ -74,8 +71,7 @@ export const PredicateTemplatePageDef = (
           />
         </div>
       </Form>
-
-    </div>
+    </Page>
   );
 
   function onFormAction(action: Action) {

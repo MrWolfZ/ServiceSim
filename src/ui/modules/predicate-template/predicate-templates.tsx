@@ -1,4 +1,5 @@
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
+import { Page } from 'src/ui/shared/common-components/page';
 import { Component, Vue } from 'vue-property-decorator';
 import { PredicateTemplateRow } from './predicate-template-row';
 import predicateTemplates from './predicate-template.store';
@@ -27,18 +28,15 @@ export default class PredicateTemplatesPage extends Vue {
   }
 
   private navigateToEditPage(templateId: string) {
-    this.$router.push(`/predicate-templates/${templateId}`);
+    this.$router.push({ name: 'predicate-template', params: { id: templateId } });
   }
 
   render() {
     return (
-      <div class='page'>
-        <h1 class='title'>
-          Predicate Templates
-        </h1>
+      <Page title='Predicate Templates'>
 
         {this.templates.length > 0 &&
-          <div>
+          <div class='flex-column flex-fill'>
             <div class='level is-mobile'>
               <div class='level-left'>
                 <div class='field'>
@@ -62,7 +60,7 @@ export default class PredicateTemplatesPage extends Vue {
               </div>
             </div>
 
-            <div>
+            <div class='flex-fill'>
               <table class='table' width='100%'>
                 <thead>
                   <tr>
@@ -109,7 +107,7 @@ export default class PredicateTemplatesPage extends Vue {
           </div>
         }
 
-      </div>
+      </Page>
     );
   }
 }

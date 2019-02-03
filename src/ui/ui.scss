@@ -18,9 +18,7 @@ body {
 }
 
 .page {
-  @extend .container;
   height: 100%;
-  display: block;
   padding: 2rem 0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -38,6 +36,7 @@ body {
 .flex-column {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .flex-row {
@@ -52,11 +51,31 @@ body {
 
 .flex-center {
   &.flex-row {
+    justify-content: center;
+  }
+
+  &.flex-column {
+    align-items: center;
+  }
+}
+
+.flex-center-alt {
+  &.flex-row {
     align-items: center;
   }
 
   &.flex-column {
     justify-content: center;
+  }
+}
+
+.flex-end {
+  &.flex-row {
+    justify-content: flex-end;
+  }
+
+  &.flex-column {
+    align-items: flex-end;
   }
 }
 

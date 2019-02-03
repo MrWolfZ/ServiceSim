@@ -57,7 +57,7 @@ export class App extends Vue {
         <Navbar />
         {this.dataWasLoaded ?
           <router-view /> :
-          <div class='page'>Loading...</div>
+          <div class='page container'>Loading...</div>
         }
       </div>
     );

@@ -96,6 +96,11 @@ new Vue({
           component: () => import(/* webpackChunkName: "development-predicate-tree" */ './modules/predicate-tree/predicate-tree'),
         },
         {
+          path: '/predicate-node/:id',
+          name: 'predicate-node',
+          component: () => import(/* webpackChunkName: "development-predicate-tree" */ './modules/predicate-tree/predicate-node'),
+        },
+        {
           path: '/predicate-templates',
           name: 'predicate-templates',
           component: () => import(/* webpackChunkName: "development-predicate-template" */ './modules/predicate-template/predicate-templates'),

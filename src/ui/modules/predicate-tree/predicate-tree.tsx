@@ -1,8 +1,9 @@
 import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
 import { page, StatefulComponentContext } from 'src/ui/infrastructure/tsx';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
-import { PredicateNodeView } from './predicate-node';
+import { Page } from 'src/ui/shared/common-components/page';
 import predicateNodes from './predicate-node.store';
+import { PredicateTreeNode } from './predicate-tree-node';
 
 interface PredicateTreePageState {
   focusedNodeId: string | undefined;
@@ -31,10 +32,7 @@ export const PredicateTreePageDef = (
   }
 
   return (
-    <div class='page flex-column'>
-      <h1 class='title'>
-        Predicate Tree
-      </h1>
+    <Page title='Predicate Tree'>
 
       <nav class='breadcrumb' aria-label='breadcrumbs'>
         <ul>
@@ -50,7 +48,7 @@ export const PredicateTreePageDef = (
       </nav>
 
       <div class='flex-fill'>
-        <PredicateNodeView
+        <PredicateTreeNode
           class='node'
           nodeId={focusedNode.id}
           isFocused={true}
@@ -69,7 +67,8 @@ export const PredicateTreePageDef = (
           />
         </div>
       }
-    </div>
+
+    </Page>
   );
 };
 
