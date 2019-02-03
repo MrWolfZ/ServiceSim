@@ -107,7 +107,7 @@
     "no-string-throw": true,
     "no-submodule-imports": false,
     "no-switch-case-fall-through": true,
-    "no-this-assignment": true,
+    "no-this-assignment": false,
     "no-trailing-whitespace": true,
     "no-unbound-method": [
       true,
