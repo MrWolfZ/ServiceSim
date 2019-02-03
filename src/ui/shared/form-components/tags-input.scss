@@ -1,0 +1,27 @@
+@import 'variables';
+
+.tagsinput {
+  border: 0;
+  height: 2.5rem !important;
+
+  .tag {
+    transition-duration: 0ms;
+    background-color: $primary;
+
+    &.is-active {
+      background-color: $link;
+
+      + .is-delete {
+        background-color: $link;
+      }
+    }
+  }
+
+  >input {
+    width: auto !important;
+    flex: 1;
+    color: $input-color;
+    background-color: $input-background-color;
+    outline-color: $input-border-color;
+  }
+}

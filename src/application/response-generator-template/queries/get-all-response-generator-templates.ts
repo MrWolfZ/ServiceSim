@@ -21,6 +21,7 @@ export async function getAllResponseGeneratorTemplatesHandler(_: GetAllResponseG
     version: t.$metadata.version,
     name: t.name,
     description: t.description,
+    tags: t.tags,
     generatorFunctionBody: t.generatorFunctionBody,
     parameters: t.parameters,
   }));

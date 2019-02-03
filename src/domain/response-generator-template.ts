@@ -4,6 +4,7 @@ import { Parameter } from 'src/domain/parameter';
 export interface ResponseGeneratorTemplateData {
   name: string;
   description: string;
+  tags: string[];
   generatorFunctionBody: string;
   parameters: Parameter[];
 }

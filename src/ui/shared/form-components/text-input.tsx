@@ -21,6 +21,7 @@ const TextInputDef = ({ placeholder, rows, controlState, isCode, onAction, style
   if (rows && rows > 1) {
     return (
       <textarea
+        id={controlState.id}
         class='textarea'
         style={style}
         rows={rows}
@@ -35,6 +36,7 @@ const TextInputDef = ({ placeholder, rows, controlState, isCode, onAction, style
 
   return (
     <input
+      id={controlState.id}
       class='input'
       style={style}
       type='text'

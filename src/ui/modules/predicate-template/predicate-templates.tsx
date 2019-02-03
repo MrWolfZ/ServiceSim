@@ -68,6 +68,7 @@ export default class PredicateTemplatesPage extends Vue {
                   <tr>
                     <th width={200}>Name</th>
                     <th>Description</th>
+                    <th width={200}>Tags</th>
                     <th width={200} />
                   </tr>
                 </thead>

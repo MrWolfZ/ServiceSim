@@ -19,6 +19,7 @@ export async function createPredicateTemplateHandler(command: CreatePredicateTem
   const template = await repo.create({
     name: command.name,
     description: command.description,
+    tags: command.tags,
     evalFunctionBody: command.evalFunctionBody,
     parameters: command.parameters,
   });
@@ -35,6 +36,7 @@ export const createPredicateTemplate = createCommandFn<CreatePredicateTemplateCo
 export const createPredicateTemplateConstraints: CommandValidationConstraints<CreatePredicateTemplateCommand> = {
   name: {},
   description: {},
+  tags: {},
   evalFunctionBody: {},
   parameters: {},
 };

@@ -74,6 +74,7 @@ export async function getAllPredicateNodesHandler(_: GetAllPredicateNodesQuery) 
         templateDataSnapshot: {
           name: template.name,
           description: template.description,
+          tags: template.tags,
           evalFunctionBody: template.evalFunctionBody,
           parameters: template.parameters,
         },
@@ -101,6 +102,7 @@ export async function getAllPredicateNodesHandler(_: GetAllPredicateNodesQuery) 
           templateDataSnapshot: {
             name: template.name,
             description: template.description,
+            tags: template.tags,
             generatorFunctionBody: template.generatorFunctionBody,
             parameters: template.parameters,
           },

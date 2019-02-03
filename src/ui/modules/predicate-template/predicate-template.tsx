@@ -1,4 +1,4 @@
-import { Action, createFormGroupState, disable, FormGroupState, formStateReducer, updateArray, updateGroup, validate } from 'pure-forms';
+import { Action, box, Boxed, createFormGroupState, disable, FormGroupState, formStateReducer, unbox, updateArray, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
 import { PredicateTemplateData } from 'src/domain/predicate-template';
 import { page, StatefulComponentContext } from 'src/ui/infrastructure/tsx';
@@ -8,11 +8,14 @@ import { validateParameterForm } from 'src/ui/shared/parameter/parameter-form';
 import { PredicateTemplateForm } from './predicate-template-form';
 import predicateTemplates from './predicate-template.store';
 
-export type PredicateTemplateFormValue = PredicateTemplateData;
+export interface PredicateTemplateFormValue extends Omit<PredicateTemplateData, 'tags'> {
+  tags: Boxed<string[]>;
+}
 
 export const EMPTY_PREDICATE_TEMPLATE_FORM_VALUE: PredicateTemplateFormValue = {
   name: '',
   description: '',
+  tags: box([]),
   evalFunctionBody: '',
   parameters: [],
 };
@@ -87,7 +90,15 @@ export const PredicateTemplatePageDef = (
     state.formState = disable(formState);
     state.isSaving = true;
 
-    await createOrUpdateTemplate(formState.value, templateId || undefined);
+    const data: PredicateTemplateData = {
+      name: formState.value.name,
+      description: formState.value.description,
+      tags: unbox(formState.value.tags),
+      evalFunctionBody: formState.value.evalFunctionBody,
+      parameters: formState.value.parameters,
+    };
+
+    await createOrUpdateTemplate(data, templateId || undefined);
 
     state.isSaving = false;
 
@@ -114,12 +125,12 @@ function initialize(state: PredicateTemplatePageState, templateId: string | null
 
   if (templateId) {
     const { id, version, ...rest } = predicateTemplates.state.templatesById[templateId];
-    state.formState = createFormState(rest);
+    state.formState = createFormState({ ...rest, tags: box(rest.tags) });
   }
 }
 
 export const PredicateTemplatePage = page(PredicateTemplatePageDef, initialState, {
-  mounted: (state, { route }) => initialize(state, route.params.id),
+  created: (state, { route }) => initialize(state, route.params.id),
 
   beforeRouteUpdate: (state, to, _, next) => {
     initialize(state, to.params.id);

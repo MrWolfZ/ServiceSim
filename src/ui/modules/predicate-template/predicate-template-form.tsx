@@ -3,6 +3,7 @@ import { pure } from 'src/ui/infrastructure/tsx';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
 import { ExpansionContainer } from 'src/ui/shared/expansion-container';
 import { FormField } from 'src/ui/shared/form-components/form-field';
+import { TagsInput } from 'src/ui/shared/form-components/tags-input';
 import { TextInput } from 'src/ui/shared/form-components/text-input';
 import { ParameterForm, ParameterFormValue } from 'src/ui/shared/parameter/parameter-form';
 import { PredicateTemplateFormValue } from './predicate-template';
@@ -36,6 +37,14 @@ const PredicateTemplateFormDef = ({ formState, onAction }: PredicateTemplateForm
           rows={3}
           placeholder='Description'
           controlState={formState.controls.description}
+          onAction={onAction}
+        />
+      </FormField>
+
+      <FormField controlState={formState.controls.tags}>
+        <TagsInput
+          placeholder='Add tag'
+          controlState={formState.controls.tags}
           onAction={onAction}
         />
       </FormField>

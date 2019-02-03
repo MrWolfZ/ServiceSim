@@ -59,6 +59,7 @@
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
+    "bulma-tagsinput": "^2.0.0",
     "bulmaswatch": "^0.7.1",
     "compression": "^1.7.3",
     "core-js": "^2.5.7",

@@ -3,6 +3,7 @@ import { ResponseGeneratorTemplateData } from 'src/domain/response-generator-tem
 export const STATIC: ResponseGeneratorTemplateData = {
   name: 'Static',
   description: 'Response generators based on this template return a static configured response.',
+  tags: [],
   generatorFunctionBody: 'return { statusCode: parameters["Status Code"], body: parameters["Body"], contentType: parameters["Content Type"] };',
   parameters: [
     {

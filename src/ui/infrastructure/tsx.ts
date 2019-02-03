@@ -66,7 +66,7 @@ export function stateful<TState, TProps = {}>(
   const name = (def.name || 'StatefulComponent').replace(/Def$/g, '');
   return Component({})(
     class extends TsxComponent<TProps> {
-      private state: TState = initialState;
+      private state: TState = { ...initialState };
 
       get context(): StatefulComponentContext {
         return {

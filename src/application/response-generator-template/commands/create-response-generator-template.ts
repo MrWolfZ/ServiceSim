@@ -21,6 +21,7 @@ export async function createResponseGeneratorTemplateHandler(
   const template = await repo.create({
     name: command.name,
     description: command.description,
+    tags: command.tags,
     generatorFunctionBody: command.generatorFunctionBody,
     parameters: command.parameters,
   });
@@ -37,6 +38,7 @@ export const createResponseGeneratorTemplate = createCommandFn<CreateResponseGen
 export const createResponseGeneratorTemplateConstraints: CommandValidationConstraints<CreateResponseGeneratorTemplateCommand> = {
   name: {},
   description: {},
+  tags: {},
   generatorFunctionBody: {},
   parameters: {},
 };

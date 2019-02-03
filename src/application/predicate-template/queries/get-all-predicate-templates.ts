@@ -21,6 +21,7 @@ export async function getAllPredicateTemplatesHandler(_: GetAllPredicateTemplate
     version: t.$metadata.version,
     name: t.name,
     description: t.description,
+    tags: t.tags,
     evalFunctionBody: t.evalFunctionBody,
     parameters: t.parameters,
   }));

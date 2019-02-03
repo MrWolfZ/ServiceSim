@@ -11,6 +11,7 @@ export interface NumberInputProps {
 const NumberInputDef = ({ placeholder, controlState, onAction }: NumberInputProps) => {
   return (
     <input
+      id={controlState.id}
       class='input'
       type='number'
       placeholder={placeholder}

@@ -21,6 +21,14 @@ export const PredicateTemplateRowDef = ({ template, onEdit, onDelete }: Predicat
       </td>
 
       <td>
+        {
+          template.tags.map((t, idx) =>
+            <span key={idx} class='tag is-primary'>{t}</span>
+          )
+        }
+      </td>
+
+      <td>
         <div class='buttons is-marginless'>
           <DangerButton
             label='Delete'
