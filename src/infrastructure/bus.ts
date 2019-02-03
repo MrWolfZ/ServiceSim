@@ -1,5 +1,5 @@
 import { Command, Query } from 'src/application/infrastructure/cqrs';
-import { Event } from 'src/domain/infrastructure/ddd';
+import { DomainEvent, Event } from 'src/domain/infrastructure/ddd';
 import { failure, isFailure } from 'src/util';
 import { CommandHandler, CommandInterceptor, CommandValidator, evaluateCommandValidationConstraints, QueryHandler, QueryInterceptor } from './cqrs';
 
@@ -19,6 +19,10 @@ const queryInterceptors: QueryInterceptor[] = [];
 export type EventHandler<TEvent extends Event<TEvent['eventType']>> = (event: TEvent) => void | Promise<void>;
 
 const eventHandlers: { [eventType: string]: EventHandler<any>[] } = {};
+
+const domainEventHandlers: { [aggregateType: string]: { [eventType: string]: EventHandler<any>[] } } = {};
+
+const universalDomainEventHandlers: { [aggregateType: string]: EventHandler<any>[] } = {};
 
 const universalEventHandlers: EventHandler<any>[] = [];
 
@@ -92,11 +96,25 @@ export async function queryMany<TQuery extends Query<TQuery['queryType'], TQuery
 
 export async function publish<TEvent extends Event<TEvent['eventType']> = Event<TEvent['eventType']>>(...events: TEvent[]) {
   for (const event of events) {
-    const handlers = (eventHandlers[event.eventType as string] || []) as EventHandler<TEvent>[];
+    const handlers = (eventHandlers[event.eventType] || []) as EventHandler<TEvent>[];
 
-    for (const handler of handlers.concat(universalEventHandlers)) {
+    handlers.push(...universalEventHandlers);
+
+    if (isDomainEvent(event)) {
+      const aggregateTypeHandlers = universalDomainEventHandlers[event.aggregateType] || [];
+      handlers.push(...aggregateTypeHandlers);
+
+      const aggregateAndEventTypeHandlers = (domainEventHandlers[event.aggregateType] || {})[event.eventType as string] || [];
+      handlers.push(...aggregateAndEventTypeHandlers);
+    }
+
+    for (const handler of handlers) {
       await handler(event);
     }
+  }
+
+  function isDomainEvent<T extends string>(event: Event<T>): event is DomainEvent<any, T> {
+    return !!(event as DomainEvent<any, T>).aggregateType;
   }
 }
 
@@ -139,6 +157,32 @@ export function registerEventHandler<TEvent extends Event<TEvent['eventType']>>(
   handler: EventHandler<TEvent>,
 ) {
   const handlers = eventHandlers[eventType as string] = eventHandlers[eventType as string] || [];
+  handlers.push(handler);
+
+  return () => {
+    handlers.splice(handlers.indexOf(handler), 1);
+  };
+}
+
+export function registerDomainEventHandler<TEvent extends DomainEvent<TEvent['aggregateType'], TEvent['eventType']>>(
+  aggregateType: TEvent['aggregateType'],
+  eventType: TEvent['eventType'],
+  handler: EventHandler<TEvent>,
+) {
+  const aggregateHandlers = domainEventHandlers[aggregateType as string] = domainEventHandlers[aggregateType as string] || {};
+  const handlers = aggregateHandlers[eventType as string] = aggregateHandlers[eventType as string] || [];
+  handlers.push(handler);
+
+  return () => {
+    handlers.splice(handlers.indexOf(handler), 1);
+  };
+}
+
+export function registerUniversalDomainEventHandler<TEvent extends DomainEvent<TEvent['aggregateType'], TEvent['eventType']>>(
+  aggregateType: TEvent['aggregateType'],
+  handler: EventHandler<TEvent>,
+) {
+  const handlers = universalDomainEventHandlers[aggregateType as string] = universalDomainEventHandlers[aggregateType as string] || [];
   handlers.push(handler);
 
   return () => {

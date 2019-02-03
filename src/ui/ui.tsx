@@ -1,3 +1,5 @@
+import { Event } from 'src/domain/infrastructure/ddd';
+import { publish, registerUniversalEventHandler } from 'src/infrastructure/bus';
 import { logger } from 'src/infrastructure/logging';
 import { Component, Vue } from 'vue-property-decorator';
 import { CONFIG } from '../infrastructure/config';
@@ -14,20 +16,26 @@ export class App extends Vue {
     await this.loadAllDataAsync();
     this.dataWasLoaded = true;
 
+    registerUniversalEventHandler(() => this.loadAllDataAsync());
+    registerUniversalEventHandler(evt => {
+      logger.info(JSON.stringify(evt));
+    });
+
     const eventSource = new EventSource(`${CONFIG.uiApiBaseUrl}/events`);
 
-    eventSource.onmessage = evt => {
-      logger.info(evt.data);
-      return this.loadAllDataAsync();
+    eventSource.onmessage = async msg => {
+      const event = JSON.parse(msg.data) as Event<any>;
+      await publish(event);
     };
 
     eventSource.onerror = evt => {
-      logger.info(evt.data);
+      logger.info(JSON.stringify(evt.data));
     };
 
-    eventSource.addEventListener('event', msg => {
-      logger.info((msg as MessageEvent).data);
-      return this.loadAllDataAsync();
+    // TODO: build smarter subscription mechanism to only subscribe to relevant events
+    eventSource.addEventListener('event', async msg => {
+      const event = JSON.parse((msg as MessageEvent).data) as Event<any>;
+      await publish(event);
     });
 
     // eventSource.close();
