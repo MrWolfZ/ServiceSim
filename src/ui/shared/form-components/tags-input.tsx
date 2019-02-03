@@ -101,7 +101,7 @@ export class TagsInput extends TsxComponent<TagsInputProps> implements TagsInput
         return;
       }
 
-      onAction(new SetValueAction(controlState.id, box(value.split(','))));
+      onAction(new SetValueAction(controlState.id, box(value.split(',').map(t => t.trim()).filter(t => !!t))));
 
       if (controlState.isPristine) {
         onAction(new MarkAsDirtyAction(controlState.id));
