@@ -7,11 +7,15 @@ import { getAllPredicateTemplatesHandler } from './queries/get-all-predicate-tem
 import { getPredicateTemplatesByIdsAndVersionsHandler } from './queries/get-predicate-templates-by-ids-and-versions';
 
 export function registerPredicateTemplateHandlers() {
-  registerCommandHandler('create-default-predicate-templates', createDefaultPredicateTemplatesHandler);
-  registerCommandHandler('create-predicate-template', createPredicateTemplateHandler, createPredicateTemplateConstraints);
-  registerCommandHandler('delete-predicate-template', deletePredicateTemplateHandler, deletePredicateTemplateConstraints);
-  registerCommandHandler('update-predicate-template', updatePredicateTemplateHandler, updatePredicateTemplateConstraints);
+  const unsubs = [
+    registerCommandHandler('create-default-predicate-templates', createDefaultPredicateTemplatesHandler),
+    registerCommandHandler('create-predicate-template', createPredicateTemplateHandler, createPredicateTemplateConstraints),
+    registerCommandHandler('delete-predicate-template', deletePredicateTemplateHandler, deletePredicateTemplateConstraints),
+    registerCommandHandler('update-predicate-template', updatePredicateTemplateHandler, updatePredicateTemplateConstraints),
 
-  registerQueryHandler('get-all-predicate-templates', getAllPredicateTemplatesHandler);
-  registerQueryHandler('get-predicate-templates-by-ids-and-versions', getPredicateTemplatesByIdsAndVersionsHandler);
+    registerQueryHandler('get-all-predicate-templates', getAllPredicateTemplatesHandler),
+    registerQueryHandler('get-predicate-templates-by-ids-and-versions', getPredicateTemplatesByIdsAndVersionsHandler),
+  ];
+
+  return () => unsubs.forEach(unsub => unsub());
 }

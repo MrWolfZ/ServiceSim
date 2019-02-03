@@ -3,6 +3,10 @@ import { createServiceInvocationConstraints, createServiceInvocationHandler } fr
 import { setServiceInvocationResponseConstraints, setServiceInvocationResponseHandler } from './commands/set-service-invocation-response';
 
 export function registerServiceInvocationHandlers() {
-  registerCommandHandler('create-service-invocation', createServiceInvocationHandler, createServiceInvocationConstraints);
-  registerCommandHandler('set-service-invocation-response', setServiceInvocationResponseHandler, setServiceInvocationResponseConstraints);
+  const unsubs = [
+    registerCommandHandler('create-service-invocation', createServiceInvocationHandler, createServiceInvocationConstraints),
+    registerCommandHandler('set-service-invocation-response', setServiceInvocationResponseHandler, setServiceInvocationResponseConstraints),
+  ];
+
+  return () => unsubs.forEach(unsub => unsub());
 }

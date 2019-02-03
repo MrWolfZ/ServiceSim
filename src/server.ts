@@ -1,18 +1,15 @@
+import 'core-js/fn/array/flat-map';
 import 'module-alias/register';
-
-import errorHandler from 'errorhandler';
 
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
+import errorHandler from 'errorhandler';
 import express from 'express';
 import session from 'express-session';
 import expressValidator from 'express-validator';
 import lusca from 'lusca';
 import path from 'path';
-
-import 'core-js/fn/array/flat-map';
-
 import * as api from './api';
 import { CONFIG } from './infrastructure/config';
 import { logger } from './infrastructure/logging';

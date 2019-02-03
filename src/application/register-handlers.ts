@@ -6,10 +6,14 @@ import { registerServiceInvocationHandlers } from './service-invocation/register
 import { registerSimulationHandlers } from './simulation/register-handlers';
 
 export function registerHandlers() {
-  registerAdminHandlers();
-  registerPredicateTemplateHandlers();
-  registerResponseGeneratorTemplateHandlers();
-  registerPredicateTreeHandlers();
-  registerServiceInvocationHandlers();
-  registerSimulationHandlers();
+  const unsubs = [
+    registerAdminHandlers(),
+    registerPredicateTemplateHandlers(),
+    registerResponseGeneratorTemplateHandlers(),
+    registerPredicateTreeHandlers(),
+    registerServiceInvocationHandlers(),
+    registerSimulationHandlers(),
+  ];
+
+  return () => unsubs.forEach(unsub => unsub());
 }

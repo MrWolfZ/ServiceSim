@@ -28,8 +28,8 @@ export class App extends Vue {
       await publish(event);
     };
 
-    eventSource.onerror = evt => {
-      logger.info(JSON.stringify(evt.data));
+    eventSource.onerror = () => {
+      logger.error('an error occured in the events connection');
     };
 
     // TODO: build smarter subscription mechanism to only subscribe to relevant events

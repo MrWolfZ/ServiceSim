@@ -11,13 +11,17 @@ import { updatePredicateNodeConstraints, updatePredicateNodeHandler } from './co
 import { getAllPredicateNodesHandler } from './queries/get-all-predicate-nodes';
 
 export function registerPredicateTreeHandlers() {
-  registerCommandHandler('add-child-predicate-node-from-template', addChildPredicateNodeFromTemplateHandler, addChildPredicateNodeFromTemplateConstraints);
-  registerCommandHandler('add-child-predicate-node-with-custom-function-body', addChildPredicateNodeWithCustomFunctionBodyHandler, addChildPredicateNodeWithCustomFunctionBodyConstraints);
-  registerCommandHandler('delete-predicate-node', deletePredicateNodeHandler, deletePredicateNodeConstraints);
-  registerCommandHandler('ensure-root-predicate-node-exists', ensureRootPredicateNodeExistsHandler);
-  registerCommandHandler('set-response-generator-from-template', setPredicateNodeResponseGeneratorFromTemplateHandler, setPredicateNodeResponseGeneratorFromTemplateConstraints);
-  registerCommandHandler('set-response-generator-with-custom-body', setPredicateNodeResponseGeneratorWithCustomBodyHandler, setPredicateNodeResponseGeneratorWithCustomBodyConstraints);
-  registerCommandHandler('update-predicate-node', updatePredicateNodeHandler, updatePredicateNodeConstraints);
+  const unsubs = [
+    registerCommandHandler('add-child-predicate-node-from-template', addChildPredicateNodeFromTemplateHandler, addChildPredicateNodeFromTemplateConstraints),
+    registerCommandHandler('add-child-predicate-node-with-custom-function-body', addChildPredicateNodeWithCustomFunctionBodyHandler, addChildPredicateNodeWithCustomFunctionBodyConstraints),
+    registerCommandHandler('delete-predicate-node', deletePredicateNodeHandler, deletePredicateNodeConstraints),
+    registerCommandHandler('ensure-root-predicate-node-exists', ensureRootPredicateNodeExistsHandler),
+    registerCommandHandler('set-response-generator-from-template', setPredicateNodeResponseGeneratorFromTemplateHandler, setPredicateNodeResponseGeneratorFromTemplateConstraints),
+    registerCommandHandler('set-response-generator-with-custom-body', setPredicateNodeResponseGeneratorWithCustomBodyHandler, setPredicateNodeResponseGeneratorWithCustomBodyConstraints),
+    registerCommandHandler('update-predicate-node', updatePredicateNodeHandler, updatePredicateNodeConstraints),
 
-  registerQueryHandler('get-all-predicate-nodes', getAllPredicateNodesHandler);
+    registerQueryHandler('get-all-predicate-nodes', getAllPredicateNodesHandler),
+  ];
+
+  return () => unsubs.forEach(unsub => unsub());
 }

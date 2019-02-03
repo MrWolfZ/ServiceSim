@@ -64,26 +64,26 @@ uiApi.get('/events', (req, res) => {
   res.flush();
 });
 
-export async function initialize() {
+export async function initialize(config = CONFIG) {
   const persistenceAdapter = (() => {
-    switch (CONFIG.persistence.adapter) {
+    switch (config.persistence.adapter) {
       case 'InMemory':
         logger.info('using in-memory persistence adapter');
         return inMemoryPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system persistence adapter with data dir ${CONFIG.persistence.adapterConfig.dataDir}`);
-        return createFileSystemPersistenceAdapter(CONFIG.persistence.adapterConfig.dataDir);
+        logger.info(`using file system persistence adapter with data dir ${config.persistence.adapterConfig.dataDir}`);
+        return createFileSystemPersistenceAdapter(config.persistence.adapterConfig.dataDir);
 
       default:
-        return assertNever(CONFIG.persistence.adapter);
+        return assertNever(config.persistence.adapter);
     }
   })();
 
   await initializeDB({ adapter: persistenceAdapter });
 
   const eventLogPersistenceAdapter = await (async () => {
-    switch (CONFIG.eventPersistence.adapter) {
+    switch (config.eventPersistence.adapter) {
       case 'Null':
         logger.info('using null event persistence adapter');
         return nullEventLogPersistenceAdapter;
@@ -93,22 +93,23 @@ export async function initialize() {
         return inMemoryEventLogPersistenceAdapter;
 
       case 'FileSystem':
-        logger.info(`using file system event persistence adapter with data dir ${CONFIG.eventPersistence.adapterConfig.dataDir}`);
-        return await createFileSystemEventLogPersistenceAdapter(path.join(CONFIG.eventPersistence.adapterConfig.dataDir));
+        logger.info(`using file system event persistence adapter with data dir ${config.eventPersistence.adapterConfig.dataDir}`);
+        return await createFileSystemEventLogPersistenceAdapter(path.join(config.eventPersistence.adapterConfig.dataDir));
 
       default:
-        return assertNever(CONFIG.eventPersistence.adapter);
+        return assertNever(config.eventPersistence.adapter);
     }
   })();
 
   await initializeEventLog({ adapter: eventLogPersistenceAdapter });
 
-  registerHandlers();
+  const unsubHandlers = registerHandlers();
 
   await ensureRootPredicateNodeExists({});
 
   return new Subscription(() => {
     logger.info('shutting down...');
+    unsubHandlers();
   });
 }
 

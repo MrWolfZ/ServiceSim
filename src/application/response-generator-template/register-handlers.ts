@@ -7,11 +7,15 @@ import { getAllResponseGeneratorTemplatesHandler } from './queries/get-all-respo
 import { getResponseGeneratorTemplatesByIdsAndVersionsHandler } from './queries/get-response-generator-templates-by-ids-and-versions';
 
 export function registerResponseGeneratorTemplateHandlers() {
-  registerCommandHandler('create-default-response-generator-templates', createDefaultResponseGeneratorTemplatesHandler);
-  registerCommandHandler('create-response-generator-template', createResponseGeneratorTemplateHandler, createResponseGeneratorTemplateConstraints);
-  registerCommandHandler('delete-response-generator-template', deleteResponseGeneratorTemplateHandler, deleteResponseGeneratorTemplateConstraints);
-  registerCommandHandler('update-response-generator-template', updateResponseGeneratorTemplateHandler, updateResponseGeneratorTemplateConstraints);
+  const unsubs = [
+    registerCommandHandler('create-default-response-generator-templates', createDefaultResponseGeneratorTemplatesHandler),
+    registerCommandHandler('create-response-generator-template', createResponseGeneratorTemplateHandler, createResponseGeneratorTemplateConstraints),
+    registerCommandHandler('delete-response-generator-template', deleteResponseGeneratorTemplateHandler, deleteResponseGeneratorTemplateConstraints),
+    registerCommandHandler('update-response-generator-template', updateResponseGeneratorTemplateHandler, updateResponseGeneratorTemplateConstraints),
 
-  registerQueryHandler('get-all-response-generator-templates', getAllResponseGeneratorTemplatesHandler);
-  registerQueryHandler('get-response-generator-templates-by-ids-and-versions', getResponseGeneratorTemplatesByIdsAndVersionsHandler);
+    registerQueryHandler('get-all-response-generator-templates', getAllResponseGeneratorTemplatesHandler),
+    registerQueryHandler('get-response-generator-templates-by-ids-and-versions', getResponseGeneratorTemplatesByIdsAndVersionsHandler),
+  ];
+
+  return () => unsubs.forEach(unsub => unsub());
 }

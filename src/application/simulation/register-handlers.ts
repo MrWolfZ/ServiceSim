@@ -3,7 +3,11 @@ import { processSimulationRequestHandler } from './commands/process-simulation-r
 import { getPredicateTreeHandler } from './queries/get-predicate-tree';
 
 export function registerSimulationHandlers() {
-  registerCommandHandler('process-simulation-request', processSimulationRequestHandler);
+  const unsubs = [
+    registerCommandHandler('process-simulation-request', processSimulationRequestHandler),
 
-  registerQueryHandler('get-predicate-tree', getPredicateTreeHandler);
+    registerQueryHandler('get-predicate-tree', getPredicateTreeHandler),
+  ];
+
+  return () => unsubs.forEach(unsub => unsub());
 }

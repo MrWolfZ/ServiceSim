@@ -1,12 +1,23 @@
-import express from 'express';
-import request from 'supertest';
+import { registerHandlers } from 'src/application/register-handlers';
+import { initializeDB } from 'src/infrastructure/db';
+import { inMemoryPersistenceAdapter } from 'src/persistence/db/in-memory';
 import { processSimulationRequest } from './process-simulation-request';
 
 describe('simulation', () => {
-  const app = express();
-  app.use(processSimulationRequest);
+  let unsub = () => { };
+
+  beforeEach(async () => {
+    await initializeDB({ adapter: inMemoryPersistenceAdapter });
+
+    unsub = registerHandlers();
+  });
+
+  afterEach(() => {
+    unsub();
+  });
 
   it('should return 404 if no predicates exist', async () => {
-    return request(app).get('/').expect(404);
+    const { response } = await processSimulationRequest({ request: { path: '/', body: '' }, timeoutInMillis: 100 });
+    expect(response.statusCode).toEqual(404);
   });
 });
