@@ -37,7 +37,7 @@ export class Navbar extends Vue {
             <div class='navbar-start'>
 
               <router-link
-                to={{ name: 'predicate-tree' }}
+                to={{ name: 'runtime' }}
                 class='navbar-item has-text-white'
                 onClick={() => this.closeMenu()}
               >
