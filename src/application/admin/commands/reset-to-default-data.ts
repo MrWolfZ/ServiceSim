@@ -22,8 +22,7 @@ export async function resetToDefaultDataHandler(_: ResetToDefaultDataCommand) {
 
   await setupMockData();
 
-  await publish(createEvent('resetToDefaultDataAsync'));
-
+  await publish({ ...createEvent('resetToDefaultDataAsync'), transient: true });
 }
 
 export const resetToDefaultData = createCommandFn<ResetToDefaultDataCommand>('reset-to-default-data');
