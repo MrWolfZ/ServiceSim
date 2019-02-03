@@ -2,6 +2,7 @@ import { ConnectableObservable, EMPTY, Observable, Observer, Subject, Subscripti
 import { filter, map, publishReplay } from 'rxjs/operators';
 import { Aggregate, DomainEvent, Event } from 'src/domain/infrastructure/ddd';
 import { failure } from 'src/util';
+import { registerUniversalEventHandler } from './bus';
 
 export interface StoredEvent {
   seqNr: number;
@@ -33,6 +34,14 @@ export async function initializeEventLog(options: { adapter: EventLogPersistence
   if (adapter.initialize) {
     await adapter.initialize();
   }
+
+  return registerUniversalEventHandler(async evt => {
+    if ((evt as any).transient) {
+      return;
+    }
+
+    await persistEvents([evt]);
+  });
 }
 
 const allEventsSubject = new Subject<[Event<any>, number]>();

@@ -17,14 +17,14 @@ export const DEFAULT_CONFIG: AppConfig = {
   persistence: {
     adapter: 'FileSystem',
     adapterConfig: {
-      dataDir: `${process.cwd()}/dist/.data`,
+      dataDir: `${process.cwd()}/.data/db`,
     },
   },
 
   eventPersistence: {
-    adapter: 'Null',
+    adapter: 'FileSystem',
     adapterConfig: {
-      dataDir: `${process.cwd()}/dist/.events`,
+      dataDir: `${process.cwd()}/.data/events`,
     },
   },
 
