@@ -11,13 +11,21 @@ export interface ServiceResponse {
   contentType: string;
 }
 
+export type ServiceInvocationStatus =
+  | 'request is received'
+  | 'service operation is determined'
+  | 'response is set'
+  ;
+
 export interface ServiceInvocationData {
-  state: 'processing pending' | 'response set';
+  status: ServiceInvocationStatus;
   request: ServiceRequest;
+  serviceOperationId: string | undefined;
   response: ServiceResponse | undefined;
 }
 
-export type ServiceInvocationAggregateType = 'service-invocation';
+export const SERVICE_INVOCATION_AGGREGATE_TYPE = 'ServiceInvocation';
+export type ServiceInvocationAggregateType = typeof SERVICE_INVOCATION_AGGREGATE_TYPE;
 
 export type ServiceInvocationAggregate = ServiceInvocationData & Aggregate<ServiceInvocationAggregateType>;
 

@@ -1,4 +1,4 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
+import { Command, registerCommandHandler } from 'src/application/infrastructure/cqrs';
 import { ServiceRequest } from 'src/domain/service-invocation';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { serviceInvocationRepo } from '../service-invocation.repo';
@@ -14,20 +14,22 @@ export interface CreateServiceInvocationCommandResponse {
   invocationVersion: number;
 }
 
-export async function createServiceInvocationHandler(command: CreateServiceInvocationCommand): Promise<CreateServiceInvocationCommandResponse> {
-  const newInvocation = await serviceInvocationRepo.create({
-    state: 'processing pending',
-    request: command.request,
-    response: undefined,
-  });
+export const createServiceInvocation = registerCommandHandler<CreateServiceInvocationCommand>(
+  'create-service-invocation',
+  async command => {
+    const newInvocation = await serviceInvocationRepo.create({
+      status: 'request is received',
+      request: command.request,
+      serviceOperationId: undefined,
+      response: undefined,
+    });
 
-  return {
-    invocationId: newInvocation.id,
-    invocationVersion: 1,
-  };
-}
-
-export const createServiceInvocation = createCommandFn<CreateServiceInvocationCommand>('create-service-invocation');
+    return {
+      invocationId: newInvocation.id,
+      invocationVersion: 1,
+    };
+  },
+);
 
 // TODO: validate
 export const createServiceInvocationConstraints: CommandValidationConstraints<CreateServiceInvocationCommand> = {
