@@ -1,4 +1,5 @@
-import { query, send } from 'src/infrastructure/bus';
+import { query, registerCommandHandler as registerCommandHandlerInBus, send } from 'src/infrastructure/bus';
+import { CommandHandler } from 'src/infrastructure/cqrs';
 
 export interface Command<TCommandType extends string, TReturn = void> {
   commandType: TCommandType;
@@ -33,6 +34,16 @@ export function createCommandFn<TCommand extends Command<TCommand['commandType']
     const cmd = createCommand<TCommand>(commandType)(customProps);
     return await send<TCommand>(cmd);
   };
+}
+
+export function registerCommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
+  commandType: TCommand['commandType'],
+  handler: CommandHandler<TCommand>,
+) {
+  // we intentionally ignore the unsub callback here since this method is supposed to be called
+  // to globally and statically register the command handler without ever unregistering it
+  registerCommandHandlerInBus(commandType, handler);
+  return createCommandFn(commandType);
 }
 
 export interface Query<TQueryType extends string, TReturn> {
