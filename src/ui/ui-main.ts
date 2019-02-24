@@ -70,12 +70,12 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 registerHandlers();
 
 registerCommandInterceptor(async command => {
-  const response = await axios.post<NonUndefined<typeof command['@return']>>(`/command`, command);
+  const response = await axios.post<NonUndefined<typeof command['@return']>>(`/command?${command.commandType}`, command);
   return response.data;
 });
 
 registerQueryInterceptor(async query => {
-  const response = await axios.post<NonUndefined<typeof query['@return']>>(`/query`, query);
+  const response = await axios.post<NonUndefined<typeof query['@return']>>(`/query?${query.queryType}`, query);
   return response.data;
 });
 
