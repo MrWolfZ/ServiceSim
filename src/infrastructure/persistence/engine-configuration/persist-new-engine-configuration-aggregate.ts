@@ -1,7 +1,8 @@
+import { EngineConfigurationAggregate } from 'src/domain/engine-configuration';
 import { Aggregate } from 'src/domain/infrastructure/ddd';
 import { getActiveEngineConfigurationPersistenceStrategy } from './engine-configuration-persistence-strategy';
 
-export function persistNewEngineConfigurationAggregate<TAggregate extends Aggregate<TAggregate['@type']>>(
+export function persistNewEngineConfigurationAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
 ) {
   return async <TData extends Omit<TAggregate, keyof Aggregate<TAggregate['@type']>>>(
@@ -20,7 +21,7 @@ export function persistNewEngineConfigurationAggregate<TAggregate extends Aggreg
       ...data as any,
     };
 
-    await persistenceStrategy.upsert(newAggregate);
+    await persistenceStrategy.upsertAggregate(newAggregate);
 
     return newAggregate;
   };

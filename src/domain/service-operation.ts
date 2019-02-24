@@ -1,4 +1,4 @@
-import { Aggregate } from './infrastructure/ddd';
+import { EngineConfigurationAggregate } from './engine-configuration';
 
 export interface TemplateInfo {
   templateId: string;
@@ -36,4 +36,4 @@ export interface ServiceOperationData {
 export const SERVICE_OPERATION_AGGREGATE_TYPE = 'ServiceOperation';
 export type ServiceOperationAggregateType = typeof SERVICE_OPERATION_AGGREGATE_TYPE;
 
-export type ServiceOperationAggregate = ServiceOperationData & Aggregate<ServiceOperationAggregateType>;
+export type ServiceOperationAggregate = ServiceOperationData & EngineConfigurationAggregate<ServiceOperationAggregateType>;

@@ -1,16 +1,21 @@
-import { Aggregate } from 'src/domain/infrastructure/ddd';
+import { EngineConfigurationAggregate } from 'src/domain/engine-configuration';
 import { failure } from 'src/util/result-monad';
 
 export interface EngineConfigurationPersistenceStrategy {
-  generateId<TAggregate extends Aggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type']): Promise<string>;
+  generateId<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type']): Promise<string>;
 
   // initialize?: () => Promise<void>;
-  upsert<TAggregate extends Aggregate<TAggregate['@type']>>(aggregate: TAggregate): Promise<void>;
-  // delete(document: TDocument): Promise<void>;
+  upsertAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregate: TAggregate): Promise<void>;
+  deleteAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type'], id: string): Promise<void>;
   // dropAll(): Promise<void>;
 
   // getAll(): Promise<TDocument[]>;
-  getAggregateById<TAggregate extends Aggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type'], id: string): Promise<TAggregate | undefined>;
+
+  getAggregateById<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
+    aggregateType: TAggregate['@type'],
+    id: string,
+  ): Promise<TAggregate | undefined>;
+
   // getByIdAndVersion(id: string, version: number): Promise<TDocument | undefined>;
 }
 

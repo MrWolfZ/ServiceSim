@@ -1,4 +1,4 @@
-import { Aggregate } from './infrastructure/ddd';
+import { EngineConfigurationAggregate } from './engine-configuration';
 import { ServiceOperationAggregate } from './service-operation';
 
 export interface ServiceData {
@@ -11,4 +11,4 @@ export interface ServiceData {
 export const SERVICE_AGGREGATE_TYPE = 'Service';
 export type ServiceAggregateType = typeof SERVICE_AGGREGATE_TYPE;
 
-export type ServiceAggregate = ServiceData & Aggregate<ServiceAggregateType>;
+export type ServiceAggregate = ServiceData & EngineConfigurationAggregate<ServiceAggregateType>;

@@ -1,4 +1,4 @@
-import { Aggregate } from 'src/domain/infrastructure/ddd';
+import { EngineConfigurationAggregate } from 'src/domain/engine-configuration';
 import { Diff } from 'src/domain/infrastructure/diff';
 import { applyDiff } from 'src/util/diff';
 import { failure } from 'src/util/result-monad';
@@ -6,7 +6,7 @@ import { isEmpty } from 'src/util/util';
 import { getActiveEngineConfigurationPersistenceStrategy } from './engine-configuration-persistence-strategy';
 
 // TODO: handle concurrent updates
-export async function patchPersistedEngineConfigurationAggregate<TAggregate extends Aggregate<TAggregate['@type']>>(
+export async function patchPersistedEngineConfigurationAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   id: string,
   diff: Diff<TAggregate>,
@@ -25,5 +25,5 @@ export async function patchPersistedEngineConfigurationAggregate<TAggregate exte
 
   const updatedAggregate = applyDiff(aggregate, diff);
 
-  await persistenceStrategy.upsert(updatedAggregate);
+  await persistenceStrategy.upsertAggregate(updatedAggregate);
 }
