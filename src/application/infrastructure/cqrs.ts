@@ -1,4 +1,4 @@
-import { query, registerCommandHandler as registerCommandHandlerInBus, send } from 'src/infrastructure/bus';
+import { query, registerCommandHandler, send } from 'src/infrastructure/bus';
 import { CommandHandler } from 'src/infrastructure/cqrs';
 
 export interface Command<TCommandType extends string, TReturn = void> {
@@ -10,8 +10,8 @@ export interface Command<TCommandType extends string, TReturn = void> {
 export function createCommand<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   commandType: TCommand['commandType'],
 ) {
-  return <TCustomProps extends Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>>(
-    customProps: TCustomProps & Exact<Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>, TCustomProps>,
+  return (
+    customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
   ): TCommand => {
     const commandProps: Command<TCommand['commandType'], TCommand['@return']> = {
       commandType,
@@ -28,21 +28,21 @@ export function createCommand<TCommand extends Command<TCommand['commandType'], 
 export function createCommandFn<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   commandType: TCommand['commandType'],
 ) {
-  return async <TCustomProps extends Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>>(
-    customProps: TCustomProps & Exact<Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>, TCustomProps>,
+  return async (
+    customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
   ) => {
     const cmd = createCommand<TCommand>(commandType)(customProps);
     return await send<TCommand>(cmd);
   };
 }
 
-export function registerCommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
+export function createAndRegisterCommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   commandType: TCommand['commandType'],
   handler: CommandHandler<TCommand>,
 ) {
   // we intentionally ignore the unsub callback here since this method is supposed to be called
   // to globally and statically register the command handler without ever unregistering it
-  registerCommandHandlerInBus(commandType, handler);
+  registerCommandHandler(commandType, handler);
   return createCommandFn(commandType);
 }
 

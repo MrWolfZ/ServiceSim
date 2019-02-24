@@ -1,4 +1,4 @@
-import { Command, registerCommandHandler } from 'src/application/infrastructure/cqrs';
+import { Command, createAndRegisterCommandHandler } from 'src/application/infrastructure/cqrs';
 import { ServiceRequest } from 'src/domain/service-invocation';
 import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
 import { serviceInvocationRepo } from '../service-invocation.repo';
@@ -14,7 +14,7 @@ export interface CreateServiceInvocationCommandResponse {
   invocationVersion: number;
 }
 
-export const createServiceInvocation = registerCommandHandler<CreateServiceInvocationCommand>(
+export const createServiceInvocation = createAndRegisterCommandHandler<CreateServiceInvocationCommand>(
   'create-service-invocation',
   async command => {
     const newInvocation = await serviceInvocationRepo.create({
