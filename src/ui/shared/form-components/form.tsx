@@ -6,7 +6,7 @@ export interface FormProps {
   onAction: (action: Action) => any;
 }
 
-const FormDef = ({ formState, onAction }: FormProps, { slots }: PureComponentContext) => {
+export const Form = pure(({ formState, onAction }: FormProps, { slots }: PureComponentContext) => {
   return (
     <form novalidate='novalidate' onSubmit={onSubmit}>
       {slots.default}
@@ -17,6 +17,4 @@ const FormDef = ({ formState, onAction }: FormProps, { slots }: PureComponentCon
     e.preventDefault();
     onAction(new MarkAsSubmittedAction(formState.id));
   }
-};
-
-export const Form = pure(FormDef);
+});

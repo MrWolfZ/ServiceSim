@@ -37,7 +37,7 @@ export const validateParameterForm = updateGroup<ParameterFormValue>({
   },
 });
 
-const ParameterFormDef = ({ formState, className, onAction, onRemove }: ParameterFormProps) => {
+export const ParameterForm = pure(({ formState, className, onAction, onRemove }: ParameterFormProps) => {
   return (
     <div class={className}>
 
@@ -129,6 +129,4 @@ const ParameterFormDef = ({ formState, className, onAction, onRemove }: Paramete
 
     </div>
   );
-};
-
-export const ParameterForm = pure(ParameterFormDef);
+});

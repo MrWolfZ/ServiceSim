@@ -11,7 +11,7 @@ export interface FormFieldProps {
   errorMessages?: { [errorName: string]: string };
 }
 
-const FormFieldDef = (
+export const FormField = pure((
   { label, tooltip, tooltipIcon, controlState, errorMessageFactory, errorMessages }: FormFieldProps,
   { slots }: PureComponentContext,
 ) => {
@@ -62,6 +62,4 @@ const FormFieldDef = (
 
     return errorMessage;
   }
-};
-
-export const FormField = pure(FormFieldDef);
+});

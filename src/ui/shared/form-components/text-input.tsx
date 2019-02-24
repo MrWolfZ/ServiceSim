@@ -11,7 +11,7 @@ export interface TextInputProps {
 }
 
 // TODO: focus handling
-const TextInputDef = ({ placeholder, rows, controlState, isCode, onAction, styleOverride }: TextInputProps) => {
+export const TextInput = pure(({ placeholder, rows, controlState, isCode, onAction, styleOverride }: TextInputProps) => {
   const style = { ...styleOverride, border: 0 };
 
   if (isCode) {
@@ -62,6 +62,4 @@ const TextInputDef = ({ placeholder, rows, controlState, isCode, onAction, style
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-};
-
-export const TextInput = pure(TextInputDef);
+});

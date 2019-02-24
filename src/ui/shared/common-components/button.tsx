@@ -11,7 +11,7 @@ export interface ButtonProps {
   onClick: () => any;
 }
 
-export const ButtonDef = (
+export const Button = pure((
   { type, label, icon, className, styleOverride, isDisabled, isOutlined, onClick }: ButtonProps,
   { slots }: PureComponentContext,
 ) => {
@@ -34,11 +34,9 @@ export const ButtonDef = (
       }
     </button>
   );
-};
+});
 
-export const Button = pure(ButtonDef);
-
-export const DangerButtonDef = (
+export const DangerButton = pure((
   { type, label, icon, className, styleOverride, isDisabled, isOutlined, onClick }: ButtonProps,
   { slots }: PureComponentContext,
 ) => {
@@ -56,11 +54,9 @@ export const DangerButtonDef = (
       {slots.default}
     </Button>
   );
-};
+});
 
-export const DangerButton = pure(DangerButtonDef);
-
-export const SuccessButtonDef = (
+export const SuccessButton = pure((
   { type, label, icon, className, styleOverride, isDisabled, isOutlined, onClick }: ButtonProps,
   { slots }: PureComponentContext,
 ) => {
@@ -78,11 +74,9 @@ export const SuccessButtonDef = (
       {slots.default}
     </Button>
   );
-};
+});
 
-export const SuccessButton = pure(SuccessButtonDef);
-
-export const PrimaryButtonDef = (
+export const PrimaryButton = pure((
   { type, label, icon, className, styleOverride, isDisabled, isOutlined, onClick }: ButtonProps,
   { slots }: PureComponentContext,
 ) => {
@@ -100,16 +94,14 @@ export const PrimaryButtonDef = (
       {slots.default}
     </Button>
   );
-};
-
-export const PrimaryButton = pure(PrimaryButtonDef);
+});
 
 export interface CancelButtonProps {
   isDisabled?: boolean;
   onClick: () => any;
 }
 
-export const CancelButtonDef = ({ isDisabled, onClick }: CancelButtonProps) => {
+export const CancelButton = pure(({ isDisabled, onClick }: CancelButtonProps) => {
   return (
     <DangerButton
       label='Cancel'
@@ -119,9 +111,7 @@ export const CancelButtonDef = ({ isDisabled, onClick }: CancelButtonProps) => {
       onClick={onClick}
     />
   );
-};
-
-export const CancelButton = pure(CancelButtonDef);
+});
 
 export interface SaveButtonProps {
   isDisabled?: boolean;
@@ -129,7 +119,7 @@ export interface SaveButtonProps {
   onClick: () => any;
 }
 
-export const SaveButtonDef = ({ isDisabled, isSaving, onClick }: SaveButtonProps) => {
+export const SaveButton = pure(({ isDisabled, isSaving, onClick }: SaveButtonProps) => {
   return (
     <SuccessButton
       type='submit'
@@ -140,6 +130,4 @@ export const SaveButtonDef = ({ isDisabled, isSaving, onClick }: SaveButtonProps
       onClick={onClick}
     />
   );
-};
-
-export const SaveButton = pure(SaveButtonDef);
+});

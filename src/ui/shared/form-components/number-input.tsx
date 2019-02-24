@@ -8,7 +8,7 @@ export interface NumberInputProps {
 }
 
 // TODO: focus handling
-const NumberInputDef = ({ placeholder, controlState, onAction }: NumberInputProps) => {
+export const NumberInput = pure(({ placeholder, controlState, onAction }: NumberInputProps) => {
   return (
     <input
       id={controlState.id}
@@ -36,6 +36,4 @@ const NumberInputDef = ({ placeholder, controlState, onAction }: NumberInputProp
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-};
-
-export const NumberInput = pure(NumberInputDef);
+});

@@ -9,7 +9,7 @@ export interface PredicateTemplateRowProps {
   onDelete: () => any;
 }
 
-export const PredicateTemplateRowDef = ({ template, onEdit, onDelete }: PredicateTemplateRowProps) => {
+export const PredicateTemplateRow = pure(({ template, onEdit, onDelete }: PredicateTemplateRowProps) => {
   return (
     <tr class='predicate-template-row'>
       <td>
@@ -46,6 +46,4 @@ export const PredicateTemplateRowDef = ({ template, onEdit, onDelete }: Predicat
 
     </tr>
   );
-};
-
-export const PredicateTemplateRow = pure(PredicateTemplateRowDef);
+});

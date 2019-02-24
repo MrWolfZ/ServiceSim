@@ -4,7 +4,7 @@ export interface PageProps {
   title: string;
 }
 
-export const PageDef = ({ title }: PageProps, { slots }: PureComponentContext) => {
+export const Page = pure(({ title }: PageProps, { slots }: PureComponentContext) => {
   return (
     <div class='page'>
       <div class='container flex-column'>
@@ -16,6 +16,4 @@ export const PageDef = ({ title }: PageProps, { slots }: PureComponentContext) =
       </div>
     </div>
   );
-};
-
-export const Page = pure(PageDef);
+});

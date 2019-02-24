@@ -9,7 +9,7 @@ export interface RadioInputProps {
 }
 
 // TODO: focus handling
-const RadioInputDef = ({ options, controlState, onAction }: RadioInputProps) => {
+export const RadioInput = pure(({ options, controlState, onAction }: RadioInputProps) => {
   return (
     <div style={{ paddingTop: '0.45rem', paddingBottom: '0.45rem' }}>
       {
@@ -60,6 +60,4 @@ const RadioInputDef = ({ options, controlState, onAction }: RadioInputProps) => 
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-};
-
-export const RadioInput = pure(RadioInputDef);
+});

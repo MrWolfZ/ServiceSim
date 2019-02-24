@@ -47,73 +47,6 @@ const initialState: PredicateTemplatePageState = {
   formState: createFormState(),
 };
 
-export const PredicateTemplatePageDef = (
-  state: PredicateTemplatePageState,
-  { router }: StatefulComponentContext,
-) => {
-  const { templateId, isSaving, formState } = state;
-
-  return (
-    <Page title={!templateId ? `Create new predicate template` : `Edit predicate template`}>
-      <Form formState={formState} onAction={onFormAction}>
-        <PredicateTemplateForm formState={formState} onAction={onFormAction} />
-
-        <div class='buttons flex-row flex-end'>
-          <CancelButton
-            onClick={navigateToList}
-            isDisabled={isSaving}
-          />
-
-          <SaveButton
-            onClick={submitDialog}
-            isDisabled={isSaving || (formState.isInvalid && formState.isSubmitted)}
-            isSaving={isSaving}
-          />
-        </div>
-      </Form>
-    </Page>
-  );
-
-  function onFormAction(action: Action) {
-    state.formState = formReducer(state.formState, action);
-  }
-
-  async function submitDialog() {
-    if (formState.isInvalid) {
-      return;
-    }
-
-    state.formState = disable(formState);
-    state.isSaving = true;
-
-    const data: PredicateTemplateData = {
-      name: formState.value.name,
-      description: formState.value.description,
-      tags: unbox(formState.value.tags),
-      evalFunctionBody: formState.value.evalFunctionBody,
-      parameters: formState.value.parameters,
-    };
-
-    await createOrUpdateTemplate(data, templateId || undefined);
-
-    state.isSaving = false;
-
-    navigateToList();
-  }
-
-  async function createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
-    if (!id) {
-      await predicateTemplates.createAsync(data);
-    } else {
-      await predicateTemplates.updateAsync({ templateId: id, data });
-    }
-  }
-
-  function navigateToList() {
-    router.push({ name: 'predicate-templates' });
-  }
-};
-
 function initialize(state: PredicateTemplatePageState, templateId: string | null | undefined) {
   state.templateId = templateId = templateId && templateId !== 'new' ? templateId : null;
   state.isSaving = false;
@@ -125,13 +58,79 @@ function initialize(state: PredicateTemplatePageState, templateId: string | null
   }
 }
 
-export const PredicateTemplatePage = page(PredicateTemplatePageDef, initialState, {
-  created: (state, _, { route }) => initialize(state, route.params.id),
+export const PredicateTemplatePage = page(
+  (state: PredicateTemplatePageState, { router }: StatefulComponentContext) => {
+    const { templateId, isSaving, formState } = state;
 
-  beforeRouteUpdate: (state, to, _, next) => {
-    initialize(state, to.params.id);
-    next();
+    return (
+      <Page title={!templateId ? `Create new predicate template` : `Edit predicate template`}>
+        <Form formState={formState} onAction={onFormAction}>
+          <PredicateTemplateForm formState={formState} onAction={onFormAction} />
+
+          <div class='buttons flex-row flex-end'>
+            <CancelButton
+              onClick={navigateToList}
+              isDisabled={isSaving}
+            />
+
+            <SaveButton
+              onClick={submitDialog}
+              isDisabled={isSaving || (formState.isInvalid && formState.isSubmitted)}
+              isSaving={isSaving}
+            />
+          </div>
+        </Form>
+      </Page>
+    );
+
+    function onFormAction(action: Action) {
+      state.formState = formReducer(state.formState, action);
+    }
+
+    async function submitDialog() {
+      if (formState.isInvalid) {
+        return;
+      }
+
+      state.formState = disable(formState);
+      state.isSaving = true;
+
+      const data: PredicateTemplateData = {
+        name: formState.value.name,
+        description: formState.value.description,
+        tags: unbox(formState.value.tags),
+        evalFunctionBody: formState.value.evalFunctionBody,
+        parameters: formState.value.parameters,
+      };
+
+      await createOrUpdateTemplate(data, templateId || undefined);
+
+      state.isSaving = false;
+
+      navigateToList();
+    }
+
+    async function createOrUpdateTemplate(data: PredicateTemplateData, id?: string) {
+      if (!id) {
+        await predicateTemplates.createAsync(data);
+      } else {
+        await predicateTemplates.updateAsync({ templateId: id, data });
+      }
+    }
+
+    function navigateToList() {
+      router.push({ name: 'predicate-templates' });
+    }
   },
-});
+  initialState,
+  {
+    created: (state, _, { route }) => initialize(state, route.params.id),
+
+    beforeRouteUpdate: (state, to, _, next) => {
+      initialize(state, to.params.id);
+      next();
+    },
+  },
+);
 
 export default PredicateTemplatePage;

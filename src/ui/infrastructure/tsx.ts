@@ -1,5 +1,5 @@
 import { keys } from 'src/util/util';
-import { ComponentOptions, CreateElement, FunctionalComponentOptions, RenderContext } from 'vue';
+import { ComponentOptions, CreateElement, RenderContext, VNode } from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueRouter, { Route } from 'vue-router';
 import { RecordPropsDefinition } from 'vue/types/options';
@@ -7,13 +7,15 @@ import { TsxComponent } from './tsx-component';
 
 export interface PureComponentContext {
   slots: {
-    [name: string]: any;
+    [name: string]: VNode[] | undefined;
   };
 }
 
+const pureCreateElementFuncs: (CreateElement | undefined)[] = [];
+
 // partly inspired by https://codeburst.io/save-the-zombies-how-to-add-state-and-lifecycle-methods-to-stateless-react-components-1a996513866d
-export function pure<TProps = {}>(def: (props: TProps, context: PureComponentContext) => JSX.Element) {
-  const name = (def.name || 'PureComponent').replace(/Def$/g, '');
+export function pure<TProps = {}>(render: (props: TProps, context: PureComponentContext) => JSX.Element) {
+  const name = (render.name || 'PureComponent').replace(/Def$/g, '');
   return Component({ functional: true } as any as ComponentOptions<TsxComponent<TProps>>)(
     class extends TsxComponent<TProps> {
       // @ts-ignore
@@ -22,9 +24,6 @@ export function pure<TProps = {}>(def: (props: TProps, context: PureComponentCon
       }
 
       render(h: CreateElement, context: RenderContext<TProps>) {
-        // babel plugin will transpile method to function component definition
-        const options = def as any as FunctionalComponentOptions<TProps>;
-
         const eventHandlers: { [name: string]: Function } = {};
         keys(context.listeners).forEach(name => {
           const normalizedName = `on${name.replace(/^on/g, '').replace(/^(.)/, v => v.toUpperCase())}`;
@@ -36,13 +35,18 @@ export function pure<TProps = {}>(def: (props: TProps, context: PureComponentCon
           eventHandlers[normalizedName] = handler;
         });
 
-        const render = options.render!.bind(undefined) as any as (h: CreateElement, props: TProps, context: PureComponentContext) => JSX.Element;
         const props = { ...context.props, ...eventHandlers } as any;
         const renderContext: PureComponentContext = {
           slots: context.slots(),
         };
 
-        return render(h, props, renderContext);
+        const w = window as any;
+        pureCreateElementFuncs.push(w.h);
+        w.h = h;
+        const res = render(props, renderContext);
+        w.h = pureCreateElementFuncs.pop();
+
+        return res;
       }
     }
   );
@@ -59,13 +63,15 @@ export interface LifecycleHooks<TState, TProps> {
   beforeRouteUpdate?(state: TState, to: Route, from: Route, next: () => void, context: StatefulComponentContext): void;
 }
 
+const statefulCreateElementFuncs: (CreateElement | undefined)[] = [];
+
 export function stateful<TState, TProps = {}>(
-  def: (state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element,
+  render: (state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element,
   initialState: TState,
   propsDef: RecordPropsDefinition<TProps>,
   lifecycleHooks: LifecycleHooks<TState, TProps> = {},
 ) {
-  const name = (def.name || 'StatefulComponent').replace(/Def$/g, '');
+  const name = (render.name || 'StatefulComponent').replace(/Def$/g, '');
   return Component({ props: propsDef })(
     class extends TsxComponent<TProps> {
       private state: TState = { ...initialState };
@@ -83,6 +89,7 @@ export function stateful<TState, TProps = {}>(
         return name;
       }
 
+      // TODO: cache this?
       get props(): TProps {
         const eventHandlers: { [name: string]: Function } = {};
         keys(this.$listeners).forEach(name => {
@@ -114,20 +121,22 @@ export function stateful<TState, TProps = {}>(
       }
 
       render(h: CreateElement) {
-        // babel plugin will transpile method to function component definition
-        const options = def as any as FunctionalComponentOptions<TProps>;
+        const w = window as any;
+        statefulCreateElementFuncs.push(w.h);
+        w.h = h;
+        const res = render(this.state, this.props, this.context);
+        w.h = statefulCreateElementFuncs.pop();
 
-        const render = options.render!.bind(undefined) as any as (...args: any[]) => JSX.Element;
-        return render.length === 4 ? render(h, this.state, this.props, this.context) : render(h, this.state, this.context);
+        return res;
       }
     }
   );
 }
 
 export function page<TState>(
-  def: (state: TState, context: StatefulComponentContext) => JSX.Element,
+  render: (state: TState, context: StatefulComponentContext) => JSX.Element,
   initialState: TState,
   lifecycleHooks: LifecycleHooks<TState, {}> = {},
 ) {
-  return stateful(def as any, initialState, {}, lifecycleHooks);
+  return stateful((s, _, context) => render(s, context), initialState, {}, lifecycleHooks);
 }

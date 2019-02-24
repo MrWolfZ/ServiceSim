@@ -10,7 +10,7 @@ export interface SelectProps {
 
 // TODO: add support for multiple selection
 // TODO: focus handling
-const SelectDef = ({ options, isMultiple, controlState, onAction }: SelectProps) => {
+export const Select = pure(({ options, isMultiple, controlState, onAction }: SelectProps) => {
   const style = {} as any;
 
   if (!isMultiple) {
@@ -60,6 +60,4 @@ const SelectDef = ({ options, isMultiple, controlState, onAction }: SelectProps)
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-};
-
-export const Select = pure(SelectDef);
+});

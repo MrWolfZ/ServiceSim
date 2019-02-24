@@ -13,7 +13,7 @@ export interface PredicateTemplateFormProps {
   onAction: (action: Action) => any;
 }
 
-const PredicateTemplateFormDef = ({ formState, onAction }: PredicateTemplateFormProps) => {
+export const PredicateTemplateForm = pure(({ formState, onAction }: PredicateTemplateFormProps) => {
   return (
     <div>
 
@@ -117,6 +117,4 @@ const PredicateTemplateFormDef = ({ formState, onAction }: PredicateTemplateForm
   function removeParameter(index: number) {
     onAction(new RemoveArrayControlAction(formState.controls.parameters.id, index));
   }
-};
-
-export const PredicateTemplateForm = pure(PredicateTemplateFormDef);
+});
