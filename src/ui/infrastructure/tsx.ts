@@ -11,7 +11,7 @@ export interface PureComponentContext {
   };
 }
 
-const pureCreateElementFuncs: (CreateElement | undefined)[] = [];
+const createElementFuncs: (CreateElement | undefined)[] = [];
 
 // partly inspired by https://codeburst.io/save-the-zombies-how-to-add-state-and-lifecycle-methods-to-stateless-react-components-1a996513866d
 export function pure<TProps = {}>(render: (props: TProps, context: PureComponentContext) => JSX.Element) {
@@ -41,10 +41,10 @@ export function pure<TProps = {}>(render: (props: TProps, context: PureComponent
         };
 
         const w = window as any;
-        pureCreateElementFuncs.push(w.h);
+        createElementFuncs.push(w.h);
         w.h = h;
         const res = render(props, renderContext);
-        w.h = pureCreateElementFuncs.pop();
+        w.h = createElementFuncs.pop();
 
         return res;
       }
@@ -62,8 +62,6 @@ export interface LifecycleHooks<TState, TProps> {
   mounted?(state: TState, props: TProps, context: StatefulComponentContext): void;
   beforeRouteUpdate?(state: TState, to: Route, from: Route, next: () => void, context: StatefulComponentContext): void;
 }
-
-const statefulCreateElementFuncs: (CreateElement | undefined)[] = [];
 
 export function stateful<TState, TProps = {}>(
   render: (state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element,
@@ -122,10 +120,10 @@ export function stateful<TState, TProps = {}>(
 
       render(h: CreateElement) {
         const w = window as any;
-        statefulCreateElementFuncs.push(w.h);
+        createElementFuncs.push(w.h);
         w.h = h;
         const res = render(this.state, this.props, this.context);
-        w.h = statefulCreateElementFuncs.pop();
+        w.h = createElementFuncs.pop();
 
         return res;
       }
