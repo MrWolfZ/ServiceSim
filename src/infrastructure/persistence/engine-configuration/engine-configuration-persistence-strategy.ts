@@ -9,7 +9,7 @@ export interface EngineConfigurationPersistenceStrategy {
   deleteAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type'], id: string): Promise<void>;
   // dropAll(): Promise<void>;
 
-  // getAll(): Promise<TDocument[]>;
+  getAllAggregates<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type']): Promise<TAggregate[]>;
 
   getAggregateById<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
     aggregateType: TAggregate['@type'],

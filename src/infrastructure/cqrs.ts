@@ -1,4 +1,4 @@
-import { query, registerCommandHandler, send } from 'src/infrastructure/bus';
+import { query, registerCommandHandler, registerQueryHandler, send } from 'src/infrastructure/bus';
 import { failure, keys, Result, success } from 'src/util';
 import validate from 'validate.js';
 
@@ -98,8 +98,8 @@ export interface Query<TQueryType extends string, TReturn> {
 export function createQuery<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
   queryType: TQuery['queryType'],
 ) {
-  return <TCustomProps extends Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>>(
-    customProps: TCustomProps & Exact<Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>, TCustomProps>,
+  return (
+    customProps: Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>,
   ): TQuery => {
     const queryProps: Query<TQuery['queryType'], TQuery['@return']> = {
       queryType,
@@ -116,10 +116,20 @@ export function createQuery<TQuery extends Query<TQuery['queryType'], TQuery['@r
 export function createQueryFn<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
   queryType: TQuery['queryType'],
 ) {
-  return async <TCustomProps extends Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>>(
-    customProps: TCustomProps & Exact<Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>, TCustomProps>,
+  return async (
+    customProps: Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>,
   ) => {
     const q = createQuery<TQuery>(queryType)(customProps);
     return await query<TQuery>(q);
   };
+}
+
+export function createAndRegisterQueryHandler<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
+  queryType: TQuery['queryType'],
+  handler: QueryHandler<TQuery>,
+) {
+  // we intentionally ignore the unsub callback here since this method is supposed to be called
+  // to globally and statically register the query handler without ever unregistering it
+  registerQueryHandler(queryType, handler);
+  return createQueryFn(queryType);
 }
