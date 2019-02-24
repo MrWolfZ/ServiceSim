@@ -1,5 +1,5 @@
-import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { ResponseGeneratorTemplateAggregate, ResponseGeneratorTemplateData } from 'src/domain/response-generator-template';
+import { createQueryFn, Query } from 'src/infrastructure/cqrs';
 import { versionedRepository } from 'src/infrastructure/db';
 
 export type GetAllResponseGeneratorTemplatesQueryType = 'get-all-response-generator-templates';

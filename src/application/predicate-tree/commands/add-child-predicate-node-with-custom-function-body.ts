@@ -1,5 +1,4 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createCommandFn } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { predicateNodeRepo } from '../predicate-node.repo';
 

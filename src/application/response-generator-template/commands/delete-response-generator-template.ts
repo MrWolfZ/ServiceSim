@@ -1,6 +1,5 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { ResponseGeneratorTemplateAggregate } from 'src/domain/response-generator-template';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createCommandFn } from 'src/infrastructure/cqrs';
 import { versionedRepository } from 'src/infrastructure/db';
 
 export type DeleteResponseGeneratorTemplateCommandType = 'delete-response-generator-template';

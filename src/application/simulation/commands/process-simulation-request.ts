@@ -1,9 +1,9 @@
 import { merge, timer } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { createServiceInvocation } from 'src/application/service-invocation/commands/create-service-invocation';
 import { setServiceInvocationResponse } from 'src/application/service-invocation/commands/set-service-invocation-response';
 import { ServiceRequest, ServiceResponse } from 'src/domain/service-invocation';
+import { Command, createCommandFn } from 'src/infrastructure/cqrs';
 import { logger } from 'src/infrastructure/logging';
 import { createObservable } from 'src/util/observable';
 import { getPredicateTree, PredicateNode, ResponseGeneratorFunction } from '../queries/get-predicate-tree';

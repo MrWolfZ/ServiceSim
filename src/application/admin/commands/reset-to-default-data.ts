@@ -1,9 +1,9 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { createDefaultPredicateTemplates } from 'src/application/predicate-template/commands/create-default-predicate-templates';
 import { ensureRootPredicateNodeExists } from 'src/application/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { createDefaultResponseGeneratorTemplates } from 'src/application/response-generator-template/commands/create-default-response-generator-templates';
 import { createEvent } from 'src/domain/infrastructure/events';
 import { publish } from 'src/infrastructure/bus';
+import { Command, createCommandFn } from 'src/infrastructure/cqrs';
 import { dropDB } from 'src/infrastructure/db';
 import { dropAllEvents } from 'src/infrastructure/event-log';
 import { setupMockData } from './mock-data';

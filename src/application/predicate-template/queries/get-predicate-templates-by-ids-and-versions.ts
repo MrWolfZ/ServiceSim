@@ -1,5 +1,5 @@
-import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { PredicateTemplateAggregate } from 'src/domain/predicate-template';
+import { createQueryFn, Query } from 'src/infrastructure/cqrs';
 import { versionedRepository } from 'src/infrastructure/db';
 import { keys } from 'src/util';
 import { PredicateTemplateDto } from './get-all-predicate-templates';

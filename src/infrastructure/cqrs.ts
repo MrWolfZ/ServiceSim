@@ -1,4 +1,4 @@
-import { Command, Query } from 'src/application/infrastructure/cqrs';
+import { query, registerCommandHandler, send } from 'src/infrastructure/bus';
 import { failure, keys, Result, success } from 'src/util';
 import validate from 'validate.js';
 
@@ -43,3 +43,83 @@ export type QueryInterceptor = <TQuery extends Query<TQuery['queryType'], TQuery
   query: TQuery,
   next: (query: TQuery) => Promise<NonUndefined<TQuery['@return']>>,
 ) => Promise<NonUndefined<TQuery['@return']>>;
+
+export interface Command<TCommandType extends string, TReturn = void> {
+  commandType: TCommandType;
+  occurredOnEpoch: number;
+  '@return'?: TReturn;
+}
+
+export function createCommand<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
+  commandType: TCommand['commandType'],
+) {
+  return (
+    customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
+  ): TCommand => {
+    const commandProps: Command<TCommand['commandType'], TCommand['@return']> = {
+      commandType,
+      occurredOnEpoch: Date.now(),
+    };
+
+    return {
+      ...commandProps,
+      ...customProps as any,
+    };
+  };
+}
+
+export function createCommandFn<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
+  commandType: TCommand['commandType'],
+) {
+  return async (
+    customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
+  ) => {
+    const cmd = createCommand<TCommand>(commandType)(customProps);
+    return await send<TCommand>(cmd);
+  };
+}
+
+export function createAndRegisterCommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
+  commandType: TCommand['commandType'],
+  handler: CommandHandler<TCommand>,
+) {
+  // we intentionally ignore the unsub callback here since this method is supposed to be called
+  // to globally and statically register the command handler without ever unregistering it
+  registerCommandHandler(commandType, handler);
+  return createCommandFn(commandType);
+}
+
+export interface Query<TQueryType extends string, TReturn> {
+  queryType: TQueryType;
+  occurredOnEpoch: number;
+  '@return'?: TReturn;
+}
+
+export function createQuery<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
+  queryType: TQuery['queryType'],
+) {
+  return <TCustomProps extends Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>>(
+    customProps: TCustomProps & Exact<Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>, TCustomProps>,
+  ): TQuery => {
+    const queryProps: Query<TQuery['queryType'], TQuery['@return']> = {
+      queryType,
+      occurredOnEpoch: Date.now(),
+    };
+
+    return {
+      ...queryProps,
+      ...customProps as any,
+    };
+  };
+}
+
+export function createQueryFn<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
+  queryType: TQuery['queryType'],
+) {
+  return async <TCustomProps extends Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>>(
+    customProps: TCustomProps & Exact<Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>, TCustomProps>,
+  ) => {
+    const q = createQuery<TQuery>(queryType)(customProps);
+    return await query<TQuery>(q);
+  };
+}

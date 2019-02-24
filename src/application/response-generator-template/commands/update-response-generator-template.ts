@@ -1,7 +1,6 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { Diff } from 'src/domain/infrastructure/diff';
 import { ResponseGeneratorTemplateAggregate, ResponseGeneratorTemplateData } from 'src/domain/response-generator-template';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createCommandFn } from 'src/infrastructure/cqrs';
 import { versionedRepository } from 'src/infrastructure/db';
 
 export type UpdateResponseGeneratorTemplateCommandType = 'update-response-generator-template';

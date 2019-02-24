@@ -1,6 +1,5 @@
-import { Command, createAndRegisterCommandHandler } from 'src/application/infrastructure/cqrs';
 import { SERVICE_AGGREGATE_TYPE, ServiceAggregate } from 'src/domain/service';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createAndRegisterCommandHandler } from 'src/infrastructure/cqrs';
 import { persistNewEngineConfigurationAggregate } from 'src/infrastructure/persistence/engine-configuration/persist-new-engine-configuration-aggregate';
 
 export interface CreateServiceCommand extends Command<'create-service', { serviceId: string }> {

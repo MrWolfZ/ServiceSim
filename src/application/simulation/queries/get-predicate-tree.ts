@@ -1,7 +1,7 @@
-import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { getAllPredicateNodes, PredicateNodeDto } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
 import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
 import { ServiceRequest, ServiceResponse } from 'src/domain/service-invocation';
+import { createQueryFn, Query } from 'src/infrastructure/cqrs';
 
 export type ResponseGeneratorFunction = (request: ServiceRequest) => ServiceResponse | Promise<ServiceResponse>;
 

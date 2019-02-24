@@ -1,5 +1,5 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
+import { Command, createCommandFn } from 'src/infrastructure/cqrs';
 import { predicateNodeRepo } from '../predicate-node.repo';
 
 export type EnsureRootPredicateNodeExistsCommandType = 'ensure-root-predicate-node-exists';

@@ -1,7 +1,15 @@
-import { Command, Query } from 'src/application/infrastructure/cqrs';
 import { DomainEvent, Event } from 'src/domain/infrastructure/ddd';
 import { failure, isFailure } from 'src/util';
-import { CommandHandler, CommandInterceptor, CommandValidator, evaluateCommandValidationConstraints, QueryHandler, QueryInterceptor } from './cqrs';
+import {
+  Command,
+  CommandHandler,
+  CommandInterceptor,
+  CommandValidator,
+  evaluateCommandValidationConstraints,
+  Query,
+  QueryHandler,
+  QueryInterceptor,
+} from './cqrs';
 
 interface CommandHandlerDefinition<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> {
   handler: CommandHandler<TCommand>;

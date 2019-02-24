@@ -1,6 +1,5 @@
-import { Command, createCommandFn } from 'src/application/infrastructure/cqrs';
 import { ServiceResponse } from 'src/domain/service-invocation';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createCommandFn } from 'src/infrastructure/cqrs';
 import { failure } from 'src/util';
 import { serviceInvocationRepo } from '../service-invocation.repo';
 

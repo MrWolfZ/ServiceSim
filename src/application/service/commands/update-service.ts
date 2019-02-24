@@ -1,6 +1,5 @@
-import { Command, createAndRegisterCommandHandler } from 'src/application/infrastructure/cqrs';
 import { SERVICE_AGGREGATE_TYPE, ServiceAggregate } from 'src/domain/service';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createAndRegisterCommandHandler } from 'src/infrastructure/cqrs';
 import { patchPersistedEngineConfigurationAggregate } from 'src/infrastructure/persistence/engine-configuration/patch-persisted-engine-configuration-aggregate';
 
 export interface UpdateServiceCommand extends Command<'update-service'> {

@@ -1,7 +1,7 @@
-import { createQueryFn, Query } from 'src/application/infrastructure/cqrs';
 import { getPredicateTemplatesByIdsAndVersions } from 'src/application/predicate-template/queries/get-predicate-templates-by-ids-and-versions';
-// tslint:disable-next-line:max-line-length
-import { getResponseGeneratorTemplatesByIdsAndVersions } from 'src/application/response-generator-template/queries/get-response-generator-templates-by-ids-and-versions';
+import {
+  getResponseGeneratorTemplatesByIdsAndVersions,
+} from 'src/application/response-generator-template/queries/get-response-generator-templates-by-ids-and-versions';
 import {
   PredicateNodeData,
   PredicateTemplateInfoWithSnapshot,
@@ -9,6 +9,7 @@ import {
   ResponseGeneratorDataWithTemplateSnapshot,
   TemplateInfo,
 } from 'src/domain/predicate-tree';
+import { createQueryFn, Query } from 'src/infrastructure/cqrs';
 import { predicateNodeRepo } from '../predicate-node.repo';
 
 export type GetAllPredicateNodesQueryType = 'get-all-predicate-nodes';

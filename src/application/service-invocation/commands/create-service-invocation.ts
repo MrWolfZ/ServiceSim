@@ -1,6 +1,5 @@
-import { Command, createAndRegisterCommandHandler } from 'src/application/infrastructure/cqrs';
 import { ServiceRequest } from 'src/domain/service-invocation';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createAndRegisterCommandHandler } from 'src/infrastructure/cqrs';
 import { serviceInvocationRepo } from '../service-invocation.repo';
 
 export type CreateServiceInvocationCommandType = 'create-service-invocation';

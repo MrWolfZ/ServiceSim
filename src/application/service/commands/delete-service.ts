@@ -1,6 +1,5 @@
-import { Command, createAndRegisterCommandHandler } from 'src/application/infrastructure/cqrs';
 import { SERVICE_AGGREGATE_TYPE, ServiceAggregate } from 'src/domain/service';
-import { CommandValidationConstraints } from 'src/infrastructure/cqrs';
+import { Command, CommandValidationConstraints, createAndRegisterCommandHandler } from 'src/infrastructure/cqrs';
 import {
   deletePersistedEngineConfigurationAggregate,
 } from 'src/infrastructure/persistence/engine-configuration/delete-persisted-engine-configuration-aggregate';
