@@ -1,8 +1,7 @@
 import { FormControlState } from 'pure-forms';
-import { pure, PureComponentContext } from 'src/ui/infrastructure/tsx';
 import { ExpansionContainer } from '../expansion-container';
 
-export interface FormFieldProps {
+export interface FormFieldProps extends ComponentProps {
   label?: string;
   tooltip?: string;
   tooltipIcon?: string;
@@ -11,10 +10,7 @@ export interface FormFieldProps {
   errorMessages?: { [errorName: string]: string };
 }
 
-export const FormField = pure((
-  { label, tooltip, tooltipIcon, controlState, errorMessageFactory, errorMessages }: FormFieldProps,
-  { slots }: PureComponentContext,
-) => {
+export const FormField = ({ label, tooltip, tooltipIcon, controlState, errorMessageFactory, errorMessages, children }: FormFieldProps) => {
   const errorNames = Object.keys(controlState.errors);
   const errorsAreShown = controlState.isInvalid && (controlState.isSubmitted || controlState.isTouched);
 
@@ -34,7 +30,7 @@ export const FormField = pure((
       }
 
       <div class='control'>
-        {slots.default}
+        {children}
         <ExpansionContainer isExpanded={errorsAreShown}>
           {
             errorNames.map(name =>
@@ -62,4 +58,4 @@ export const FormField = pure((
 
     return errorMessage;
   }
-});
+};

@@ -1,5 +1,4 @@
 import { Action, FormControlState, FormControlValueTypes, isBoxed, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
-import { pure } from 'src/ui/infrastructure/tsx';
 
 export interface SelectProps {
   options: { [key: string]: { label?: string; value: FormControlValueTypes } | FormControlValueTypes };
@@ -10,7 +9,7 @@ export interface SelectProps {
 
 // TODO: add support for multiple selection
 // TODO: focus handling
-export const Select = pure(({ options, isMultiple, controlState, onAction }: SelectProps) => {
+export const Select = ({ options, isMultiple, controlState, onAction }: SelectProps) => {
   const style = {} as any;
 
   if (!isMultiple) {
@@ -60,4 +59,4 @@ export const Select = pure(({ options, isMultiple, controlState, onAction }: Sel
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-});
+};

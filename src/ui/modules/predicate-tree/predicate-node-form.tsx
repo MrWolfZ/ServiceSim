@@ -89,7 +89,7 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
             errorMessages={{ required: 'Please enter a function body' }}
           >
             <TextInput
-              class='code'
+              className='code'
               rows={5}
               controlState={this.formState.controls.evalFunctionBody}
               onAction={onAction}
@@ -105,7 +105,6 @@ export class PredicateNodeForm extends TsxComponent<PredicateNodeFormProps> impl
             {
               this.parameterNames.map(name =>
                 <FormField
-                  key={name}
                   label={name}
                   tooltip={this.getParameterDescription(name)}
                   controlState={this.getParameterControlState(name)}

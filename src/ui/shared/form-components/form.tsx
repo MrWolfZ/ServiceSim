@@ -1,15 +1,14 @@
 import { Action, FormGroupState, MarkAsSubmittedAction } from 'pure-forms';
-import { pure, PureComponentContext } from 'src/ui/infrastructure/tsx';
 
-export interface FormProps {
+export interface FormProps extends ComponentProps {
   formState: FormGroupState<any>;
   onAction: (action: Action) => any;
 }
 
-export const Form = pure(({ formState, onAction }: FormProps, { slots }: PureComponentContext) => {
+export const Form = ({ formState, onAction, children }: FormProps) => {
   return (
     <form novalidate='novalidate' onSubmit={onSubmit}>
-      {slots.default}
+      {children}
     </form>
   );
 
@@ -17,4 +16,4 @@ export const Form = pure(({ formState, onAction }: FormProps, { slots }: PureCom
     e.preventDefault();
     onAction(new MarkAsSubmittedAction(formState.id));
   }
-});
+};

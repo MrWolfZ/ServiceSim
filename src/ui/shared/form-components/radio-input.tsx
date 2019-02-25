@@ -1,5 +1,4 @@
 import { Action, FormControlState, FormControlValueTypes, isBoxed, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
-import { pure } from 'src/ui/infrastructure/tsx';
 import './radio-input.scss';
 
 export interface RadioInputProps {
@@ -9,7 +8,7 @@ export interface RadioInputProps {
 }
 
 // TODO: focus handling
-export const RadioInput = pure(({ options, controlState, onAction }: RadioInputProps) => {
+export const RadioInput = ({ options, controlState, onAction }: RadioInputProps) => {
   return (
     <div style={{ paddingTop: '0.45rem', paddingBottom: '0.45rem' }}>
       {
@@ -60,4 +59,4 @@ export const RadioInput = pure(({ options, controlState, onAction }: RadioInputP
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-});
+};

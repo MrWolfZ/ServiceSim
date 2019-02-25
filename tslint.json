@@ -221,7 +221,8 @@
       "always"
     ],
     "jsx-no-lambda": false,
-    "jsx-no-multiline-js": false
+    "jsx-no-multiline-js": false,
+    "jsx-key": false
   },
   "rulesDirectory": []
 }

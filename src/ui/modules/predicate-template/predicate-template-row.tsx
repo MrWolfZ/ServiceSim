@@ -1,4 +1,3 @@
-import { pure } from 'src/ui/infrastructure/tsx';
 import { DangerButton, PrimaryButton } from 'src/ui/shared/common-components/button';
 import './predicate-template-row.scss';
 import { PredicateTemplateState } from './predicate-template.store';
@@ -9,7 +8,7 @@ export interface PredicateTemplateRowProps {
   onDelete: () => any;
 }
 
-export const PredicateTemplateRow = pure(({ template, onEdit, onDelete }: PredicateTemplateRowProps) => {
+export const PredicateTemplateRow = ({ template, onEdit, onDelete }: PredicateTemplateRowProps) => {
   return (
     <tr class='predicate-template-row'>
       <td>
@@ -46,4 +45,4 @@ export const PredicateTemplateRow = pure(({ template, onEdit, onDelete }: Predic
 
     </tr>
   );
-});
+};

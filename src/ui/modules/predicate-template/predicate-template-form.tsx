@@ -1,5 +1,4 @@
 import { Action, AddArrayControlAction, FormGroupState, RemoveArrayControlAction } from 'pure-forms';
-import { pure } from 'src/ui/infrastructure/tsx';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
 import { ExpansionContainer } from 'src/ui/shared/expansion-container';
 import { FormField } from 'src/ui/shared/form-components/form-field';
@@ -13,7 +12,7 @@ export interface PredicateTemplateFormProps {
   onAction: (action: Action) => any;
 }
 
-export const PredicateTemplateForm = pure(({ formState, onAction }: PredicateTemplateFormProps) => {
+export const PredicateTemplateForm = ({ formState, onAction }: PredicateTemplateFormProps) => {
   return (
     <div>
 
@@ -55,7 +54,7 @@ export const PredicateTemplateForm = pure(({ formState, onAction }: PredicateTem
         errorMessages={{ required: 'Please enter a function body' }}
       >
         <TextInput
-          class='code'
+          className='code'
           rows={5}
           controlState={formState.controls.evalFunctionBody}
           onAction={onAction}
@@ -74,7 +73,6 @@ export const PredicateTemplateForm = pure(({ formState, onAction }: PredicateTem
             {
               formState.controls.parameters.controls.map((form, idx) =>
                 <ParameterForm
-                  key={idx}
                   className='tile is-12 is-child box parameter'
                   formState={form}
                   onAction={onAction}
@@ -117,4 +115,4 @@ export const PredicateTemplateForm = pure(({ formState, onAction }: PredicateTem
   function removeParameter(index: number) {
     onAction(new RemoveArrayControlAction(formState.controls.parameters.id, index));
   }
-});
+};

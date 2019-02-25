@@ -1,5 +1,4 @@
 import { Action, FormControlState, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
-import { pure } from 'src/ui/infrastructure/tsx';
 
 export interface NumberInputProps {
   placeholder?: string;
@@ -8,7 +7,7 @@ export interface NumberInputProps {
 }
 
 // TODO: focus handling
-export const NumberInput = pure(({ placeholder, controlState, onAction }: NumberInputProps) => {
+export const NumberInput = ({ placeholder, controlState, onAction }: NumberInputProps) => {
   return (
     <input
       id={controlState.id}
@@ -36,4 +35,4 @@ export const NumberInput = pure(({ placeholder, controlState, onAction }: Number
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-});
+};

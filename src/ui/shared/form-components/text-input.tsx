@@ -1,7 +1,6 @@
 import { Action, FormControlState, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction } from 'pure-forms';
-import { pure } from 'src/ui/infrastructure/tsx';
 
-export interface TextInputProps {
+export interface TextInputProps extends ComponentProps {
   placeholder?: string;
   rows?: number;
   controlState: FormControlState<string>;
@@ -11,7 +10,7 @@ export interface TextInputProps {
 }
 
 // TODO: focus handling
-export const TextInput = pure(({ placeholder, rows, controlState, isCode, onAction, styleOverride }: TextInputProps) => {
+export const TextInput = ({ placeholder, rows, controlState, isCode, onAction, styleOverride }: TextInputProps) => {
   const style = { ...styleOverride, border: 0 };
 
   if (isCode) {
@@ -62,4 +61,4 @@ export const TextInput = pure(({ placeholder, rows, controlState, isCode, onActi
       onAction(new MarkAsTouchedAction(controlState.id));
     }
   }
-});
+};

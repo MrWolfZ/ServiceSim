@@ -1,7 +1,6 @@
 import { Action, FormControlState, FormGroupState, setValue, updateGroup, validate } from 'pure-forms';
 import { required } from 'pure-forms/validation';
 import { Parameter } from 'src/domain/parameter';
-import { pure } from 'src/ui/infrastructure/tsx';
 import { FormField } from '../form-components/form-field';
 import { NumberInput } from '../form-components/number-input';
 import { RadioInput } from '../form-components/radio-input';
@@ -37,7 +36,7 @@ export const validateParameterForm = updateGroup<ParameterFormValue>({
   },
 });
 
-export const ParameterForm = pure(({ formState, className, onAction, onRemove }: ParameterFormProps) => {
+export const ParameterForm = ({ formState, className, onAction, onRemove }: ParameterFormProps) => {
   return (
     <div class={className}>
 
@@ -129,4 +128,4 @@ export const ParameterForm = pure(({ formState, className, onAction, onRemove }:
 
     </div>
   );
-});
+};

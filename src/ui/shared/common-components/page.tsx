@@ -1,10 +1,8 @@
-import { pure, PureComponentContext } from 'src/ui/infrastructure/tsx';
-
-export interface PageProps {
+export interface PageProps extends ComponentProps {
   title: string;
 }
 
-export const Page = pure(({ title }: PageProps, { slots }: PureComponentContext) => {
+export const Page = ({ title, children }: PageProps) => {
   return (
     <div class='page'>
       <div class='container flex-column'>
@@ -12,8 +10,8 @@ export const Page = pure(({ title }: PageProps, { slots }: PureComponentContext)
           {title}
         </h1>
 
-        {slots.default}
+        {children}
       </div>
     </div>
   );
-});
+};
