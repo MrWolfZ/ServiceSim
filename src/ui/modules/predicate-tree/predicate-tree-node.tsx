@@ -1,11 +1,13 @@
+import { Observable, of } from 'rxjs';
 import { stateful } from 'src/ui/infrastructure/stateful-component';
 import { ExpansionContainer } from 'src/ui/shared/expansion-container';
 import { navigateToPredicateTree } from 'src/ui/shared/routing';
 import { Location } from 'vue-router';
-import predicateNodes from './predicate-node.store';
+import predicateNodes, { PredicateNodeState } from './predicate-node.store';
 import './predicate-tree-node.scss';
 
 export interface PredicateTreeNodeProps {
+  nodesById: Observable<{ [templateId: string]: PredicateNodeState }>;
   nodeId: string;
   isFocused: boolean;
 }
@@ -20,9 +22,13 @@ const initialState: PredicateTreeNodeState = {
 
 export const PredicateTreeNode = stateful<PredicateTreeNodeState, PredicateTreeNodeProps>(
   initialState,
-  {},
-  function PredicateTreeNodeDef({ isExpanded, nodeId, isFocused, setState }) {
-    const node = predicateNodes.state.nodesById[nodeId];
+  { nodesById: of(predicateNodes.state.nodesById) },
+  function PredicateTreeNodeDef({ isExpanded, nodesById, nodeId, isFocused, setState }) {
+    if (!nodesById) {
+      return null;
+    }
+
+    const node = nodesById[nodeId];
 
     return (
       // isDisabled => opacity: 0.3

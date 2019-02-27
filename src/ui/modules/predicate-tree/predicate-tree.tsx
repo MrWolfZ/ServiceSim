@@ -1,32 +1,34 @@
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
-import { page, StatefulComponentContext } from 'src/ui/infrastructure/tsx';
+import { stateful } from 'src/ui/infrastructure/stateful-component';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
 import { Page } from 'src/ui/shared/common-components/page';
-import predicateNodes from './predicate-node.store';
+import { routeParams$ } from 'src/ui/shared/routing';
+import predicateNodes, { PredicateNodeState } from './predicate-node.store';
 import { PredicateTreeNode } from './predicate-tree-node';
 
-interface PredicateTreePageState {
-  focusedNodeId: string | undefined;
+interface PredicateTreePageProps {
+  focusedNodeId: Observable<string | undefined>;
+  nodesById: Observable<Dictionary<PredicateNodeState>>;
+  rootNode: Observable<PredicateNodeState>;
 }
 
-const initialState: PredicateTreePageState = {
-  focusedNodeId: undefined,
-};
-
-export const PredicateTreePage = page(
-  (
-    state: PredicateTreePageState,
-    { router }: StatefulComponentContext,
-  ) => {
-    const { focusedNodeId } = state;
-
-    const focusedNode = focusedNodeId ? predicateNodes.state.nodesById[focusedNodeId] : predicateNodes.rootNode;
+export const PredicateTreePage = stateful<{}, PredicateTreePageProps>(
+  {},
+  {
+    focusedNodeId: routeParams$.pipe(map(p => p.focusedNodeId)),
+    nodesById: of(predicateNodes.state.nodesById),
+    rootNode: of(predicateNodes.rootNode),
+  },
+  function PredicateTreePage({ focusedNodeId, nodesById, rootNode }) {
+    const focusedNode = focusedNodeId ? nodesById[focusedNodeId] : rootNode;
 
     const parentNodeChain: { id: string; name: string }[] = [];
 
     let parentNodeId = focusedNode.parentNodeId;
     while (!!parentNodeId) {
-      const parentNode = predicateNodes.state.nodesById[parentNodeId];
+      const parentNode = nodesById[parentNodeId];
       parentNodeId = parentNode.parentNodeId;
 
       parentNodeChain.unshift({ id: parentNode.id, name: parentNode.name });
@@ -64,7 +66,7 @@ export const PredicateTreePage = page(
             <PrimaryButton
               label='Create new node'
               icon='plus'
-              onClick={() => router.push({ name: 'TODO' })}
+              onClick={() => /* router.push({ name: 'TODO' }) */ { }}
             />
           </div>
         }
@@ -72,15 +74,6 @@ export const PredicateTreePage = page(
       </Page>
     );
   },
-  initialState,
-  {
-    created: (state, _, { route }) => state.focusedNodeId = route.params.focusedNodeId,
-
-    beforeRouteUpdate: (state, to, _, next) => {
-      state.focusedNodeId = to.params.focusedNodeId;
-      next();
-    },
-  }
 );
 
 export default PredicateTreePage;

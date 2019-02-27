@@ -1,11 +1,12 @@
 import { Observable, Subscription } from 'rxjs';
 import { keys } from 'src/util/util';
-import { AsyncComponent, Component, CreateElement, VNode, VNodeChildren, VNodeData } from 'vue';
+import { AsyncComponent, Component, CreateElement, VNode, VNodeChildren, VNodeData, VueConstructor } from 'vue';
 import { Component as ComponentDecorator } from 'vue-property-decorator';
 import { TsxComponent } from './tsx-component';
 
 export interface StateProps<TState> {
   setState(update: (state: TState) => TState): void;
+  patchState(update: (state: TState) => Partial<TState>): void;
 }
 
 export interface LifecycleHooks<TState, TProps> {
@@ -22,12 +23,12 @@ export type StatefulComponentArgs<TState, TProps> = Readonly<
 
 const createElementFuncs: (CreateElement | undefined)[] = [];
 
-export function stateful<TState, TProps>(
+export function stateful<TState, TProps = {}>(
   initialState: TState,
   observableProps: ObservableProperties<TProps>,
-  render: (args: StatefulComponentArgs<TState, TProps>) => JSX.Element,
+  render: (args: StatefulComponentArgs<TState, TProps>) => JSX.Element | null,
   lifecycleHooks: LifecycleHooks<TState, TProps> = {},
-): { new(): TsxComponent<NonObservableProperties<TProps>> } {
+): { new(): TsxComponent<NonObservableProperties<TProps>> } & VueConstructor {
   const name = (render.name || 'StatefulComponent').replace(/Def$/g, '');
   return ComponentDecorator({})(
     class extends TsxComponent<NonObservableProperties<TProps>> {
@@ -72,6 +73,11 @@ export function stateful<TState, TProps>(
 
           setState: update => {
             this.state = update(this.state);
+            this.$forceUpdate();
+          },
+
+          patchState: update => {
+            this.state = { ...this.state, ...update(this.state) };
             this.$forceUpdate();
           },
         };
