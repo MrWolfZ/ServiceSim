@@ -11,15 +11,19 @@
     },
     {
       "type": "chrome",
-      "request": "launch",
-      "name": "vuejs: chrome",
-      "url": "http://localhost:8080",
-      "webRoot": "${workspaceFolder}/src/ui-vue",
-      "breakOnLoad": true,
+      "request": "attach",
+      "port": 9222,
+      "name": "Attach to UI in Vivaldi",
+      "urlFilter": "http://localhost:8081/*",
+      "targetTypes": [
+        "page",
+        "webview"
+      ],
+      "webRoot": "${workspaceFolder}/src/ui",
       "sourceMaps": true,
       "sourceMapPathOverrides": {
-        "webpack:///src/ui-vue/*": "${webRoot}/*",
-        "webpack:///./src/ui-vue/*": "${webRoot}/*"
+        "webpack:///src/ui/*": "${webRoot}/*",
+        "webpack:///./src/ui/*": "${webRoot}/*"
       }
     },
     {
