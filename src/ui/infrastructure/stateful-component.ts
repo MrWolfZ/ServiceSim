@@ -1,50 +1,42 @@
+import { Observable, Subscription } from 'rxjs';
 import { keys } from 'src/util/util';
-import { CreateElement, VNode, VNodeChildren, VNodeData } from 'vue';
+import { AsyncComponent, Component, CreateElement, VNode, VNodeChildren, VNodeData } from 'vue';
 import { Component as ComponentDecorator } from 'vue-property-decorator';
-import VueRouter, { Route } from 'vue-router';
-import { AsyncComponent, Component } from 'vue/types/options';
 import { TsxComponent } from './tsx-component';
 
-export interface Props {
-  children?: VNodeChildren;
-}
-
-const createElementFuncs: (CreateElement | undefined)[] = [];
-
-export interface StatefulComponentContext {
-  route: Route;
-  router: VueRouter;
-  element: Element;
-  slots: {
-    [name: string]: VNode[] | undefined;
-  };
+export interface StateProps<TState> {
+  setState(update: (state: TState) => TState): void;
 }
 
 export interface LifecycleHooks<TState, TProps> {
-  created?(state: TState, props: TProps, context: StatefulComponentContext): void;
-  mounted?(state: TState, props: TProps, context: StatefulComponentContext): void;
-  beforeRouteUpdate?(state: TState, to: Route, from: Route, next: () => void, context: StatefulComponentContext): void;
+  created?(args: StatefulComponentArgs<TState, TProps>): unknown;
+  mounted?(args: StatefulComponentArgs<TState, TProps>, element: HTMLElement): unknown;
 }
 
-// partly inspired by https://codeburst.io/save-the-zombies-how-to-add-state-and-lifecycle-methods-to-stateless-react-components-1a996513866d
-export function stateful<TState, TProps = {}>(
-  render: (state: TState, props: TProps, context: StatefulComponentContext) => JSX.Element,
+export type StatefulComponentArgs<TState, TProps> = Readonly<
+  ResolvedObservableProperties<ObservableProperties<TProps>>
+  & NonObservableProperties<TProps>
+  & TState
+  & StateProps<TState>
+>;
+
+const createElementFuncs: (CreateElement | undefined)[] = [];
+
+export function stateful<TState, TProps>(
   initialState: TState,
+  observableProps: ObservableProperties<TProps>,
+  render: (args: StatefulComponentArgs<TState, TProps>) => JSX.Element,
   lifecycleHooks: LifecycleHooks<TState, TProps> = {},
-) {
+): { new(): TsxComponent<NonObservableProperties<TProps>> } {
   const name = (render.name || 'StatefulComponent').replace(/Def$/g, '');
   return ComponentDecorator({})(
-    class extends TsxComponent<TProps> {
-      private state: TState = { ...initialState };
+    class extends TsxComponent<NonObservableProperties<TProps>> {
+      // we laziliy initialize the state when the component is created to
+      // prevent vue from making the state reactive
+      private state: TState = initialState;
+      private resolvedObservableProps: ResolvedObservableProperties<ObservableProperties<TProps>>;
 
-      getContext(): StatefulComponentContext {
-        return {
-          slots: this.$slots,
-          route: this.$route,
-          router: this.$router,
-          element: this.$el,
-        };
-      }
+      private subscriptions: Subscription[];
 
       // @ts-ignore
       static get name() {
@@ -52,7 +44,7 @@ export function stateful<TState, TProps = {}>(
       }
 
       // TODO: cache this?
-      get props(): TProps {
+      get props(): NonObservableProperties<TProps> {
         const eventHandlers: { [name: string]: Function } = {};
         keys(this.$listeners).forEach(name => {
           const normalizedName = `on${name.replace(/^on/g, '').replace(/^(.)/, v => v.toUpperCase())}`;
@@ -71,37 +63,54 @@ export function stateful<TState, TProps = {}>(
         };
       }
 
+      // TODO: cache this?
+      get componentArgs(): StatefulComponentArgs<TState, TProps> {
+        return {
+          ...this.state,
+          ...this.props,
+          ...this.resolvedObservableProps,
+
+          setState: update => {
+            this.state = update(this.state);
+            this.$forceUpdate();
+          },
+        };
+      }
+
       created() {
-        lifecycleHooks.created && lifecycleHooks.created(this.state, this.props, this.getContext());
+        this.state = initialState;
+        this.resolvedObservableProps = {} as ResolvedObservableProperties<ObservableProperties<TProps>>;
+
+        this.subscriptions = keys(observableProps).map(key => {
+          const obs = observableProps[key] as unknown as Observable<ResolvedObservableProperties<ObservableProperties<TProps>>[typeof key]>;
+          return obs.subscribe(value => {
+            this.resolvedObservableProps[key] = value;
+            this.$forceUpdate();
+          });
+        });
+
+        lifecycleHooks.created && lifecycleHooks.created(this.componentArgs);
       }
 
       mounted() {
-        lifecycleHooks.mounted && lifecycleHooks.mounted(this.state, this.props, this.getContext());
+        lifecycleHooks.mounted && lifecycleHooks.mounted(this.componentArgs, this.$el as HTMLElement);
       }
 
-      beforeRouteUpdate(to: Route, from: Route, next: () => void) {
-        lifecycleHooks.beforeRouteUpdate && lifecycleHooks.beforeRouteUpdate(this.state, to, from, next, this.getContext());
+      destroyed() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
       }
 
       render(h: CreateElement) {
         const w = window as any;
         createElementFuncs.push(w.h);
         w.h = createElement(h);
-        const res = render(this.state, this.props, this.getContext());
+        const res = render(this.componentArgs);
         w.h = createElementFuncs.pop();
 
         return res;
       }
     }
   );
-}
-
-export function page<TState>(
-  render: (state: TState, context: StatefulComponentContext) => JSX.Element,
-  initialState: TState,
-  lifecycleHooks: LifecycleHooks<TState, {}> = {},
-) {
-  return stateful((s, _, context) => render(s, context), initialState, lifecycleHooks);
 }
 
 export function createElement(h: CreateElement): CreateElement {

@@ -6,6 +6,7 @@ import { CONFIG } from '../infrastructure/config';
 import predicateTemplates from './modules/predicate-template/predicate-template.store';
 import predicateNodes from './modules/predicate-tree/predicate-node.store';
 import { Navbar } from './shared/navbar';
+import { setActiveRouter } from './shared/routing';
 import './ui.scss';
 
 @Component({})
@@ -13,6 +14,8 @@ export class App extends Vue {
   private dataWasLoaded = false;
 
   async created() {
+    setActiveRouter(this.$router);
+
     await this.loadAllDataAsync();
     this.dataWasLoaded = true;
 

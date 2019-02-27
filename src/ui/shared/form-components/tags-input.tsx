@@ -1,23 +1,14 @@
 import Tagify from 'bulma-tagsinput';
 import { Action, box, Boxed, FocusAction, FormControlState, MarkAsDirtyAction, MarkAsTouchedAction, SetValueAction, unbox, UnfocusAction } from 'pure-forms';
-import { logger } from 'src/infrastructure/logging';
-import { stateful } from 'src/ui/infrastructure/tsx';
-import { RecordPropsDefinition } from 'vue/types/options';
+import { stateful } from 'src/ui/infrastructure/stateful-component';
 import './tags-input.scss';
 
 export interface TagsInputProps {
   placeholder?: string;
   controlState: FormControlState<Boxed<string[]>>;
-  styleOverride?: any;
-  onAction: (action: Action) => any;
+  styleOverride?: unknown;
+  onAction: (action: Action) => unknown;
 }
-
-const propsDefinition: RecordPropsDefinition<TagsInputProps> = {
-  placeholder: {},
-  controlState: {},
-  styleOverride: {},
-  onAction: {},
-};
 
 export interface TagsInputState {
   tagsInstance: Tagify | undefined;
@@ -27,15 +18,13 @@ const initialState: TagsInputState = {
   tagsInstance: undefined,
 };
 
-export const TagsInput = stateful(
-  function TagsInput(
-    state: TagsInputState,
-    { placeholder, controlState, styleOverride, onAction }: TagsInputProps,
-  ) {
+export const TagsInput = stateful<TagsInputState, TagsInputProps>(
+  initialState,
+  {},
+  function TagsInput({ tagsInstance, placeholder, controlState, styleOverride, onAction }) {
     const style = { ...styleOverride, border: 0 };
 
-    // tslint:disable-next-line:no-floating-promises
-    Promise.resolve().then(() => updateTagsInstanceFromControlState(controlState));
+    updateTagsInstanceFromControlState(controlState);
 
     return (
       <input
@@ -63,59 +52,57 @@ export const TagsInput = stateful(
     }
 
     function updateTagsInstanceFromControlState(newState: FormControlState<Boxed<string[]>>) {
-      if (!state.tagsInstance) {
-        logger.warn('control state changed while tags instance was not initialized!');
+      if (!tagsInstance) {
         return;
       }
 
       if (newState.isEnabled) {
-        state.tagsInstance.enable();
+        tagsInstance.enable();
       }
 
       if (newState.isDisabled) {
         // TODO: fix value getting reset
-        state.tagsInstance.disable();
+        tagsInstance.disable();
       }
 
-      if (state.tagsInstance.getValue() === unbox(newState.value).join(',')) {
+      if (tagsInstance.getValue() === unbox(newState.value).join(',')) {
         return;
       }
 
       // we need to manually reset the HTML since (as of version 2.0.0) the source
       // implementation is bugged (tries to remove non-direct child which throws)
-      state.tagsInstance.reset();
-      state.tagsInstance.container.querySelectorAll('.control').forEach(e => {
-        state.tagsInstance!.container.removeChild(e);
+      tagsInstance.reset();
+      tagsInstance.container.querySelectorAll('.control').forEach(e => {
+        tagsInstance!.container.removeChild(e);
       });
 
-      state.tagsInstance.setValue(unbox(newState.value));
-      state.tagsInstance.select();
+      tagsInstance.setValue(unbox(newState.value));
+      tagsInstance.select();
     }
   },
-  initialState,
-  propsDefinition,
   {
-    mounted(state, props, context) {
-      state.tagsInstance = new Tagify(context.element);
-      const tagInput = state.tagsInstance.container.querySelector('input')!;
+    mounted({ controlState, onAction, setState }, element) {
+      const tagsInstance = new Tagify(element);
+      setState(s => ({ ...s, tagsInstance }));
+      const tagInput = tagsInstance.container.querySelector('input')!;
       tagInput.addEventListener('blur', () => {
         onBlur();
-        state.tagsInstance!.select();
+        tagsInstance!.select();
 
-        if (props.controlState.isFocused) {
-          props.onAction(new UnfocusAction(props.controlState.id));
+        if (controlState.isFocused) {
+          onAction(new UnfocusAction(controlState.id));
         }
       });
 
       tagInput.addEventListener('focus', () => {
-        if (props.controlState.isUnfocused) {
-          props.onAction(new FocusAction(props.controlState.id));
+        if (controlState.isUnfocused) {
+          onAction(new FocusAction(controlState.id));
         }
       });
 
       function onBlur() {
-        if (props.controlState.isUntouched) {
-          props.onAction(new MarkAsTouchedAction(props.controlState.id));
+        if (controlState.isUntouched) {
+          onAction(new MarkAsTouchedAction(controlState.id));
         }
       }
     },

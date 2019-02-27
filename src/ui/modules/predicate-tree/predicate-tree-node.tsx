@@ -1,7 +1,7 @@
-import { stateful, StatefulComponentContext } from 'src/ui/infrastructure/tsx';
+import { stateful } from 'src/ui/infrastructure/stateful-component';
 import { ExpansionContainer } from 'src/ui/shared/expansion-container';
+import { navigateToPredicateTree } from 'src/ui/shared/routing';
 import { Location } from 'vue-router';
-import { RecordPropsDefinition } from 'vue/types/options';
 import predicateNodes from './predicate-node.store';
 import './predicate-tree-node.scss';
 
@@ -9,11 +9,6 @@ export interface PredicateTreeNodeProps {
   nodeId: string;
   isFocused: boolean;
 }
-
-const propsDefinition: RecordPropsDefinition<PredicateTreeNodeProps> = {
-  nodeId: {},
-  isFocused: {},
-};
 
 export interface PredicateTreeNodeState {
   isExpanded: boolean;
@@ -23,13 +18,10 @@ const initialState: PredicateTreeNodeState = {
   isExpanded: true,
 };
 
-export const PredicateTreeNode = stateful(
-  (
-    state: PredicateTreeNodeState,
-    { nodeId, isFocused }: PredicateTreeNodeProps,
-    { router }: StatefulComponentContext,
-  ) => {
-    const { isExpanded } = state;
+export const PredicateTreeNode = stateful<PredicateTreeNodeState, PredicateTreeNodeProps>(
+  initialState,
+  {},
+  function PredicateTreeNodeDef({ isExpanded, nodeId, isFocused, setState }) {
     const node = predicateNodes.state.nodesById[nodeId];
 
     return (
@@ -52,13 +44,13 @@ export const PredicateTreeNode = stateful(
       </div>
     );
 
-    function onDoubleClick(event: Event) {
+    async function onDoubleClick(event: Event) {
       if (isFocused) {
         return;
       }
 
       event.stopPropagation();
-      router.push({ name: 'predicate-tree', params: { focusedNodeId: nodeId } });
+      await navigateToPredicateTree(nodeId);
     }
 
     function renderExpansionToggleTrigger() {
@@ -80,7 +72,7 @@ export const PredicateTreeNode = stateful(
         <div
           class='icon'
           style={style}
-          onClick={(e: Event) => { state.isExpanded = !isExpanded; e.stopPropagation(); }}
+          onClick={(e: Event) => { setState(s => ({ ...s, isExpanded: !s.isExpanded })); e.stopPropagation(); }}
         >
           <fa-icon style={iconStyle} icon='chevron-right' />
         </div>
@@ -152,9 +144,7 @@ export const PredicateTreeNode = stateful(
       );
     }
   },
-  initialState,
-  propsDefinition,
   {
-    created(state, { isFocused }) { state.isExpanded = isFocused; },
+    created({ isFocused, setState }) { setState(s => ({ ...s, isExpanded: isFocused })); },
   },
 );
