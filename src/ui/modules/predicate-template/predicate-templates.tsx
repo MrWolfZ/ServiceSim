@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { stateful } from 'src/ui/infrastructure/stateful-component';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
-import { Page } from 'src/ui/shared/common-components/page';
+import { Page } from 'src/ui/shared/common-components/layout/page';
 import { navigateToPredicateTemplateDetails } from 'src/ui/shared/routing';
 import { PredicateTemplateRow } from './predicate-template-row';
 import predicateTemplates, { PredicateTemplateState } from './predicate-template.store';

@@ -24,6 +24,8 @@ import { registerCommandInterceptor, registerQueryInterceptor } from '../infrast
 import { App } from './ui';
 
 import 'core-js/fn/array/flat-map';
+import { logger } from 'src/infrastructure/logging';
+import { CONDITION_TEMPLATES_ROUTE, ENGINE_RUNTIME_ROUTE, RESPONDER_TEMPLATES_ROUTE, SERVICES_CONFIGURATION_ROUTE } from './shared/routing';
 
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
 // import 'core-js/es6/symbol';
@@ -84,6 +86,40 @@ function createRouter() {
     mode: 'history',
     base: process.env.BASE_URL,
     routes: [
+      {
+        path: '/engine-runtime',
+        name: ENGINE_RUNTIME_ROUTE,
+        component: () => import(
+          /* webpackChunkName: "engine-runtime" */
+          './pages/engine-runtime/engine-runtime.page'
+        ),
+      },
+      ...prefixWith('/engine-configuration', [
+        {
+          path: '/services',
+          name: SERVICES_CONFIGURATION_ROUTE,
+          component: () => import(
+            /* webpackChunkName: "engine-configuration" */
+            './pages/engine-configuration/services-configuration/services-configuration.page'
+          ),
+        },
+        {
+          path: '/condition-templates',
+          name: CONDITION_TEMPLATES_ROUTE,
+          component: () => import(
+            /* webpackChunkName: "engine-configuration" */
+            './pages/engine-configuration/condition-templates/condition-templates.page'
+          ),
+        },
+        {
+          path: '/responder-templates',
+          name: RESPONDER_TEMPLATES_ROUTE,
+          component: () => import(
+            /* webpackChunkName: "engine-configuration" */
+            './pages/engine-configuration/responder-templates/responder-templates.page'
+          ),
+        },
+      ]),
       {
         path: '/runtime',
         name: 'runtime',
@@ -152,15 +188,13 @@ function prefixWith(prefix: string, configs: RouteConfig[]): RouteConfig[] {
 }
 
 if (module.hot) {
-  module.hot.accept('./modules/predicate-template/predicate-templates', async () => {
-    console.log('reloading module ./modules/predicate-template/predicate-templates');
-    await import(/* webpackChunkName: "development-predicate-template" */ './modules/predicate-template/predicate-templates');
-    createAndMountApp();
-  });
-
-  module.hot.accept('./modules/predicate-template/predicate-template', async () => {
-    console.log('reloading module ./modules/predicate-template/predicate-template');
-    await import(/* webpackChunkName: "development-predicate-template" */ './modules/predicate-template/predicate-template');
+  module.hot.accept([
+    './pages/engine-runtime/engine-runtime.page',
+    './pages/engine-configuration/services-configuration/services-configuration.page',
+    './pages/engine-configuration/condition-templates/condition-templates.page',
+    './pages/engine-configuration/responder-templates/responder-templates.page',
+  ], moduleIds => {
+    logger.debug(`hot reloading modules '${moduleIds.join(', ')}'...`);
     createAndMountApp();
   });
 }

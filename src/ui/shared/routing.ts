@@ -24,6 +24,12 @@ function pushRoute(location: RawLocation) {
   });
 }
 
+export const ENGINE_RUNTIME_ROUTE = 'engine-runtime.services';
+export const SERVICES_CONFIGURATION_ROUTE = 'engine-configuration.services';
+export const CONDITION_TEMPLATES_ROUTE = 'engine-configuration.condition-templates';
+export const RESPONDER_TEMPLATES_ROUTE = 'engine-configuration.responder-templates';
+export const ADMIN_ROUTE = 'admin';
+
 export async function navigateToPredicateTree(focusedNodeId = '') {
   await pushRoute({ name: 'predicate-tree', params: { focusedNodeId } });
 }

@@ -1,7 +1,8 @@
 import { Observable, Subscription } from 'rxjs';
 import { keys } from 'src/util/util';
-import { AsyncComponent, Component, CreateElement, VNode, VNodeChildren, VNodeData, VueConstructor } from 'vue';
+import { CreateElement, VueConstructor } from 'vue';
 import { Component as ComponentDecorator } from 'vue-property-decorator';
+import { createElement } from './create-element';
 import { TsxComponent } from './tsx-component';
 
 export interface StateProps<TState> {
@@ -117,42 +118,4 @@ export function stateful<TState, TProps = {}>(
       }
     }
   );
-}
-
-export function createElement(h: CreateElement): CreateElement {
-  return (
-    tag?: string | Component<any, any, any, any> | AsyncComponent<any, any, any, any> | (() => Component),
-    childrenOrData?: VNodeData | VNodeChildren,
-    children?: VNodeChildren,
-  ): VNode => {
-    if (!isPureComponentRenderFunction(tag) || !isPureComponentDataArg(childrenOrData)) {
-      return h(tag, childrenOrData as any, children);
-    }
-
-    const render = tag as ((props: unknown) => JSX.Element);
-    const args = childrenOrData;
-    const on = args.on || {};
-    const eventHandlers: { [name: string]: Function } = {};
-    keys(on).forEach(name => {
-      const normalizedName = `on${name.replace(/^on/g, '').replace(/^(.)/, v => v.toUpperCase())}`;
-      let handler = on[name];
-      handler = Array.isArray(handler) ? () => {
-        const args = arguments;
-        (handler as Function[]).forEach(h => h(...args));
-      } : handler;
-      eventHandlers[normalizedName] = handler;
-    });
-
-    const props = { ...args.attrs, ...eventHandlers, children } as any;
-
-    return render(props);
-
-    function isPureComponentRenderFunction(arg: any): arg is ((props: unknown) => JSX.Element) {
-      return (arg instanceof Function) && !arg.cid;
-    }
-
-    function isPureComponentDataArg(arg: any): arg is ({ attrs: { [key: string]: any }; on?: { [key: string]: Function | Function[] } }) {
-      return Object.prototype.hasOwnProperty.call(arg, 'attrs');
-    }
-  };
 }

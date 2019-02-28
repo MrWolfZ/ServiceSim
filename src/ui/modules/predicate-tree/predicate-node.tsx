@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { stateful } from 'src/ui/infrastructure/stateful-component';
-import { Page } from 'src/ui/shared/common-components/page';
+import { Page } from 'src/ui/shared/common-components/layout/page';
 import { routeParams$ } from 'src/ui/shared/routing';
 import predicateNodes, { PredicateNodeState } from './predicate-node.store';
 

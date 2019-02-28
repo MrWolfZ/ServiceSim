@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { ROOT_NODE_NAME } from 'src/domain/predicate-tree';
 import { stateful } from 'src/ui/infrastructure/stateful-component';
 import { PrimaryButton } from 'src/ui/shared/common-components/button';
-import { Page } from 'src/ui/shared/common-components/page';
+import { Page } from 'src/ui/shared/common-components/layout/page';
 import { routeParams$ } from 'src/ui/shared/routing';
 import predicateNodes, { PredicateNodeState } from './predicate-node.store';
 import { PredicateTreeNode } from './predicate-tree-node';

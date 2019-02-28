@@ -1,6 +1,6 @@
 import { resetToDefaultData } from 'src/application/admin/commands/reset-to-default-data';
 import { DangerButton } from 'src/ui/shared/common-components/button';
-import { Page } from 'src/ui/shared/common-components/page';
+import { Page } from 'src/ui/shared/common-components/layout/page';
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component({})

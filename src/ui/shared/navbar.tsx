@@ -1,96 +1,118 @@
-import { Component, Vue } from 'vue-property-decorator';
+import { stateful } from '../infrastructure/stateful-component';
+import { Container } from './common-components/layout/container';
+import { ADMIN_ROUTE, CONDITION_TEMPLATES_ROUTE, ENGINE_RUNTIME_ROUTE, RESPONDER_TEMPLATES_ROUTE, SERVICES_CONFIGURATION_ROUTE } from './routing';
 
-@Component({})
-export class Navbar extends Vue {
-  menuIsOpen = false;
-
-  toggleMenu() {
-    this.menuIsOpen = !this.menuIsOpen;
-  }
-
-  closeMenu() {
-    this.menuIsOpen = false;
-  }
-
-  render() {
+export const Navbar = stateful<{ menuIsOpen: boolean }>(
+  { menuIsOpen: false },
+  {},
+  function Navbar({ menuIsOpen, patchState }) {
     return (
       <nav
         class='navbar is-fixed-top'
         role='navigation'
         aria-label='main navigation'
       >
-        <div class='container'>
+        <Container>
+          <NavbarBrand />
 
-          <div class='navbar-brand' style={{ marginLeft: 0 }}>
-            <a
-              role='button'
-              class={`navbar-burger has-text-white ${this.menuIsOpen ? `is-active` : ``}`}
-              onClick={() => this.toggleMenu()}
-            >
-              <span />
-              <span />
-              <span />
-            </a>
-          </div>
-
-          <div class={`navbar-menu ${this.menuIsOpen ? `is-active` : ``}`}>
+          <div class={`navbar-menu ${menuIsOpen ? `is-active` : ``}`}>
             <div class='navbar-start'>
 
-              <router-link
-                to={{ name: 'runtime' }}
-                class='navbar-item has-text-white'
-                onClick={() => this.closeMenu()}
-              >
-                Runtime
-              </router-link>
+              <NavLink to={ENGINE_RUNTIME_ROUTE}>
+                Engine Runtime
+              </NavLink>
 
-              <div class='navbar-item has-dropdown is-hoverable'>
-                <a class='navbar-link'>
-                  Development
-                </a>
+              <MultiNavLink label='Engine Configuration'>
 
-                <div class='navbar-dropdown'>
+                <NavLink to={SERVICES_CONFIGURATION_ROUTE}>
+                  Services
+                </NavLink>
 
-                  <router-link
-                    to={{ name: 'predicate-tree' }}
-                    class='navbar-item has-text-white'
-                    onClick={() => this.closeMenu()}
-                  >
-                    Predicate Tree
-                  </router-link>
+                <NavLink to={CONDITION_TEMPLATES_ROUTE}>
+                  Condition Templates
+                </NavLink>
 
-                  <router-link
-                    to={{ name: 'predicate-templates' }}
-                    class='navbar-item has-text-white'
-                    onClick={() => this.closeMenu()}
-                  >
-                    Predicate Templates
-                  </router-link>
+                <NavLink to={RESPONDER_TEMPLATES_ROUTE}>
+                  Responder Templates
+                </NavLink>
 
-                  <router-link
-                    to={{ name: 'response-generator-templates' }}
-                    class='navbar-item has-text-white'
-                    onClick={() => this.closeMenu()}
-                  >
-                    Response Generator Templates
-                  </router-link>
+              </MultiNavLink>
 
-                </div>
-              </div>
-
-              <router-link
-                to={{ name: 'admin' }}
-                class='navbar-item has-text-white'
-                onClick={() => this.closeMenu()}
-              >
+              <NavLink to={ADMIN_ROUTE}>
                 Admin
-              </router-link>
+              </NavLink>
+
+              <MultiNavLink label='Legacy'>
+
+                <NavLink to='predicate-tree'>
+                  Predicate Tree
+                </NavLink>
+
+                <NavLink to='predicate-templates'>
+                  Predicate Templates
+                </NavLink>
+
+                <NavLink to='response-generator-templates'>
+                  Response Generator Templates
+                </NavLink>
+
+              </MultiNavLink>
 
             </div>
 
           </div>
-        </div>
+        </Container>
       </nav>
     );
+
+    function NavbarBrand() {
+      return (
+        <div class='navbar-brand' style={{ marginLeft: 0 }}>
+          <a
+            role='button'
+            class={`navbar-burger has-text-white ${menuIsOpen ? `is-active` : ``}`}
+            onClick={() => patchState(s => ({ menuIsOpen: !s.menuIsOpen }))}
+          >
+            <span />
+            <span />
+            <span />
+          </a>
+        </div>
+      );
+    }
+
+    interface NavLinkProps extends ComponentProps {
+      to: string;
+    }
+
+    function NavLink({ to, children }: NavLinkProps) {
+      return (
+        <router-link
+          to={{ name: to }}
+          class='navbar-item has-text-white'
+          onClick={() => patchState(() => ({ menuIsOpen: false }))}
+        >
+          {children}
+        </router-link>
+      );
+    }
+
+    interface MultiNavLinkProps extends ComponentProps {
+      label: string;
+    }
+
+    function MultiNavLink({ label, children }: MultiNavLinkProps) {
+      return (
+        <div class='navbar-item has-dropdown is-hoverable'>
+          <a class='navbar-link'>
+            {label}
+          </a>
+
+          <div class='navbar-dropdown'>
+            {children}
+          </div>
+        </div>
+      );
+    }
   }
-}
+);

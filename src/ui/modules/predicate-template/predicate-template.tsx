@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { PredicateTemplateData } from 'src/domain/predicate-template';
 import { stateful } from 'src/ui/infrastructure/stateful-component';
 import { CancelButton, SaveButton } from 'src/ui/shared/common-components/button';
-import { Page } from 'src/ui/shared/common-components/page';
+import { Page } from 'src/ui/shared/common-components/layout/page';
 import { Form } from 'src/ui/shared/form-components/form';
 import { validateParameterForm } from 'src/ui/shared/parameter/parameter-form';
 import { navigateToPredicateTemplates, routeParams$ } from 'src/ui/shared/routing';
