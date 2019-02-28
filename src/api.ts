@@ -1,6 +1,8 @@
 import express, { Response } from 'express';
+import glob from 'glob';
 import path from 'path';
 import { Subscription } from 'rxjs';
+import { promisify } from 'util';
 import { ensureRootPredicateNodeExists } from './application/predicate-tree/commands/ensure-root-predicate-node-exists';
 import { registerHandlers } from './application/register-handlers';
 import { processSimulationRequest } from './application/simulation/commands/process-simulation-request';
@@ -20,6 +22,8 @@ import { createFileSystemEventLogPersistenceAdapter } from './persistence/event-
 import { inMemoryEventLogPersistenceAdapter } from './persistence/event-log/in-memory';
 import { nullEventLogPersistenceAdapter } from './persistence/event-log/null';
 import { assertNever, isFailure } from './util';
+
+const globAsync = promisify(glob);
 
 declare module 'http' {
   interface ServerResponse {
@@ -111,6 +115,11 @@ export async function initialize(config = CONFIG) {
     await createLocalDevelopmentFileSystemEngineConfigurationPersistenceStrategyBaseDataDir(path.join(process.cwd(), '.data'));
 
   setActiveEngineConfigurationPersistenceStrategy(engineConfigurationPersistenceStrategy);
+
+  const commandFiles = await globAsync(path.join(__dirname, 'application/**/commands/*.js'));
+  const queryFiles = await globAsync(path.join(__dirname, './application/**/queries/*.js'));
+
+  commandFiles.concat(queryFiles).filter(f => !f.endsWith('.spec.js')).forEach(require);
 
   const unsubHandlers = registerHandlers();
 

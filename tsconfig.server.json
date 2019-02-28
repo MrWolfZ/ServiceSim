@@ -15,6 +15,11 @@
     "./src/server.ts",
   ],
   "include": [
-    "types/**/*"
+    "types/**/*",
+    "src/application/**/commands/*.ts",
+    "src/application/**/queries/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
   ]
 }
