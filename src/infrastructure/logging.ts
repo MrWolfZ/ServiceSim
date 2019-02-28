@@ -21,7 +21,7 @@ if (CONFIG.platform === 'node') {
 if (CONFIG.environment !== 'production') {
   const myFormat = format.printf(arg => {
     const { level, message, timestamp } = arg;
-    return CONFIG.platform === 'node' ? `${timestamp} ${level}: ${message}` : `${level}: ${message}`;
+    return CONFIG.platform === 'node' ? `${timestamp} ${level}: ${message}` : message;
   });
 
   logger.add(
@@ -31,6 +31,8 @@ if (CONFIG.environment !== 'production') {
         format.splat(),
         myFormat,
       ),
+      stderrLevels: ['error'],
+      consoleWarnLevels: ['warn'],
     }),
   );
 }
