@@ -79,8 +79,8 @@ registerQueryInterceptor(async query => {
   return response.data;
 });
 
-new Vue({
-  router: new Router({
+function createRouter() {
+  return new Router({
     mode: 'history',
     base: process.env.BASE_URL,
     routes: [
@@ -130,11 +130,37 @@ new Vue({
         redirect: '/',
       },
     ],
-  }),
-  store: getStoreBuilder<{}>().vuexStore(),
-  render: (h) => h(App),
-}).$mount('#app');
+  });
+}
+
+function createAndMountApp() {
+  const router = createRouter();
+
+  const app = new Vue({
+    router,
+    store: getStoreBuilder<{}>().vuexStore(),
+    render: (h) => h(App),
+  });
+
+  app.$mount('#app > *');
+}
+
+createAndMountApp();
 
 function prefixWith(prefix: string, configs: RouteConfig[]): RouteConfig[] {
   return configs.map(c => ({ ...c, path: `${prefix}${c.path}` }));
+}
+
+if (module.hot) {
+  module.hot.accept('./modules/predicate-template/predicate-templates', async () => {
+    console.log('reloading module ./modules/predicate-template/predicate-templates');
+    await import(/* webpackChunkName: "development-predicate-template" */ './modules/predicate-template/predicate-templates');
+    createAndMountApp();
+  });
+
+  module.hot.accept('./modules/predicate-template/predicate-template', async () => {
+    console.log('reloading module ./modules/predicate-template/predicate-template');
+    await import(/* webpackChunkName: "development-predicate-template" */ './modules/predicate-template/predicate-template');
+    createAndMountApp();
+  });
 }
