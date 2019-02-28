@@ -15,6 +15,7 @@ const writeFile = promisify(fs.writeFile);
 type Aggregate<T extends string> = EngineConfigurationAggregate<T>;
 
 // TODO: handle race conditions, cache lots of things in memory and be smarter about fetching documents
+// TODO: watch file system and expose API to notify about updated aggregates
 export async function createLocalDevelopmentFileSystemEngineConfigurationPersistenceStrategyBaseDataDir(
   baseDataDirPath: string,
 ): Promise<EngineConfigurationPersistenceStrategy> {
