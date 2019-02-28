@@ -41,7 +41,7 @@ export async function processSimulationRequestHandler(
             contentType: '',
           };
 
-          const rootNode = await getPredicateTree({});
+          const rootNode = await getPredicateTree();
 
           if (rootNode) {
             const node = await findNode(rootNode.childNodesOrResponseGenerator as PredicateNode[]);

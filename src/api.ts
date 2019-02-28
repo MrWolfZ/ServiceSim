@@ -105,7 +105,7 @@ export async function initialize(config = CONFIG) {
 
   const unsubHandlers = registerHandlers();
 
-  await ensureRootPredicateNodeExists({});
+  await ensureRootPredicateNodeExists();
 
   return new Subscription(() => {
     logger.info('shutting down...');

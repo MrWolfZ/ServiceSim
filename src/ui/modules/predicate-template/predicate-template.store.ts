@@ -46,7 +46,7 @@ export function reset(state: PredicateTemplatesState) {
 }
 
 export async function loadAllAsync() {
-  const response = await getAllPredicateTemplates({});
+  const response = await getAllPredicateTemplates();
   predicateTemplates.addAll(response);
 }
 

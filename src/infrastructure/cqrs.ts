@@ -68,15 +68,22 @@ export function createCommand<TCommand extends Command<TCommand['commandType'], 
   };
 }
 
+export type CommandFn<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> =
+  Command<TCommand['commandType'], TCommand['@return']> extends TCommand
+  ? () => Promise<NonUndefined<TCommand['@return']>>
+  : (customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>) => Promise<NonUndefined<TCommand['@return']>>;
+
 export function createCommandFn<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   commandType: TCommand['commandType'],
-) {
-  return async (
-    customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
-  ) => {
-    const cmd = createCommand<TCommand>(commandType)(customProps);
+): CommandFn<TCommand> {
+  const fn = async (
+    customProps?: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
+  ): Promise<NonUndefined<TCommand['@return']>> => {
+    const cmd = createCommand<TCommand>(commandType)(customProps || ({} as any));
     return await send<TCommand>(cmd);
   };
+
+  return fn as any;
 }
 
 export function createAndRegisterCommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
@@ -113,15 +120,22 @@ export function createQuery<TQuery extends Query<TQuery['queryType'], TQuery['@r
   };
 }
 
+export type QueryFn<TQuery extends Query<TQuery['queryType'], TQuery['@return']>> =
+  Query<TQuery['queryType'], TQuery['@return']> extends TQuery
+  ? () => Promise<NonUndefined<TQuery['@return']>>
+  : (customProps: Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>) => Promise<NonUndefined<TQuery['@return']>>;
+
 export function createQueryFn<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
   queryType: TQuery['queryType'],
-) {
-  return async (
-    customProps: Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>,
+): QueryFn<TQuery> {
+  const fn = async (
+    customProps?: Omit<TQuery, keyof Query<TQuery['queryType'], TQuery['@return']>>,
   ) => {
-    const q = createQuery<TQuery>(queryType)(customProps);
+    const q = createQuery<TQuery>(queryType)(customProps || ({} as any));
     return await query<TQuery>(q);
   };
+
+  return fn as any;
 }
 
 export function createAndRegisterQueryHandler<TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(

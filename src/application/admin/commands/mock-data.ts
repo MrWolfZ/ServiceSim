@@ -7,14 +7,14 @@ import { STATIC } from 'src/application/response-generator-template/default-temp
 import { getAllResponseGeneratorTemplates } from 'src/application/response-generator-template/queries/get-all-response-generator-templates';
 
 export async function setupMockData() {
-  const allTemplates = await getAllPredicateTemplates({});
+  const allTemplates = await getAllPredicateTemplates();
   const pathPrefixPredicateTemplate = allTemplates.find(t => t.name === PATH_PREFIX.name)!;
   const allPredicateTemplate = allTemplates.find(t => t.name === ALL.name)!;
 
-  const allResponseGeneratorTemplates = await getAllResponseGeneratorTemplates({});
+  const allResponseGeneratorTemplates = await getAllResponseGeneratorTemplates();
   const staticResponseGeneratorTemplate = allResponseGeneratorTemplates.find(t => t.name === STATIC.name)!;
 
-  const rootNode = (await getAllPredicateNodes({}))[0];
+  const rootNode = (await getAllPredicateNodes())[0];
 
   const topLevelPredicateNode1Result = await addChildPredicateNodeFromTemplate({
     parentNodeId: rootNode.id,

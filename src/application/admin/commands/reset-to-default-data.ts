@@ -16,9 +16,9 @@ export async function resetToDefaultDataHandler(_: ResetToDefaultDataCommand) {
   await dropDB();
   await dropAllEvents();
 
-  await createDefaultPredicateTemplates({});
-  await createDefaultResponseGeneratorTemplates({});
-  await ensureRootPredicateNodeExists({});
+  await createDefaultPredicateTemplates();
+  await createDefaultResponseGeneratorTemplates();
+  await ensureRootPredicateNodeExists();
 
   await setupMockData();
 

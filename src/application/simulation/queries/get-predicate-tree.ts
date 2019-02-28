@@ -19,7 +19,7 @@ export type GetPredicateTreeQueryType = 'get-predicate-tree';
 export interface GetPredicateTreeQuery extends Query<GetPredicateTreeQueryType, PredicateNode | null> { }
 
 export async function getPredicateTreeHandler(_: GetPredicateTreeQuery): Promise<PredicateNode | null> {
-  const allNodes = await getAllPredicateNodes({});
+  const allNodes = await getAllPredicateNodes();
 
   const rootNode = allNodes.find(n => n.name === ROOT_NODE_NAME);
   return rootNode ? await buildNode(rootNode.id, allNodes) : null;

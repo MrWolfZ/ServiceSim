@@ -47,7 +47,7 @@ export function reset(state: PredicateNodesState) {
 }
 
 export async function loadAllAsync() {
-  const response = await getAllPredicateNodes({});
+  const response = await getAllPredicateNodes();
 
   predicateNodes.addAll(response);
 }
