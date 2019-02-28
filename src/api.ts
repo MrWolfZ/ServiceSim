@@ -10,8 +10,12 @@ import { CONFIG } from './infrastructure/config';
 import { initializeDB } from './infrastructure/db';
 import { initializeEventLog } from './infrastructure/event-log';
 import { logger } from './infrastructure/logging';
+import { setActiveEngineConfigurationPersistenceStrategy } from './infrastructure/persistence/engine-configuration/engine-configuration-persistence-strategy';
 import { createFileSystemPersistenceAdapter } from './persistence/db/file-system';
 import { inMemoryPersistenceAdapter } from './persistence/db/in-memory';
+import {
+  createLocalDevelopmentFileSystemEngineConfigurationPersistenceStrategyBaseDataDir,
+} from './persistence/engine-configuration/local-development-file-system-engine-configuration-persistence-strategy';
 import { createFileSystemEventLogPersistenceAdapter } from './persistence/event-log/file-system';
 import { inMemoryEventLogPersistenceAdapter } from './persistence/event-log/in-memory';
 import { nullEventLogPersistenceAdapter } from './persistence/event-log/null';
@@ -102,6 +106,11 @@ export async function initialize(config = CONFIG) {
   })();
 
   await initializeEventLog({ adapter: eventLogPersistenceAdapter });
+
+  const engineConfigurationPersistenceStrategy =
+    await createLocalDevelopmentFileSystemEngineConfigurationPersistenceStrategyBaseDataDir(path.join(process.cwd(), '.data'));
+
+  setActiveEngineConfigurationPersistenceStrategy(engineConfigurationPersistenceStrategy);
 
   const unsubHandlers = registerHandlers();
 

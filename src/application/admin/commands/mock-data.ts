@@ -5,8 +5,27 @@ import { setPredicateNodeResponseGeneratorFromTemplate } from 'src/application/p
 import { getAllPredicateNodes } from 'src/application/predicate-tree/queries/get-all-predicate-nodes';
 import { STATIC } from 'src/application/response-generator-template/default-templates';
 import { getAllResponseGeneratorTemplates } from 'src/application/response-generator-template/queries/get-all-response-generator-templates';
+import { createService } from 'src/application/service/commands/create-service';
 
 export async function setupMockData() {
+  await createService({
+    name: 'CRM client API',
+    description: 'basic REST CRUD API for managing clients',
+    pathRegex: '^/crm/clients',
+  });
+
+  await createService({
+    name: 'Document Management',
+    description: 'fetching documents, rendering PDFs etc.',
+    pathRegex: '^/edm',
+  });
+
+  await createService({
+    name: 'UI API',
+    description: 'API endpoints required by our UI to be able to run it without the backend',
+    pathRegex: '^/ui-api',
+  });
+
   const allTemplates = await getAllPredicateTemplates();
   const pathPrefixPredicateTemplate = allTemplates.find(t => t.name === PATH_PREFIX.name)!;
   const allPredicateTemplate = allTemplates.find(t => t.name === ALL.name)!;

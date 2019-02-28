@@ -6,6 +6,7 @@ import { publish } from 'src/infrastructure/bus';
 import { Command, createCommandFn } from 'src/infrastructure/cqrs';
 import { dropDB } from 'src/infrastructure/db';
 import { dropAllEvents } from 'src/infrastructure/event-log';
+import { getActiveEngineConfigurationPersistenceStrategy } from 'src/infrastructure/persistence/engine-configuration/engine-configuration-persistence-strategy';
 import { setupMockData } from './mock-data';
 
 export type ResetToDefaultDataCommandType = 'reset-to-default-data';
@@ -15,6 +16,8 @@ export interface ResetToDefaultDataCommand extends Command<ResetToDefaultDataCom
 export async function resetToDefaultDataHandler(_: ResetToDefaultDataCommand) {
   await dropDB();
   await dropAllEvents();
+
+  await getActiveEngineConfigurationPersistenceStrategy().deleteAllData();
 
   await createDefaultPredicateTemplates();
   await createDefaultResponseGeneratorTemplates();

@@ -4,10 +4,9 @@ import { failure } from 'src/util/result-monad';
 export interface EngineConfigurationPersistenceStrategy {
   generateId<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type']): Promise<string>;
 
-  // initialize?: () => Promise<void>;
   upsertAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregate: TAggregate): Promise<void>;
   deleteAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type'], id: string): Promise<void>;
-  // dropAll(): Promise<void>;
+  deleteAllData(): Promise<void>;
 
   getAllAggregates<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(aggregateType: TAggregate['@type']): Promise<TAggregate[]>;
 
@@ -23,7 +22,7 @@ let activeStrategy: EngineConfigurationPersistenceStrategy | undefined;
 
 export function getActiveEngineConfigurationPersistenceStrategy() {
   if (!activeStrategy) {
-    throw failure(`DB adapter must be set`);
+    throw failure(`engine configuration persistence strategy is not set`);
   }
 
   return activeStrategy;
