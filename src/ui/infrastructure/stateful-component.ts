@@ -1,5 +1,5 @@
 import { Observable, Subscription } from 'rxjs';
-import { keys } from 'src/util/util';
+import { isEmpty, keys } from 'src/util/util';
 import { CreateElement, VueConstructor } from 'vue';
 import { Component as ComponentDecorator } from 'vue-property-decorator';
 import { createElement } from './create-element';
@@ -33,9 +33,8 @@ export function stateful<TState, TProps = {}>(
   const name = (render.name || 'StatefulComponent').replace(/Def$/g, '');
   return ComponentDecorator({})(
     class extends TsxComponent<NonObservableProperties<TProps>> {
-      // we laziliy initialize the state when the component is created to
-      // prevent vue from making the state reactive
       private state: TState = initialState;
+      private allObservablePropsHaveEmitted = false;
       private resolvedObservableProps: ResolvedObservableProperties<ObservableProperties<TProps>>;
 
       private subscriptions: Subscription[];
@@ -88,13 +87,22 @@ export function stateful<TState, TProps = {}>(
         this.state = initialState;
         this.resolvedObservableProps = {} as ResolvedObservableProperties<ObservableProperties<TProps>>;
 
-        this.subscriptions = keys(observableProps).map(key => {
-          const obs = observableProps[key] as unknown as Observable<ResolvedObservableProperties<ObservableProperties<TProps>>[typeof key]>;
+        const observablePropsThatHaveNotEmittedYet = keys(observableProps).reduce(
+          (acc, name) => ({ ...acc, [name]: 0 }),
+          {} as Dictionary<number>,
+        );
+
+        this.subscriptions = keys(observableProps).map(name => {
+          const obs = observableProps[name] as unknown as Observable<ResolvedObservableProperties<ObservableProperties<TProps>>[typeof name]>;
           return obs.subscribe(value => {
-            this.resolvedObservableProps[key] = value;
+            this.resolvedObservableProps[name] = value;
+            delete observablePropsThatHaveNotEmittedYet[name as string];
+            this.allObservablePropsHaveEmitted = isEmpty(observablePropsThatHaveNotEmittedYet);
             this.$forceUpdate();
           });
         });
+
+        this.allObservablePropsHaveEmitted = isEmpty(observablePropsThatHaveNotEmittedYet);
 
         lifecycleHooks.created && lifecycleHooks.created(this.componentArgs);
       }
@@ -108,6 +116,10 @@ export function stateful<TState, TProps = {}>(
       }
 
       render(h: CreateElement) {
+        if (!this.allObservablePropsHaveEmitted) {
+          return null;
+        }
+
         const w = window as any;
         createElementFuncs.push(w.h);
         w.h = createElement(h);
