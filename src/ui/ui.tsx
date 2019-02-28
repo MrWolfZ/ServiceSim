@@ -21,7 +21,7 @@ export class App extends Vue {
 
     registerUniversalEventHandler(() => this.loadAllDataAsync());
     registerUniversalEventHandler(evt => {
-      logger.info(JSON.stringify(evt));
+      logger.debug(JSON.stringify(evt));
     });
 
     const eventSource = new EventSource(`${CONFIG.uiApiBaseUrl}/events`);

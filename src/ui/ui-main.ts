@@ -72,13 +72,47 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 registerHandlers();
 
 registerCommandInterceptor(async command => {
-  const response = await axios.post<NonUndefined<typeof command['@return']>>(`/command?${command.commandType}`, command);
-  return response.data;
+  try {
+    const response = await axios.post<NonUndefined<typeof command['@return']>>(`/command?${command.commandType}`, command);
+    return response.data;
+  } catch (err) {
+    logger.error(`error while executing command of type ${command.commandType}`);
+    if (err.response.data && err.response.data.messages) {
+      const messages = err.response.data.messages as string[];
+      const stackTrace = err.response.data.stackTrace as string || '';
+      for (const msg of messages) {
+        logger.error(msg);
+      }
+
+      logger.error(stackTrace);
+
+      alert(`error while executing command of type ${command.commandType}\n\n${messages.join('\n')}\n\n${stackTrace}`);
+    }
+
+    throw err;
+  }
 });
 
 registerQueryInterceptor(async query => {
-  const response = await axios.post<NonUndefined<typeof query['@return']>>(`/query?${query.queryType}`, query);
-  return response.data;
+  try {
+    const response = await axios.post<NonUndefined<typeof query['@return']>>(`/query?${query.queryType}`, query);
+    return response.data;
+  } catch (err) {
+    logger.error(`error while executing query of type ${query.queryType}`);
+    if (err.response.data && err.response.data.messages) {
+      const messages = err.response.data.messages as string[];
+      const stackTrace = err.response.data.stackTrace as string || '';
+      for (const msg of messages) {
+        logger.error(msg);
+      }
+
+      logger.error(stackTrace);
+
+      alert(`error while executing query of type ${query.queryType}\n\n${messages.join('\n')}\n\n${stackTrace}`);
+    }
+
+    throw err;
+  }
 });
 
 function createRouter() {

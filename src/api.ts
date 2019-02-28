@@ -149,12 +149,11 @@ export interface ErrorResponsePayload {
 export function writeErrorResponse(res: Response, error: any) {
   const isProduction = CONFIG.environment === 'production';
 
-  let statusCode = 500;
+  const statusCode = 500;
   let messages: string[] = [isProduction ? 'an unknown error occured' : JSON.stringify(error)];
   let stackTrace: string | undefined;
 
   if (isFailure<string | string[]>(error)) {
-    statusCode = 400;
     messages = Array.isArray(error.failure) ? error.failure : [error.failure];
     stackTrace = error.stackTrace;
   }
