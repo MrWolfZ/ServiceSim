@@ -8,6 +8,7 @@ import predicateTemplates, { PredicateTemplateState } from './predicate-template
 
 interface PredicateTemplatesPageProps {
   templates: Observable<PredicateTemplateState[]>;
+  templatesById: Observable<Dictionary<PredicateTemplateState>>;
 }
 
 interface PredicateTemplatesPageState {
@@ -20,8 +21,11 @@ const initialState: PredicateTemplatesPageState = {
 
 export const PredicateTemplatesPage = stateful<PredicateTemplatesPageState, PredicateTemplatesPageProps>(
   initialState,
-  { templates: of(predicateTemplates.all) },
-  function PredicateTemplatesPage({ filterValue, templates, patchState }) {
+  {
+    templates: of(predicateTemplates.all),
+    templatesById: of(predicateTemplates.state.templatesById),
+  },
+  function PredicateTemplatesPage({ filterValue, templates, templatesById, patchState }) {
     templates = templates || [];
     const upperCaseFilterValue = filterValue.toUpperCase();
     const filteredTemplates = templates.filter(
@@ -75,7 +79,7 @@ export const PredicateTemplatesPage = stateful<PredicateTemplatesPageState, Pred
                   {
                     filteredTemplates.map(template =>
                       <PredicateTemplateRow
-                        template={predicateTemplates.state.templatesById[template.id]}
+                        template={templatesById[template.id]}
                         onEdit={() => navigateToPredicateTemplateDetails(template.id)}
                         onDelete={() => deleteTemplate(template.id)}
                       />
