@@ -1,5 +1,7 @@
 import { EngineConfigurationAggregate } from 'src/domain/engine-configuration';
 import { Diff } from 'src/domain/infrastructure/diff';
+import { createUpdateDataEvent } from 'src/domain/infrastructure/events';
+import { publish } from 'src/infrastructure/bus';
 import { applyDiff } from 'src/util/diff';
 import { failure } from 'src/util/result-monad';
 import { isEmpty } from 'src/util/util';
@@ -26,4 +28,6 @@ export async function patchPersistedEngineConfigurationAggregate<TAggregate exte
   const updatedAggregate = applyDiff(aggregate, diff);
 
   await persistenceStrategy.upsertAggregate(updatedAggregate);
+
+  await publish(createUpdateDataEvent(aggregateType, id, diff));
 }

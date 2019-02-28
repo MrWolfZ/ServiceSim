@@ -1,5 +1,7 @@
 import { EngineConfigurationAggregate } from 'src/domain/engine-configuration';
 import { Aggregate } from 'src/domain/infrastructure/ddd';
+import { createCreateDataEvent } from 'src/domain/infrastructure/events';
+import { publish } from 'src/infrastructure/bus';
 import { getActiveEngineConfigurationPersistenceStrategy } from './engine-configuration-persistence-strategy';
 
 export function persistNewEngineConfigurationAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
@@ -22,6 +24,8 @@ export function persistNewEngineConfigurationAggregate<TAggregate extends Engine
     };
 
     await persistenceStrategy.upsertAggregate(newAggregate);
+
+    await publish(createCreateDataEvent(newAggregate));
 
     return newAggregate;
   };

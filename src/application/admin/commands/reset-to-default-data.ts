@@ -14,6 +14,8 @@ export type ResetToDefaultDataCommandType = 'reset-to-default-data';
 export interface ResetToDefaultDataCommand extends Command<ResetToDefaultDataCommandType> { }
 
 export async function resetToDefaultDataHandler(_: ResetToDefaultDataCommand) {
+  await publish(createEvent('reset-to-default-data-start'));
+
   await dropDB();
   await dropAllEvents();
 
@@ -25,7 +27,7 @@ export async function resetToDefaultDataHandler(_: ResetToDefaultDataCommand) {
 
   await setupMockData();
 
-  await publish({ ...createEvent('resetToDefaultDataAsync'), transient: true });
+  await publish(createEvent('reset-to-default-data-end'));
 }
 
 export const resetToDefaultData = createCommandFn<ResetToDefaultDataCommand>('reset-to-default-data');

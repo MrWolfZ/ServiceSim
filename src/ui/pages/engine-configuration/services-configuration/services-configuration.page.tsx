@@ -1,7 +1,9 @@
 import { Observable } from 'rxjs';
+import { createService } from 'src/application/service/commands/create-service';
 import { allServices$ } from 'src/application/service/queries/observe-all-services';
 import { ServiceAggregate } from 'src/domain/service';
 import { stateful } from 'src/ui/infrastructure/stateful-component';
+import { PrimaryButton } from 'src/ui/shared/common-components/button';
 import { Page } from 'src/ui/shared/common-components/layout/page';
 
 export interface ServicesConfigurationPageProps {
@@ -26,8 +28,16 @@ export const ServicesConfigurationPage = stateful<ServicesConfigurationPageState
             </div>
           )
         }
+
+        <PrimaryButton onClick={createMockService}>
+          Create mock service
+        </PrimaryButton>
       </Page>
     );
+
+    async function createMockService() {
+      await createService({ name: 'test', description: '', pathRegex: '' });
+    }
   },
 );
 

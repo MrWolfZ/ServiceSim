@@ -19,7 +19,7 @@ export function createElement(h: CreateElement): CreateElement {
     keys(on).forEach(name => {
       const normalizedName = `on${name.replace(/^on/g, '').replace(/^(.)/, v => v.toUpperCase())}`;
       let handler = on[name];
-      handler = Array.isArray(handler) ? () => {
+      handler = Array.isArray(handler) ? function () {
         const args = arguments;
         (handler as Function[]).forEach(h => h(...args));
       } : handler;
@@ -35,7 +35,7 @@ export function createElement(h: CreateElement): CreateElement {
     }
 
     function isVNodeData(arg: any): arg is VNodeData {
-      return !!arg && Object.prototype.hasOwnProperty.call(arg, 'attrs');
+      return !!arg && (Object.prototype.hasOwnProperty.call(arg, 'attrs') || Object.prototype.hasOwnProperty.call(arg, 'on'));
     }
   };
 }

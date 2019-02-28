@@ -32,9 +32,8 @@ export interface DomainEvent<TAggregateType extends string, TEventType extends s
 
 export interface DataEvent<
   TAggregate extends Aggregate<TAggregate['@type']>,
-  TEventType extends 'Create' | 'Update' | 'Delete',
+  TEventType extends 'Create' | 'Update' | 'FullUpdate' | 'Delete',
   > extends DomainEvent<TAggregate['@type'], TEventType> {
-  metadata: AggregateMetadata<TAggregate>;
 }
 
 export interface CreateEvent<TAggregate extends Aggregate<TAggregate['@type']>>
@@ -47,6 +46,11 @@ export interface UpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>>
   diff: Diff<TAggregate>;
 }
 
+export interface FullUpdateEvent<TAggregate extends Aggregate<TAggregate['@type']>>
+  extends DataEvent<TAggregate, 'FullUpdate'> {
+  aggregate: TAggregate;
+}
+
 export interface DeleteEvent<TAggregate extends Aggregate<TAggregate['@type']>>
   extends DataEvent<TAggregate, 'Delete'> {
 }
@@ -54,6 +58,7 @@ export interface DeleteEvent<TAggregate extends Aggregate<TAggregate['@type']>>
 export type DataEvents<TAggregate extends Aggregate<TAggregate['@type']>> =
   | CreateEvent<TAggregate>
   | UpdateEvent<TAggregate>
+  | FullUpdateEvent<TAggregate>
   | DeleteEvent<TAggregate>
   ;
 

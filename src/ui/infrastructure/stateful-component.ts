@@ -65,7 +65,7 @@ export function stateful<TState, TProps = {}>(
       }
 
       // TODO: cache this?
-      get componentArgs(): StatefulComponentArgs<TState, TProps> {
+      getComponentArgs(): StatefulComponentArgs<TState, TProps> {
         return {
           ...this.state,
           ...this.props,
@@ -84,7 +84,6 @@ export function stateful<TState, TProps = {}>(
       }
 
       created() {
-        this.state = initialState;
         this.resolvedObservableProps = {} as ResolvedObservableProperties<ObservableProperties<TProps>>;
 
         const observablePropsThatHaveNotEmittedYet = keys(observableProps).reduce(
@@ -104,11 +103,11 @@ export function stateful<TState, TProps = {}>(
 
         this.allObservablePropsHaveEmitted = isEmpty(observablePropsThatHaveNotEmittedYet);
 
-        lifecycleHooks.created && lifecycleHooks.created(this.componentArgs);
+        lifecycleHooks.created && lifecycleHooks.created(this.getComponentArgs());
       }
 
       mounted() {
-        lifecycleHooks.mounted && lifecycleHooks.mounted(this.componentArgs, this.$el as HTMLElement);
+        lifecycleHooks.mounted && lifecycleHooks.mounted(this.getComponentArgs(), this.$el as HTMLElement);
       }
 
       destroyed() {
@@ -123,7 +122,7 @@ export function stateful<TState, TProps = {}>(
         const w = window as any;
         createElementFuncs.push(w.h);
         w.h = createElement(h);
-        const res = render(this.componentArgs);
+        const res = render(this.getComponentArgs());
         w.h = createElementFuncs.pop();
 
         return res;

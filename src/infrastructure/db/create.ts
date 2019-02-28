@@ -44,7 +44,7 @@ export default function create<TAggregate extends Aggregate<TAggregate['@type']>
 
     await col.upsert(newAggregateWithMedata);
 
-    await publish(createCreateDataEvent(newAggregate, $metadata));
+    await publish(createCreateDataEvent(newAggregate));
 
     return newAggregate;
   };

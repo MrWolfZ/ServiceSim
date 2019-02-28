@@ -1,3 +1,4 @@
+import { allServices$ } from 'src/application/service/queries/observe-all-services';
 import { Event } from 'src/domain/infrastructure/ddd';
 import { publish, registerUniversalEventHandler } from 'src/infrastructure/bus';
 import { logger } from 'src/infrastructure/logging';
@@ -40,6 +41,8 @@ export class App extends Vue {
       const event = JSON.parse((msg as MessageEvent).data) as Event<any>;
       await publish(event);
     });
+
+    allServices$.subscribe();
 
     // eventSource.close();
   }

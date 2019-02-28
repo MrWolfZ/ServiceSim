@@ -47,6 +47,6 @@ export default function delete$<TAggregate extends Aggregate<TAggregate['@type']
 
     await col.delete(updatedAggregate);
 
-    await publish(createDeleteDataEvent(aggregateType, id, $metadata));
+    await publish(createDeleteDataEvent(aggregateType, id));
   };
 }

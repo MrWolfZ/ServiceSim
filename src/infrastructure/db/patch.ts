@@ -67,7 +67,7 @@ export default function patch<TAggregate extends Aggregate<TAggregate['@type']>,
 
     await col.upsert(updatedAggregateWithMetadata);
 
-    await publish(createUpdateDataEvent(aggregateType, id, finalDiff, $metadata));
+    await publish(createUpdateDataEvent(aggregateType, id, finalDiff));
     await publish(...eventsWithId);
 
     return $metadata.version;

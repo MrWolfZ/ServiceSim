@@ -1,4 +1,6 @@
 import { EngineConfigurationAggregate } from 'src/domain/engine-configuration';
+import { createDeleteDataEvent } from 'src/domain/infrastructure/events';
+import { publish } from 'src/infrastructure/bus';
 import { failure } from 'src/util/result-monad';
 import { getActiveEngineConfigurationPersistenceStrategy } from './engine-configuration-persistence-strategy';
 
@@ -15,4 +17,6 @@ export async function deletePersistedEngineConfigurationAggregate<TAggregate ext
   }
 
   await persistenceStrategy.deleteAggregate(aggregateType, id);
+
+  await publish(createDeleteDataEvent(aggregateType, id));
 }

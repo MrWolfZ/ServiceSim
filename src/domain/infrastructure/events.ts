@@ -1,4 +1,4 @@
-import { Aggregate, AggregateMetadata, CreateEvent, DeleteEvent, DomainEvent, Event, EventOfType, UpdateEvent } from './ddd';
+import { Aggregate, CreateEvent, DeleteEvent, DomainEvent, Event, EventOfType, UpdateEvent } from './ddd';
 import { Diff } from './diff';
 
 export function createEvent<TEventType extends string>(eventType: TEventType): Event<TEventType> {
@@ -33,7 +33,6 @@ export function createDomainEvent<
 
 export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregate: TAggregate,
-  metadata: AggregateMetadata<TAggregate>,
 ): CreateEvent<TAggregate> {
   return createDomainEvent<CreateEvent<TAggregate>>(
     'Create',
@@ -41,7 +40,6 @@ export function createCreateDataEvent<TAggregate extends Aggregate<TAggregate['@
     aggregate.id,
     {
       aggregate,
-      metadata,
     },
   );
 }
@@ -50,7 +48,6 @@ export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@
   aggregateType: TAggregate['@type'],
   aggregateId: string,
   diff: Diff<TAggregate>,
-  metadata: AggregateMetadata<TAggregate>,
 ): UpdateEvent<TAggregate> {
   return createDomainEvent<UpdateEvent<TAggregate>>(
     'Update',
@@ -58,7 +55,6 @@ export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@
     aggregateId,
     {
       diff,
-      metadata,
     },
   );
 }
@@ -66,14 +62,11 @@ export function createUpdateDataEvent<TAggregate extends Aggregate<TAggregate['@
 export function createDeleteDataEvent<TAggregate extends Aggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   aggregateId: string,
-  metadata: AggregateMetadata<TAggregate>,
 ): DeleteEvent<TAggregate> {
   return createDomainEvent<DeleteEvent<TAggregate>>(
     'Delete',
     aggregateType,
     aggregateId,
-    {
-      metadata,
-    },
+    {},
   );
 }
