@@ -1,8 +1,10 @@
+import { generateId } from 'src/util/id';
 import { Aggregate, CreateEvent, DeleteEvent, DomainEvent, Event, EventOfType, UpdateEvent } from './ddd';
 import { Diff } from './diff';
 
 export function createEvent<TEventType extends string>(eventType: TEventType): Event<TEventType> {
   return {
+    eventId: generateId(21),
     eventType,
     occurredOnEpoch: Date.now(),
   };

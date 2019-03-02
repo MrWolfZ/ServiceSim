@@ -3,31 +3,30 @@ import { ensureRootPredicateNodeExists } from 'src/application/predicate-tree/co
 import { createDefaultResponseGeneratorTemplates } from 'src/application/response-generator-template/commands/create-default-response-generator-templates';
 import { createEvent } from 'src/domain/infrastructure/events';
 import { publish } from 'src/infrastructure/bus';
-import { Command, createCommandFn } from 'src/infrastructure/cqrs';
+import { Command, createAndRegisterCommandHandler } from 'src/infrastructure/cqrs';
 import { dropDB } from 'src/infrastructure/db';
 import { dropAllEvents } from 'src/infrastructure/event-log';
 import { getActiveEngineConfigurationPersistenceStrategy } from 'src/infrastructure/persistence/engine-configuration/engine-configuration-persistence-strategy';
 import { setupMockData } from './mock-data';
 
-export type ResetToDefaultDataCommandType = 'reset-to-default-data';
+export interface ResetToDefaultDataCommand extends Command<'reset-to-default-data'> { }
 
-export interface ResetToDefaultDataCommand extends Command<ResetToDefaultDataCommandType> { }
+export const resetToDefaultData = createAndRegisterCommandHandler<ResetToDefaultDataCommand>(
+  'reset-to-default-data',
+  async ({ commandId }) => {
+    await publish(commandId, createEvent('reset-to-default-data-start'));
 
-export async function resetToDefaultDataHandler(_: ResetToDefaultDataCommand) {
-  await publish(createEvent('reset-to-default-data-start'));
+    await dropDB();
+    await dropAllEvents();
 
-  await dropDB();
-  await dropAllEvents();
+    await getActiveEngineConfigurationPersistenceStrategy().deleteAllData();
 
-  await getActiveEngineConfigurationPersistenceStrategy().deleteAllData();
+    await createDefaultPredicateTemplates();
+    await createDefaultResponseGeneratorTemplates();
+    await ensureRootPredicateNodeExists();
 
-  await createDefaultPredicateTemplates();
-  await createDefaultResponseGeneratorTemplates();
-  await ensureRootPredicateNodeExists();
+    await setupMockData();
 
-  await setupMockData();
-
-  await publish(createEvent('reset-to-default-data-end'));
-}
-
-export const resetToDefaultData = createCommandFn<ResetToDefaultDataCommand>('reset-to-default-data');
+    await publish(commandId, createEvent('reset-to-default-data-end'));
+  },
+);

@@ -10,10 +10,11 @@ export interface DeleteServiceCommand extends Command<'delete-service'> {
 
 export const updatePredicateNode = createAndRegisterCommandHandler<DeleteServiceCommand>(
   'delete-service',
-  async ({ serviceId }) => {
+  async ({ serviceId, commandId }) => {
     await deletePersistedEngineConfigurationAggregate<ServiceAggregate>(
       SERVICE_AGGREGATE_TYPE,
       serviceId,
+      commandId,
     );
   },
 );

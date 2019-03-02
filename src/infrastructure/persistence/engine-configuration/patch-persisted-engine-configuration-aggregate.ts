@@ -12,6 +12,7 @@ export async function patchPersistedEngineConfigurationAggregate<TAggregate exte
   aggregateType: TAggregate['@type'],
   id: string,
   diff: Diff<TAggregate>,
+  originatingCommandId?: string,
 ): Promise<void> {
   const persistenceStrategy = getActiveEngineConfigurationPersistenceStrategy();
 
@@ -29,5 +30,5 @@ export async function patchPersistedEngineConfigurationAggregate<TAggregate exte
 
   await persistenceStrategy.upsertAggregate(updatedAggregate);
 
-  await publish(createUpdateDataEvent(aggregateType, id, diff));
+  await publish(originatingCommandId, createUpdateDataEvent(aggregateType, id, diff));
 }

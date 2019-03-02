@@ -21,6 +21,7 @@ export interface AggregateMetadata<
 export type AggregateWithMetadata<TAggregate extends Aggregate<TAggregate['@type']>> = TAggregate & { $metadata: AggregateMetadata<TAggregate> };
 
 export interface Event<TEventType extends string> {
+  eventId: string;
   eventType: TEventType;
   occurredOnEpoch: number;
 }

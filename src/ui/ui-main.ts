@@ -14,6 +14,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
+import { CommandHandlerReturnValue } from 'src/infrastructure/cqrs';
+import { logger } from 'src/infrastructure/logging';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import Router, { RouteConfig } from 'vue-router';
@@ -21,11 +23,10 @@ import Vuex from 'vuex';
 import { getStoreBuilder } from 'vuex-typex';
 import { registerHandlers } from '../application/register-handlers';
 import { registerCommandInterceptor, registerQueryInterceptor } from '../infrastructure/bus';
+import { CONDITION_TEMPLATES_ROUTE, ENGINE_RUNTIME_ROUTE, RESPONDER_TEMPLATES_ROUTE, SERVICES_CONFIGURATION_ROUTE } from './shared/routing';
 import { App } from './ui';
 
 import 'core-js/fn/array/flat-map';
-import { logger } from 'src/infrastructure/logging';
-import { CONDITION_TEMPLATES_ROUTE, ENGINE_RUNTIME_ROUTE, RESPONDER_TEMPLATES_ROUTE, SERVICES_CONFIGURATION_ROUTE } from './shared/routing';
 
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
 // import 'core-js/es6/symbol';
@@ -73,7 +74,7 @@ registerHandlers();
 
 registerCommandInterceptor(async command => {
   try {
-    const response = await axios.post<NonUndefined<typeof command['@return']>>(`/command?${command.commandType}`, command);
+    const response = await axios.post<CommandHandlerReturnValue<typeof command>>(`/command?${command.commandType}`, command);
     return response.data;
   } catch (err) {
     logger.error(`error while executing command of type ${command.commandType}`);

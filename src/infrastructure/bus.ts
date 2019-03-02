@@ -3,6 +3,7 @@ import { failure, isFailure } from 'src/util';
 import {
   Command,
   CommandHandler,
+  CommandHandlerReturnValue,
   CommandInterceptor,
   CommandValidator,
   evaluateCommandValidationConstraints,
@@ -34,6 +35,8 @@ const universalDomainEventHandlers: { [aggregateType: string]: EventHandler<any>
 
 const universalEventHandlers: EventHandler<any>[] = [];
 
+const originatingCommandEventHandlers: { [commandId: string]: EventHandler<any> } = {};
+
 export async function send<TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(command: TCommand) {
   const handlerDef = commandHandlers[command.commandType as string] as CommandHandlerDefinition<TCommand>;
 
@@ -63,15 +66,24 @@ export async function send<TCommand extends Command<TCommand['commandType'], TCo
     throw failure(validationMessages);
   }
 
-  const handlerInterceptor: CommandInterceptor = async cmd => await handlerDef.handler(cmd as any as TCommand) as any;
+  const handlerInterceptor: CommandInterceptor = async cmd => {
+    const events: Event<any>[] = [];
+    const unsub = registerEventHandlerForOriginatingCommand(command.commandId, evt => { events.push(evt); });
+    const result = await handlerDef.handler(cmd as any as TCommand) as any;
+    unsub();
+    return {
+      returnValue: result,
+      events,
+    };
+  };
 
   const chain = [...commandInterceptors, handlerInterceptor];
 
-  return await executeChain(command, chain);
+  return await executeChain(command, chain, []);
 
-  async function executeChain(cmd: TCommand, chain: CommandInterceptor[]): Promise<NonUndefined<TCommand['@return']>> {
+  async function executeChain(cmd: TCommand, chain: CommandInterceptor[], events: Event<any>[]): CommandHandlerReturnValue<TCommand> {
     const [first, ...rest] = chain;
-    return await first(cmd, c => executeChain(c, rest));
+    return await first(cmd, (c, ...evts) => executeChain(c, rest, events.concat(evts)));
   }
 }
 
@@ -102,11 +114,49 @@ export async function queryMany<TQuery extends Query<TQuery['queryType'], TQuery
   return await Promise.all(queries.map(query));
 }
 
-export async function publish<TEvent extends Event<TEvent['eventType']> = Event<TEvent['eventType']>>(...events: TEvent[]) {
+// TODO: improve performance by deleting old event IDs instead of using plain queue
+const MAX_DEDUPLICATION_MEMORY = 1000;
+const publishedEventIdsDictionary: Dictionary<number> = {};
+const publishedEventIdsList: string[] = [];
+
+export async function publish<TEvent extends Event<TEvent['eventType']> = Event<TEvent['eventType']>>(
+  originatingCommandId: string | undefined,
+  ...events: TEvent[]
+): Promise<void>;
+
+export async function publish<TEvent extends Event<TEvent['eventType']> = Event<TEvent['eventType']>>(...events: TEvent[]): Promise<void>;
+
+export async function publish<TEvent extends Event<TEvent['eventType']> = Event<TEvent['eventType']>>(
+  originatingCommandIdOrEvent: TEvent | string | undefined,
+  ...events: TEvent[]
+) {
+  let originatingCommandId = '';
+  if (typeof originatingCommandIdOrEvent === 'string' || originatingCommandIdOrEvent === undefined) {
+    originatingCommandId = originatingCommandIdOrEvent || '';
+  } else {
+    events.unshift(originatingCommandIdOrEvent);
+  }
+
   for (const event of events) {
+    if (!!publishedEventIdsDictionary[event.eventId]) {
+      continue;
+    }
+
+    publishedEventIdsDictionary[event.eventId] = 1;
+    publishedEventIdsList.push(event.eventId);
+
+    if (publishedEventIdsList.length > MAX_DEDUPLICATION_MEMORY) {
+      const id = publishedEventIdsList.shift()!;
+      delete publishedEventIdsDictionary[id];
+    }
+
     const handlers = (eventHandlers[event.eventType] || []) as EventHandler<TEvent>[];
 
     handlers.push(...universalEventHandlers);
+
+    if (originatingCommandEventHandlers[originatingCommandId]) {
+      handlers.push(originatingCommandEventHandlers[originatingCommandId]);
+    }
 
     if (isDomainEvent(event)) {
       const aggregateTypeHandlers = universalDomainEventHandlers[event.aggregateType] || [];
@@ -203,6 +253,17 @@ export function registerUniversalEventHandler(handler: EventHandler<Event<any>>)
 
   return () => {
     universalEventHandlers.splice(universalEventHandlers.indexOf(handler), 1);
+  };
+}
+
+export function registerEventHandlerForOriginatingCommand(
+  originatingCommandId: string,
+  handler: EventHandler<Event<any>>,
+) {
+  originatingCommandEventHandlers[originatingCommandId] = handler;
+
+  return () => {
+    delete originatingCommandEventHandlers[originatingCommandId];
   };
 }
 

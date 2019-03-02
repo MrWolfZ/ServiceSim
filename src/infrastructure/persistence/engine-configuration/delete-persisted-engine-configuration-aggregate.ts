@@ -7,6 +7,7 @@ import { getActiveEngineConfigurationPersistenceStrategy } from './engine-config
 export async function deletePersistedEngineConfigurationAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
   id: string,
+  originatingCommandId?: string,
 ): Promise<void> {
   const persistenceStrategy = getActiveEngineConfigurationPersistenceStrategy();
 
@@ -18,5 +19,5 @@ export async function deletePersistedEngineConfigurationAggregate<TAggregate ext
 
   await persistenceStrategy.deleteAggregate(aggregateType, id);
 
-  await publish(createDeleteDataEvent(aggregateType, id));
+  await publish(originatingCommandId, createDeleteDataEvent(aggregateType, id));
 }

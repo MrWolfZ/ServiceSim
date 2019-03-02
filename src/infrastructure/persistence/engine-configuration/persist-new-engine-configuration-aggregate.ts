@@ -6,6 +6,7 @@ import { getActiveEngineConfigurationPersistenceStrategy } from './engine-config
 
 export function persistNewEngineConfigurationAggregate<TAggregate extends EngineConfigurationAggregate<TAggregate['@type']>>(
   aggregateType: TAggregate['@type'],
+  originatingCommandId?: string,
 ) {
   return async <TData extends Omit<TAggregate, keyof Aggregate<TAggregate['@type']>>>(
     data: TData & Exact<Omit<TAggregate, keyof Aggregate<TAggregate['@type']>>, TData>,
@@ -25,7 +26,7 @@ export function persistNewEngineConfigurationAggregate<TAggregate extends Engine
 
     await persistenceStrategy.upsertAggregate(newAggregate);
 
-    await publish(createCreateDataEvent(newAggregate));
+    await publish(originatingCommandId, createCreateDataEvent(newAggregate));
 
     return newAggregate;
   };

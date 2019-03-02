@@ -10,9 +10,9 @@ export interface CreateServiceCommand extends Command<'create-service', { servic
 
 export const createService = createAndRegisterCommandHandler<CreateServiceCommand>(
   'create-service',
-  async ({ name, description, pathRegex }) => {
+  async ({ name, description, pathRegex, commandId }) => {
     // check name uniqueness constraint
-    const newService = await persistNewEngineConfigurationAggregate<ServiceAggregate>(SERVICE_AGGREGATE_TYPE)({
+    const newService = await persistNewEngineConfigurationAggregate<ServiceAggregate>(SERVICE_AGGREGATE_TYPE, commandId)({
       name,
       description,
       pathRegex,

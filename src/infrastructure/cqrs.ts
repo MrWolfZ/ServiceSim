@@ -1,5 +1,8 @@
-import { query, registerCommandHandler, registerQueryHandler, send } from 'src/infrastructure/bus';
-import { failure, keys, Result, success } from 'src/util';
+import { Event } from 'src/domain/infrastructure/ddd';
+import { publish, query, registerCommandHandler, registerQueryHandler, send } from 'src/infrastructure/bus';
+import { generateId } from 'src/util/id';
+import { failure, Result, success } from 'src/util/result-monad';
+import { keys } from 'src/util/util';
 import validate from 'validate.js';
 
 export type CommandHandler<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> =
@@ -27,17 +30,25 @@ export function evaluateCommandValidationConstraints<TCommand>(
 ): Result<void, string[]> {
   const messages: string[] = validate(command, constraints, { format: 'flat' }) || [];
   keys(command)
-    .filter(key => key !== 'commandType' && key !== 'occurredOnEpoch')
+    .filter(key => key !== 'commandId' && key !== 'commandType' && key !== 'occurredOnEpoch')
     .filter(key => !(constraints as any)[key])
     .forEach(key => messages.push(`${key} is not a valid property on this type of command`));
 
   return messages.length > 0 ? failure(messages) : success();
 }
 
+export interface CommandHandlerReturnValueWithEvents<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> {
+  returnValue: NonUndefined<TCommand['@return']>;
+  events: Event<any>[];
+}
+
+export type CommandHandlerReturnValue<TCommand extends Command<TCommand['commandType'], TCommand['@return']>> =
+  Promise<NonUndefined<TCommand['@return']> | CommandHandlerReturnValueWithEvents<TCommand>>;
+
 export type CommandInterceptor = <TCommand extends Command<TCommand['commandType'], TCommand['@return']>>(
   command: TCommand,
-  next: (command: TCommand) => Promise<NonUndefined<TCommand['@return']>>,
-) => Promise<NonUndefined<TCommand['@return']>>;
+  next: (command: TCommand, ...events: Event<any>[]) => CommandHandlerReturnValue<TCommand>,
+) => CommandHandlerReturnValue<TCommand>;
 
 export type QueryInterceptor = <TQuery extends Query<TQuery['queryType'], TQuery['@return']>>(
   query: TQuery,
@@ -45,6 +56,7 @@ export type QueryInterceptor = <TQuery extends Query<TQuery['queryType'], TQuery
 ) => Promise<NonUndefined<TQuery['@return']>>;
 
 export interface Command<TCommandType extends string, TReturn = void> {
+  commandId: string;
   commandType: TCommandType;
   occurredOnEpoch: number;
   '@return'?: TReturn;
@@ -57,6 +69,7 @@ export function createCommand<TCommand extends Command<TCommand['commandType'], 
     customProps: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
   ): TCommand => {
     const commandProps: Command<TCommand['commandType'], TCommand['@return']> = {
+      commandId: generateId(21),
       commandType,
       occurredOnEpoch: Date.now(),
     };
@@ -80,7 +93,12 @@ export function createCommandFn<TCommand extends Command<TCommand['commandType']
     customProps?: Omit<TCommand, keyof Command<TCommand['commandType'], TCommand['@return']>>,
   ): Promise<NonUndefined<TCommand['@return']>> => {
     const cmd = createCommand<TCommand>(commandType)(customProps || ({} as any));
-    return await send<TCommand>(cmd);
+    const result = await send<TCommand>(cmd);
+
+    const returnValue = (result as CommandHandlerReturnValueWithEvents<TCommand>).returnValue || (result as NonUndefined<TCommand['@return']>);
+    const events = (result as CommandHandlerReturnValueWithEvents<TCommand>).events || [];
+    await publish(...events);
+    return returnValue;
   };
 
   return fn as any;

@@ -11,7 +11,7 @@ export interface UpdateServiceCommand extends Command<'update-service'> {
 
 export const updatePredicateNode = createAndRegisterCommandHandler<UpdateServiceCommand>(
   'update-service',
-  async ({ serviceId, name, description, pathRegex }) => {
+  async ({ serviceId, name, description, pathRegex, commandId }) => {
     await patchPersistedEngineConfigurationAggregate<ServiceAggregate>(
       SERVICE_AGGREGATE_TYPE,
       serviceId,
@@ -20,6 +20,7 @@ export const updatePredicateNode = createAndRegisterCommandHandler<UpdateService
         description,
         pathRegex,
       },
+      commandId,
     );
   },
 );

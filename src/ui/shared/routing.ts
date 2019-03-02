@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { publishReplay, refCount, startWith } from 'rxjs/operators';
+import { map, publishReplay, refCount, startWith } from 'rxjs/operators';
 import { createObservable } from 'src/util/observable';
 import { failure } from 'src/util/result-monad';
 import VueRouter, { RawLocation } from 'vue-router';
@@ -56,3 +56,7 @@ export const routeParams$: Observable<Dictionary<string>> =
     publishReplay(1),
     refCount(),
   );
+
+export function observeRouteParam(name: string) {
+  return routeParams$.pipe(map(p => p[name]));
+}
